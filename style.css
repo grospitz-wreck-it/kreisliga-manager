@@ -88,6 +88,28 @@ table {
   margin-top: 10px;
   text-align: left;
 }
+/* ACTIVE BUTTON */
+.activeBtn {
+  background: yellow;
+  color: black;
+  font-weight: bold;
+}
+
+/* TIMELINE */
+#timeline {
+  width: 100%;
+  height: 10px;
+  background: #222;
+  margin-top: 10px;
+  position: relative;
+}
+
+#timelineBar {
+  height: 100%;
+  width: 0%;
+  background: lime;
+  transition: width 0.1s linear;
+}
 td, th {
   padding: 5px;
   border: 1px solid black;
