@@ -11,9 +11,8 @@ function selectTeam() {
 
   console.log("Team gesetzt:", selectedTeam);
 
-  select.disabled = true;
-
-  updateTable();
+  // 👉 WICHTIG: nichts anderes verändern!
+  // kein updateTable hier nötig
 }
 
 // ================= TAKTIK =================
