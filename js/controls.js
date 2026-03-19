@@ -1,5 +1,17 @@
 function selectLeague(){
+
+  loadLeague(league);
+  generateSchedule();
+  populateTeamSelect();
+  updateTable();
+}
+
+function selectTeam(){
+  const select=document.getElementById("teamSelect");
+  if(!select.value) return alert("Team wählen");
+
   selectedTeam=select.value;
+  document.getElementById("loggedTeam").innerText = "Dein Team: " + selectedTeam;
   updateTable();
 }
 
@@ -27,11 +39,8 @@ function makeSub(){
   if(!isSimulating) return alert("Spiel läuft nicht!");
   if(substitutions<=0) return alert("Keine Wechsel mehr!");
 
-  let type=prompt("offensiv / defensiv");
-  if(!type) return;
-
-  if(type==="offensiv") liveModifier+=0.01;
-  else if(type==="defensiv") liveModifier-=0.01;
+  let events=["🔁 Frischer Stürmer kommt","🔁 Defensiver Wechsel","🔁 Mittelfeld wird verstärkt"];
+  addEvent(events[Math.floor(Math.random()*events.length)]);
 
   substitutions--;
   document.getElementById("subCount").innerText="Wechsel: "+substitutions;
@@ -44,5 +53,8 @@ function setSpeed(e,speed){
   buttons.forEach(b=>b.classList.remove("active"));
   e.target.classList.add("active");
 
-  if(isSimulating) restartInterval();
+  if(isSimulating){
+    clearInterval(currentInterval);
+    startInterval();
+  }
 }
