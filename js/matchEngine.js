@@ -4,20 +4,49 @@ let matchDuration = 180000; // 3 Minuten
 let halftimeDone = false;
 
 function simulateMatchday() {
-  if (!selectedTeam) return alert("Team wählen!");
-  if (currentMatchday >= schedule.length) return alert("Saison beendet!");
+  if (!selectedTeam) {
+    alert("Team wählen!");
+    return;
+  }
+
+  if (!schedule || schedule.length === 0) {
+    alert("Spielplan fehlt!");
+    return;
+  }
+
+  if (currentMatchday >= schedule.length) {
+    alert("Saison beendet!");
+    return;
+  }
 
   let matches = schedule[currentMatchday];
 
-  // 👉 USER MATCH finden
-  let userMatch = matches.find(m =>
-    m[0].name === selectedTeam || m[1].name === selectedTeam
-  );
+  console.log("Aktueller Spieltag:", currentMatchday);
+  console.log("Dein Team:", selectedTeam);
 
-  // 👉 Rest simulieren (ohne Anzeige)
+  // 👉 DEBUG SAFE MATCH
+  let userMatch = null;
+
+  for (let m of matches) {
+    if (m[0].name === selectedTeam || m[1].name === selectedTeam) {
+      userMatch = m;
+      break;
+    }
+  }
+
+  if (!userMatch) {
+    console.error("Team nicht gefunden im Spieltag!", selectedTeam);
+    alert("Fehler: Dein Team hat kein Spiel!");
+    return;
+  }
+
+  // Rest simulieren
   matches.forEach(match => {
     if (match !== userMatch) simulateQuick(match[0], match[1]);
   });
+
+  simulateLiveMatch(userMatch[0], userMatch[1]);
+}
 
   // 👉 Live-Spiel starten
   simulateLiveMatch(userMatch[0], userMatch[1]);
