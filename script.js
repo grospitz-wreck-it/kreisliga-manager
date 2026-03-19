@@ -22,7 +22,13 @@ let leagues = {
     { name: "TSV Löhne", strength: 66 },
     { name: "SV Löhne-Obernbeck", strength: 64 },
     { name: "SC Enger", strength: 62 },
-    { name: "FA Herringhausen/Eickum", strength: 60 }
+    { name: "FA Herringhausen/Eickum", strength: 60 },
+    { name: "FC Exter", strength: 58 },
+    { name: "TuRa Löhne", strength: 57 },
+    { name: "SV Rödinghausen III", strength: 56 },
+    { name: "TSG Kirchlengern II", strength: 55 },
+    { name: "GW Pödinghausen", strength: 54 },
+    { name: "SV Oetinghausen", strength: 53 }
   ]
 };
 
