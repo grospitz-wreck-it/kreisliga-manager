@@ -1,6 +1,6 @@
 window.onload = function () {
 
-  // 👉 Liga Dropdown füllen
+  // ================= LIGA DROPDOWN =================
   let leagueSelect = document.getElementById("leagueSelect");
   leagueSelect.innerHTML = "";
 
@@ -11,17 +11,20 @@ window.onload = function () {
     leagueSelect.appendChild(o);
   });
 
-  // 👉 Default Liga setzen
+  // 👉 Standard Liga
   let selectedLeague = leagueSelect.value;
 
-  // 👉 Teams initialisieren
+  // ================= TEAMS INITIALISIEREN =================
   teams = leagues[selectedLeague].map(t => ({
     ...t,
     points: 0,
     goals: 0
   }));
 
-  // 👉 Team Dropdown füllen
+  // 👉 WICHTIG: Reset
+  currentMatchday = 0;
+
+  // ================= TEAM DROPDOWN =================
   let teamSelect = document.getElementById("teamSelect");
   teamSelect.innerHTML = "";
 
@@ -32,12 +35,22 @@ window.onload = function () {
     teamSelect.appendChild(o);
   });
 
-  // 👉 Spielplan generieren
+  // ================= SPIELPLAN =================
   generateSchedule();
 
-  // 👉 UI initial
+  // Sicherheitscheck
+  if (!schedule || schedule.length === 0) {
+    console.error("Spielplan konnte nicht erstellt werden!");
+  }
+
+  // ================= UI =================
   document.getElementById("matchday").innerText =
     "Spieltag: 0 / " + schedule.length;
 
   updateTable();
+
+  // Debug (optional)
+  console.log("Liga geladen:", selectedLeague);
+  console.log("Teams:", teams.length);
+  console.log("Spieltage:", schedule.length);
 };
