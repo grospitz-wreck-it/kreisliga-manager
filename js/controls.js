@@ -1,14 +1,11 @@
 function selectLeague(){
-    alert("Team kann nicht mehr gewechselt werden!");
-    return;
-  }
+  if(teamLocked){ alert("Team gesperrt!"); return; }
 
-  const select=document.getElementById("teamSelect");
-  if(!select.value) return alert("Team wählen");
+  const val = document.getElementById("teamSelect").value;
+  if(!val){ alert("Team wählen"); return; }
 
-  selectedTeam=select.value;
-
-  document.getElementById("loggedTeam").innerText = "Dein Team: " + selectedTeam;
+  selectedTeam = val;
+  document.getElementById("loggedTeam").innerText = "Dein Team: " + val;
   updateTable();
 }
 
@@ -19,8 +16,8 @@ function lockTeam(){
 }
 
 function setTactic(){
-  selectedTactic=document.getElementById("tacticSelect").value;
-  document.getElementById("currentTactic").innerText="Taktik: "+selectedTactic;
+  const t = document.getElementById("tacticSelect").value;
+  document.getElementById("currentTactic").innerText = "Taktik: " + t;
 }
 
 function setLiveMode(mode){
@@ -28,40 +25,28 @@ function setLiveMode(mode){
   document.getElementById("btnCalm").classList.remove("active");
 
   if(mode==="attack"){
-    liveModifier+=0.01;
+    liveModifier += 0.02;
     document.getElementById("btnAttack").classList.add("active");
   } else {
-    liveModifier-=0.01;
+    liveModifier -= 0.02;
     document.getElementById("btnCalm").classList.add("active");
   }
-
-  liveModifier=Math.max(-0.1,Math.min(0.1,liveModifier));
 }
 
 function makeSub(){
-  if(!isSimulating) return alert("Spiel läuft nicht!");
-  if(substitutions<=0) return alert("Keine Wechsel mehr!");
+  if(!isSimulating){ alert("Kein Spiel"); return; }
+  if(substitutions<=0){ alert("Keine Wechsel mehr"); return; }
 
-  let events=[
-    "🔁 Frischer Stürmer kommt",
-    "🔁 Defensiver Wechsel",
-    "🔁 Mittelfeld wird verstärkt"
-  ];
-
-  addEvent(events[Math.floor(Math.random()*events.length)]);
-
+  addEvent("🔁 Wechsel durchgeführt");
   substitutions--;
-  document.getElementById("subCount").innerText="Wechsel: "+substitutions;
+  document.getElementById("subCount").innerText = "Wechsel: " + substitutions;
 }
 
-function setSpeed(e,multi){
-  speedMultiplier = multi;
+function setSpeed(mult){
+  speedMultiplier = mult;
 
-  let buttons=e.target.parentElement.querySelectorAll("button");
-  buttons.forEach(b=>b.classList.remove("active"));
-  e.target.classList.add("active");
+  document.querySelectorAll(".speed").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`.speed[data-speed='${mult}']`).classList.add("active");
 
-  if(isSimulating){
-    restartInterval();
-  }
+  if(isSimulating){ restartInterval(); }
 }
