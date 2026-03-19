@@ -20,28 +20,22 @@ let substitutions = 3;
 // ================= LIGEN =================
 let leagues = {
   "Kreisliga A Herford": [
-    { name: "Team A", strength: 75 },
-    { name: "Team B", strength: 70 },
-    { name: "Team C", strength: 68 },
-    { name: "Team D", strength: 65 },
-    { name: "Team E", strength: 64 },
-    { name: "Team F", strength: 63 },
-    { name: "Team G", strength: 62 },
-    { name: "Team H", strength: 61 },
-    { name: "Team I", strength: 60 },
-    { name: "Team J", strength: 59 },
-    { name: "Team K", strength: 58 },
-    { name: "Team L", strength: 57 },
-    { name: "Team M", strength: 56 },
-    { name: "Team N", strength: 55 },
-    { name: "Team O", strength: 54 },
-    { name: "Team P", strength: 53 }
-  ],
-  "Kreisliga B": [
-    { name: "Team Q", strength: 60 },
-    { name: "Team R", strength: 58 },
-    { name: "Team S", strength: 56 },
-    { name: "Team T", strength: 54 }
+    { name: "TuS Bruchmühlen", strength: 75 },
+    { name: "VfL Holsen", strength: 70 },
+    { name: "Bünder SV", strength: 68 },
+    { name: "TSG Kirchlengern II", strength: 65 },
+    { name: "SV Löhne-Obernbeck", strength: 64 },
+    { name: "TuRa Löhne", strength: 63 },
+    { name: "GW Pödinghausen", strength: 62 },
+    { name: "SV Enger-Westerenger", strength: 61 },
+    { name: "TSV Löhne", strength: 60 },
+    { name: "SC Enger", strength: 59 },
+    { name: "FC Exter", strength: 58 },
+    { name: "SV Rödinghausen III", strength: 57 },
+    { name: "SV Oetinghausen", strength: 56 },
+    { name: "FA Herringhausen/Eickum", strength: 55 },
+    { name: "VfL Herford II", strength: 54 },
+    { name: "TuS Hücker-Aschen", strength: 53 }
   ]
 };
 
@@ -63,17 +57,17 @@ function generateSchedule() {
   schedule = [];
   let temp = [...teams];
 
+  // Hinrunde
   for (let i = 0; i < temp.length - 1; i++) {
     let round = [];
-
     for (let j = 0; j < temp.length / 2; j++) {
       round.push([temp[j], temp[temp.length - 1 - j]]);
     }
-
     schedule.push(round);
     temp.splice(1, 0, temp.pop());
   }
 
+  // Rückrunde
   let secondHalf = schedule.map(r =>
     r.map(m => [m[1], m[0]])
   );
@@ -92,11 +86,15 @@ function makeSub() {
   if (substitutions <= 0) return;
 
   substitutions--;
-  document.getElementById("subsLeft").innerText =
-    "Wechsel: " + substitutions;
+  updateSubsUI();
 
   addEvent("🔁 Wechsel durchgeführt");
   liveModifier += 0.015;
+}
+
+function updateSubsUI() {
+  let el = document.getElementById("subsLeft");
+  if (el) el.innerText = "Wechsel: " + substitutions;
 }
 
 // ================= MATCHDAY =================
@@ -107,8 +105,7 @@ function simulateMatchday() {
   substitutions = 3;
   momentum = 0;
   liveModifier = 0;
-
-  document.getElementById("subsLeft").innerText = "Wechsel: 3";
+  updateSubsUI();
 
   isSimulating = true;
 
@@ -123,7 +120,7 @@ function simulateMatchday() {
   });
 }
 
-// ================= MATCH =================
+// ================= LIVE MATCH =================
 function simulateLiveMatch(t1, t2, cb) {
   let s1 = 0, s2 = 0;
   let minute = 0;
@@ -134,18 +131,18 @@ function simulateLiveMatch(t1, t2, cb) {
   let i = setInterval(() => {
     minute++;
 
-    // Momentum Shift
+    // Momentum
     if (Math.random() < 0.05) {
       momentum += Math.random() < 0.5 ? 1 : -1;
     }
 
-    let chance = 0.02 + liveModifier + (momentum * 0.005);
+    let baseChance = 0.018;
+    let chance = baseChance + liveModifier + (momentum * 0.004);
 
-    // Druck bei Rückstand
-    if (s1 < s2) chance += 0.01;
-    if (s2 < s1) chance += 0.01;
+    if (s1 < s2) chance += 0.008;
+    if (s2 < s1) chance += 0.008;
 
-    // TOR
+    // TORE
     if (Math.random() < chance) {
       if (Math.random() < 0.5) {
         s1++;
@@ -157,13 +154,13 @@ function simulateLiveMatch(t1, t2, cb) {
     }
 
     // FOUL / KARTEN
-    if (Math.random() < 0.025) {
+    if (Math.random() < 0.02) {
       let team = Math.random() < 0.5 ? t1 : t2;
 
-      if (team.yellow === 1 && Math.random() < 0.3) {
+      if (team.yellow === 1 && Math.random() < 0.25) {
         addEvent(`🟨🟥 ${minute}' ${team.name}`);
         team.red++;
-      } else if (Math.random() < 0.1) {
+      } else if (Math.random() < 0.08) {
         addEvent(`🟥 ${minute}' ${team.name}`);
         team.red++;
       } else {
@@ -172,16 +169,17 @@ function simulateLiveMatch(t1, t2, cb) {
       }
     }
 
-    // VERLETZUNG
-    if (Math.random() < 0.004) {
+    // VERLETZUNG (selten!)
+    if (Math.random() < 0.003) {
       let team = Math.random() < 0.5 ? t1 : t2;
-      team.injured = true;
-      substitutions = Math.max(0, substitutions - 1);
 
-      document.getElementById("subsLeft").innerText =
-        "Wechsel: " + substitutions;
+      if (!team.injured) {
+        team.injured = true;
+        substitutions = Math.max(0, substitutions - 1);
+        updateSubsUI();
 
-      addEvent(`🚑 Verletzung bei ${team.name}`);
+        addEvent(`🚑 ${minute}' Verletzung bei ${team.name}`);
+      }
     }
 
     updateScoreboard(t1, t2, s1, s2);
@@ -222,7 +220,7 @@ function secondHalf(t1, t2, s1, s2, cb) {
   let i = setInterval(() => {
     minute++;
 
-    let chance = 0.025 + liveModifier + (momentum * 0.005);
+    let chance = 0.02 + liveModifier + (momentum * 0.004);
 
     if (Math.random() < chance) {
       if (Math.random() < 0.5) s1++;
@@ -236,6 +234,7 @@ function secondHalf(t1, t2, s1, s2, cb) {
       clearInterval(i);
 
       updateStats(t1, t2, s1, s2);
+
       addEvent(`Endstand: ${s1}:${s2}`);
 
       setTimeout(cb, 800);
@@ -281,8 +280,13 @@ function endSeason() {
 
   addEvent(`🏆 Meister: ${teams[0].name}`);
 
-  let choice = confirm("Neue Saison starten?");
-  if (choice) location.reload();
+  let action = prompt("Saison beendet: reset / weiter");
+
+  if (action === "reset") location.reload();
+
+  if (action === "weiter") {
+    alert("Liga-Wechsel folgt später 😉");
+  }
 }
 
 // ================= FINISH =================
@@ -294,7 +298,17 @@ function finishMatchday() {
     endSeason();
   }
 
+  document.getElementById("matchday").innerText =
+    "Spieltag: " + currentMatchday + " / " + schedule.length;
+
   updateTable();
+}
+
+// ================= SCORE =================
+function updateScoreboard(t1, t2, s1, s2) {
+  document.getElementById("team1Name").innerText = t1.name;
+  document.getElementById("team2Name").innerText = t2.name;
+  document.getElementById("score").innerText = s1 + " : " + s2;
 }
 
 // ================= TABLE =================
@@ -339,6 +353,7 @@ function populateTeamSelect() {
 }
 
 function selectTeam() {
+  if (teamLocked) return;
   selectedTeam = document.getElementById("teamSelect").value;
   teamLocked = true;
   leagueLocked = true;
@@ -350,3 +365,6 @@ teams = initTeams(leagues[currentLeague]);
 generateSchedule();
 populateTeamSelect();
 updateTable();
+
+document.getElementById("matchday").innerText =
+  "Spieltag: 0 / " + schedule.length;
