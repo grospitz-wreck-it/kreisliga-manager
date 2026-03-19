@@ -1,5 +1,4 @@
 function generateSchedule(){
-    if(rand<0.04+liveModifier){
       if(Math.random()<0.5){
         liveScore.s1++;
         addEvent(`⚽ ${currentMinute}' Tor ${liveScore.t1.name}`);
@@ -7,12 +6,12 @@ function generateSchedule(){
         liveScore.s2++;
         addEvent(`⚽ ${currentMinute}' Tor ${liveScore.t2.name}`);
       }
-    } else if(rand<0.08){
+    } else if(rand<0.10){
       addEvent(`🟨 ${currentMinute}' Gelbe Karte`);
-    } else if(rand<0.1){
+    } else if(rand<0.14){
       addEvent(`💥 ${currentMinute}' Große Chance`);
-    } else if(rand<0.12){
-      addEvent(`🧤 ${currentMinute}' Starke Parade`);
+    } else if(rand<0.18){
+      addEvent(`🧤 ${currentMinute}' Parade`);
     }
 
     updateScoreboard(liveScore.t1,liveScore.t2,liveScore.s1,liveScore.s2);
@@ -31,7 +30,11 @@ function generateSchedule(){
       finishMatch();
     }
 
-  },matchDuration/90);
+  }, intervalTime);
+}
+
+function restartInterval(){
+  startInterval();
 }
 
 function resumeMatch(){
