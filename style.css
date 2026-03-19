@@ -29,6 +29,8 @@ body {
 .highlight {
   color: yellow;
   font-weight: bold;
+  background: rgba(255,255,0,0.15);
+  padding: 2px;
 }
 
 button, select {
