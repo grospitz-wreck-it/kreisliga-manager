@@ -5,7 +5,6 @@
   <title>Kreisliga Manager</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <h1>Kreisliga Manager</h1>
@@ -13,10 +12,12 @@
 <div class="container">
 
   <!-- LINKS -->
-  <div class="left">
+  <div class="panel">
     <h2>Liga wählen</h2>
-    <select id="leagueSelect"></select>
-    <button onclick="selectLeague()">Liga starten</button>
+    <select id="leagueSelect">
+      <option>Kreisliga A Herford</option>
+    </select>
+    <button>Liga starten</button>
 
     <h2>Team</h2>
     <select id="teamSelect"></select>
@@ -33,90 +34,66 @@
     <p id="currentTactic">Taktik: normal</p>
 
     <h3>Formation</h3>
-    <select id="formationSelect">
-      <option value="442">4-4-2</option>
-      <option value="433">4-3-3</option>
-      <option value="532">5-3-2</option>
+    <select>
+      <option>4-4-2</option>
+      <option>4-3-3</option>
+      <option>3-5-2</option>
     </select>
   </div>
 
   <!-- MITTE -->
-  <div class="middle">
+  <div class="panel center">
+    <h2 id="matchday">Spieltag: 0 / 30</h2>
 
-    <h2 id="matchday">Spieltag: 0</h2>
     <button onclick="simulateMatchday()">▶ Spiel starten</button>
-    <div>
-  <button onclick="setLiveMode('attack')">🔥 Druck</button>
-  <button onclick="setLiveMode('calm')">🧊 Ruhig</button>
-  <button onclick="makeSub()">🔁 Wechsel</button>
-  <span id="subsLeft">Wechsel: 3</span>
-  </div>
-<div>
-  <button id="btnAttack" onclick="setLiveMode('attack')">🔥 Druck</button>
-  <button id="btnCalm" onclick="setLiveMode('calm')">🧊 Ruhig</button>
-  <button onclick="makeSub()">🔁 Wechsel</button>
-  <span id="subsLeft">Wechsel: 3</span>
-</div>
 
-<div>
-  Geschwindigkeit:
-  <button onclick="setSpeed(200)">3x</button>
-  <button onclick="setSpeed(120)">5x</button>
-  <button onclick="setSpeed(60)">10x</button>
-  <button onclick="fastForward()">⏩</button>
-</div>
-
-<div id="timeline">
-  <div id="timelineBar"></div>
-</div>
-    <!-- SCORE -->
-    <div id="scoreWrapper">
-      <span id="team1Name">-</span>
-
-      <div id="scoreboard">
-        <span id="score">0 : 0</span>
-      </div>
-
-      <span id="team2Name">-</span>
+    <!-- SCOREBOARD -->
+    <div class="scoreboard">
+      <span id="team1Name">Team 1</span>
+      <div id="score">0 : 0</div>
+      <span id="team2Name">Team 2</span>
     </div>
 
-    <h3>Live-Spiel</h3>
-    <div id="liveMatch"></div>
+    <!-- TIMELINE -->
+    <div id="timeline">
+      <div id="timelineBar"></div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <button id="btnAttack" onclick="setLiveMode('attack')">🔥 Druck</button>
+      <button id="btnCalm" onclick="setLiveMode('calm')">🧊 Ruhig</button>
+      <button onclick="makeSub()">🔁 Wechsel</button>
+      <span id="subsLeft">Wechsel: 3</span>
+    </div>
+
+    <div class="controls">
+      Geschwindigkeit:
+      <button onclick="setSpeed(200)">3x</button>
+      <button onclick="setSpeed(120)">5x</button>
+      <button onclick="setSpeed(60)">10x</button>
+      <button onclick="fastForward()">⏩</button>
+    </div>
+
+    <!-- LIVE -->
+    <div id="liveMatch" class="live-box"></div>
 
     <!-- HALBZEIT -->
-    <div id="halftimePanel" style="display:none;">
+    <div id="halftimePanel" class="halftime">
       <h3>Halbzeit</h3>
-
-      <label>Taktik:</label>
       <select id="halfTactic">
         <option value="normal">Normal</option>
         <option value="offensive">Offensiv</option>
         <option value="defensive">Defensiv</option>
       </select>
-
-      <br><br>
-
-      <label>Formation:</label>
-      <select id="halfFormation">
-        <option value="442">4-4-2</option>
-        <option value="433">4-3-3</option>
-        <option value="532">5-3-2</option>
-      </select>
-
-      <br><br>
-
       <button onclick="applyHalftime()">Weiter</button>
     </div>
-
-    <h3>Letzter Spieltag</h3>
-    <div id="results"></div>
 
   </div>
 
   <!-- RECHTS -->
-  <div class="right">
+  <div class="panel">
     <h2>Tabelle</h2>
-
     <table id="table">
       <thead>
         <tr>
@@ -130,9 +107,7 @@
   </div>
 
 </div>
-<h3>NW-Spiel-Ticker ⚽</h3>
-<div id="ticker"></div>
-<script src="script.js"></script>
 
+<script src="script.js"></script>
 </body>
 </html>
