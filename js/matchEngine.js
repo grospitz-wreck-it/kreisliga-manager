@@ -86,8 +86,12 @@ function simulateLiveMatch(t1, t2) {
     clearInterval(currentInterval);
   }
 
-  let s1 = 0;
-  let s2 = 0;
+  liveScore = {
+  t1: t1,
+  t2: t2,
+  s1: 0,
+  s2: 0
+};
   let minute = 0;
 
   isSimulating = true;
