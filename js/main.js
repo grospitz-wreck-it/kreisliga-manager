@@ -53,4 +53,5 @@ window.onload = function () {
   console.log("Liga geladen:", selectedLeague);
   console.log("Teams:", teams.length);
   console.log("Spieltage:", schedule.length);
+  console.log("Teams geladen:", teams.map(t => t.name));
 };
