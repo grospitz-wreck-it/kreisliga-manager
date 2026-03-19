@@ -13,11 +13,11 @@
 
   <!-- LINKS -->
   <div class="panel">
-    <h2>Liga wählen</h2>
+    <h2>Liga</h2>
     <select id="leagueSelect">
       <option>Kreisliga A Herford</option>
     </select>
-    <button>Liga starten</button>
+    <button onclick="selectLeague()">Liga starten</button>
 
     <h2>Team</h2>
     <select id="teamSelect"></select>
@@ -60,18 +60,18 @@
     </div>
 
     <!-- CONTROLS -->
-    <div class="controls">
-      <button id="btnAttack" onclick="setLiveMode('attack')">🔥 Druck</button>
-      <button id="btnCalm" onclick="setLiveMode('calm')">🧊 Ruhig</button>
-      <button onclick="makeSub()">🔁 Wechsel</button>
+    <div>
+      <button id="btnAttack" onclick="setLiveMode('attack')">Druck</button>
+      <button id="btnCalm" onclick="setLiveMode('calm')">Ruhig</button>
+      <button onclick="makeSub()">Wechsel</button>
       <span id="subsLeft">Wechsel: 3</span>
     </div>
 
-    <div class="controls">
+    <div>
       Geschwindigkeit:
-      <button onclick="setSpeed(200)">3x</button>
-      <button onclick="setSpeed(120)">5x</button>
-      <button onclick="setSpeed(60)">10x</button>
+      <button class="speedBtn" onclick="setSpeed(event,200)">3x</button>
+      <button class="speedBtn" onclick="setSpeed(event,120)">5x</button>
+      <button class="speedBtn" onclick="setSpeed(event,60)">10x</button>
       <button onclick="fastForward()">⏩</button>
     </div>
 
