@@ -5,7 +5,6 @@ let selectedTeam = null;
 
 let isSimulating = false;
 let currentInterval = null;
-
 let matchStartTime = 0;
 let matchDuration = 180000; // 3 Minuten
 
