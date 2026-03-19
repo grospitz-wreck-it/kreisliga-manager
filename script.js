@@ -4,6 +4,7 @@ let currentMatchday = 0;
 
 let selectedTeam = null;
 let selectedFormation = "4-4-2";
+let selectedTactic = "normal";
 
 let isSimulating = false;
 let teamLocked = false;
@@ -47,10 +48,7 @@ function initTeams(raw) {
   return raw.map(t => ({
     ...t,
     points: 0,
-    goals: 0,
-    yellow: 0,
-    red: 0,
-    form: 0
+    goals: 0
   }));
 }
 
@@ -70,13 +68,6 @@ function generateSchedule() {
 
   let second = schedule.map(r => r.map(m => [m[1], m[0]]));
   schedule = schedule.concat(second);
-}
-
-// ================= FORMATION =================
-function getFormationModifier() {
-  if (selectedFormation === "4-3-3") return 0.002;
-  if (selectedFormation === "5-3-2") return -0.002;
-  return 0;
 }
 
 // ================= UI =================
@@ -120,6 +111,45 @@ function addEvent(text) {
   box.prepend(p);
 }
 
+// ================= BUTTONS =================
+function setTactic() {
+  selectedTactic = document.getElementById("tacticSelect").value;
+  document.getElementById("currentTactic").innerText =
+    "Taktik: " + selectedTactic;
+}
+
+function setLiveMode(mode) {
+  liveModifier = 0;
+
+  if (mode === "attack") liveModifier = 0.003;
+  if (mode === "calm") liveModifier = -0.002;
+}
+
+function setSpeed(e, speed) {
+  gameSpeed = speed;
+
+  if (currentInterval) {
+    clearInterval(currentInterval);
+    currentInterval = setInterval(gameLoop, gameSpeed);
+  }
+}
+
+function makeSub() {
+  if (substitutions <= 0) return alert("Keine Wechsel mehr!");
+
+  let type = prompt("offensiv oder defensiv?");
+
+  if (type === "offensiv") {
+    liveModifier += 0.002;
+    addEvent("🔼 Offensiver Wechsel");
+  } else {
+    liveModifier -= 0.002;
+    addEvent("🔽 Defensiver Wechsel");
+  }
+
+  substitutions--;
+}
+
 // ================= MATCH =================
 function simulateMatchday() {
   if (!selectedTeam) return alert("Team wählen!");
@@ -153,7 +183,7 @@ function simulateLiveMatch(t1, t2) {
 
     updateTimeline(minute);
 
-    let chance = 0.001 + liveModifier + getFormationModifier();
+    let chance = 0.001 + liveModifier;
 
     if (Math.random() < chance) {
       if (Math.random() < 0.5) {
@@ -163,12 +193,6 @@ function simulateLiveMatch(t1, t2) {
       }
     }
 
-    // Zusatz-Events
-    if (Math.random() < 0.002) addEvent(`🎯 Freistoß ${minute}'`);
-    if (Math.random() < 0.002) addEvent(`🚩 Abseits ${minute}'`);
-    if (Math.random() < 0.002) addEvent(`🔄 Ecke ${minute}'`);
-    if (Math.random() < 0.0015) addEvent(`🔥 Großchance ${minute}'`);
-
     updateScoreboard(t1, t2, s1, s2);
     updateTable();
 
@@ -176,7 +200,6 @@ function simulateLiveMatch(t1, t2) {
       halftimeDone = true;
       clearInterval(currentInterval);
       document.getElementById("halftimePanel").style.display = "block";
-      window.resume = () => secondHalf(t1, t2, s1, s2);
       return;
     }
 
@@ -190,28 +213,11 @@ function simulateLiveMatch(t1, t2) {
   currentInterval = setInterval(gameLoop, gameSpeed);
 }
 
-// ================= SECOND HALF =================
-function secondHalf(t1, t2, s1, s2) {
+// ================= HALFTIME =================
+function applyHalftime() {
   document.getElementById("halftimePanel").style.display = "none";
   matchStartTime = Date.now() - matchDuration / 2;
   currentInterval = setInterval(gameLoop, gameSpeed);
-}
-
-// ================= WECHSEL =================
-function makeSubstitution() {
-  if (substitutions <= 0) return alert("Keine Wechsel mehr!");
-
-  let type = prompt("Wechsel: offensiv / defensiv");
-
-  if (type === "offensiv") {
-    liveModifier += 0.002;
-    addEvent("🔼 Offensiver Wechsel");
-  } else {
-    liveModifier -= 0.002;
-    addEvent("🔽 Defensiver Wechsel");
-  }
-
-  substitutions--;
 }
 
 // ================= FINISH =================
@@ -227,6 +233,20 @@ function finishMatch(t1, t2, s1, s2) {
 
   currentMatchday++;
   isSimulating = false;
+
+  // 🏆 SAISON ENDE
+  if (currentMatchday >= schedule.length) {
+    let sorted = [...teams].sort((a,b)=>b.points-a.points);
+    let pos = sorted.findIndex(t => t.name === selectedTeam);
+
+    let box = document.getElementById("liveMatch");
+
+    if (pos === 0) {
+      box.innerHTML = `<h1>🏆 Glückwunsch, du bist in die Bezirksliga aufgestiegen!</h1>`;
+    } else if (pos >= sorted.length - 2) {
+      box.innerHTML = `<h1>❌ Schade, du bist in Kreisliga B abgestiegen</h1>`;
+    }
+  }
 
   document.getElementById("matchday").innerText =
     "Spieltag: " + currentMatchday + " / " + schedule.length;
@@ -248,10 +268,7 @@ function populateTeamSelect() {
 }
 
 function selectTeam() {
-  if (teamLocked) {
-    alert("Team bereits gewählt!");
-    return;
-  }
+  if (teamLocked) return alert("Team bereits gewählt!");
 
   selectedTeam = document.getElementById("teamSelect").value;
   teamLocked = true;
