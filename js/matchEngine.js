@@ -1,5 +1,4 @@
-// ⚠️ KEINE GLOBALS HIER DEFINIEREN!
-
+// ================= SPIELPLAN =================
 function generateSchedule() {
   schedule = [];
 
@@ -30,8 +29,9 @@ function generateSchedule() {
 // ================= SPIELTAG =================
 function simulateMatchday() {
 
+  // ❌ mehrfaches Starten verhindern
   if (isSimulating) {
-    console.log("Spiel läuft bereits!");
+    console.log("Spiel läuft bereits");
     return;
   }
 
@@ -45,13 +45,16 @@ function simulateMatchday() {
     return;
   }
 
+  // Button sperren
+  document.getElementById("startBtn").disabled = true;
+
   let matches = schedule[currentMatchday];
 
   let userMatch = matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
 
-  // 👉 alle anderen Spiele korrekt simulieren
+  // andere Spiele simulieren
   matches.forEach(m => {
     if (m !== userMatch) simulateQuick(m[0], m[1]);
   });
@@ -59,7 +62,7 @@ function simulateMatchday() {
   simulateLiveMatch(userMatch[0], userMatch[1]);
 }
 
-// ================= QUICK =================
+// ================= QUICK MATCH =================
 function simulateQuick(t1, t2) {
   let s1 = Math.floor(Math.random() * 3);
   let s2 = Math.floor(Math.random() * 3);
@@ -69,24 +72,36 @@ function simulateQuick(t1, t2) {
 
   if (s1 > s2) t1.points += 3;
   else if (s2 > s1) t2.points += 3;
-  else { t1.points++; t2.points++; }
+  else {
+    t1.points++;
+    t2.points++;
+  }
 }
 
-// ================= LIVE =================
+// ================= LIVE MATCH =================
 function simulateLiveMatch(t1, t2) {
-  let box = document.getElementById("liveMatch");
-  box.innerHTML = "";
 
-  let s1 = 0, s2 = 0;
+  // ❗ alte Intervalle stoppen
+  if (currentInterval) {
+    clearInterval(currentInterval);
+  }
+
+  let s1 = 0;
+  let s2 = 0;
   let minute = 0;
 
   isSimulating = true;
 
+  let box = document.getElementById("liveMatch");
+  box.innerHTML = "";
+
+  updateScoreboard(t1, t2, s1, s2);
+
   currentInterval = setInterval(() => {
     minute++;
 
-    // ⚽ realistische Tore
-    if (Math.random() < 0.05) {
+    // ⚽ reduzierte Torchance (viel realistischer)
+    if (Math.random() < 0.04) {
       if (Math.random() < 0.5) {
         s1++;
         addEvent(`⚽ ${minute}' ${t1.name}`);
@@ -99,23 +114,54 @@ function simulateLiveMatch(t1, t2) {
     updateScoreboard(t1, t2, s1, s2);
     updateTimeline(minute);
 
+    // Halbzeit
     if (minute === 45) {
       clearInterval(currentInterval);
       document.getElementById("halftimePanel").style.display = "block";
       return;
     }
 
+    // Ende
     if (minute >= 90) {
       clearInterval(currentInterval);
       finishMatch(t1, t2, s1, s2);
     }
 
-  }, 100);
+  }, matchDuration / 90);
+}
+
+// ================= HALBZEIT =================
+function resumeMatch() {
+
+  document.getElementById("halftimePanel").style.display = "none";
+
+  if (currentInterval) {
+    clearInterval(currentInterval);
+  }
+
+  let minute = 45;
+
+  currentInterval = setInterval(() => {
+    minute++;
+
+    if (Math.random() < 0.04) {
+      addEvent(`⚽ ${minute}'`);
+    }
+
+    updateTimeline(minute);
+
+    if (minute >= 90) {
+      clearInterval(currentInterval);
+      finishMatch(...getCurrentScore());
+    }
+
+  }, matchDuration / 90);
 }
 
 // ================= ENDE =================
 function finishMatch(t1, t2, s1, s2) {
 
+  // ❌ doppelte Ausführung verhindern
   if (!isSimulating) return;
 
   isSimulating = false;
@@ -127,7 +173,10 @@ function finishMatch(t1, t2, s1, s2) {
 
   if (s1 > s2) t1.points += 3;
   else if (s2 > s1) t2.points += 3;
-  else { t1.points++; t2.points++; }
+  else {
+    t1.points++;
+    t2.points++;
+  }
 
   currentMatchday++;
 
@@ -135,21 +184,7 @@ function finishMatch(t1, t2, s1, s2) {
     "Spieltag: " + currentMatchday + " / " + schedule.length;
 
   updateTable();
-}
 
-// ================= HALBZEIT =================
-function resumeMatch() {
-  document.getElementById("halftimePanel").style.display = "none";
-
-  matchStartTime = Date.now() - matchDuration / 2;
-
-  currentInterval = setInterval(() => {
-    let elapsed = Date.now() - matchStartTime;
-    let minute = Math.floor((elapsed / matchDuration) * 90);
-
-    updateTimeline(minute);
-  }, 100);
-}
-if (currentInterval) {
-  clearInterval(currentInterval);
+  // Button wieder aktivieren
+  document.getElementById("startBtn").disabled = false;
 }
