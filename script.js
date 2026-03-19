@@ -8,10 +8,13 @@ function loadGame() {
 
   if (saved) {
     let data = JSON.parse(saved);
-    teams = data.teams;
-    schedule = data.schedule;
-    currentMatchday = data.currentMatchday;
+
+    teams = data.teams || [];
+    schedule = data.schedule || [];
+    currentMatchday = data.currentMatchday || 0;
+
   } else {
+    // Neue Liga erstellen
     teams = [
       { name: "Team A", strength: 70, points: 0, goals: 0 },
       { name: "Team B", strength: 65, points: 0, goals: 0 },
@@ -24,6 +27,7 @@ function loadGame() {
   }
 }
 
+// Spiel speichern
 function saveGame() {
   localStorage.setItem("kreisligaSave", JSON.stringify({
     teams,
@@ -34,6 +38,8 @@ function saveGame() {
 
 // Spielplan generieren (Round Robin)
 function generateSchedule() {
+  schedule = []; // wichtig!
+
   let tempTeams = [...teams];
 
   for (let i = 0; i < tempTeams.length - 1; i++) {
@@ -85,6 +91,7 @@ function simulateMatchday() {
   });
 
   currentMatchday++;
+
   saveGame();
   updateTable();
   updateMatchdayDisplay();
@@ -109,11 +116,29 @@ function updateTable() {
 
 // Spieltag anzeigen
 function updateMatchdayDisplay() {
-  document.getElementById("matchday").innerText =
-    "Spieltag: " + currentMatchday;
+  const el = document.getElementById("matchday");
+  if (el) {
+    el.innerText = "Spieltag: " + currentMatchday;
+  }
+}
+
+// 🔥 Wichtig: einmal alten Speicher löschen bei Update
+function resetIfBroken() {
+  let saved = localStorage.getItem("kreisligaSave");
+
+  if (saved) {
+    let data = JSON.parse(saved);
+
+    // Falls alter Speicher ohne Spielplan
+    if (!data.schedule || !data.teams) {
+      localStorage.clear();
+      location.reload();
+    }
+  }
 }
 
 // Init
+resetIfBroken();
 loadGame();
 updateTable();
 updateMatchdayDisplay();
