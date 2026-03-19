@@ -1,7 +1,6 @@
-let teams = [];
 let schedule = [];
+let teams = [];
 let currentMatchday = 0;
-
 let selectedTeam = null;
 let selectedTactic = "normal";
 let selectedFormation = "4-4-2";
