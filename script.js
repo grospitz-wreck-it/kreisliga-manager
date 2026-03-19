@@ -4,32 +4,22 @@ let currentMatchday = 0;
 let selectedTeam = null;
 let selectedTactic = "normal";
 let lastResults = [];
+let isSimulating = false;
 
-// Spiel laden
+// Laden
 function loadGame() {
   let saved = localStorage.getItem("kreisligaSave");
 
   if (saved) {
-    try {
-      let data = JSON.parse(saved);
+    let data = JSON.parse(saved);
 
-      if (!data.teams) {
-        throw "Alter Speicher inkompatibel";
-      }
+    teams = data.teams;
+    currentMatchday = data.currentMatchday || 0;
+    selectedTeam = data.selectedTeam || null;
+    selectedTactic = data.selectedTactic || "normal";
+    lastResults = data.lastResults || [];
 
-      teams = data.teams;
-      currentMatchday = data.currentMatchday || 0;
-      selectedTeam = data.selectedTeam || null;
-      selectedTactic = data.selectedTactic || "normal";
-      lastResults = data.lastResults || [];
-
-      generateSchedule();
-
-    } catch (e) {
-      localStorage.clear();
-      createNewGame();
-    }
-
+    generateSchedule();
   } else {
     createNewGame();
   }
@@ -64,91 +54,119 @@ function saveGame() {
   }));
 }
 
-// Spielplan generieren
+// Spielplan
 function generateSchedule() {
   schedule = [];
+  let temp = [...teams];
 
-  let tempTeams = [...teams];
-
-  for (let i = 0; i < tempTeams.length - 1; i++) {
+  for (let i = 0; i < temp.length - 1; i++) {
     let matchday = [];
 
-    for (let j = 0; j < tempTeams.length / 2; j++) {
-      matchday.push([
-        tempTeams[j],
-        tempTeams[tempTeams.length - 1 - j]
-      ]);
+    for (let j = 0; j < temp.length / 2; j++) {
+      matchday.push([temp[j], temp[temp.length - 1 - j]]);
     }
 
     schedule.push(matchday);
-    tempTeams.splice(1, 0, tempTeams.pop());
+    temp.splice(1, 0, temp.pop());
   }
 }
 
-// Taktik anwenden
-function applyTactic(team, baseScore) {
-  if (team.name !== selectedTeam) return baseScore;
+// Taktik
+function applyTactic(team, score) {
+  if (team.name !== selectedTeam) return score;
 
-  if (selectedTactic === "offensive") {
-    return baseScore + 1;
-  }
+  if (selectedTactic === "offensive") return score + 1;
+  if (selectedTactic === "defensive") return Math.max(0, score - 1);
 
-  if (selectedTactic === "defensive") {
-    return Math.max(0, baseScore - 1);
-  }
-
-  return baseScore;
+  return score;
 }
 
-// Spiel simulieren
-function simulateMatch(team1, team2) {
-  let score1 = Math.floor(Math.random() * (team1.strength / 20));
-  let score2 = Math.floor(Math.random() * (team2.strength / 20));
-
-  score1 = applyTactic(team1, score1);
-  score2 = applyTactic(team2, score2);
-
-  team1.goals += score1;
-  team2.goals += score2;
-
-  if (score1 > score2) {
-    team1.points += 3;
-  } else if (score2 > score1) {
-    team2.points += 3;
-  } else {
-    team1.points += 1;
-    team2.points += 1;
-  }
-
-  return {
-    team1: team1.name,
-    team2: team2.name,
-    score1,
-    score2
-  };
-}
-
-// Spieltag simulieren
+// Spieltag starten
 function simulateMatchday() {
-  if (!schedule || currentMatchday >= schedule.length) {
+  if (isSimulating) return;
+
+  if (currentMatchday >= schedule.length) {
     alert("Saison beendet!");
     return;
   }
 
-  let matches = schedule[currentMatchday];
+  isSimulating = true;
   lastResults = [];
 
-  matches.forEach(match => {
-    let result = simulateMatch(match[0], match[1]);
-    lastResults.push(result);
+  playMatchesLive(schedule[currentMatchday], 0);
+}
+
+// Spiele nacheinander
+function playMatchesLive(matches, index) {
+  if (index >= matches.length) {
+    currentMatchday++;
+    isSimulating = false;
+
+    saveGame();
+    updateTable();
+    updateMatchdayDisplay();
+    updateResults();
+    return;
+  }
+
+  let [team1, team2] = matches[index];
+
+  simulateLiveMatch(team1, team2, () => {
+    playMatchesLive(matches, index + 1);
   });
+}
 
-  currentMatchday++;
+// EIN Spiel live
+function simulateLiveMatch(team1, team2, callback) {
+  let minute = 0;
+  let score1 = 0;
+  let score2 = 0;
 
-  saveGame();
-  updateTable();
-  updateMatchdayDisplay();
-  updateResults();
+  let box = document.getElementById("liveMatch");
+  box.innerHTML = `<p><b>${team1.name} vs ${team2.name}</b></p>`;
+
+  let interval = setInterval(() => {
+    minute++;
+
+    if (Math.random() < 0.15) {
+      let attack1 = team1.strength + Math.random() * 20;
+      let attack2 = team2.strength + Math.random() * 20;
+
+      if (attack1 > attack2) {
+        score1++;
+        box.innerHTML += `<p>⚽ ${minute}' ${team1.name}</p>`;
+      } else {
+        score2++;
+        box.innerHTML += `<p>⚽ ${minute}' ${team2.name}</p>`;
+      }
+
+      box.scrollTop = box.scrollHeight;
+    }
+
+    if (minute >= 90) {
+      clearInterval(interval);
+
+      score1 = applyTactic(team1, score1);
+      score2 = applyTactic(team2, score2);
+
+      team1.goals += score1;
+      team2.goals += score2;
+
+      if (score1 > score2) team1.points += 3;
+      else if (score2 > score1) team2.points += 3;
+      else {
+        team1.points++;
+        team2.points++;
+      }
+
+      box.innerHTML += `<p><b>Endstand: ${score1}:${score2}</b></p><hr>`;
+
+      lastResults.push({ team1: team1.name, team2: team2.name, score1, score2 });
+
+      setTimeout(callback, 800);
+    }
+
+  }, 100);
 }
 
 // Tabelle
@@ -158,89 +176,63 @@ function updateTable() {
   let tbody = document.querySelector("#table tbody");
   tbody.innerHTML = "";
 
-  teams.forEach(team => {
-    let name = team.name === selectedTeam
-      ? "👉 " + team.name
-      : team.name;
+  teams.forEach(t => {
+    let name = t.name === selectedTeam ? "👉 " + t.name : t.name;
 
-    let row = `<tr>
-      <td>${name}</td>
-      <td>${team.points}</td>
-      <td>${team.goals}</td>
-    </tr>`;
-    tbody.innerHTML += row;
+    tbody.innerHTML += `
+      <tr>
+        <td>${name}</td>
+        <td>${t.points}</td>
+        <td>${t.goals}</td>
+      </tr>`;
   });
 }
 
-// Spieltag Anzeige
+// Anzeige
 function updateMatchdayDisplay() {
-  const el = document.getElementById("matchday");
-  if (el) {
-    el.innerText = "Spieltag: " + currentMatchday;
-  }
+  document.getElementById("matchday").innerText =
+    "Spieltag: " + currentMatchday;
 }
 
-// Ergebnisse anzeigen
+// Ergebnisse
 function updateResults() {
-  let container = document.getElementById("results");
-  if (!container) return;
-
-  container.innerHTML = "";
+  let div = document.getElementById("results");
+  div.innerHTML = "";
 
   lastResults.forEach(r => {
-    let isUserMatch =
-      r.team1 === selectedTeam || r.team2 === selectedTeam;
-
     let line = `${r.team1} ${r.score1}:${r.score2} ${r.team2}`;
-
-    if (isUserMatch) {
+    if (r.team1 === selectedTeam || r.team2 === selectedTeam) {
       line = "👉 " + line;
     }
-
-    container.innerHTML += `<p>${line}</p>`;
+    div.innerHTML += `<p>${line}</p>`;
   });
 }
 
-// Taktik anzeigen
-function updateTacticDisplay() {
-  let el = document.getElementById("currentTactic");
-  if (el) {
-    el.innerText = "Aktuelle Taktik: " + selectedTactic;
-  }
-}
-
-// Dropdown Team
+// UI
 function populateTeamSelect() {
   let select = document.getElementById("teamSelect");
-  if (!select) return;
-
   select.innerHTML = "";
 
-  teams.forEach(team => {
-    let option = document.createElement("option");
-    option.value = team.name;
-    option.textContent = team.name;
-
-    if (team.name === selectedTeam) {
-      option.selected = true;
-    }
-
-    select.appendChild(option);
+  teams.forEach(t => {
+    let opt = document.createElement("option");
+    opt.value = t.name;
+    opt.textContent = t.name;
+    if (t.name === selectedTeam) opt.selected = true;
+    select.appendChild(opt);
   });
 }
 
-// Team wählen
 function selectTeam() {
   selectedTeam = document.getElementById("teamSelect").value;
   saveGame();
   updateTable();
 }
 
-// Taktik setzen
 function setTactic() {
   selectedTactic = document.getElementById("tacticSelect").value;
+  document.getElementById("currentTactic").innerText =
+    "Aktuelle Taktik: " + selectedTactic;
   saveGame();
-  updateTacticDisplay();
 }
 
 // INIT
@@ -249,4 +241,5 @@ updateTable();
 updateMatchdayDisplay();
 populateTeamSelect();
 updateResults();
-updateTacticDisplay();
+document.getElementById("currentTactic").innerText =
+  "Aktuelle Taktik: " + selectedTactic;
