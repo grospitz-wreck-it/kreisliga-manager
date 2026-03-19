@@ -23,7 +23,6 @@ function loadGame() {
       selectedTactic = data.selectedTactic || "normal";
       lastResults = data.lastResults || [];
 
-      // 🔥 Spielplan immer neu erzeugen
       generateSchedule();
 
     } catch (e) {
@@ -54,7 +53,7 @@ function createNewGame() {
   saveGame();
 }
 
-// Speichern (OHNE schedule!)
+// Speichern
 function saveGame() {
   localStorage.setItem("kreisligaSave", JSON.stringify({
     teams,
@@ -202,6 +201,14 @@ function updateResults() {
   });
 }
 
+// Taktik anzeigen
+function updateTacticDisplay() {
+  let el = document.getElementById("currentTactic");
+  if (el) {
+    el.innerText = "Aktuelle Taktik: " + selectedTactic;
+  }
+}
+
 // Dropdown Team
 function populateTeamSelect() {
   let select = document.getElementById("teamSelect");
@@ -233,6 +240,7 @@ function selectTeam() {
 function setTactic() {
   selectedTactic = document.getElementById("tacticSelect").value;
   saveGame();
+  updateTacticDisplay();
 }
 
 // INIT
@@ -241,3 +249,4 @@ updateTable();
 updateMatchdayDisplay();
 populateTeamSelect();
 updateResults();
+updateTacticDisplay();
