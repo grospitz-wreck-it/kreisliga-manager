@@ -1,28 +1,4 @@
-function generateSchedule() {
-  schedule = [];
-  let temp = [...teams];
-  let n = temp.length;
-
-  for (let r = 0; r < n - 1; r++) {
-    let day = [];
-
-    for (let i = 0; i < n / 2; i++) {
-      day.push([temp[i], temp[n - 1 - i]]);
-    }
-
-    schedule.push(day);
-
-    let last = temp.pop();
-    temp.splice(1, 0, last);
-  }
-
-  // Rückrunde
-  let second = schedule.map(d =>
-    d.map(m => [m[1], m[0]])
-  );
-
-  schedule = schedule.concat(second);
-}
+// nutzt state.js Variablen!
 
 function simulateMatchday() {
   if (!selectedTeam) {
@@ -41,6 +17,7 @@ function simulateMatchday() {
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
 
+  // andere Spiele schnell
   matches.forEach(m => {
     if (m !== userMatch) simulateQuick(m[0], m[1]);
   });
@@ -48,6 +25,7 @@ function simulateMatchday() {
   simulateLiveMatch(userMatch[0], userMatch[1]);
 }
 
+// ================= QUICK MATCH =================
 function simulateQuick(t1, t2) {
   let s1 = Math.floor(Math.random() * 3);
   let s2 = Math.floor(Math.random() * 3);
@@ -57,32 +35,102 @@ function simulateQuick(t1, t2) {
 
   if (s1 > s2) t1.points += 3;
   else if (s2 > s1) t2.points += 3;
-  else {
-    t1.points++;
-    t2.points++;
-  }
+  else { t1.points++; t2.points++; }
 }
 
+// ================= LIVE MATCH =================
 function simulateLiveMatch(t1, t2) {
   let box = document.getElementById("liveMatch");
+  box.innerHTML = "";
 
-  let s1 = Math.floor(Math.random() * 3);
-  let s2 = Math.floor(Math.random() * 3);
+  let s1 = 0;
+  let s2 = 0;
+  let minute = 0;
 
-  box.innerHTML = `
-    <b>${t1.name} vs ${t2.name}</b><br>
-    Endstand: ${s1}:${s2}
-  `;
+  isSimulating = true;
+
+  let interval = setInterval(() => {
+    minute++;
+
+    // ⚽ realistischere Chance
+    let baseChance = 0.08;
+
+    if (Math.random() < baseChance) {
+      let attack1 = t1.strength + Math.random() * 20;
+      let attack2 = t2.strength + Math.random() * 20;
+
+      if (attack1 > attack2) {
+        s1++;
+        addEvent(`⚽ ${minute}' ${t1.name}`);
+      } else {
+        s2++;
+        addEvent(`⚽ ${minute}' ${t2.name}`);
+      }
+    }
+
+    updateScoreboard(t1, t2, s1, s2);
+    updateTimeline(minute);
+
+    // Halbzeit
+    if (minute === 45) {
+      addEvent("⏸ Halbzeit");
+      clearInterval(interval);
+
+      document.getElementById("halftimePanel").style.display = "block";
+
+      return;
+    }
+
+    // Ende
+    if (minute >= 90) {
+      clearInterval(interval);
+      finishMatch(t1, t2, s1, s2);
+    }
+
+  }, 100);
+}
+
+// ================= HALBZEIT FORTSETZEN =================
+function continueSecondHalf(t1, t2, s1, s2, minuteStart) {
+
+  let interval = setInterval(() => {
+    minuteStart++;
+
+    let baseChance = 0.08;
+
+    if (Math.random() < baseChance) {
+      if (Math.random() < 0.5) {
+        s1++;
+        addEvent(`⚽ ${minuteStart}' ${t1.name}`);
+      } else {
+        s2++;
+        addEvent(`⚽ ${minuteStart}' ${t2.name}`);
+      }
+    }
+
+    updateScoreboard(t1, t2, s1, s2);
+    updateTimeline(minuteStart);
+
+    if (minuteStart >= 90) {
+      clearInterval(interval);
+      finishMatch(t1, t2, s1, s2);
+    }
+
+  }, 100);
+}
+
+// ================= ENDE =================
+function finishMatch(t1, t2, s1, s2) {
+  isSimulating = false;
+
+  addEvent(`🏁 Endstand: ${s1}:${s2}`);
 
   t1.goals += s1;
   t2.goals += s2;
 
   if (s1 > s2) t1.points += 3;
   else if (s2 > s1) t2.points += 3;
-  else {
-    t1.points++;
-    t2.points++;
-  }
+  else { t1.points++; t2.points++; }
 
   currentMatchday++;
 
