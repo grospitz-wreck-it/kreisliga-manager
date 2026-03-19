@@ -1,16 +1,4 @@
 function generateSchedule(){
-      if(Math.random()<0.5){
-        liveScore.s1++;
-        addEvent(`⚽ ${currentMinute}' Tor ${liveScore.t1.name}`);
-      } else {
-        liveScore.s2++;
-        addEvent(`⚽ ${currentMinute}' Tor ${liveScore.t2.name}`);
-      }
-    } else if(rand<0.10){
-      addEvent(`🟨 ${currentMinute}' Gelbe Karte`);
-    } else if(rand<0.14){
-      addEvent(`💥 ${currentMinute}' Große Chance`);
-    } else if(rand<0.18){
       addEvent(`🧤 ${currentMinute}' Parade`);
     }
 
