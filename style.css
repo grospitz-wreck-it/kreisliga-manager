@@ -32,6 +32,8 @@ body {
   font-size: 28px;
   padding: 10px 20px;
   border: 2px solid white;
+  text-align: center;
+  min-width: 120px;
 }
 
 .timeline {
@@ -52,6 +54,7 @@ body {
   overflow-y: auto;
   padding: 10px;
 }
+
 button.active {
   background: #00ffcc;
   color: black;
