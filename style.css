@@ -4,7 +4,6 @@ body {
   color: white;
   text-align: center;
 
-  /* 🌱 Pixel-Rasen */
   background: repeating-linear-gradient(
     45deg,
     #2e7d32,
@@ -18,14 +17,12 @@ h1 {
   margin: 10px;
 }
 
-/* Layout */
 .container {
   display: flex;
   justify-content: space-around;
   margin-top: 20px;
 }
 
-/* Panels */
 .panel {
   background: rgba(0, 0, 0, 0.7);
   padding: 15px;
@@ -34,14 +31,12 @@ h1 {
   min-height: 400px;
 }
 
-/* Buttons & Select */
 button, select {
   margin: 5px;
   padding: 5px;
   font-size: 14px;
 }
 
-/* Tabelle */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -54,7 +49,16 @@ td, th {
   padding: 5px;
 }
 
-/* Ergebnisse */
 #results p {
   margin: 5px 0;
+}
+
+#liveMatch {
+  text-align: left;
+  background: black;
+  padding: 10px;
+  margin-top: 10px;
+  height: 200px;
+  overflow-y: auto;
+  font-family: monospace;
 }
