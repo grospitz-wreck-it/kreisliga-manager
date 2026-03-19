@@ -44,16 +44,19 @@
     <h2 id="matchday">Spieltag: 0</h2>
     <button onclick="simulateMatchday()">▶ Spiel starten</button>
 
+    <!-- ✅ FIXED SCOREBOARD -->
     <div class="scoreboard">
-      <span id="team1Name"></span>
+      <span id="teamLeft"></span>
       <div id="score">0 : 0</div>
-      <span id="team2Name"></span>
+      <span id="teamRight"></span>
     </div>
 
+    <!-- ✅ TIMELINE -->
     <div class="timeline">
       <div id="timelineBar"></div>
     </div>
 
+    <!-- CONTROLS -->
     <div class="controls">
       <button onclick="setLiveMode('attack')">🔥 Druck</button>
       <button onclick="setLiveMode('calm')">🧊 Ruhig</button>
@@ -61,6 +64,7 @@
       <span id="subCount">Wechsel: 5</span>
     </div>
 
+    <!-- SPEED -->
     <div>
       Geschwindigkeit:
       <button onclick="setSpeed(event,100)">3x</button>
@@ -68,11 +72,13 @@
       <button onclick="setSpeed(event,20)">10x</button>
     </div>
 
+    <!-- LIVE EVENTS -->
     <div id="liveMatch" class="live"></div>
 
+    <!-- ✅ HALBZEIT -->
     <div id="halftimePanel" style="display:none;">
       <h3>Halbzeit</h3>
-      <button onclick="applyHalftime()">Weiter</button>
+      <button onclick="resumeMatch()">2. Halbzeit starten</button>
     </div>
 
   </div>
@@ -82,7 +88,11 @@
     <h2>Tabelle</h2>
     <table id="table">
       <thead>
-        <tr><th>Team</th><th>Punkte</th><th>Tore</th></tr>
+        <tr>
+          <th>Team</th>
+          <th>Punkte</th>
+          <th>Tore</th>
+        </tr>
       </thead>
       <tbody></tbody>
     </table>
