@@ -72,7 +72,7 @@ function generateSchedule() {
   schedule = schedule.concat(second);
 }
 
-// ================= FORMATION EFFECT =================
+// ================= FORMATION =================
 function getFormationModifier() {
   if (selectedFormation === "4-3-3") return 0.002;
   if (selectedFormation === "5-3-2") return -0.002;
@@ -80,15 +80,36 @@ function getFormationModifier() {
 }
 
 // ================= UI =================
-function updateTimeline(minute) {
-  document.getElementById("timelineBar").style.width =
-    (minute / 90) * 100 + "%";
+function updateTable() {
+  let tbody = document.querySelector("#table tbody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  teams.sort((a,b)=>b.points-a.points);
+
+  teams.forEach(t=>{
+    let name = t.name === selectedTeam ? "👉 " + t.name : t.name;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${name}</td>
+        <td>${t.points}</td>
+        <td>${t.goals}</td>
+      </tr>
+    `;
+  });
 }
 
 function updateScoreboard(t1, t2, s1, s2) {
   document.getElementById("team1Name").innerText = t1.name;
   document.getElementById("team2Name").innerText = t2.name;
   document.getElementById("score").innerText = s1 + " : " + s2;
+}
+
+function updateTimeline(minute) {
+  let bar = document.getElementById("timelineBar");
+  if (bar) bar.style.width = (minute / 90) * 100 + "%";
 }
 
 // ================= EVENTS =================
@@ -109,6 +130,7 @@ function simulateMatchday() {
   isSimulating = true;
 
   let matches = schedule[currentMatchday];
+
   let userMatch = matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
@@ -133,7 +155,6 @@ function simulateLiveMatch(t1, t2) {
 
     let chance = 0.001 + liveModifier + getFormationModifier();
 
-    // ⚽ TOR
     if (Math.random() < chance) {
       if (Math.random() < 0.5) {
         s1++; addEvent(`⚽ ${minute}' ${t1.name}`);
@@ -142,15 +163,15 @@ function simulateLiveMatch(t1, t2) {
       }
     }
 
-    // 🔄 EVENTS STATT KARTEN
+    // Zusatz-Events
     if (Math.random() < 0.002) addEvent(`🎯 Freistoß ${minute}'`);
     if (Math.random() < 0.002) addEvent(`🚩 Abseits ${minute}'`);
     if (Math.random() < 0.002) addEvent(`🔄 Ecke ${minute}'`);
     if (Math.random() < 0.0015) addEvent(`🔥 Großchance ${minute}'`);
 
     updateScoreboard(t1, t2, s1, s2);
+    updateTable();
 
-    // HALBZEIT
     if (minute >= 45 && !halftimeDone) {
       halftimeDone = true;
       clearInterval(currentInterval);
@@ -206,27 +227,45 @@ function finishMatch(t1, t2, s1, s2) {
 
   currentMatchday++;
   isSimulating = false;
+
+  document.getElementById("matchday").innerText =
+    "Spieltag: " + currentMatchday + " / " + schedule.length;
+
+  updateTable();
 }
 
 // ================= TEAM =================
 function populateTeamSelect() {
   let s = document.getElementById("teamSelect");
-  s.innerHTML="";
+  s.innerHTML = "";
+
   teams.forEach(t=>{
-    let o=document.createElement("option");
-    o.value=t.name;
-    o.textContent=t.name;
+    let o = document.createElement("option");
+    o.value = t.name;
+    o.textContent = t.name;
     s.appendChild(o);
   });
 }
 
 function selectTeam() {
-  if (teamLocked) return;
+  if (teamLocked) {
+    alert("Team bereits gewählt!");
+    return;
+  }
+
   selectedTeam = document.getElementById("teamSelect").value;
   teamLocked = true;
+
+  document.getElementById("teamSelect").disabled = true;
+
+  updateTable();
 }
 
 // ================= INIT =================
 teams = initTeams(leagues["Kreisliga A Herford"]);
 generateSchedule();
 populateTeamSelect();
+updateTable();
+
+document.getElementById("matchday").innerText =
+  "Spieltag: 0 / " + schedule.length;
