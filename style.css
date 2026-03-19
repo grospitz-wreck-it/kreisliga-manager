@@ -29,7 +29,6 @@ body {
 .highlight {
   color: yellow;
   font-weight: bold;
-  background: rgba(255,255,0,0.15);
 }
 
 button, select {
@@ -51,7 +50,7 @@ td, th {
 
 #liveMatch {
   background: black;
-  height: 200px;
+  height: 220px;
   overflow-y: auto;
   padding: 10px;
   font-family: monospace;
