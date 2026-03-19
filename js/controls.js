@@ -1,3 +1,4 @@
+// ================= TEAM AUSWÄHLEN =================
 function selectTeam() {
   const select = document.getElementById("teamSelect");
 
@@ -6,7 +7,7 @@ function selectTeam() {
     return;
   }
 
-  selectedTeam = select.value.trim(); // 👉 wichtig!
+  selectedTeam = select.value.trim();
 
   console.log("Team gesetzt:", selectedTeam);
 
@@ -16,19 +17,70 @@ function selectTeam() {
   updateTable();
 }
 
+// ================= LIGA AUSWÄHLEN =================
+function selectLeague() {
+  let league = document.getElementById("leagueSelect").value;
+
+  // 👉 neue Teams laden
+  teams = leagues[league].map(t => ({
+    ...t,
+    points: 0,
+    goals: 0
+  }));
+
+  // 👉 RESET (entscheidend!)
+  selectedTeam = null;
+  currentMatchday = 0;
+
+  // 👉 Spielplan neu
+  generateSchedule();
+
+  // 👉 Team Dropdown neu aufbauen
+  let teamSelect = document.getElementById("teamSelect");
+  teamSelect.innerHTML = "";
+
+  teams.forEach(t => {
+    let o = document.createElement("option");
+    o.value = t.name;
+    o.textContent = t.name;
+    teamSelect.appendChild(o);
+  });
+
+  // 👉 wieder aktivieren
+  teamSelect.disabled = false;
+
+  updateTable();
+
+  document.getElementById("matchday").innerText =
+    "Spieltag: 0 / " + schedule.length;
+
+  console.log("Liga gewechselt:", league);
+}
+
+// ================= TAKTIK =================
 function setTactic() {
   selectedTactic = document.getElementById("tacticSelect").value;
+
   document.getElementById("currentTactic").innerText =
     "Taktik: " + selectedTactic;
 }
 
+// ================= LIVE MODUS =================
 function setLiveMode(mode) {
   liveModifier = mode === "attack" ? 0.003 : -0.002;
 }
 
+// ================= WECHSEL =================
 function makeSub() {
-  if (!isSimulating) return alert("Spiel läuft nicht!");
-  if (substitutions <= 0) return alert("Keine Wechsel mehr!");
+  if (!isSimulating) {
+    alert("Spiel läuft nicht!");
+    return;
+  }
+
+  if (substitutions <= 0) {
+    alert("Keine Wechsel mehr!");
+    return;
+  }
 
   let type = prompt("offensiv oder defensiv?");
 
@@ -43,49 +95,27 @@ function makeSub() {
   }
 
   substitutions--;
+
   document.getElementById("subCount").innerText =
     "Wechsel: " + substitutions;
 }
 
-function setSpeed(e, speed) {}
-function applyHalftime() {}
-function selectLeague() {
-  let league = document.getElementById("leagueSelect").value;
+// ================= GESCHWINDIGKEIT =================
+function setSpeed(e, speed) {
+  matchDuration = speed * 1800; 
+  // 100 = langsam, 20 = schnell
+}
 
-  // 👉 neue Teams laden
-  teams = leagues[league].map(t => ({
-    ...t,
-    points: 0,
-    goals: 0
-  }));
+// ================= HALBZEIT =================
+function applyHalftime() {
+  document.getElementById("halftimePanel").style.display = "none";
 
-  // 👉 GANZ WICHTIG: Reset
-  selectedTeam = null;
+  matchStartTime = Date.now() - matchDuration / 2;
 
-  currentMatchday = 0;
+  currentInterval = setInterval(() => {
+    let elapsed = Date.now() - matchStartTime;
+    let minute = Math.floor((elapsed / matchDuration) * 90);
 
-  // 👉 neuer Spielplan
-  generateSchedule();
-
-  // 👉 Team Dropdown neu aufbauen
-  let teamSelect = document.getElementById("teamSelect");
-  teamSelect.innerHTML = "";
-
-  teams.forEach(t => {
-    let o = document.createElement("option");
-    o.value = t.name;
-    o.textContent = t.name;
-    teamSelect.appendChild(o);
-  });
-
-  // 👉 wieder auswählbar machen
-  teamSelect.disabled = false;
-
-  // 👉 Anzeige aktualisieren
-  updateTable();
-
-  document.getElementById("matchday").innerText =
-    "Spieltag: 0 / " + schedule.length;
-
-  console.log("Liga gewechselt:", league);
+    updateTimeline(minute);
+  }, 100);
 }
