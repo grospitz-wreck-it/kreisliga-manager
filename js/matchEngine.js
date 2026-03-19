@@ -29,7 +29,6 @@ function generateSchedule() {
 // ================= SPIELTAG =================
 function simulateMatchday() {
 
-  // ❌ mehrfaches Starten verhindern
   if (isSimulating) {
     console.log("Spiel läuft bereits");
     return;
@@ -45,7 +44,6 @@ function simulateMatchday() {
     return;
   }
 
-  // Button sperren
   document.getElementById("startBtn").disabled = true;
 
   let matches = schedule[currentMatchday];
@@ -81,41 +79,43 @@ function simulateQuick(t1, t2) {
 // ================= LIVE MATCH =================
 function simulateLiveMatch(t1, t2) {
 
-  // ❗ alte Intervalle stoppen
+  // alte Intervalle stoppen
   if (currentInterval) {
     clearInterval(currentInterval);
   }
 
-  liveScore = {
-  t1: t1,
-  t2: t2,
-  s1: 0,
-  s2: 0
-};
-  let minute = 0;
-
   isSimulating = true;
+
+  // 🔥 globaler Spielstand
+  liveScore = {
+    t1: t1,
+    t2: t2,
+    s1: 0,
+    s2: 0
+  };
+
+  let minute = 0;
 
   let box = document.getElementById("liveMatch");
   box.innerHTML = "";
 
-  updateScoreboard(t1, t2, s1, s2);
+  updateScoreboard(t1, t2, 0, 0);
 
   currentInterval = setInterval(() => {
     minute++;
 
-    // ⚽ reduzierte Torchance (viel realistischer)
+    // ⚽ realistische Torchance
     if (Math.random() < 0.04) {
       if (Math.random() < 0.5) {
-        s1++;
+        liveScore.s1++;
         addEvent(`⚽ ${minute}' ${t1.name}`);
       } else {
-        s2++;
+        liveScore.s2++;
         addEvent(`⚽ ${minute}' ${t2.name}`);
       }
     }
 
-    updateScoreboard(t1, t2, s1, s2);
+    updateScoreboard(t1, t2, liveScore.s1, liveScore.s2);
     updateTimeline(minute);
 
     // Halbzeit
@@ -128,7 +128,7 @@ function simulateLiveMatch(t1, t2) {
     // Ende
     if (minute >= 90) {
       clearInterval(currentInterval);
-      finishMatch(t1, t2, s1, s2);
+      finishMatch(liveScore.t1, liveScore.t2, liveScore.s1, liveScore.s2);
     }
 
   }, matchDuration / 90);
@@ -149,14 +149,32 @@ function resumeMatch() {
     minute++;
 
     if (Math.random() < 0.04) {
-      addEvent(`⚽ ${minute}'`);
+      if (Math.random() < 0.5) {
+        liveScore.s1++;
+        addEvent(`⚽ ${minute}' ${liveScore.t1.name}`);
+      } else {
+        liveScore.s2++;
+        addEvent(`⚽ ${minute}' ${liveScore.t2.name}`);
+      }
     }
+
+    updateScoreboard(
+      liveScore.t1,
+      liveScore.t2,
+      liveScore.s1,
+      liveScore.s2
+    );
 
     updateTimeline(minute);
 
     if (minute >= 90) {
       clearInterval(currentInterval);
-      finishMatch(...getCurrentScore());
+      finishMatch(
+        liveScore.t1,
+        liveScore.t2,
+        liveScore.s1,
+        liveScore.s2
+      );
     }
 
   }, matchDuration / 90);
@@ -165,7 +183,6 @@ function resumeMatch() {
 // ================= ENDE =================
 function finishMatch(t1, t2, s1, s2) {
 
-  // ❌ doppelte Ausführung verhindern
   if (!isSimulating) return;
 
   isSimulating = false;
