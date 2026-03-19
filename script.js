@@ -268,7 +268,35 @@ function updateResults(){
 function updateMatchdayDisplay(){
   document.getElementById("matchday").innerText="Spieltag: "+currentMatchday;
 }
+// TEAM DROPDOWN
+function populateTeamSelect() {
+  let s = document.getElementById("teamSelect");
+  s.innerHTML = "";
 
+  teams.forEach(t => {
+    let o = document.createElement("option");
+    o.value = t.name;
+    o.textContent = t.name;
+    s.appendChild(o);
+  });
+
+  if (teamLocked) s.disabled = true;
+}
+
+// LIGA DROPDOWN
+function populateLeagueSelect() {
+  let s = document.getElementById("leagueSelect");
+  s.innerHTML = "";
+
+  Object.keys(leagues).forEach(l => {
+    let o = document.createElement("option");
+    o.value = l;
+    o.textContent = l;
+    s.appendChild(o);
+  });
+
+  if (leagueLocked) s.disabled = true;
+}
 // INIT
 loadGame();
 populateTeamSelect();
