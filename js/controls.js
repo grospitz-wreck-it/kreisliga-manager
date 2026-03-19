@@ -49,3 +49,43 @@ function makeSub() {
 
 function setSpeed(e, speed) {}
 function applyHalftime() {}
+function selectLeague() {
+  let league = document.getElementById("leagueSelect").value;
+
+  // 👉 neue Teams laden
+  teams = leagues[league].map(t => ({
+    ...t,
+    points: 0,
+    goals: 0
+  }));
+
+  // 👉 GANZ WICHTIG: Reset
+  selectedTeam = null;
+
+  currentMatchday = 0;
+
+  // 👉 neuer Spielplan
+  generateSchedule();
+
+  // 👉 Team Dropdown neu aufbauen
+  let teamSelect = document.getElementById("teamSelect");
+  teamSelect.innerHTML = "";
+
+  teams.forEach(t => {
+    let o = document.createElement("option");
+    o.value = t.name;
+    o.textContent = t.name;
+    teamSelect.appendChild(o);
+  });
+
+  // 👉 wieder auswählbar machen
+  teamSelect.disabled = false;
+
+  // 👉 Anzeige aktualisieren
+  updateTable();
+
+  document.getElementById("matchday").innerText =
+    "Spieltag: 0 / " + schedule.length;
+
+  console.log("Liga gewechselt:", league);
+}
