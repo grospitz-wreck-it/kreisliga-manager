@@ -139,3 +139,15 @@ function finishMatch(t1, t2, s1, s2) {
 
   updateTable();
 }
+function resumeMatch() {
+  document.getElementById("halftimePanel").style.display = "none";
+
+  matchStartTime = Date.now() - matchDuration / 2;
+
+  currentInterval = setInterval(() => {
+    let elapsed = Date.now() - matchStartTime;
+    let minute = Math.floor((elapsed / matchDuration) * 90);
+
+    updateTimeline(minute);
+  }, 100);
+}
