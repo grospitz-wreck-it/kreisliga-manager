@@ -11,15 +11,15 @@ let teamLocked = false;
 let liveModifier = 0;
 let substitutions = 3;
 
-let gameSpeed = 120;
+let gameSpeed = 100; // ms
 let currentInterval = null;
-let gameLoop = null;
 
-let matchDuration = 180000;
+let matchDuration = 180000; // 3 Minuten
 let matchStartTime = 0;
+
 let halftimeDone = false;
 
-// TEAMS
+// ================= TEAMS =================
 let leagues = {
   "Kreisliga A Herford": [
     { name: "TuS Bruchmühlen", strength: 75 },
@@ -41,7 +41,7 @@ let leagues = {
   ]
 };
 
-// INIT
+// ================= INIT =================
 function initTeams(raw) {
   return raw.map(t => ({
     ...t,
@@ -50,7 +50,7 @@ function initTeams(raw) {
   }));
 }
 
-// SCHEDULE
+// ================= SCHEDULE =================
 function generateSchedule() {
   schedule = [];
   let temp = [...teams];
@@ -68,7 +68,7 @@ function generateSchedule() {
   schedule = schedule.concat(second);
 }
 
-// UI
+// ================= UI =================
 function updateTimeline(minute) {
   document.getElementById("timelineBar").style.width =
     (minute / 90) * 100 + "%";
@@ -97,7 +97,7 @@ function updateTable() {
   });
 }
 
-// BUTTONS
+// ================= BUTTONS =================
 function setLiveMode(mode) {
   liveModifier = 0;
 
@@ -105,12 +105,12 @@ function setLiveMode(mode) {
   document.getElementById("btnCalm").classList.remove("activeBtn");
 
   if (mode === "attack") {
-    liveModifier = 0.02;
+    liveModifier = 0.01; // kleiner!
     document.getElementById("btnAttack").classList.add("activeBtn");
   }
 
   if (mode === "calm") {
-    liveModifier = -0.015;
+    liveModifier = -0.005;
     document.getElementById("btnCalm").classList.add("activeBtn");
   }
 }
@@ -122,7 +122,7 @@ function setSpeed(e, speed) {
     b.classList.remove("activeBtn")
   );
 
-  e.target.classList.add("activeBtn");
+  if (e && e.target) e.target.classList.add("activeBtn");
 
   if (currentInterval) {
     clearInterval(currentInterval);
@@ -131,10 +131,12 @@ function setSpeed(e, speed) {
 }
 
 function fastForward() {
-  setSpeed({target:null}, 30);
+  setSpeed(null, 30);
 }
 
-// MATCH
+// ================= MATCH =================
+let gameLoop;
+
 function simulateMatchday() {
   if (!selectedTeam) return alert("Team wählen!");
   if (isSimulating) return;
@@ -166,7 +168,9 @@ function simulateLiveMatch(t1, t2) {
 
     updateTimeline(minute);
 
-    let chance = 0.01 + liveModifier;
+    // 👉 TORLOGIK FIX
+    let baseChance = 0.002; // SEHR niedrig!
+    let chance = baseChance + liveModifier;
 
     if (Math.random() < chance) {
       if (Math.random() < 0.5) {
@@ -181,6 +185,7 @@ function simulateLiveMatch(t1, t2) {
     updateScoreboard(t1, t2, s1, s2);
     updateTable();
 
+    // HALBZEIT
     if (minute >= 45 && !halftimeDone) {
       halftimeDone = true;
       clearInterval(currentInterval);
@@ -189,6 +194,7 @@ function simulateLiveMatch(t1, t2) {
       return;
     }
 
+    // ENDE
     if (elapsed >= matchDuration) {
       clearInterval(currentInterval);
       finishMatch(t1, t2, s1, s2);
@@ -210,6 +216,7 @@ function applyHalftime() {
   window.resume();
 }
 
+// ================= EVENTS =================
 function addEvent(text) {
   let box = document.getElementById("liveMatch");
   let p = document.createElement("p");
@@ -217,6 +224,7 @@ function addEvent(text) {
   box.prepend(p);
 }
 
+// ================= FINISH =================
 function finishMatch(t1, t2, s1, s2) {
   t1.goals += s1;
   t2.goals += s2;
@@ -236,7 +244,7 @@ function finishMatch(t1, t2, s1, s2) {
   updateTable();
 }
 
-// TEAM
+// ================= TEAM =================
 function populateTeamSelect() {
   let s = document.getElementById("teamSelect");
   s.innerHTML="";
@@ -254,13 +262,7 @@ function selectTeam() {
   teamLocked = true;
 }
 
-function setTactic() {
-  selectedTactic = document.getElementById("tacticSelect").value;
-  document.getElementById("currentTactic").innerText =
-    "Taktik: " + selectedTactic;
-}
-
-// INIT
+// ================= INIT =================
 teams = initTeams(leagues["Kreisliga A Herford"]);
 generateSchedule();
 populateTeamSelect();
