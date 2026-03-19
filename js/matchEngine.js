@@ -115,6 +115,9 @@ function simulateLiveMatch(t1, t2) {
 
 // ================= ENDE =================
 function finishMatch(t1, t2, s1, s2) {
+
+  if (!isSimulating) return;
+
   isSimulating = false;
 
   addEvent(`🏁 Endstand: ${s1}:${s2}`);
@@ -146,4 +149,7 @@ function resumeMatch() {
 
     updateTimeline(minute);
   }, 100);
+}
+if (currentInterval) {
+  clearInterval(currentInterval);
 }
