@@ -85,7 +85,9 @@ function simulateLiveMatch(t1, t2) {
   }
 
   isSimulating = true;
-
+  halftimeDone = false;
+  substitutions = 5;
+  liveModifier = 0;
   // 🔥 globaler Spielstand
   liveScore = {
     t1: t1,
