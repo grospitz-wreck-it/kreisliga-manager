@@ -4,6 +4,27 @@ body {
   color: white;
 }
 
+.layout {
+  display: flex;
+  gap: 20px;
+}
+
+.panel {
+  border: 2px solid white;
+  padding: 15px;
+  width: 30%;
+}
+
+.center {
+  text-align: center;
+}
+
+.scoreboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+}
 
 #score {
   background: black;
