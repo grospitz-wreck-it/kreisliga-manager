@@ -1,3 +1,20 @@
+// ================= League =================
+function selectLeague() {
+  const league = document.getElementById("leagueSelect").value;
+
+  if (!league) {
+    alert("Bitte Liga wählen!");
+    return;
+  }
+
+  loadLeague(league);
+  generateSchedule();
+  populateTeamSelect();
+  updateTable();
+
+  console.log("Liga gestartet:", league);
+}
+
 // ================= TEAM =================
 function selectTeam() {
   const select = document.getElementById("teamSelect");
