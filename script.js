@@ -42,7 +42,7 @@ function initTeams(raw) {
   }));
 }
 
-// ================= SAVE =================
+// ================= SAVE / LOAD =================
 function saveGame() {
   localStorage.setItem("save", JSON.stringify({
     teams, currentMatchday, selectedTeam,
@@ -56,9 +56,18 @@ function loadGame() {
 
   if (s) {
     let d = JSON.parse(s);
-    Object.assign(window, d);
+    teams = d.teams;
+    currentMatchday = d.currentMatchday;
+    selectedTeam = d.selectedTeam;
+    selectedTactic = d.selectedTactic;
+    teamLocked = d.teamLocked;
+    leagueLocked = d.leagueLocked;
+    currentLeague = d.currentLeague;
+    lastResults = d.lastResults;
     generateSchedule();
-  } else createNewGame();
+  } else {
+    createNewGame();
+  }
 }
 
 // ================= NEW =================
@@ -95,7 +104,7 @@ function generateSchedule() {
   schedule = [...schedule, ...returnRound];
 }
 
-// ================= UI DROPDOWNS =================
+// ================= DROPDOWNS =================
 function populateTeamSelect() {
   let s = document.getElementById("teamSelect");
   s.innerHTML = "";
@@ -104,8 +113,15 @@ function populateTeamSelect() {
     let o = document.createElement("option");
     o.value = t.name;
     o.textContent = t.name;
+
+    if (t.name === selectedTeam) o.selected = true;
+
     s.appendChild(o);
   });
+
+  if (!selectedTeam && teams.length > 0) {
+    s.value = teams[0].name;
+  }
 
   if (teamLocked) s.disabled = true;
 }
@@ -131,6 +147,7 @@ function selectLeague() {
   if (leagueLocked) return alert("Liga bereits gewählt!");
 
   currentLeague = document.getElementById("leagueSelect").value;
+
   createNewGame();
 
   populateTeamSelect();
@@ -141,23 +158,33 @@ function selectLeague() {
 function selectTeam() {
   if (teamLocked) return alert("Team bereits gewählt!");
 
-  selectedTeam = document.getElementById("teamSelect").value;
+  let dropdown = document.getElementById("teamSelect");
+  selectedTeam = dropdown.options[dropdown.selectedIndex].value;
 
   teamLocked = true;
   leagueLocked = true;
 
   populateTeamSelect();
   populateLeagueSelect();
+
   saveGame();
   updateAll();
 }
 
 function setTactic() {
   selectedTactic = document.getElementById("tacticSelect").value;
+
   document.getElementById("currentTactic").innerText =
     "Taktik: " + selectedTactic;
 
   saveGame();
+}
+
+// ================= SCOREBOARD =================
+function updateScoreboard(t1, t2, s1, s2) {
+  document.getElementById("team1Name").innerText = t1.name;
+  document.getElementById("team2Name").innerText = t2.name;
+  document.getElementById("score").innerText = s1 + " : " + s2;
 }
 
 // ================= MATCHDAY =================
@@ -171,7 +198,6 @@ function simulateMatchday() {
 
   let matches = schedule[currentMatchday];
 
-  // 👉 USER MATCH GARANTIERT
   let userMatch = matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
@@ -207,7 +233,9 @@ function simulateLiveMatch(t1, t2, cb) {
   let extra1 = Math.floor(Math.random() * 5) + 1;
   let extra2 = Math.floor(Math.random() * 5) + 1;
 
-  box.innerHTML = `<h2>${t1.name} vs ${t2.name}</h2>`;
+  box.innerHTML = "";
+
+  updateScoreboard(t1, t2, s1, s2);
 
   let interval = setInterval(() => {
     minute++;
@@ -223,18 +251,18 @@ function simulateLiveMatch(t1, t2, cb) {
     if (Math.random() < getGoalChance(minute, s1, s2)) {
       if (Math.random() < 0.5) {
         s1++;
-        box.innerHTML += `<p>⚽ ${display}' ${t1.name}</p>`;
+        box.innerHTML = `<p>⚽ ${display}' ${t1.name}</p>` + box.innerHTML;
       } else {
         s2++;
-        box.innerHTML += `<p>⚽ ${display}' ${t2.name}</p>`;
+        box.innerHTML = `<p>⚽ ${display}' ${t2.name}</p>` + box.innerHTML;
       }
+
+      updateScoreboard(t1, t2, s1, s2);
       updateTable();
     }
 
-    // HALBZEIT → UI PANEL
     if (minute === 45 + extra1) {
       clearInterval(interval);
-
       showHalftimeUI(s1, s2, () => {
         simulateSecondHalf(t1, t2, s1, s2, extra2, cb);
       });
@@ -243,35 +271,12 @@ function simulateLiveMatch(t1, t2, cb) {
   }, 120);
 }
 
-// ================= HALBZEIT UI =================
+// ================= HALBZEIT =================
 function showHalftimeUI(score1, score2, resumeCallback) {
-  let box = document.getElementById("liveMatch");
+  let panel = document.getElementById("halftimePanel");
 
-  box.innerHTML += `
-    <div style="background:#222;padding:10px;margin-top:10px;">
-      <h3>Halbzeit (${score1}:${score2})</h3>
-
-      <label>Taktik:</label>
-      <select id="halfTactic">
-        <option value="normal">Normal</option>
-        <option value="offensive">Offensiv</option>
-        <option value="defensive">Defensiv</option>
-      </select>
-
-      <br><br>
-
-      <label>Formation:</label>
-      <select id="halfFormation">
-        <option value="442">4-4-2</option>
-        <option value="433">4-3-3</option>
-        <option value="532">5-3-2</option>
-      </select>
-
-      <br><br>
-
-      <button onclick="applyHalftime()">Weiter</button>
-    </div>
-  `;
+  panel.style.display = "block";
+  panel.querySelector("h3").innerText = `Halbzeit (${score1}:${score2})`;
 
   window.resumeMatch = resumeCallback;
 }
@@ -284,6 +289,8 @@ function applyHalftime() {
 
   document.getElementById("currentTactic").innerText =
     "Taktik: " + selectedTactic;
+
+  document.getElementById("halftimePanel").style.display = "none";
 
   saveGame();
 
@@ -306,11 +313,13 @@ function simulateSecondHalf(t1, t2, s1, s2, extra2, cb) {
     if (Math.random() < getGoalChance(minute, s1, s2)) {
       if (Math.random() < 0.5) {
         s1++;
-        box.innerHTML += `<p>⚽ ${display}' ${t1.name}</p>`;
+        box.innerHTML = `<p>⚽ ${display}' ${t1.name}</p>` + box.innerHTML;
       } else {
         s2++;
-        box.innerHTML += `<p>⚽ ${display}' ${t2.name}</p>`;
+        box.innerHTML = `<p>⚽ ${display}' ${t2.name}</p>` + box.innerHTML;
       }
+
+      updateScoreboard(t1, t2, s1, s2);
       updateTable();
     }
 
@@ -319,7 +328,7 @@ function simulateSecondHalf(t1, t2, s1, s2, extra2, cb) {
 
       updateStats(t1, t2, s1, s2);
 
-      box.innerHTML += `<h3>Endstand: ${s1}:${s2}</h3>`;
+      box.innerHTML = `<h3>Endstand: ${s1}:${s2}</h3>` + box.innerHTML;
 
       lastResults.push({ team1: t1.name, team2: t2.name, score1: s1, score2: s2 });
 
