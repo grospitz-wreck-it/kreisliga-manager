@@ -11,6 +11,7 @@
 
 <div class="container">
 
+  <!-- LINKS -->
   <div class="panel">
     <h2>Liga wählen</h2>
     <select id="leagueSelect"></select>
@@ -21,16 +22,30 @@
     <button onclick="selectTeam()">Übernehmen</button>
 
     <h2>Taktik</h2>
+
+    <label>Spielstil:</label><br>
     <select id="tacticSelect">
       <option value="normal">Normal</option>
       <option value="offensive">Offensiv</option>
       <option value="defensive">Defensiv</option>
     </select>
-    <button onclick="setTactic()">Speichern</button>
 
+    <br><br>
+
+    <label>Formation:</label><br>
+    <select id="formationSelect">
+      <option value="442">4-4-2</option>
+      <option value="433">4-3-3</option>
+      <option value="532">5-3-2</option>
+    </select>
+
+    <br><br>
+
+    <button onclick="setTactic()">Speichern</button>
     <p id="currentTactic"></p>
   </div>
 
+  <!-- MITTE -->
   <div class="panel">
     <h2 id="matchday">Spieltag: 0</h2>
     <button onclick="simulateMatchday()">▶ Spiel starten</button>
@@ -42,6 +57,7 @@
     <div id="results"></div>
   </div>
 
+  <!-- RECHTS -->
   <div class="panel">
     <h2>Tabelle</h2>
     <table id="table">
