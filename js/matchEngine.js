@@ -29,13 +29,14 @@ function generateSchedule() {
 
 // ================= SPIELTAG =================
 function simulateMatchday() {
-  if (!selectedTeam) {
-    alert("Team wählen!");
+
+  if (isSimulating) {
+    console.log("Spiel läuft bereits!");
     return;
   }
 
-  if (!schedule || schedule.length === 0) {
-    alert("Spielplan fehlt!");
+  if (!selectedTeam) {
+    alert("Team wählen!");
     return;
   }
 
@@ -50,6 +51,7 @@ function simulateMatchday() {
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
 
+  // 👉 alle anderen Spiele korrekt simulieren
   matches.forEach(m => {
     if (m !== userMatch) simulateQuick(m[0], m[1]);
   });
