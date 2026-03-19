@@ -35,4 +35,3 @@ function updateScoreboard(t1,t2,s1,s2){
 function updateTimeline(minute){
   document.getElementById("timelineBar").style.width=(minute/90)*100+"%";
 }
-
