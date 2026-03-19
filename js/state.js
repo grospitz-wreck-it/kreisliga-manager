@@ -5,18 +5,13 @@ let selectedTeam = null;
 
 let isSimulating = false;
 let currentInterval = null;
+let currentMinute = 0;
 
-let matchDuration = 180000; // 3 Minuten
-
-let halftimeDone = false;
+let matchDuration = 180000;
 
 let liveModifier = 0;
 let substitutions = 5;
 
-// 🔥 globaler Spielstand
-let liveScore = {
-  t1: null,
-  t2: null,
-  s1: 0,
-  s2: 0
-};
+let liveScore = { t1:null, t2:null, s1:0, s2:0 };
+
+const leagues = { herford: "Kreisliga Herford" };
