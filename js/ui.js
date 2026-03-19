@@ -11,3 +11,30 @@ function updateTable(){
       tbody.appendChild(tr);
     });
 }
+
+function populateTeamSelect(){
+  const select = document.getElementById("teamSelect");
+  select.innerHTML = "";
+
+  teams.forEach(t=>{
+    const o = document.createElement("option");
+    o.value = t.name;
+    o.textContent = t.name;
+    select.appendChild(o);
+  });
+}
+
+function addEvent(text){
+  const box = document.getElementById("liveMatch");
+  box.innerHTML = `<p>${text}</p>` + box.innerHTML;
+}
+
+function updateScoreboard(t1,t2,s1,s2){
+  document.getElementById("score").innerText = `${s1} : ${s2}`;
+  document.getElementById("teamLeft").innerText = t1.name;
+  document.getElementById("teamRight").innerText = t2.name;
+}
+
+function updateTimeline(minute){
+  document.getElementById("timelineBar").style.width = (minute/90)*100 + "%";
+}
