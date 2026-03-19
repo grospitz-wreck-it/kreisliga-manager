@@ -13,16 +13,18 @@ function loadGame() {
     try {
       let data = JSON.parse(saved);
 
-      if (!data.teams || !data.schedule) {
+      if (!data.teams) {
         throw "Alter Speicher inkompatibel";
       }
 
       teams = data.teams;
-      schedule = data.schedule;
       currentMatchday = data.currentMatchday || 0;
       selectedTeam = data.selectedTeam || null;
       selectedTactic = data.selectedTactic || "normal";
       lastResults = data.lastResults || [];
+
+      // 🔥 Spielplan immer neu erzeugen
+      generateSchedule();
 
     } catch (e) {
       localStorage.clear();
@@ -43,20 +45,19 @@ function createNewGame() {
     { name: "Team D", strength: 55, points: 0, goals: 0 }
   ];
 
-  generateSchedule();
   currentMatchday = 0;
   selectedTeam = null;
   selectedTactic = "normal";
   lastResults = [];
 
+  generateSchedule();
   saveGame();
 }
 
-// Speichern
+// Speichern (OHNE schedule!)
 function saveGame() {
   localStorage.setItem("kreisligaSave", JSON.stringify({
     teams,
-    schedule,
     currentMatchday,
     selectedTeam,
     selectedTactic,
@@ -64,7 +65,7 @@ function saveGame() {
   }));
 }
 
-// Spielplan
+// Spielplan generieren
 function generateSchedule() {
   schedule = [];
 
