@@ -2,6 +2,7 @@ let teams = [];
 let schedule = [];
 let currentMatchday = 0;
 let selectedTeam = null;
+let selectedTactic = "normal";
 
 // Spiel laden
 function loadGame() {
@@ -19,9 +20,9 @@ function loadGame() {
       schedule = data.schedule;
       currentMatchday = data.currentMatchday || 0;
       selectedTeam = data.selectedTeam || null;
+      selectedTactic = data.selectedTactic || "normal";
 
     } catch (e) {
-      console.log("Speicher zurückgesetzt:", e);
       localStorage.clear();
       createNewGame();
     }
@@ -31,7 +32,7 @@ function loadGame() {
   }
 }
 
-// Neue Liga erstellen
+// Neue Liga
 function createNewGame() {
   teams = [
     { name: "Team A", strength: 70, points: 0, goals: 0 },
@@ -43,6 +44,7 @@ function createNewGame() {
   generateSchedule();
   currentMatchday = 0;
   selectedTeam = null;
+  selectedTactic = "normal";
 
   saveGame();
 }
@@ -53,11 +55,12 @@ function saveGame() {
     teams,
     schedule,
     currentMatchday,
-    selectedTeam
+    selectedTeam,
+    selectedTactic
   }));
 }
 
-// Spielplan generieren
+// Spielplan
 function generateSchedule() {
   schedule = [];
 
@@ -74,15 +77,33 @@ function generateSchedule() {
     }
 
     schedule.push(matchday);
-
     tempTeams.splice(1, 0, tempTeams.pop());
   }
+}
+
+// 🔥 Taktik-Einfluss
+function applyTactic(team, baseScore) {
+  if (team.name !== selectedTeam) return baseScore;
+
+  if (selectedTactic === "offensive") {
+    return baseScore + 1;
+  }
+
+  if (selectedTactic === "defensive") {
+    return Math.max(0, baseScore - 1);
+  }
+
+  return baseScore;
 }
 
 // Spiel simulieren
 function simulateMatch(team1, team2) {
   let score1 = Math.floor(Math.random() * (team1.strength / 20));
   let score2 = Math.floor(Math.random() * (team2.strength / 20));
+
+  // 🔥 Taktik anwenden
+  score1 = applyTactic(team1, score1);
+  score2 = applyTactic(team2, score2);
 
   team1.goals += score1;
   team2.goals += score2;
@@ -97,14 +118,9 @@ function simulateMatch(team1, team2) {
   }
 }
 
-// Spieltag simulieren
+// Spieltag
 function simulateMatchday() {
-  if (!schedule || schedule.length === 0) {
-    alert("Fehler im Spielplan – neu laden!");
-    return;
-  }
-
-  if (currentMatchday >= schedule.length) {
+  if (!schedule || currentMatchday >= schedule.length) {
     alert("Saison beendet!");
     return;
   }
@@ -124,20 +140,18 @@ function simulateMatchday() {
 
 // Tabelle
 function updateTable() {
-  if (!teams) return;
-
   teams.sort((a, b) => b.points - a.points);
 
   let tbody = document.querySelector("#table tbody");
   tbody.innerHTML = "";
 
   teams.forEach(team => {
-    let nameDisplay = team.name === selectedTeam
+    let name = team.name === selectedTeam
       ? "👉 " + team.name
       : team.name;
 
     let row = `<tr>
-      <td>${nameDisplay}</td>
+      <td>${name}</td>
       <td>${team.points}</td>
       <td>${team.goals}</td>
     </tr>`;
@@ -145,15 +159,13 @@ function updateTable() {
   });
 }
 
-// Spieltag anzeigen
+// Spieltag Anzeige
 function updateMatchdayDisplay() {
-  const el = document.getElementById("matchday");
-  if (el) {
-    el.innerText = "Spieltag: " + currentMatchday;
-  }
+  document.getElementById("matchday").innerText =
+    "Spieltag: " + currentMatchday;
 }
 
-// Dropdown füllen
+// Team Dropdown
 function populateTeamSelect() {
   let select = document.getElementById("teamSelect");
   if (!select) return;
@@ -173,13 +185,17 @@ function populateTeamSelect() {
   });
 }
 
-// Team auswählen
+// Team wählen
 function selectTeam() {
-  let select = document.getElementById("teamSelect");
-  selectedTeam = select.value;
-
+  selectedTeam = document.getElementById("teamSelect").value;
   saveGame();
   updateTable();
+}
+
+// 🔥 Taktik speichern
+function setTactic() {
+  selectedTactic = document.getElementById("tacticSelect").value;
+  saveGame();
 }
 
 // INIT
