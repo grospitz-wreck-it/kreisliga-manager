@@ -12,7 +12,7 @@ let leagueLocked = false;
 
 let currentLeague = "Kreisliga A Herford";
 
-// ================= LIGEN =================
+// ================= LIGA =================
 let leagues = {
   "Kreisliga A Herford": [
     { name: "TuS Bruchmühlen", strength: 75 },
@@ -42,11 +42,12 @@ function initTeams(raw) {
   }));
 }
 
-// ================= SAVE / LOAD =================
+// ================= SAVE =================
 function saveGame() {
   localStorage.setItem("save", JSON.stringify({
-    teams, currentMatchday, selectedTeam, selectedTactic,
-    teamLocked, leagueLocked, currentLeague, lastResults
+    teams, currentMatchday, selectedTeam,
+    selectedTactic, teamLocked, leagueLocked,
+    currentLeague, lastResults
   }));
 }
 
@@ -55,18 +56,9 @@ function loadGame() {
 
   if (s) {
     let d = JSON.parse(s);
-    teams = d.teams;
-    currentMatchday = d.currentMatchday;
-    selectedTeam = d.selectedTeam;
-    selectedTactic = d.selectedTactic;
-    teamLocked = d.teamLocked;
-    leagueLocked = d.leagueLocked;
-    currentLeague = d.currentLeague;
-    lastResults = d.lastResults;
+    Object.assign(window, d);
     generateSchedule();
-  } else {
-    createNewGame();
-  }
+  } else createNewGame();
 }
 
 // ================= NEW =================
@@ -99,14 +91,11 @@ function generateSchedule() {
     temp.splice(1, 0, temp.pop());
   }
 
-  let returnRound = schedule.map(day =>
-    day.map(match => [match[1], match[0]])
-  );
-
+  let returnRound = schedule.map(d => d.map(m => [m[1], m[0]]));
   schedule = [...schedule, ...returnRound];
 }
 
-// ================= DROPDOWNS =================
+// ================= UI DROPDOWNS =================
 function populateTeamSelect() {
   let s = document.getElementById("teamSelect");
   s.innerHTML = "";
@@ -142,7 +131,6 @@ function selectLeague() {
   if (leagueLocked) return alert("Liga bereits gewählt!");
 
   currentLeague = document.getElementById("leagueSelect").value;
-
   createNewGame();
 
   populateTeamSelect();
@@ -160,23 +148,22 @@ function selectTeam() {
 
   populateTeamSelect();
   populateLeagueSelect();
-
   saveGame();
   updateAll();
 }
 
 function setTactic() {
   selectedTactic = document.getElementById("tacticSelect").value;
-
   document.getElementById("currentTactic").innerText =
     "Taktik: " + selectedTactic;
 
   saveGame();
 }
 
-// ================= GAME =================
+// ================= MATCHDAY =================
 function simulateMatchday() {
   if (isSimulating) return;
+  if (!selectedTeam) return alert("Bitte Team wählen!");
   if (currentMatchday >= schedule.length) return alert("Saison beendet!");
 
   isSimulating = true;
@@ -184,6 +171,7 @@ function simulateMatchday() {
 
   let matches = schedule[currentMatchday];
 
+  // 👉 USER MATCH GARANTIERT
   let userMatch = matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
@@ -193,62 +181,141 @@ function simulateMatchday() {
   });
 }
 
-// ================= MATCH =================
+// ================= GOAL LOGIC =================
+function getGoalChance(minute, s1, s2) {
+  let base = 0.05;
+
+  if (minute > 75) base += 0.02;
+  if (minute > 90) base += 0.05;
+
+  if (selectedTactic === "offensive") base += 0.03;
+  if (selectedTactic === "defensive") base -= 0.02;
+
+  let diff = Math.abs(s1 - s2);
+  if (diff >= 1) base += 0.02;
+
+  return Math.max(0.02, base);
+}
+
+// ================= LIVE MATCH =================
 function simulateLiveMatch(t1, t2, cb) {
-  let min = 0, s1 = 0, s2 = 0;
+  let minute = 0;
+  let s1 = 0, s2 = 0;
+
   let box = document.getElementById("liveMatch");
+
+  let extra1 = Math.floor(Math.random() * 5) + 1;
+  let extra2 = Math.floor(Math.random() * 5) + 1;
 
   box.innerHTML = `<h2>${t1.name} vs ${t2.name}</h2>`;
 
-  let i = setInterval(() => {
-    min++;
+  let interval = setInterval(() => {
+    minute++;
 
-    if (Math.random() < 0.08) {
+    let display = minute;
+
+    if (minute > 45 && minute <= 45 + extra1)
+      display = `45+${minute - 45}`;
+
+    if (minute > 90)
+      display = `90+${minute - 90}`;
+
+    if (Math.random() < getGoalChance(minute, s1, s2)) {
       if (Math.random() < 0.5) {
         s1++;
-        box.innerHTML += `<p>⚽ ${min}' ${t1.name}</p>`;
+        box.innerHTML += `<p>⚽ ${display}' ${t1.name}</p>`;
       } else {
         s2++;
-        box.innerHTML += `<p>⚽ ${min}' ${t2.name}</p>`;
+        box.innerHTML += `<p>⚽ ${display}' ${t2.name}</p>`;
       }
-
       updateTable();
     }
 
-    if (min === 45) {
-      clearInterval(i);
+    // HALBZEIT → UI PANEL
+    if (minute === 45 + extra1) {
+      clearInterval(interval);
 
-      if (confirm(`Halbzeit ${s1}:${s2} ändern?`)) {
-        selectedTactic = prompt("normal/offensive/defensive", selectedTactic) || selectedTactic;
-      }
-
-      setTimeout(() => simulateSecondHalf(t1, t2, s1, s2, cb), 1000);
+      showHalftimeUI(s1, s2, () => {
+        simulateSecondHalf(t1, t2, s1, s2, extra2, cb);
+      });
     }
 
   }, 120);
 }
 
-function simulateSecondHalf(t1, t2, s1, s2, cb) {
-  let min = 45;
+// ================= HALBZEIT UI =================
+function showHalftimeUI(score1, score2, resumeCallback) {
   let box = document.getElementById("liveMatch");
 
-  let i = setInterval(() => {
-    min++;
+  box.innerHTML += `
+    <div style="background:#222;padding:10px;margin-top:10px;">
+      <h3>Halbzeit (${score1}:${score2})</h3>
 
-    if (Math.random() < 0.08) {
+      <label>Taktik:</label>
+      <select id="halfTactic">
+        <option value="normal">Normal</option>
+        <option value="offensive">Offensiv</option>
+        <option value="defensive">Defensiv</option>
+      </select>
+
+      <br><br>
+
+      <label>Formation:</label>
+      <select id="halfFormation">
+        <option value="442">4-4-2</option>
+        <option value="433">4-3-3</option>
+        <option value="532">5-3-2</option>
+      </select>
+
+      <br><br>
+
+      <button onclick="applyHalftime()">Weiter</button>
+    </div>
+  `;
+
+  window.resumeMatch = resumeCallback;
+}
+
+function applyHalftime() {
+  selectedTactic = document.getElementById("halfTactic").value;
+
+  let f = document.getElementById("halfFormation").value;
+  document.getElementById("formationSelect").value = f;
+
+  document.getElementById("currentTactic").innerText =
+    "Taktik: " + selectedTactic;
+
+  saveGame();
+
+  if (window.resumeMatch) window.resumeMatch();
+}
+
+// ================= SECOND HALF =================
+function simulateSecondHalf(t1, t2, s1, s2, extra2, cb) {
+  let minute = 45;
+  let box = document.getElementById("liveMatch");
+
+  let interval = setInterval(() => {
+    minute++;
+
+    let display = minute;
+
+    if (minute > 90)
+      display = `90+${minute - 90}`;
+
+    if (Math.random() < getGoalChance(minute, s1, s2)) {
       if (Math.random() < 0.5) {
         s1++;
-        box.innerHTML += `<p>⚽ ${min}' ${t1.name}</p>`;
+        box.innerHTML += `<p>⚽ ${display}' ${t1.name}</p>`;
       } else {
         s2++;
-        box.innerHTML += `<p>⚽ ${min}' ${t2.name}</p>`;
+        box.innerHTML += `<p>⚽ ${display}' ${t2.name}</p>`;
       }
-
       updateTable();
     }
 
-    if (min >= 90) {
-      clearInterval(i);
+    if (minute === 90 + extra2) {
+      clearInterval(interval);
 
       updateStats(t1, t2, s1, s2);
 
@@ -265,11 +332,12 @@ function simulateSecondHalf(t1, t2, s1, s2, cb) {
 // ================= OTHERS =================
 function simulateOthers(matches) {
   let box = document.getElementById("liveMatch");
+
   box.innerHTML += "<hr><small>Andere Spiele:</small>";
 
   matches.forEach(([t1, t2]) => {
-    let s1 = randomGoals(t1);
-    let s2 = randomGoals(t2);
+    let s1 = Math.floor(Math.random() * 3);
+    let s2 = Math.floor(Math.random() * 3);
 
     updateStats(t1, t2, s1, s2);
 
@@ -279,17 +347,7 @@ function simulateOthers(matches) {
   finishMatchday();
 }
 
-// ================= LOGIC =================
-function randomGoals(team) {
-  let base = (team.strength / 100) + (team.form * 0.1);
-
-  let g = 0;
-  if (Math.random() < base) g++;
-  if (Math.random() < base * 0.4) g++;
-
-  return g;
-}
-
+// ================= STATS =================
 function updateStats(t1, t2, s1, s2) {
   t1.goals += s1;
   t2.goals += s2;
@@ -308,7 +366,7 @@ function updateStats(t1, t2, s1, s2) {
   }
 }
 
-// ================= END =================
+// ================= FINISH =================
 function finishMatchday() {
   currentMatchday++;
   isSimulating = false;
@@ -331,13 +389,14 @@ function updateTable() {
   tb.innerHTML = "";
 
   teams.forEach(t => {
-    let n = t.name === selectedTeam ? "👉 " + t.name : t.name;
+    let name = t.name === selectedTeam ? "👉 " + t.name : t.name;
 
-    tb.innerHTML += `<tr>
-      <td>${n}</td>
-      <td>${t.points}</td>
-      <td>${t.goals}</td>
-    </tr>`;
+    tb.innerHTML += `
+      <tr>
+        <td>${name}</td>
+        <td>${t.points}</td>
+        <td>${t.goals}</td>
+      </tr>`;
   });
 }
 
