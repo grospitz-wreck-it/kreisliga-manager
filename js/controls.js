@@ -1,98 +1,48 @@
-// ================= League =================
-function selectLeague() {
-  const league = document.getElementById("leagueSelect").value;
-
-  if (!league) {
-    alert("Bitte Liga wählen!");
-    return;
-  }
-
-  loadLeague(league);
-  generateSchedule();
-  populateTeamSelect();
+function selectLeague(){
+  selectedTeam=select.value;
   updateTable();
-
-  console.log("Liga gestartet:", league);
 }
 
-// ================= TEAM =================
-function selectTeam() {
-  const select = document.getElementById("teamSelect");
-
-  if (!select.value) {
-    alert("Bitte Team auswählen!");
-    return;
-  }
-
-  selectedTeam = select.value.trim();
-
-  console.log("Team gesetzt:", selectedTeam);
-
-  // 👉 WICHTIG: nichts anderes verändern!
-  // kein updateTable hier nötig
+function setTactic(){
+  selectedTactic=document.getElementById("tacticSelect").value;
+  document.getElementById("currentTactic").innerText="Taktik: "+selectedTactic;
 }
 
-// ================= TAKTIK =================
-function setTactic() {
-  selectedTactic = document.getElementById("tacticSelect").value;
+function setLiveMode(mode){
+  document.getElementById("btnAttack").classList.remove("active");
+  document.getElementById("btnCalm").classList.remove("active");
 
-  document.getElementById("currentTactic").innerText =
-    "Taktik: " + selectedTactic;
-}
-
-// ================= LIVE MODE =================
-function setLiveMode(mode) {
-  if (mode === "attack") {
-    liveModifier += 0.01;
+  if(mode==="attack"){
+    liveModifier+=0.01;
+    document.getElementById("btnAttack").classList.add("active");
   } else {
-    liveModifier -= 0.01;
+    liveModifier-=0.01;
+    document.getElementById("btnCalm").classList.add("active");
   }
+
+  liveModifier=Math.max(-0.1,Math.min(0.1,liveModifier));
 }
 
-// ================= WECHSEL =================
-function makeSub() {
+function makeSub(){
+  if(!isSimulating) return alert("Spiel läuft nicht!");
+  if(substitutions<=0) return alert("Keine Wechsel mehr!");
 
-  if (!isSimulating) {
-    alert("Spiel läuft nicht!");
-    return;
-  }
+  let type=prompt("offensiv / defensiv");
+  if(!type) return;
 
-  if (substitutions <= 0) {
-    alert("Keine Wechsel mehr!");
-    return;
-  }
-
-  let type = prompt("Wechsel? offensiv / defensiv");
-
-  if (!type) return;
-
-  type = type.toLowerCase();
-
-  if (type === "offensiv") {
-    liveModifier += 0.01;
-    addEvent("🔼 Offensiver Wechsel");
-  } 
-  else if (type === "defensiv") {
-    liveModifier -= 0.01;
-    addEvent("🔽 Defensiver Wechsel");
-  } 
-  else {
-    alert("Bitte 'offensiv' oder 'defensiv' eingeben");
-    return;
-  }
+  if(type==="offensiv") liveModifier+=0.01;
+  else if(type==="defensiv") liveModifier-=0.01;
 
   substitutions--;
-
-  document.getElementById("subCount").innerText =
-    "Wechsel: " + substitutions;
+  document.getElementById("subCount").innerText="Wechsel: "+substitutions;
 }
 
-// ================= SPEED =================
-function setSpeed(e, speed) {
-  matchDuration = speed * 1800;
+function setSpeed(e,speed){
+  matchDuration=speed*1800;
 
-  let buttons = e.target.parentElement.querySelectorAll("button");
-  buttons.forEach(b => b.classList.remove("active"));
-
+  let buttons=e.target.parentElement.querySelectorAll("button");
+  buttons.forEach(b=>b.classList.remove("active"));
   e.target.classList.add("active");
+
+  if(isSimulating) restartInterval();
 }
