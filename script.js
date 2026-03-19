@@ -13,7 +13,7 @@ let leagueLocked = false;
 
 let currentLeague = "Kreisliga A Herford";
 
-// ================= LIGA =================
+// ================= LIGEN =================
 let leagues = {
   "Kreisliga A Herford": [
     { name: "TuS Bruchmühlen", strength: 75 },
@@ -41,28 +41,25 @@ function initTeams(raw) {
     ...t,
     points: 0,
     goals: 0,
-    form: 0
+    form: 0,
+    red: 0
   }));
 }
 
-// ================= SCHEDULE (HIN + RÜCK) =================
+// ================= SCHEDULE =================
 function generateSchedule() {
   schedule = [];
   let temp = [...teams];
 
-  // HINRUNDE
   for (let i = 0; i < temp.length - 1; i++) {
     let round = [];
-
     for (let j = 0; j < temp.length / 2; j++) {
       round.push([temp[j], temp[temp.length - 1 - j]]);
     }
-
     schedule.push(round);
     temp.splice(1, 0, temp.pop());
   }
 
-  // RÜCKRUNDE
   let secondHalf = schedule.map(r =>
     r.map(m => [m[1], m[0]])
   );
@@ -70,93 +67,32 @@ function generateSchedule() {
   schedule = schedule.concat(secondHalf);
 }
 
-// ================= DROPDOWNS =================
-function populateLeagueSelect() {
-  let s = document.getElementById("leagueSelect");
-  s.innerHTML = "";
-
-  Object.keys(leagues).forEach(l => {
-    let o = document.createElement("option");
-    o.value = l;
-    o.textContent = l;
-    s.appendChild(o);
-  });
-
-  if (leagueLocked) s.disabled = true;
-}
-
-function populateTeamSelect() {
-  let s = document.getElementById("teamSelect");
-  s.innerHTML = "";
-
-  teams.forEach(t => {
-    let o = document.createElement("option");
-    o.value = t.name;
-    o.textContent = t.name;
-    s.appendChild(o);
-  });
-
-  if (teamLocked) s.disabled = true;
-}
-
-// ================= ACTIONS =================
-function selectLeague() {
-  if (leagueLocked) return alert("Liga bereits gewählt!");
-
-  currentLeague = document.getElementById("leagueSelect").value;
-
-  teams = initTeams(leagues[currentLeague]);
-  generateSchedule();
-
-  populateTeamSelect();
-  updateTable();
-}
-
-function selectTeam() {
-  if (teamLocked) return alert("Team bereits gewählt!");
-
-  selectedTeam = document.getElementById("teamSelect").value;
-
-  teamLocked = true;
-  leagueLocked = true;
-
-  populateLeagueSelect();
-  populateTeamSelect();
-}
-
-function setTactic() {
-  selectedTactic = document.getElementById("tacticSelect").value;
-
-  document.getElementById("currentTactic").innerText =
-    "Taktik: " + selectedTactic;
-}
-
-// ================= TABLE =================
-function updateTable() {
-  let tbody = document.querySelector("#table tbody");
-  if (!tbody) return;
-
-  tbody.innerHTML = "";
-
-  teams.sort((a, b) => b.points - a.points);
-
-  teams.forEach(t => {
-    let name = t.name === selectedTeam ? "👉 " + t.name : t.name;
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${name}</td>
-        <td>${t.points}</td>
-        <td>${t.goals}</td>
-      </tr>`;
-  });
-}
-
-// ================= SCOREBOARD =================
+// ================= SCORE =================
 function updateScoreboard(t1, t2, s1, s2) {
   document.getElementById("team1Name").innerText = t1.name;
   document.getElementById("team2Name").innerText = t2.name;
   document.getElementById("score").innerText = s1 + " : " + s2;
+}
+
+// ================= TICKER =================
+const tickerPhrases = [
+  "Arbeitssieg eingefahren",
+  "Später Treffer entscheidet die Partie",
+  "Defensivschlacht ohne Sieger",
+  "Klare Angelegenheit",
+  "Überraschung des Spieltags",
+  "Kampf bis zur letzten Minute",
+  "Torfestival am Sonntag",
+  "Last-Minute Drama!",
+  "Favorit strauchelt",
+  "Starke Moral bewiesen"
+];
+
+function addTicker(text) {
+  let box = document.getElementById("ticker");
+  let p = document.createElement("p");
+  p.textContent = "📰 " + text;
+  box.prepend(p);
 }
 
 // ================= MATCHDAY =================
@@ -177,7 +113,7 @@ function simulateMatchday() {
   });
 }
 
-// ================= LIVE MATCH =================
+// ================= MATCH =================
 function simulateLiveMatch(t1, t2, cb) {
   let s1 = 0, s2 = 0;
   let minute = 0;
@@ -190,36 +126,56 @@ function simulateLiveMatch(t1, t2, cb) {
   let i = setInterval(() => {
     minute++;
 
-    let chance = 0.06 + (t1.form + t2.form) * 0.005;
+    let pressure1 = s1 < s2 ? 0.02 : 0;
+    let pressure2 = s2 < s1 ? 0.02 : 0;
 
-    if (Math.random() < chance) {
-      if (Math.random() < 0.5) {
-        s1++;
-        addEvent(`⚽ ${minute}' ${t1.name}`);
-      } else {
-        s2++;
-        addEvent(`⚽ ${minute}' ${t2.name}`);
-      }
+    let chance = 0.03 + (t1.form + t2.form) * 0.002;
 
-      updateScoreboard(t1, t2, s1, s2);
-      updateTable();
+    // TOR
+    if (Math.random() < chance + pressure1) {
+      s1++;
+      addEvent(`⚽ ${minute}' ${t1.name}`);
     }
+    if (Math.random() < chance + pressure2) {
+      s2++;
+      addEvent(`⚽ ${minute}' ${t2.name}`);
+    }
+
+    // FOULS / KARTEN
+    if (Math.random() < 0.03) {
+      let team = Math.random() < 0.5 ? t1 : t2;
+      let type = Math.random();
+
+      if (type < 0.7) addEvent(`🟨 ${minute}' ${team.name}`);
+      else if (type < 0.9) addEvent(`🟨🟥 ${minute}' ${team.name}`);
+      else {
+        addEvent(`🟥 ${minute}' ${team.name}`);
+        team.red++;
+      }
+    }
+
+    // VERLETZUNG (SEHR SELTEN)
+    if (Math.random() < 0.005) {
+      let team = Math.random() < 0.5 ? t1 : t2;
+      addEvent(`🚑 ${minute}' Verletzung bei ${team.name}`);
+    }
+
+    updateScoreboard(t1, t2, s1, s2);
+    updateTable();
 
     if (minute === 45) {
       clearInterval(i);
       showHalftime(t1, t2, s1, s2, cb);
     }
 
-  }, 100);
+  }, 120);
 }
 
-// ================= EVENT =================
+// ================= EVENTS =================
 function addEvent(text) {
   let box = document.getElementById("liveMatch");
-
   let p = document.createElement("p");
   p.textContent = text;
-
   box.prepend(p);
 }
 
@@ -232,10 +188,8 @@ function showHalftime(t1, t2, s1, s2, cb) {
 
 function applyHalftime() {
   selectedTactic = document.getElementById("halfTactic").value;
-
   document.getElementById("halftimePanel").style.display = "none";
-
-  if (window.resumeMatch) window.resumeMatch();
+  window.resumeMatch();
 }
 
 // ================= SECOND HALF =================
@@ -245,7 +199,9 @@ function secondHalf(t1, t2, s1, s2, cb) {
   let i = setInterval(() => {
     minute++;
 
-    if (Math.random() < 0.07) {
+    let chance = 0.035;
+
+    if (Math.random() < chance) {
       if (Math.random() < 0.5) {
         s1++;
         addEvent(`⚽ ${minute}' ${t1.name}`);
@@ -253,10 +209,10 @@ function secondHalf(t1, t2, s1, s2, cb) {
         s2++;
         addEvent(`⚽ ${minute}' ${t2.name}`);
       }
-
-      updateScoreboard(t1, t2, s1, s2);
-      updateTable();
     }
+
+    updateScoreboard(t1, t2, s1, s2);
+    updateTable();
 
     if (minute === 90) {
       clearInterval(i);
@@ -268,7 +224,7 @@ function secondHalf(t1, t2, s1, s2, cb) {
       setTimeout(cb, 800);
     }
 
-  }, 100);
+  }, 120);
 }
 
 // ================= OTHER MATCHES =================
@@ -278,6 +234,9 @@ function simulateOthers(matches) {
     let s2 = Math.floor(Math.random() * 3);
 
     updateStats(t1, t2, s1, s2);
+
+    let phrase = tickerPhrases[Math.floor(Math.random()*tickerPhrases.length)];
+    addTicker(`${t1.name} ${s1}:${s2} ${t2.name} – ${phrase}`);
   });
 
   finishMatchday();
@@ -307,19 +266,88 @@ function finishMatchday() {
   currentMatchday++;
   isSimulating = false;
 
+  if (currentMatchday >= schedule.length) {
+    endSeason();
+  }
+
   document.getElementById("matchday").innerText =
     "Spieltag: " + currentMatchday + " / " + schedule.length;
 
   updateTable();
 }
 
-// ================= INIT =================
-populateLeagueSelect();
+// ================= SAISON ENDE =================
+function endSeason() {
+  teams.sort((a,b)=>b.points-a.points);
 
+  let winner = teams[0];
+
+  addEvent(`🏆 Meister: ${winner.name}`);
+
+  // Auf/Abstieg Info
+  addTicker(`⬆ Aufstieg: ${teams[0].name}, ${teams[1].name}`);
+  addTicker(`⬇ Abstieg: ${teams[teams.length-1].name}, ${teams[teams.length-2].name}`);
+}
+
+// ================= TABLE =================
+function updateTable() {
+  let tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";
+
+  teams.sort((a,b)=>b.points-a.points);
+
+  teams.forEach(t=>{
+    let name = t.name===selectedTeam ? "👉 "+t.name : t.name;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${name}</td>
+        <td>${t.points}</td>
+        <td>${t.goals}</td>
+      </tr>`;
+  });
+}
+
+// ================= INIT =================
+function populateLeagueSelect() {
+  let s = document.getElementById("leagueSelect");
+  Object.keys(leagues).forEach(l=>{
+    let o=document.createElement("option");
+    o.value=l;
+    o.textContent=l;
+    s.appendChild(o);
+  });
+}
+
+function populateTeamSelect() {
+  let s = document.getElementById("teamSelect");
+  s.innerHTML="";
+  teams.forEach(t=>{
+    let o=document.createElement("option");
+    o.value=t.name;
+    o.textContent=t.name;
+    s.appendChild(o);
+  });
+}
+
+function selectLeague() {
+  if (leagueLocked) return;
+
+  teams = initTeams(leagues[currentLeague]);
+  generateSchedule();
+
+  populateTeamSelect();
+}
+
+function selectTeam() {
+  selectedTeam = document.getElementById("teamSelect").value;
+  teamLocked = true;
+  leagueLocked = true;
+}
+
+// START
+populateLeagueSelect();
 teams = initTeams(leagues[currentLeague]);
 generateSchedule();
 populateTeamSelect();
 updateTable();
-
-document.getElementById("matchday").innerText =
-  "Spieltag: 0 / " + schedule.length;
