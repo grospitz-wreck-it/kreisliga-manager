@@ -1,5 +1,16 @@
 function generateSchedule(){
-      addEvent(`🧤 ${currentMinute}' Parade`);
+        liveScore.s1++;
+        addEvent(`⚽ ${currentMinute}' ${liveScore.t1.name}`);
+      } else {
+        liveScore.s2++;
+        addEvent(`⚽ ${currentMinute}' ${liveScore.t2.name}`);
+      }
+    } else if(rand < 0.10){
+      addEvent(`🟨 ${currentMinute}' Gelb`);
+    } else if(rand < 0.14){
+      addEvent(`💥 Chance`);
+    } else if(rand < 0.18){
+      addEvent(`🧤 Parade`);
     }
 
     updateScoreboard(liveScore.t1,liveScore.t2,liveScore.s1,liveScore.s2);
@@ -9,7 +20,6 @@ function generateSchedule(){
       clearInterval(currentInterval);
       isSimulating=false;
       document.getElementById("halftimePanel").style.display="block";
-      addEvent("⏸️ Halbzeit");
       return;
     }
 
@@ -36,8 +46,6 @@ function finishMatch(){
 
   let {t1,t2,s1,s2}=liveScore;
 
-  addEvent(`🏁 Endstand: ${s1}:${s2}`);
-
   t1.goals+=s1; t2.goals+=s2;
 
   if(s1>s2) t1.points+=3;
@@ -46,7 +54,7 @@ function finishMatch(){
 
   currentMatchday++;
 
-  document.getElementById("matchday").innerText=
+  document.getElementById("matchday").innerText =
     "Spieltag: "+currentMatchday+" / "+schedule.length;
 
   updateTable();
