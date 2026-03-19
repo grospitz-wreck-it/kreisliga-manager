@@ -2,8 +2,10 @@
 let teams = [];
 let schedule = [];
 let currentMatchday = 0;
+
 let selectedTeam = null;
 let selectedTactic = "normal";
+
 let isSimulating = false;
 
 let teamLocked = false;
@@ -11,19 +13,25 @@ let leagueLocked = false;
 
 let currentLeague = "Kreisliga A Herford";
 
-// ================= LIGEN =================
+// ================= LIGA =================
 let leagues = {
   "Kreisliga A Herford": [
     { name: "TuS Bruchmühlen", strength: 75 },
     { name: "VfL Holsen", strength: 70 },
     { name: "Bünder SV", strength: 68 },
-    { name: "TSG Kirchlengern II", strength: 65 }
-  ],
-  "Kreisliga B": [
-    { name: "Team E", strength: 60 },
-    { name: "Team F", strength: 58 },
-    { name: "Team G", strength: 55 },
-    { name: "Team H", strength: 50 }
+    { name: "TSG Kirchlengern II", strength: 65 },
+    { name: "SV Löhne-Obernbeck", strength: 64 },
+    { name: "TuRa Löhne", strength: 63 },
+    { name: "GW Pödinghausen", strength: 62 },
+    { name: "SV Enger-Westerenger", strength: 61 },
+    { name: "TSV Löhne", strength: 60 },
+    { name: "SC Enger", strength: 59 },
+    { name: "FC Exter", strength: 58 },
+    { name: "SV Rödinghausen III", strength: 57 },
+    { name: "SV Oetinghausen", strength: 56 },
+    { name: "FA Herringhausen/Eickum", strength: 55 },
+    { name: "VfL Herford II", strength: 54 },
+    { name: "TuS Hücker-Aschen", strength: 53 }
   ]
 };
 
@@ -32,15 +40,17 @@ function initTeams(raw) {
   return raw.map(t => ({
     ...t,
     points: 0,
-    goals: 0
+    goals: 0,
+    form: 0
   }));
 }
 
-// ================= SCHEDULE =================
+// ================= SCHEDULE (HIN + RÜCK) =================
 function generateSchedule() {
   schedule = [];
   let temp = [...teams];
 
+  // HINRUNDE
   for (let i = 0; i < temp.length - 1; i++) {
     let round = [];
 
@@ -51,6 +61,13 @@ function generateSchedule() {
     schedule.push(round);
     temp.splice(1, 0, temp.pop());
   }
+
+  // RÜCKRUNDE
+  let secondHalf = schedule.map(r =>
+    r.map(m => [m[1], m[0]])
+  );
+
+  schedule = schedule.concat(secondHalf);
 }
 
 // ================= DROPDOWNS =================
@@ -65,7 +82,6 @@ function populateLeagueSelect() {
     s.appendChild(o);
   });
 
-  s.value = currentLeague;
   if (leagueLocked) s.disabled = true;
 }
 
@@ -143,7 +159,7 @@ function updateScoreboard(t1, t2, s1, s2) {
   document.getElementById("score").innerText = s1 + " : " + s2;
 }
 
-// ================= MATCH =================
+// ================= MATCHDAY =================
 function simulateMatchday() {
   if (!selectedTeam) return alert("Team wählen!");
   if (isSimulating) return;
@@ -165,15 +181,18 @@ function simulateMatchday() {
 function simulateLiveMatch(t1, t2, cb) {
   let s1 = 0, s2 = 0;
   let minute = 0;
-  let box = document.getElementById("liveMatch");
 
+  let box = document.getElementById("liveMatch");
   box.innerHTML = "";
+
   updateScoreboard(t1, t2, s1, s2);
 
   let i = setInterval(() => {
     minute++;
 
-    if (Math.random() < 0.08) {
+    let chance = 0.06 + (t1.form + t2.form) * 0.005;
+
+    if (Math.random() < chance) {
       if (Math.random() < 0.5) {
         s1++;
         addEvent(`⚽ ${minute}' ${t1.name}`);
@@ -191,17 +210,16 @@ function simulateLiveMatch(t1, t2, cb) {
       showHalftime(t1, t2, s1, s2, cb);
     }
 
-  }, 120);
+  }, 100);
 }
 
-// ================= EVENT SYSTEM (FIX!) =================
+// ================= EVENT =================
 function addEvent(text) {
   let box = document.getElementById("liveMatch");
 
   let p = document.createElement("p");
   p.textContent = text;
 
-  // 🔥 NEU: oben einfügen
   box.prepend(p);
 }
 
@@ -227,7 +245,7 @@ function secondHalf(t1, t2, s1, s2, cb) {
   let i = setInterval(() => {
     minute++;
 
-    if (Math.random() < 0.08) {
+    if (Math.random() < 0.07) {
       if (Math.random() < 0.5) {
         s1++;
         addEvent(`⚽ ${minute}' ${t1.name}`);
@@ -250,7 +268,7 @@ function secondHalf(t1, t2, s1, s2, cb) {
       setTimeout(cb, 800);
     }
 
-  }, 120);
+  }, 100);
 }
 
 // ================= OTHER MATCHES =================
@@ -270,9 +288,15 @@ function updateStats(t1, t2, s1, s2) {
   t1.goals += s1;
   t2.goals += s2;
 
-  if (s1 > s2) t1.points += 3;
-  else if (s2 > s1) t2.points += 3;
-  else {
+  if (s1 > s2) {
+    t1.points += 3;
+    t1.form++;
+    t2.form--;
+  } else if (s2 > s1) {
+    t2.points += 3;
+    t2.form++;
+    t1.form--;
+  } else {
     t1.points++;
     t2.points++;
   }
@@ -282,6 +306,9 @@ function updateStats(t1, t2, s1, s2) {
 function finishMatchday() {
   currentMatchday++;
   isSimulating = false;
+
+  document.getElementById("matchday").innerText =
+    "Spieltag: " + currentMatchday + " / " + schedule.length;
 
   updateTable();
 }
@@ -293,3 +320,6 @@ teams = initTeams(leagues[currentLeague]);
 generateSchedule();
 populateTeamSelect();
 updateTable();
+
+document.getElementById("matchday").innerText =
+  "Spieltag: 0 / " + schedule.length;
