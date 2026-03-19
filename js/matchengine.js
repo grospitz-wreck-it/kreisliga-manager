@@ -47,12 +47,11 @@ function simulateLiveMatch(t1, t2) {
   updateScoreboard(t1, t2, s1, s2);
 
   currentInterval = setInterval(() => {
-    let elapsed = Date.now() - matchStartTime;
-    let minute = Math.floor((elapsed / matchDuration) * 90);
+  let elapsed = Date.now() - matchStartTime;
+  let minute = Math.floor((elapsed / matchDuration) * 90);
 
-    if (minute > 90) minute = 90;
-
-    updateTimeline(minute);
+  updateTimeline(minute);
+}, 100);
 
     // ⚽ realistischere Chance
     let chance = 0.015;
