@@ -46,17 +46,46 @@
   </div>
 
   <!-- MITTE -->
-  <div class="panel">
-    <h2 id="matchday">Spieltag: 0</h2>
-    <button onclick="simulateMatchday()">▶ Spiel starten</button>
+  <h2 id="matchday">Spieltag: 0</h2>
+<button onclick="simulateMatchday()">▶ Spiel starten</button>
 
-    <h3>Live-Spiel</h3>
-    <div id="liveMatch"></div>
+<!-- SCOREBOARD -->
+<div id="scoreboard">
+  <span id="team1Name">-</span>
+  <span id="score">0 : 0</span>
+  <span id="team2Name">-</span>
+</div>
 
-    <h3>Letzter Spieltag</h3>
-    <div id="results"></div>
-  </div>
+<h3>Live-Spiel</h3>
+<div id="liveMatch"></div>
 
+<!-- HALBZEIT PANEL -->
+<div id="halftimePanel" style="display:none;">
+  <h3>Halbzeit</h3>
+
+  <label>Taktik:</label>
+  <select id="halfTactic">
+    <option value="normal">Normal</option>
+    <option value="offensive">Offensiv</option>
+    <option value="defensive">Defensiv</option>
+  </select>
+
+  <br><br>
+
+  <label>Formation:</label>
+  <select id="halfFormation">
+    <option value="442">4-4-2</option>
+    <option value="433">4-3-3</option>
+    <option value="532">5-3-2</option>
+  </select>
+
+  <br><br>
+
+  <button onclick="applyHalftime()">Weiter</button>
+</div>
+
+<h3>Letzter Spieltag</h3>
+<div id="results"></div>
   <!-- RECHTS -->
   <div class="panel">
     <h2>Tabelle</h2>
