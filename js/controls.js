@@ -49,3 +49,12 @@ function setTactic() {
   document.getElementById("currentTactic").innerText =
     "Taktik: " + selectedTactic;
 }
+function setSpeed(e, speed) {
+  matchDuration = speed * 1800;
+
+  // visuelles Feedback (aktive Taste)
+  let buttons = e.target.parentElement.querySelectorAll("button");
+  buttons.forEach(b => b.classList.remove("active"));
+
+  e.target.classList.add("active");
+}
