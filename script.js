@@ -1,44 +1,65 @@
 let teams = [];
 let schedule = [];
 let currentMatchday = 0;
+let selectedTeam = null;
 
 // Spiel laden
 function loadGame() {
   let saved = localStorage.getItem("kreisligaSave");
 
   if (saved) {
-    let data = JSON.parse(saved);
+    try {
+      let data = JSON.parse(saved);
 
-    teams = data.teams || [];
-    schedule = data.schedule || [];
-    currentMatchday = data.currentMatchday || 0;
+      if (!data.teams || !data.schedule) {
+        throw "Alter Speicher inkompatibel";
+      }
+
+      teams = data.teams;
+      schedule = data.schedule;
+      currentMatchday = data.currentMatchday || 0;
+      selectedTeam = data.selectedTeam || null;
+
+    } catch (e) {
+      console.log("Speicher zurückgesetzt:", e);
+      localStorage.clear();
+      createNewGame();
+    }
 
   } else {
-    // Neue Liga erstellen
-    teams = [
-      { name: "Team A", strength: 70, points: 0, goals: 0 },
-      { name: "Team B", strength: 65, points: 0, goals: 0 },
-      { name: "Team C", strength: 60, points: 0, goals: 0 },
-      { name: "Team D", strength: 55, points: 0, goals: 0 }
-    ];
-
-    generateSchedule();
-    saveGame();
+    createNewGame();
   }
 }
 
-// Spiel speichern
+// Neue Liga erstellen
+function createNewGame() {
+  teams = [
+    { name: "Team A", strength: 70, points: 0, goals: 0 },
+    { name: "Team B", strength: 65, points: 0, goals: 0 },
+    { name: "Team C", strength: 60, points: 0, goals: 0 },
+    { name: "Team D", strength: 55, points: 0, goals: 0 }
+  ];
+
+  generateSchedule();
+  currentMatchday = 0;
+  selectedTeam = null;
+
+  saveGame();
+}
+
+// Speichern
 function saveGame() {
   localStorage.setItem("kreisligaSave", JSON.stringify({
     teams,
     schedule,
-    currentMatchday
+    currentMatchday,
+    selectedTeam
   }));
 }
 
-// Spielplan generieren (Round Robin)
+// Spielplan generieren
 function generateSchedule() {
-  schedule = []; // wichtig!
+  schedule = [];
 
   let tempTeams = [...teams];
 
@@ -54,7 +75,6 @@ function generateSchedule() {
 
     schedule.push(matchday);
 
-    // Rotation (außer erstes Team)
     tempTeams.splice(1, 0, tempTeams.pop());
   }
 }
@@ -79,6 +99,11 @@ function simulateMatch(team1, team2) {
 
 // Spieltag simulieren
 function simulateMatchday() {
+  if (!schedule || schedule.length === 0) {
+    alert("Fehler im Spielplan – neu laden!");
+    return;
+  }
+
   if (currentMatchday >= schedule.length) {
     alert("Saison beendet!");
     return;
@@ -97,16 +122,22 @@ function simulateMatchday() {
   updateMatchdayDisplay();
 }
 
-// Tabelle updaten
+// Tabelle
 function updateTable() {
+  if (!teams) return;
+
   teams.sort((a, b) => b.points - a.points);
 
   let tbody = document.querySelector("#table tbody");
   tbody.innerHTML = "";
 
   teams.forEach(team => {
+    let nameDisplay = team.name === selectedTeam
+      ? "👉 " + team.name
+      : team.name;
+
     let row = `<tr>
-      <td>${team.name}</td>
+      <td>${nameDisplay}</td>
       <td>${team.points}</td>
       <td>${team.goals}</td>
     </tr>`;
@@ -122,23 +153,37 @@ function updateMatchdayDisplay() {
   }
 }
 
-// 🔥 Wichtig: einmal alten Speicher löschen bei Update
-function resetIfBroken() {
-  let saved = localStorage.getItem("kreisligaSave");
+// Dropdown füllen
+function populateTeamSelect() {
+  let select = document.getElementById("teamSelect");
+  if (!select) return;
 
-  if (saved) {
-    let data = JSON.parse(saved);
+  select.innerHTML = "";
 
-    // Falls alter Speicher ohne Spielplan
-    if (!data.schedule || !data.teams) {
-      localStorage.clear();
-      location.reload();
+  teams.forEach(team => {
+    let option = document.createElement("option");
+    option.value = team.name;
+    option.textContent = team.name;
+
+    if (team.name === selectedTeam) {
+      option.selected = true;
     }
-  }
+
+    select.appendChild(option);
+  });
 }
 
-// Init
-resetIfBroken();
+// Team auswählen
+function selectTeam() {
+  let select = document.getElementById("teamSelect");
+  selectedTeam = select.value;
+
+  saveGame();
+  updateTable();
+}
+
+// INIT
 loadGame();
 updateTable();
 updateMatchdayDisplay();
+populateTeamSelect();
