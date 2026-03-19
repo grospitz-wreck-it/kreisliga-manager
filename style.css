@@ -1,31 +1,27 @@
 body {
-  font-family: Arial;
-  background: repeating-linear-gradient(
-    45deg,
-    #0a5f1a,
-    #0a5f1a 10px,
-    #0c6b1d 10px,
-    #0c6b1d 20px
-  );
-  color: white;
+  font-family: "Courier New", monospace;
+  background: #0b5f1a;
+  color: #00ff00;
   text-align: center;
 }
 
+/* PIXEL LOOK */
 .container {
   display: flex;
   justify-content: space-between;
-  padding: 20px;
+  padding: 10px;
 }
 
 .panel {
-  width: 30%;
-  border: 2px solid white;
-  padding: 15px;
-  background: rgba(0,0,0,0.6);
+  width: 32%;
+  border: 3px solid #00ff00;
+  padding: 10px;
+  background: black;
+  box-shadow: 0 0 10px #00ff00;
 }
 
 .center {
-  width: 35%;
+  width: 36%;
 }
 
 /* SCOREBOARD */
@@ -33,75 +29,80 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 15px 0;
 }
 
 #score {
   background: black;
   color: white;
-  font-size: 28px;
+  font-size: 32px;
   padding: 10px 20px;
-  border: 2px solid white;
+  border: 3px solid #00ff00;
+  font-family: "Courier New";
 }
 
-/* LIVE BOX */
+/* LIVE */
 .live-box {
   height: 250px;
   overflow-y: auto;
   background: black;
   padding: 10px;
   margin-top: 10px;
+  border: 2px solid #00ff00;
   text-align: left;
-}
-
-/* EVENTS */
-.live-box p {
-  margin: 5px 0;
 }
 
 /* TIMELINE */
 #timeline {
   width: 100%;
-  height: 10px;
-  background: #222;
+  height: 8px;
+  background: #002200;
   margin-top: 10px;
 }
 
 #timelineBar {
   height: 100%;
   width: 0%;
-  background: lime;
+  background: #00ff00;
 }
 
-/* BUTTONS */
+/* BUTTONS (RETRO) */
 button {
+  background: black;
+  color: #00ff00;
+  border: 2px solid #00ff00;
+  padding: 5px;
   margin: 3px;
-  padding: 5px 10px;
   cursor: pointer;
 }
 
-.activeBtn {
-  background: yellow;
-  color: black;
-  font-weight: bold;
+button:hover {
+  background: #003300;
 }
 
-/* HALFTIME */
-.halftime {
-  display: none;
-  margin-top: 15px;
-  padding: 10px;
-  background: rgba(255,255,255,0.1);
+/* ACTIVE BUTTON */
+.activeBtn {
+  background: #00ff00 !important;
+  color: black !important;
+  font-weight: bold;
 }
 
 /* TABLE */
 table {
   width: 100%;
-  background: white;
-  color: black;
+  background: black;
+  color: #00ff00;
+  border: 2px solid #00ff00;
 }
 
-th, td {
+td, th {
+  border: 1px solid #00ff00;
   padding: 5px;
-  border: 1px solid black;
+}
+
+/* HALFTIME */
+.halftime {
+  display: none;
+  border: 2px solid #00ff00;
+  margin-top: 10px;
+  padding: 10px;
 }
