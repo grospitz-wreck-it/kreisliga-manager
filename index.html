@@ -1,36 +1,23 @@
 <!DOCTYPE html>
-    <div class="scoreboard">
-      <span id="teamLeft"></span>
-      <div id="score">0 : 0</div>
-      <span id="teamRight"></span>
-    </div>
-
-    <div class="timeline">
-      <div id="timelineBar"></div>
-    </div>
-
-    <div class="controls">
-      <button id="btnAttack">🔥 Druck</button>
-      <button id="btnCalm">🧊 Ruhig</button>
-      <button id="btnSub">🔄 Wechsel</button>
+      <button onclick="makeSub()">🔄 Wechsel</button>
       <span id="subCount">Wechsel: 5</span>
     </div>
 
     <div>
       Geschwindigkeit:
-      <button class="speed" data-speed="3">3x</button>
-      <button class="speed" data-speed="5">5x</button>
-      <button class="speed" data-speed="10">10x</button>
+      <button onclick="setSpeed(event,3)">3x</button>
+      <button onclick="setSpeed(event,5)">5x</button>
+      <button onclick="setSpeed(event,10)">10x</button>
     </div>
 
     <div id="liveMatch" class="live"></div>
 
     <div id="halftimePanel" style="display:none;">
       <h3>Halbzeit</h3>
-      <button id="halfAttack">Mehr Druck</button>
-      <button id="halfCalm">Defensiver</button>
+      <button onclick="setLiveMode('attack')">Mehr Druck</button>
+      <button onclick="setLiveMode('calm')">Defensiver</button>
       <br><br>
-      <button id="resumeBtn">2. Halbzeit starten</button>
+      <button onclick="resumeMatch()">2. Halbzeit starten</button>
     </div>
 
   </div>
