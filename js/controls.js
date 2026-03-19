@@ -1,5 +1,18 @@
 function selectTeam() {
-  selectedTeam = document.getElementById("teamSelect").value;
+  const select = document.getElementById("teamSelect");
+
+  if (!select.value) {
+    alert("Bitte Team auswählen!");
+    return;
+  }
+
+  selectedTeam = select.value.trim(); // 👉 wichtig!
+
+  console.log("Team gesetzt:", selectedTeam);
+
+  // UI Feedback
+  select.disabled = true;
+
   updateTable();
 }
 
