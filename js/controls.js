@@ -1,23 +1,16 @@
 function selectLeague(){
-  if(teamLocked){ alert("Team gesperrt!"); return; }
-
-  const val = document.getElementById("teamSelect").value;
-  if(!val){ alert("Team wählen"); return; }
-
-  selectedTeam = val;
-  document.getElementById("loggedTeam").innerText = "Dein Team: " + val;
   updateTable();
 }
 
 function lockTeam(){
-  teamLocked = true;
-  document.getElementById("teamSelect").disabled = true;
-  document.getElementById("btnSelectTeam").disabled = true;
+  teamLocked=true;
+  document.getElementById("teamSelect").disabled=true;
+  document.getElementById("btnSelectTeam").disabled=true;
 }
 
 function setTactic(){
-  const t = document.getElementById("tacticSelect").value;
-  document.getElementById("currentTactic").innerText = "Taktik: " + t;
+  const val=document.getElementById("tacticSelect").value;
+  document.getElementById("currentTactic").innerText="Taktik: "+val;
 }
 
 function setLiveMode(mode){
@@ -25,28 +18,31 @@ function setLiveMode(mode){
   document.getElementById("btnCalm").classList.remove("active");
 
   if(mode==="attack"){
-    liveModifier += 0.02;
+    liveModifier+=0.01;
     document.getElementById("btnAttack").classList.add("active");
   } else {
-    liveModifier -= 0.02;
+    liveModifier-=0.01;
     document.getElementById("btnCalm").classList.add("active");
   }
 }
 
 function makeSub(){
-  if(!isSimulating){ alert("Kein Spiel"); return; }
-  if(substitutions<=0){ alert("Keine Wechsel mehr"); return; }
+  if(!isSimulating){ alert("Spiel läuft nicht"); return; }
+  if(substitutions<=0){ alert("Keine Wechsel"); return; }
 
-  addEvent("🔁 Wechsel durchgeführt");
+  let events=["🔁 Wechsel","🔁 Defensivwechsel","🔁 Offensivwechsel"];
+  addEvent(events[Math.floor(Math.random()*events.length)]);
+
   substitutions--;
-  document.getElementById("subCount").innerText = "Wechsel: " + substitutions;
+  document.getElementById("subCount").innerText="Wechsel: "+substitutions;
 }
 
-function setSpeed(mult){
-  speedMultiplier = mult;
+function setSpeed(e,multi){
+  speedMultiplier=multi;
 
-  document.querySelectorAll(".speed").forEach(b=>b.classList.remove("active"));
-  document.querySelector(`.speed[data-speed='${mult}']`).classList.add("active");
+  let buttons=e.target.parentElement.querySelectorAll("button");
+  buttons.forEach(b=>b.classList.remove("active"));
+  e.target.classList.add("active");
 
   if(isSimulating){ restartInterval(); }
 }
