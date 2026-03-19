@@ -1,16 +1,4 @@
 <!DOCTYPE html>
-    <h2 id="matchday">Spieltag: 0 / 0</h2>
-    <button id="startBtn" onclick="simulateMatchday()">▶ Spiel starten</button>
-
-    <div class="scoreboard">
-      <span id="teamLeft"></span>
-      <div id="score">0 : 0</div>
-      <span id="teamRight"></span>
-    </div>
-
-    <div class="timeline">
-      <div id="timelineBar"></div>
-    </div>
 
     <div class="controls">
       <button id="btnAttack" onclick="setLiveMode('attack')">🔥 Druck</button>
@@ -21,9 +9,9 @@
 
     <div>
       Geschwindigkeit:
-      <button onclick="setSpeed(event,100)">3x</button>
-      <button onclick="setSpeed(event,50)">5x</button>
-      <button onclick="setSpeed(event,20)">10x</button>
+      <button onclick="setSpeed(event,3)">3x</button>
+      <button onclick="setSpeed(event,5)">5x</button>
+      <button onclick="setSpeed(event,10)">10x</button>
     </div>
 
     <div id="liveMatch" class="live"></div>
