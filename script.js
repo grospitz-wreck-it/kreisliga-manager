@@ -3,12 +3,13 @@ let schedule = [];
 let currentMatchday = 0;
 
 let selectedTeam = null;
+let selectedFormation = "4-4-2";
 
 let isSimulating = false;
 let teamLocked = false;
 
 let liveModifier = 0;
-let substitutions = 3;
+let substitutions = 5;
 
 let gameSpeed = 100;
 let currentInterval = null;
@@ -49,7 +50,6 @@ function initTeams(raw) {
     goals: 0,
     yellow: 0,
     red: 0,
-    injured: false,
     form: 0
   }));
 }
@@ -72,6 +72,13 @@ function generateSchedule() {
   schedule = schedule.concat(second);
 }
 
+// ================= FORMATION EFFECT =================
+function getFormationModifier() {
+  if (selectedFormation === "4-3-3") return 0.002;
+  if (selectedFormation === "5-3-2") return -0.002;
+  return 0;
+}
+
 // ================= UI =================
 function updateTimeline(minute) {
   document.getElementById("timelineBar").style.width =
@@ -84,58 +91,12 @@ function updateScoreboard(t1, t2, s1, s2) {
   document.getElementById("score").innerText = s1 + " : " + s2;
 }
 
-function updateTable() {
-  let tbody = document.querySelector("#table tbody");
-  tbody.innerHTML = "";
-
-  teams.sort((a,b)=>b.points-a.points);
-
-  teams.forEach(t=>{
-    let name = t.name===selectedTeam ? "👉 "+t.name : t.name;
-
-    tbody.innerHTML += `<tr>
-      <td>${name}</td>
-      <td>${t.points}</td>
-      <td>${t.goals}</td>
-    </tr>`;
-  });
-}
-
-// ================= BUTTONS =================
-function setLiveMode(mode) {
-  liveModifier = 0;
-
-  document.getElementById("btnAttack").classList.remove("activeBtn");
-  document.getElementById("btnCalm").classList.remove("activeBtn");
-
-  if (mode === "attack") {
-    liveModifier = 0.004; // leicht!
-    document.getElementById("btnAttack").classList.add("activeBtn");
-  }
-
-  if (mode === "calm") {
-    liveModifier = -0.002;
-    document.getElementById("btnCalm").classList.add("activeBtn");
-  }
-}
-
-function setSpeed(e, speed) {
-  gameSpeed = speed;
-
-  document.querySelectorAll(".speedBtn").forEach(b =>
-    b.classList.remove("activeBtn")
-  );
-
-  if (e && e.target) e.target.classList.add("activeBtn");
-
-  if (currentInterval) {
-    clearInterval(currentInterval);
-    currentInterval = setInterval(gameLoop, gameSpeed);
-  }
-}
-
-function fastForward() {
-  setSpeed(null, 30);
+// ================= EVENTS =================
+function addEvent(text) {
+  let box = document.getElementById("liveMatch");
+  let p = document.createElement("p");
+  p.textContent = text;
+  box.prepend(p);
 }
 
 // ================= MATCH =================
@@ -143,12 +104,11 @@ function simulateMatchday() {
   if (!selectedTeam) return alert("Team wählen!");
   if (isSimulating) return;
 
-  substitutions = 3;
+  substitutions = 5;
   halftimeDone = false;
   isSimulating = true;
 
   let matches = schedule[currentMatchday];
-
   let userMatch = matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
@@ -156,7 +116,7 @@ function simulateMatchday() {
   simulateLiveMatch(userMatch[0], userMatch[1]);
 }
 
-// ================= LIVE MATCH =================
+// ================= LIVE =================
 function simulateLiveMatch(t1, t2) {
   let s1 = 0, s2 = 0;
   let box = document.getElementById("liveMatch");
@@ -171,45 +131,24 @@ function simulateLiveMatch(t1, t2) {
 
     updateTimeline(minute);
 
-    // ⚽ REALISTISCHE TORE
-    let chance = 0.0015 + liveModifier;
+    let chance = 0.001 + liveModifier + getFormationModifier();
 
+    // ⚽ TOR
     if (Math.random() < chance) {
       if (Math.random() < 0.5) {
-        s1++;
-        addEvent(`⚽ ${minute}' ${t1.name}`);
+        s1++; addEvent(`⚽ ${minute}' ${t1.name}`);
       } else {
-        s2++;
-        addEvent(`⚽ ${minute}' ${t2.name}`);
+        s2++; addEvent(`⚽ ${minute}' ${t2.name}`);
       }
     }
 
-    // 🟨 GELB
-    if (Math.random() < 0.002) {
-      let team = Math.random() < 0.5 ? t1 : t2;
-
-      if (team.yellow === 1 && Math.random() < 0.15) {
-        addEvent(`🟥 ${minute}' ${team.name}`);
-        team.red++;
-      } else {
-        addEvent(`🟨 ${minute}' ${team.name}`);
-        team.yellow = 1;
-      }
-    }
-
-    // 🚑 VERLETZUNG (selten!)
-    if (Math.random() < 0.0008) {
-      let team = Math.random() < 0.5 ? t1 : t2;
-
-      if (!team.injured) {
-        team.injured = true;
-        substitutions = Math.max(0, substitutions - 1);
-        addEvent(`🚑 ${minute}' Verletzung (${team.name})`);
-      }
-    }
+    // 🔄 EVENTS STATT KARTEN
+    if (Math.random() < 0.002) addEvent(`🎯 Freistoß ${minute}'`);
+    if (Math.random() < 0.002) addEvent(`🚩 Abseits ${minute}'`);
+    if (Math.random() < 0.002) addEvent(`🔄 Ecke ${minute}'`);
+    if (Math.random() < 0.0015) addEvent(`🔥 Großchance ${minute}'`);
 
     updateScoreboard(t1, t2, s1, s2);
-    updateTable();
 
     // HALBZEIT
     if (minute >= 45 && !halftimeDone) {
@@ -220,7 +159,6 @@ function simulateLiveMatch(t1, t2) {
       return;
     }
 
-    // ENDE
     if (elapsed >= matchDuration) {
       clearInterval(currentInterval);
       finishMatch(t1, t2, s1, s2);
@@ -235,20 +173,24 @@ function simulateLiveMatch(t1, t2) {
 function secondHalf(t1, t2, s1, s2) {
   document.getElementById("halftimePanel").style.display = "none";
   matchStartTime = Date.now() - matchDuration / 2;
-
   currentInterval = setInterval(gameLoop, gameSpeed);
 }
 
-function applyHalftime() {
-  window.resume();
-}
+// ================= WECHSEL =================
+function makeSubstitution() {
+  if (substitutions <= 0) return alert("Keine Wechsel mehr!");
 
-// ================= EVENTS =================
-function addEvent(text) {
-  let box = document.getElementById("liveMatch");
-  let p = document.createElement("p");
-  p.textContent = text;
-  box.prepend(p);
+  let type = prompt("Wechsel: offensiv / defensiv");
+
+  if (type === "offensiv") {
+    liveModifier += 0.002;
+    addEvent("🔼 Offensiver Wechsel");
+  } else {
+    liveModifier -= 0.002;
+    addEvent("🔽 Defensiver Wechsel");
+  }
+
+  substitutions--;
 }
 
 // ================= FINISH =================
@@ -264,11 +206,6 @@ function finishMatch(t1, t2, s1, s2) {
 
   currentMatchday++;
   isSimulating = false;
-
-  document.getElementById("matchday").innerText =
-    "Spieltag: " + currentMatchday + " / " + schedule.length;
-
-  updateTable();
 }
 
 // ================= TEAM =================
@@ -293,7 +230,3 @@ function selectTeam() {
 teams = initTeams(leagues["Kreisliga A Herford"]);
 generateSchedule();
 populateTeamSelect();
-updateTable();
-
-document.getElementById("matchday").innerText =
-  "Spieltag: 0 / " + schedule.length;
