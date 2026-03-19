@@ -1,3 +1,4 @@
+console.log("matchEngine geladen");
 let schedule = [];
 let isSimulating = false;
 let currentInterval = null;
