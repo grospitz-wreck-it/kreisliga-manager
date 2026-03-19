@@ -51,7 +51,24 @@
   <button onclick="makeSub()">🔁 Wechsel</button>
   <span id="subsLeft">Wechsel: 3</span>
   </div>
+<div>
+  <button id="btnAttack" onclick="setLiveMode('attack')">🔥 Druck</button>
+  <button id="btnCalm" onclick="setLiveMode('calm')">🧊 Ruhig</button>
+  <button onclick="makeSub()">🔁 Wechsel</button>
+  <span id="subsLeft">Wechsel: 3</span>
+</div>
 
+<div>
+  Geschwindigkeit:
+  <button onclick="setSpeed(200)">3x</button>
+  <button onclick="setSpeed(120)">5x</button>
+  <button onclick="setSpeed(60)">10x</button>
+  <button onclick="fastForward()">⏩</button>
+</div>
+
+<div id="timeline">
+  <div id="timelineBar"></div>
+</div>
     <!-- SCORE -->
     <div id="scoreWrapper">
       <span id="team1Name">-</span>
