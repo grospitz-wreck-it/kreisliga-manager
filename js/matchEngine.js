@@ -1,33 +1,16 @@
-console.log("matchEngine geladen");
-let schedule = [];
-let isSimulating = false;
-let currentInterval = null;
-let matchStartTime = 0;
-let matchDuration = 180000; // 3 Minuten
-let halftimeDone = false;
+// ❗ KEIN let schedule hier!!!
 
-// ================= SPIELPLAN =================
 function generateSchedule() {
   schedule = [];
 
   let temp = [...teams];
-
-  if (temp.length % 2 !== 0) {
-    temp.push({ name: "SPIELFREI" });
-  }
-
   let n = temp.length;
 
   for (let round = 0; round < n - 1; round++) {
     let matchday = [];
 
     for (let i = 0; i < n / 2; i++) {
-      let home = temp[i];
-      let away = temp[n - 1 - i];
-
-      if (home.name !== "SPIELFREI" && away.name !== "SPIELFREI") {
-        matchday.push([home, away]);
-      }
+      matchday.push([temp[i], temp[n - 1 - i]]);
     }
 
     schedule.push(matchday);
@@ -44,22 +27,9 @@ function generateSchedule() {
   schedule = schedule.concat(secondHalf);
 }
 
-// ================= SPIELTAG =================
 function simulateMatchday() {
-  if (!selectedTeam) {
-    alert("Team wählen!");
-    return;
-  }
-
-  if (!schedule || schedule.length === 0) {
-    alert("Spielplan fehlt!");
-    return;
-  }
-
-  if (currentMatchday >= schedule.length) {
-    alert("Saison beendet!");
-    return;
-  }
+  if (!selectedTeam) return alert("Team wählen!");
+  if (currentMatchday >= schedule.length) return alert("Saison beendet!");
 
   let matches = schedule[currentMatchday];
 
@@ -67,12 +37,6 @@ function simulateMatchday() {
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
 
-  if (!userMatch) {
-    alert("Dein Team hat kein Spiel!");
-    return;
-  }
-
-  // andere Spiele schnell simulieren
   matches.forEach(match => {
     if (match !== userMatch) simulateQuick(match[0], match[1]);
   });
@@ -80,7 +44,6 @@ function simulateMatchday() {
   simulateLiveMatch(userMatch[0], userMatch[1]);
 }
 
-// ================= SCHNELLSIM =================
 function simulateQuick(t1, t2) {
   let s1 = Math.floor(Math.random() * 3);
   let s2 = Math.floor(Math.random() * 3);
@@ -90,15 +53,12 @@ function simulateQuick(t1, t2) {
 
   if (s1 > s2) t1.points += 3;
   else if (s2 > s1) t2.points += 3;
-  else {
-    t1.points++;
-    t2.points++;
-  }
+  else { t1.points++; t2.points++; }
 }
 
-// ================= LIVE MATCH =================
 function simulateLiveMatch(t1, t2) {
   isSimulating = true;
+  substitutions = 5;
 
   let s1 = 0, s2 = 0;
   let box = document.getElementById("liveMatch");
@@ -110,15 +70,14 @@ function simulateLiveMatch(t1, t2) {
   updateScoreboard(t1, t2, s1, s2);
 
   currentInterval = setInterval(() => {
-
     let elapsed = Date.now() - matchStartTime;
     let minute = Math.floor((elapsed / matchDuration) * 90);
     if (minute > 90) minute = 90;
 
     updateTimeline(minute);
 
-    // ⚽ realistische Chance
-    if (Math.random() < 0.008) {
+    // ⚽ realistischere Tore
+    if (Math.random() < 0.006 + liveModifier) {
       if (Math.random() < 0.5) {
         s1++;
         addEvent(`⚽ ${minute}' ${t1.name}`);
@@ -147,7 +106,6 @@ function simulateLiveMatch(t1, t2) {
   }, 100);
 }
 
-// ================= ENDE =================
 function finishMatch(t1, t2, s1, s2) {
   isSimulating = false;
 
@@ -158,10 +116,7 @@ function finishMatch(t1, t2, s1, s2) {
 
   if (s1 > s2) t1.points += 3;
   else if (s2 > s1) t2.points += 3;
-  else {
-    t1.points++;
-    t2.points++;
-  }
+  else { t1.points++; t2.points++; }
 
   currentMatchday++;
 
