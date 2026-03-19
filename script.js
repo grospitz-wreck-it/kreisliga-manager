@@ -1,11 +1,16 @@
 let teams = [];
+let schedule = [];
+let currentMatchday = 0;
 
-// Lade gespeicherte Daten oder erstelle neue
+// Spiel laden
 function loadGame() {
   let saved = localStorage.getItem("kreisligaSave");
 
   if (saved) {
-    teams = JSON.parse(saved);
+    let data = JSON.parse(saved);
+    teams = data.teams;
+    schedule = data.schedule;
+    currentMatchday = data.currentMatchday;
   } else {
     teams = [
       { name: "Team A", strength: 70, points: 0, goals: 0 },
@@ -13,14 +18,42 @@ function loadGame() {
       { name: "Team C", strength: 60, points: 0, goals: 0 },
       { name: "Team D", strength: 55, points: 0, goals: 0 }
     ];
+
+    generateSchedule();
     saveGame();
   }
 }
 
 function saveGame() {
-  localStorage.setItem("kreisligaSave", JSON.stringify(teams));
+  localStorage.setItem("kreisligaSave", JSON.stringify({
+    teams,
+    schedule,
+    currentMatchday
+  }));
 }
 
+// Spielplan generieren (Round Robin)
+function generateSchedule() {
+  let tempTeams = [...teams];
+
+  for (let i = 0; i < tempTeams.length - 1; i++) {
+    let matchday = [];
+
+    for (let j = 0; j < tempTeams.length / 2; j++) {
+      matchday.push([
+        tempTeams[j],
+        tempTeams[tempTeams.length - 1 - j]
+      ]);
+    }
+
+    schedule.push(matchday);
+
+    // Rotation (außer erstes Team)
+    tempTeams.splice(1, 0, tempTeams.pop());
+  }
+}
+
+// Spiel simulieren
 function simulateMatch(team1, team2) {
   let score1 = Math.floor(Math.random() * (team1.strength / 20));
   let score2 = Math.floor(Math.random() * (team2.strength / 20));
@@ -38,15 +71,26 @@ function simulateMatch(team1, team2) {
   }
 }
 
+// Spieltag simulieren
 function simulateMatchday() {
-  for (let i = 0; i < teams.length; i += 2) {
-    simulateMatch(teams[i], teams[i + 1]);
+  if (currentMatchday >= schedule.length) {
+    alert("Saison beendet!");
+    return;
   }
 
+  let matches = schedule[currentMatchday];
+
+  matches.forEach(match => {
+    simulateMatch(match[0], match[1]);
+  });
+
+  currentMatchday++;
   saveGame();
   updateTable();
+  updateMatchdayDisplay();
 }
 
+// Tabelle updaten
 function updateTable() {
   teams.sort((a, b) => b.points - a.points);
 
@@ -63,6 +107,13 @@ function updateTable() {
   });
 }
 
-// Spiel laden beim Start
+// Spieltag anzeigen
+function updateMatchdayDisplay() {
+  document.getElementById("matchday").innerText =
+    "Spieltag: " + currentMatchday;
+}
+
+// Init
 loadGame();
 updateTable();
+updateMatchdayDisplay();
