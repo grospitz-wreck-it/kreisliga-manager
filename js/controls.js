@@ -1,18 +1,21 @@
 function selectLeague(){
+    alert("Team kann nicht mehr gewechselt werden!");
+    return;
+  }
 
-  loadLeague(league);
-  generateSchedule();
-  populateTeamSelect();
-  updateTable();
-}
-
-function selectTeam(){
   const select=document.getElementById("teamSelect");
   if(!select.value) return alert("Team wählen");
 
   selectedTeam=select.value;
+
   document.getElementById("loggedTeam").innerText = "Dein Team: " + selectedTeam;
   updateTable();
+}
+
+function lockTeam(){
+  teamLocked = true;
+  document.getElementById("teamSelect").disabled = true;
+  document.getElementById("btnSelectTeam").disabled = true;
 }
 
 function setTactic(){
@@ -39,22 +42,26 @@ function makeSub(){
   if(!isSimulating) return alert("Spiel läuft nicht!");
   if(substitutions<=0) return alert("Keine Wechsel mehr!");
 
-  let events=["🔁 Frischer Stürmer kommt","🔁 Defensiver Wechsel","🔁 Mittelfeld wird verstärkt"];
+  let events=[
+    "🔁 Frischer Stürmer kommt",
+    "🔁 Defensiver Wechsel",
+    "🔁 Mittelfeld wird verstärkt"
+  ];
+
   addEvent(events[Math.floor(Math.random()*events.length)]);
 
   substitutions--;
   document.getElementById("subCount").innerText="Wechsel: "+substitutions;
 }
 
-function setSpeed(e,speed){
-  matchDuration=speed*1800;
+function setSpeed(e,multi){
+  speedMultiplier = multi;
 
   let buttons=e.target.parentElement.querySelectorAll("button");
   buttons.forEach(b=>b.classList.remove("active"));
   e.target.classList.add("active");
 
   if(isSimulating){
-    clearInterval(currentInterval);
-    startInterval();
+    restartInterval();
   }
 }
