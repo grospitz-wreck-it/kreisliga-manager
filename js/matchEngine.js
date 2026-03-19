@@ -1,4 +1,26 @@
 function generateSchedule(){
+    if(rand<0.04+liveModifier){
+      if(Math.random()<0.5){
+        liveScore.s1++;
+        addEvent(`⚽ ${currentMinute}' Tor ${liveScore.t1.name}`);
+      } else {
+        liveScore.s2++;
+        addEvent(`⚽ ${currentMinute}' Tor ${liveScore.t2.name}`);
+      }
+    } else if(rand<0.08){
+      addEvent(`🟨 ${currentMinute}' Gelbe Karte`);
+    } else if(rand<0.1){
+      addEvent(`💥 ${currentMinute}' Große Chance`);
+    } else if(rand<0.12){
+      addEvent(`🧤 ${currentMinute}' Starke Parade`);
+    }
+
+    updateScoreboard(liveScore.t1,liveScore.t2,liveScore.s1,liveScore.s2);
+    updateTimeline(currentMinute);
+
+    if(currentMinute===45){
+      clearInterval(currentInterval);
+      isSimulating=false;
       document.getElementById("halftimePanel").style.display="block";
       addEvent("⏸️ Halbzeit");
       return;
@@ -10,11 +32,6 @@ function generateSchedule(){
     }
 
   },matchDuration/90);
-}
-
-function restartInterval(){
-  clearInterval(currentInterval);
-  startInterval();
 }
 
 function resumeMatch(){
