@@ -5,13 +5,15 @@ let selectedTeam = null;
 
 let isSimulating = false;
 let currentInterval = null;
-let matchStartTime = 0;
+
 let matchDuration = 180000; // 3 Minuten
 
 let halftimeDone = false;
 
 let liveModifier = 0;
 let substitutions = 5;
+
+// 🔥 globaler Spielstand
 let liveScore = {
   t1: null,
   t2: null,
