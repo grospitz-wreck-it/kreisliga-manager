@@ -14,7 +14,21 @@ function setLiveMode(mode) {
 }
 
 function makeSub() {
-  if (substitutions <= 0) return alert("Keine Wechsel!");
+  if (!isSimulating) return alert("Spiel läuft nicht!");
+  if (substitutions <= 0) return alert("Keine Wechsel mehr!");
+
+  let type = prompt("offensiv oder defensiv?");
+
+  if (type === "offensiv") {
+    liveModifier += 0.002;
+    addEvent("🔼 Offensiver Wechsel");
+  } else if (type === "defensiv") {
+    liveModifier -= 0.002;
+    addEvent("🔽 Defensiver Wechsel");
+  } else {
+    return;
+  }
+
   substitutions--;
   document.getElementById("subCount").innerText =
     "Wechsel: " + substitutions;
