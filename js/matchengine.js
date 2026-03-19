@@ -1,20 +1,39 @@
 function simulateMatchday() {
-  if (!selectedTeam) return alert("Team wählen!");
+  if (!selectedTeam) {
+    alert("Team wählen!");
+    return;
+  }
 
-  let t1 = teams[0];
-  let t2 = teams[1];
+  if (currentMatchday >= schedule.length) {
+    alert("Saison beendet!");
+    return;
+  }
 
-  let s1 = Math.floor(Math.random()*3);
-  let s2 = Math.floor(Math.random()*3);
+  let matches = schedule[currentMatchday];
 
-  addEvent(`${t1.name} ${s1}:${s2} ${t2.name}`);
+  addEvent(`--- Spieltag ${currentMatchday + 1} ---`);
 
-  t1.goals += s1;
-  t2.goals += s2;
+  matches.forEach(match => {
+    let t1 = match[0];
+    let t2 = match[1];
 
-  if (s1 > s2) t1.points += 3;
-  else if (s2 > s1) t2.points += 3;
-  else { t1.points++; t2.points++; }
+    let s1 = Math.floor(Math.random() * 3);
+    let s2 = Math.floor(Math.random() * 3);
+
+    addEvent(`${t1.name} ${s1}:${s2} ${t2.name}`);
+
+    t1.goals += s1;
+    t2.goals += s2;
+
+    if (s1 > s2) t1.points += 3;
+    else if (s2 > s1) t2.points += 3;
+    else { t1.points++; t2.points++; }
+  });
+
+  currentMatchday++;
+
+  document.getElementById("matchday").innerText =
+    "Spieltag: " + currentMatchday + " / " + schedule.length;
 
   updateTable();
 }
