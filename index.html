@@ -12,14 +12,13 @@
 
 <div class="container">
 
-  <!-- 🔵 LINKS: Einstellungen -->
+  <!-- LINKS -->
   <div class="left">
-
     <h2>Liga wählen</h2>
     <select id="leagueSelect"></select>
     <button onclick="selectLeague()">Liga starten</button>
 
-    <h2>Team auswählen</h2>
+    <h2>Team</h2>
     <select id="teamSelect"></select>
     <button onclick="selectTeam()">Übernehmen</button>
 
@@ -39,26 +38,29 @@
       <option value="433">4-3-3</option>
       <option value="532">5-3-2</option>
     </select>
-
   </div>
 
-  <!-- 🟢 MITTE: Spiel -->
+  <!-- MITTE -->
   <div class="middle">
 
     <h2 id="matchday">Spieltag: 0</h2>
     <button onclick="simulateMatchday()">▶ Spiel starten</button>
 
-    <!-- SCOREBOARD -->
-    <div id="scoreboard">
+    <!-- SCORE -->
+    <div id="scoreWrapper">
       <span id="team1Name">-</span>
-      <span id="score">0 : 0</span>
+
+      <div id="scoreboard">
+        <span id="score">0 : 0</span>
+      </div>
+
       <span id="team2Name">-</span>
     </div>
 
     <h3>Live-Spiel</h3>
     <div id="liveMatch"></div>
 
-    <!-- HALBZEIT PANEL -->
+    <!-- HALBZEIT -->
     <div id="halftimePanel" style="display:none;">
       <h3>Halbzeit</h3>
 
@@ -88,9 +90,8 @@
 
   </div>
 
-  <!-- 🟡 RECHTS: Tabelle -->
+  <!-- RECHTS -->
   <div class="right">
-
     <h2>Tabelle</h2>
 
     <table id="table">
@@ -103,7 +104,6 @@
       </thead>
       <tbody></tbody>
     </table>
-
   </div>
 
 </div>
