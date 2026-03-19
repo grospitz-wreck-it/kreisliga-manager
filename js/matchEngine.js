@@ -1,16 +1,8 @@
 function generateSchedule(){
-        liveScore.s1++;
-        addEvent(`⚽ ${currentMinute}' ${liveScore.t1.name}`);
-      } else {
-        liveScore.s2++;
-        addEvent(`⚽ ${currentMinute}' ${liveScore.t2.name}`);
-      }
-    } else if(rand < 0.10){
+    } else if(r<0.10){
       addEvent(`🟨 ${currentMinute}' Gelb`);
-    } else if(rand < 0.14){
+    } else if(r<0.15){
       addEvent(`💥 Chance`);
-    } else if(rand < 0.18){
-      addEvent(`🧤 Parade`);
     }
 
     updateScoreboard(liveScore.t1,liveScore.t2,liveScore.s1,liveScore.s2);
@@ -54,9 +46,8 @@ function finishMatch(){
 
   currentMatchday++;
 
-  document.getElementById("matchday").innerText =
+  document.getElementById("matchday").innerText=
     "Spieltag: "+currentMatchday+" / "+schedule.length;
 
   updateTable();
-  document.getElementById("startBtn").disabled=false;
 }
