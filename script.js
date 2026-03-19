@@ -5,6 +5,19 @@ let selectedTeam = null;
 let selectedTactic = "normal";
 let lastResults = [];
 let isSimulating = false;
+let teamLocked = false;
+
+// 🔥 LIGEN SYSTEM (vorbereitet)
+let leagues = {
+  "Kreisliga A": [
+    { name: "Team A", strength: 70, points: 0, goals: 0 },
+    { name: "Team B", strength: 65, points: 0, goals: 0 },
+    { name: "Team C", strength: 60, points: 0, goals: 0 },
+    { name: "Team D", strength: 55, points: 0, goals: 0 }
+  ]
+};
+
+let currentLeague = "Kreisliga A";
 
 // Laden
 function loadGame() {
@@ -18,6 +31,8 @@ function loadGame() {
     selectedTeam = data.selectedTeam || null;
     selectedTactic = data.selectedTactic || "normal";
     lastResults = data.lastResults || [];
+    teamLocked = data.teamLocked || false;
+    currentLeague = data.currentLeague || "Kreisliga A";
 
     generateSchedule();
   } else {
@@ -27,17 +42,13 @@ function loadGame() {
 
 // Neue Liga
 function createNewGame() {
-  teams = [
-    { name: "Team A", strength: 70, points: 0, goals: 0 },
-    { name: "Team B", strength: 65, points: 0, goals: 0 },
-    { name: "Team C", strength: 60, points: 0, goals: 0 },
-    { name: "Team D", strength: 55, points: 0, goals: 0 }
-  ];
+  teams = JSON.parse(JSON.stringify(leagues[currentLeague]));
 
   currentMatchday = 0;
   selectedTeam = null;
   selectedTactic = "normal";
   lastResults = [];
+  teamLocked = false;
 
   generateSchedule();
   saveGame();
@@ -50,7 +61,9 @@ function saveGame() {
     currentMatchday,
     selectedTeam,
     selectedTactic,
-    lastResults
+    lastResults,
+    teamLocked,
+    currentLeague
   }));
 }
 
@@ -116,7 +129,7 @@ function playMatchesLive(matches, index) {
   });
 }
 
-// EIN Spiel live
+// Live-Spiel
 function simulateLiveMatch(team1, team2, callback) {
   let minute = 0;
   let score1 = 0;
@@ -220,12 +233,24 @@ function populateTeamSelect() {
     if (t.name === selectedTeam) opt.selected = true;
     select.appendChild(opt);
   });
+
+  if (teamLocked) {
+    select.disabled = true;
+  }
 }
 
 function selectTeam() {
+  if (teamLocked) {
+    alert("Team bereits gewählt!");
+    return;
+  }
+
   selectedTeam = document.getElementById("teamSelect").value;
+  teamLocked = true;
+
   saveGame();
   updateTable();
+  populateTeamSelect();
 }
 
 function setTactic() {
@@ -241,5 +266,6 @@ updateTable();
 updateMatchdayDisplay();
 populateTeamSelect();
 updateResults();
+
 document.getElementById("currentTactic").innerText =
   "Aktuelle Taktik: " + selectedTactic;
