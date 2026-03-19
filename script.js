@@ -1,4 +1,3 @@
-// ================= STATE =================
 let teams = [];
 let schedule = [];
 let currentMatchday = 0;
@@ -7,24 +6,20 @@ let selectedTeam = null;
 let selectedTactic = "normal";
 
 let isSimulating = false;
-
 let teamLocked = false;
-let leagueLocked = false;
-
-let currentLeague = "Kreisliga A Herford";
 
 let liveModifier = 0;
-let momentum = 0;
 let substitutions = 3;
 
 let gameSpeed = 120;
 let currentInterval = null;
+let gameLoop = null;
 
-let matchDuration = 180000; // 3 Minuten
+let matchDuration = 180000;
 let matchStartTime = 0;
 let halftimeDone = false;
 
-// ================= LIGA =================
+// TEAMS
 let leagues = {
   "Kreisliga A Herford": [
     { name: "TuS Bruchmühlen", strength: 75 },
@@ -46,20 +41,16 @@ let leagues = {
   ]
 };
 
-// ================= INIT =================
+// INIT
 function initTeams(raw) {
   return raw.map(t => ({
     ...t,
     points: 0,
-    goals: 0,
-    form: 0,
-    yellow: 0,
-    red: 0,
-    injured: false
+    goals: 0
   }));
 }
 
-// ================= SCHEDULE =================
+// SCHEDULE
 function generateSchedule() {
   schedule = [];
   let temp = [...teams];
@@ -73,17 +64,14 @@ function generateSchedule() {
     temp.splice(1, 0, temp.pop());
   }
 
-  let secondHalf = schedule.map(r =>
-    r.map(m => [m[1], m[0]])
-  );
-
-  schedule = schedule.concat(secondHalf);
+  let second = schedule.map(r => r.map(m => [m[1], m[0]]));
+  schedule = schedule.concat(second);
 }
 
-// ================= UI =================
+// UI
 function updateTimeline(minute) {
-  let percent = (minute / 90) * 100;
-  document.getElementById("timelineBar").style.width = percent + "%";
+  document.getElementById("timelineBar").style.width =
+    (minute / 90) * 100 + "%";
 }
 
 function updateScoreboard(t1, t2, s1, s2) {
@@ -101,21 +89,15 @@ function updateTable() {
   teams.forEach(t=>{
     let name = t.name===selectedTeam ? "👉 "+t.name : t.name;
 
-    tbody.innerHTML += `
-      <tr>
-        <td>${name}</td>
-        <td>${t.points}</td>
-        <td>${t.goals}</td>
-      </tr>`;
+    tbody.innerHTML += `<tr>
+      <td>${name}</td>
+      <td>${t.points}</td>
+      <td>${t.goals}</td>
+    </tr>`;
   });
 }
 
-function updateSubsUI() {
-  let el = document.getElementById("subsLeft");
-  if (el) el.innerText = "Wechsel: " + substitutions;
-}
-
-// ================= BUTTONS =================
+// BUTTONS
 function setLiveMode(mode) {
   liveModifier = 0;
 
@@ -133,37 +115,32 @@ function setLiveMode(mode) {
   }
 }
 
-function setSpeed(speed) {
+function setSpeed(e, speed) {
   gameSpeed = speed;
+
+  document.querySelectorAll(".speedBtn").forEach(b =>
+    b.classList.remove("activeBtn")
+  );
+
+  e.target.classList.add("activeBtn");
+
+  if (currentInterval) {
+    clearInterval(currentInterval);
+    currentInterval = setInterval(gameLoop, gameSpeed);
+  }
 }
 
 function fastForward() {
-  gameSpeed = 30;
+  setSpeed({target:null}, 30);
 }
 
-// ================= ACTIONS =================
-function makeSub() {
-  if (substitutions <= 0) return;
-
-  substitutions--;
-  updateSubsUI();
-  liveModifier += 0.01;
-
-  addEvent("🔁 Wechsel");
-}
-
-// ================= MATCHDAY =================
+// MATCH
 function simulateMatchday() {
   if (!selectedTeam) return alert("Team wählen!");
   if (isSimulating) return;
 
   substitutions = 3;
-  momentum = 0;
-  liveModifier = 0;
   halftimeDone = false;
-
-  updateSubsUI();
-
   isSimulating = true;
 
   let matches = schedule[currentMatchday];
@@ -172,28 +149,24 @@ function simulateMatchday() {
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
 
-  simulateLiveMatch(userMatch[0], userMatch[1], () => {
-    simulateOthers(matches.filter(m => m !== userMatch));
-  });
+  simulateLiveMatch(userMatch[0], userMatch[1]);
 }
 
-// ================= LIVE MATCH =================
-function simulateLiveMatch(t1, t2, cb) {
+function simulateLiveMatch(t1, t2) {
   let s1 = 0, s2 = 0;
   let box = document.getElementById("liveMatch");
   box.innerHTML = "";
 
   matchStartTime = Date.now();
 
-  currentInterval = setInterval(() => {
-
+  gameLoop = function() {
     let elapsed = Date.now() - matchStartTime;
     let minute = Math.floor((elapsed / matchDuration) * 90);
     if (minute > 90) minute = 90;
 
     updateTimeline(minute);
 
-    let chance = 0.01 + liveModifier + (momentum * 0.003);
+    let chance = 0.01 + liveModifier;
 
     if (Math.random() < chance) {
       if (Math.random() < 0.5) {
@@ -205,54 +178,38 @@ function simulateLiveMatch(t1, t2, cb) {
       }
     }
 
-    // Karten
-    if (Math.random() < 0.015) {
-      let team = Math.random() < 0.5 ? t1 : t2;
-
-      if (team.yellow === 1 && Math.random() < 0.2) {
-        addEvent(`🟨🟥 ${minute}' ${team.name}`);
-        team.red++;
-      } else {
-        addEvent(`🟨 ${minute}' ${team.name}`);
-        team.yellow = 1;
-      }
-    }
-
-    // Verletzung (selten)
-    if (Math.random() < 0.002) {
-      let team = Math.random() < 0.5 ? t1 : t2;
-
-      if (!team.injured) {
-        team.injured = true;
-        substitutions = Math.max(0, substitutions - 1);
-        updateSubsUI();
-        addEvent(`🚑 ${minute}' Verletzung`);
-      }
-    }
-
     updateScoreboard(t1, t2, s1, s2);
     updateTable();
 
     if (minute >= 45 && !halftimeDone) {
       halftimeDone = true;
       clearInterval(currentInterval);
-      showHalftime(t1, t2, s1, s2, cb);
+      document.getElementById("halftimePanel").style.display = "block";
+      window.resume = () => secondHalf(t1, t2, s1, s2);
       return;
     }
 
     if (elapsed >= matchDuration) {
       clearInterval(currentInterval);
-
-      updateStats(t1, t2, s1, s2);
-      addEvent(`Endstand: ${s1}:${s2}`);
-
-      setTimeout(cb, 800);
+      finishMatch(t1, t2, s1, s2);
     }
+  };
 
-  }, gameSpeed);
+  currentInterval = setInterval(gameLoop, gameSpeed);
 }
 
-// ================= EVENTS =================
+function secondHalf(t1, t2, s1, s2) {
+  document.getElementById("halftimePanel").style.display = "none";
+  matchStartTime = Date.now() - matchDuration / 2;
+
+  currentInterval = setInterval(gameLoop, gameSpeed);
+}
+
+function applyHalftime() {
+  selectedTactic = document.getElementById("halfTactic").value;
+  window.resume();
+}
+
 function addEvent(text) {
   let box = document.getElementById("liveMatch");
   let p = document.createElement("p");
@@ -260,74 +217,16 @@ function addEvent(text) {
   box.prepend(p);
 }
 
-// ================= HALBZEIT =================
-function showHalftime(t1, t2, s1, s2, cb) {
-  document.getElementById("halftimePanel").style.display = "block";
-  window.resumeMatch = () => secondHalf(t1, t2, s1, s2, cb);
-}
-
-function applyHalftime() {
-  selectedTactic = document.getElementById("halfTactic").value;
-  document.getElementById("halftimePanel").style.display = "none";
-  window.resumeMatch();
-}
-
-// ================= SECOND HALF =================
-function secondHalf(t1, t2, s1, s2, cb) {
-  matchStartTime = Date.now() - (matchDuration / 2);
-
-  currentInterval = setInterval(() => {
-
-    let elapsed = Date.now() - matchStartTime;
-    let minute = Math.floor((elapsed / matchDuration) * 90);
-
-    updateTimeline(minute);
-
-    let chance = 0.012 + liveModifier;
-
-    if (Math.random() < chance) {
-      if (Math.random() < 0.5) s1++;
-      else s2++;
-    }
-
-    updateScoreboard(t1, t2, s1, s2);
-    updateTable();
-
-    if (elapsed >= matchDuration) {
-      clearInterval(currentInterval);
-
-      updateStats(t1, t2, s1, s2);
-      addEvent(`Endstand: ${s1}:${s2}`);
-
-      setTimeout(cb, 800);
-    }
-
-  }, gameSpeed);
-}
-
-// ================= OTHER MATCHES =================
-function simulateOthers(matches) {
-  matches.forEach(([t1, t2]) => {
-    let s1 = Math.floor(Math.random() * 3);
-    let s2 = Math.floor(Math.random() * 3);
-    updateStats(t1, t2, s1, s2);
-  });
-
-  finishMatchday();
-}
-
-// ================= STATS =================
-function updateStats(t1, t2, s1, s2) {
+function finishMatch(t1, t2, s1, s2) {
   t1.goals += s1;
   t2.goals += s2;
 
   if (s1 > s2) t1.points += 3;
   else if (s2 > s1) t2.points += 3;
   else { t1.points++; t2.points++; }
-}
 
-// ================= FINISH =================
-function finishMatchday() {
+  addEvent(`Endstand: ${s1}:${s2}`);
+
   currentMatchday++;
   isSimulating = false;
 
@@ -337,7 +236,7 @@ function finishMatchday() {
   updateTable();
 }
 
-// ================= TEAM =================
+// TEAM
 function populateTeamSelect() {
   let s = document.getElementById("teamSelect");
   s.innerHTML="";
@@ -355,8 +254,14 @@ function selectTeam() {
   teamLocked = true;
 }
 
-// ================= INIT =================
-teams = initTeams(leagues[currentLeague]);
+function setTactic() {
+  selectedTactic = document.getElementById("tacticSelect").value;
+  document.getElementById("currentTactic").innerText =
+    "Taktik: " + selectedTactic;
+}
+
+// INIT
+teams = initTeams(leagues["Kreisliga A Herford"]);
 generateSchedule();
 populateTeamSelect();
 updateTable();
