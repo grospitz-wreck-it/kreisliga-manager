@@ -1,116 +1,388 @@
-body {
-  background: repeating-linear-gradient(
-    45deg,
-    #0b5e2b,
-    #0b5e2b 10px,
-    #0a4f25 10px,
-    #0a4f25 20px
+// ================= STATE =================
+let teams = [];
+let schedule = [];
+let currentMatchday = 0;
+
+let selectedTeam = null;
+let selectedTactic = "normal";
+
+let isSimulating = false;
+
+let teamLocked = false;
+let leagueLocked = false;
+
+let currentLeague = "Kreisliga A Herford";
+
+let liveModifier = 0;
+let momentum = 0;
+let substitutions = 3;
+
+let gameSpeed = 120;
+let currentInterval = null;
+
+// ================= LIGA =================
+let leagues = {
+  "Kreisliga A Herford": [
+    { name: "TuS Bruchmühlen", strength: 75 },
+    { name: "VfL Holsen", strength: 70 },
+    { name: "Bünder SV", strength: 68 },
+    { name: "TSG Kirchlengern II", strength: 65 },
+    { name: "SV Löhne-Obernbeck", strength: 64 },
+    { name: "TuRa Löhne", strength: 63 },
+    { name: "GW Pödinghausen", strength: 62 },
+    { name: "SV Enger-Westerenger", strength: 61 },
+    { name: "TSV Löhne", strength: 60 },
+    { name: "SC Enger", strength: 59 },
+    { name: "FC Exter", strength: 58 },
+    { name: "SV Rödinghausen III", strength: 57 },
+    { name: "SV Oetinghausen", strength: 56 },
+    { name: "FA Herringhausen/Eickum", strength: 55 },
+    { name: "VfL Herford II", strength: 54 },
+    { name: "TuS Hücker-Aschen", strength: 53 }
+  ]
+};
+
+// ================= INIT =================
+function initTeams(raw) {
+  return raw.map(t => ({
+    ...t,
+    points: 0,
+    goals: 0,
+    form: 0,
+    yellow: 0,
+    red: 0,
+    injured: false
+  }));
+}
+
+// ================= SCHEDULE =================
+function generateSchedule() {
+  schedule = [];
+  let temp = [...teams];
+
+  for (let i = 0; i < temp.length - 1; i++) {
+    let round = [];
+    for (let j = 0; j < temp.length / 2; j++) {
+      round.push([temp[j], temp[temp.length - 1 - j]]);
+    }
+    schedule.push(round);
+    temp.splice(1, 0, temp.pop());
+  }
+
+  let secondHalf = schedule.map(r =>
+    r.map(m => [m[1], m[0]])
   );
-  color: white;
-  font-family: monospace;
-  text-align: center;
+
+  schedule = schedule.concat(secondHalf);
 }
 
-.container {
-  display: flex;
-  gap: 20px;
-  padding: 20px;
+// ================= UI HELPERS =================
+function updateButtons(mode) {
+  document.getElementById("btnAttack")?.classList.remove("activeBtn");
+  document.getElementById("btnCalm")?.classList.remove("activeBtn");
+
+  if (mode === "attack")
+    document.getElementById("btnAttack")?.classList.add("activeBtn");
+
+  if (mode === "calm")
+    document.getElementById("btnCalm")?.classList.add("activeBtn");
 }
 
-.left, .middle, .right {
-  flex: 1;
-  border: 2px solid white;
-  padding: 10px;
+function updateTimeline(minute) {
+  let percent = (minute / 90) * 100;
+  document.getElementById("timelineBar").style.width = percent + "%";
 }
 
-/* SCOREBOARD */
-#scoreWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  margin: 15px 0;
-  font-weight: bold;
+function updateSubsUI() {
+  let el = document.getElementById("subsLeft");
+  if (el) el.innerText = "Wechsel: " + substitutions;
 }
 
-#team1Name, #team2Name {
-  font-size: 18px;
-  min-width: 140px;
+// ================= CONTROLS =================
+function setLiveMode(mode) {
+  if (mode === "attack") liveModifier = 0.03;
+  if (mode === "calm") liveModifier = -0.02;
+  updateButtons(mode);
 }
 
-#team1Name {
-  text-align: right;
+function setSpeed(speed) {
+  gameSpeed = speed;
 }
 
-#team2Name {
-  text-align: left;
+function fastForward() {
+  gameSpeed = 30;
 }
 
-#scoreboard {
-  background: black;
-  color: white;
-  font-size: 32px;
-  padding: 10px 20px;
-  border: 3px solid white;
-  min-width: 120px;
+function makeSub() {
+  if (substitutions <= 0) return;
+
+  substitutions--;
+  updateSubsUI();
+
+  liveModifier += 0.015;
+  addEvent("🔁 Wechsel durchgeführt");
 }
 
-/* LIVE FEED */
-#liveMatch {
-  background: black;
-  height: 220px;
-  overflow-y: auto;
-  padding: 10px;
-  display: flex;
-  flex-direction: column-reverse;
+// ================= MATCHDAY =================
+function simulateMatchday() {
+  if (!selectedTeam) return alert("Team wählen!");
+  if (isSimulating) return;
+
+  substitutions = 3;
+  momentum = 0;
+  liveModifier = 0;
+
+  updateSubsUI();
+
+  isSimulating = true;
+
+  let matches = schedule[currentMatchday];
+
+  let userMatch = matches.find(m =>
+    m[0].name === selectedTeam || m[1].name === selectedTeam
+  );
+
+  simulateLiveMatch(userMatch[0], userMatch[1], () => {
+    simulateOthers(matches.filter(m => m !== userMatch));
+  });
 }
 
-/* HALBZEIT */
-#halftimePanel {
-  background: rgba(0,0,0,0.8);
-  border: 2px solid white;
-  padding: 10px;
-  margin-top: 10px;
+// ================= LIVE MATCH =================
+function simulateLiveMatch(t1, t2, cb) {
+  let s1 = 0, s2 = 0;
+  let minute = 0;
+
+  let box = document.getElementById("liveMatch");
+  box.innerHTML = "";
+
+  currentInterval = setInterval(() => {
+    minute++;
+
+    if (gameSpeed === 30) minute += 1;
+
+    updateTimeline(minute);
+
+    // Momentum
+    if (Math.random() < 0.05) {
+      momentum += Math.random() < 0.5 ? 1 : -1;
+    }
+
+    let chance = 0.018 + liveModifier + (momentum * 0.004);
+
+    if (s1 < s2) chance += 0.008;
+    if (s2 < s1) chance += 0.008;
+
+    // TORE
+    if (Math.random() < chance) {
+      if (Math.random() < 0.5) {
+        s1++;
+        addEvent(`⚽ ${minute}' ${t1.name}`);
+      } else {
+        s2++;
+        addEvent(`⚽ ${minute}' ${t2.name}`);
+      }
+    }
+
+    // KARTEN
+    if (Math.random() < 0.02) {
+      let team = Math.random() < 0.5 ? t1 : t2;
+
+      if (team.yellow === 1 && Math.random() < 0.25) {
+        addEvent(`🟨🟥 ${minute}' ${team.name}`);
+        team.red++;
+      } else if (Math.random() < 0.08) {
+        addEvent(`🟥 ${minute}' ${team.name}`);
+        team.red++;
+      } else {
+        addEvent(`🟨 ${minute}' ${team.name}`);
+        team.yellow = 1;
+      }
+    }
+
+    // VERLETZUNG
+    if (Math.random() < 0.003) {
+      let team = Math.random() < 0.5 ? t1 : t2;
+
+      if (!team.injured) {
+        team.injured = true;
+        substitutions = Math.max(0, substitutions - 1);
+        updateSubsUI();
+
+        addEvent(`🚑 ${minute}' Verletzung bei ${team.name}`);
+      }
+    }
+
+    updateScoreboard(t1, t2, s1, s2);
+    updateTable();
+
+    if (minute >= 45) {
+      clearInterval(currentInterval);
+      showHalftime(t1, t2, s1, s2, cb);
+    }
+
+  }, gameSpeed);
 }
 
-/* TABLE */
-table {
-  width: 100%;
-  background: white;
-  color: black;
-}
-#ticker {
-  background: black;
-  height: 150px;
-  overflow-y: auto;
-  font-size: 12px;
-  padding: 8px;
-  margin-top: 10px;
-  text-align: left;
-}
-/* ACTIVE BUTTON */
-.activeBtn {
-  background: yellow;
-  color: black;
-  font-weight: bold;
+// ================= EVENTS =================
+function addEvent(text) {
+  let box = document.getElementById("liveMatch");
+  let p = document.createElement("p");
+  p.textContent = text;
+  box.prepend(p);
 }
 
-/* TIMELINE */
-#timeline {
-  width: 100%;
-  height: 10px;
-  background: #222;
-  margin-top: 10px;
-  position: relative;
+// ================= HALBZEIT =================
+function showHalftime(t1, t2, s1, s2, cb) {
+  document.getElementById("halftimePanel").style.display = "block";
+  window.resumeMatch = () => secondHalf(t1, t2, s1, s2, cb);
 }
 
-#timelineBar {
-  height: 100%;
-  width: 0%;
-  background: lime;
-  transition: width 0.1s linear;
+function applyHalftime() {
+  selectedTactic = document.getElementById("halfTactic").value;
+  document.getElementById("halftimePanel").style.display = "none";
+  window.resumeMatch();
 }
-td, th {
-  padding: 5px;
-  border: 1px solid black;
+
+// ================= SECOND HALF =================
+function secondHalf(t1, t2, s1, s2, cb) {
+  let minute = 45;
+
+  currentInterval = setInterval(() => {
+    minute++;
+
+    if (gameSpeed === 30) minute += 1;
+
+    updateTimeline(minute);
+
+    let chance = 0.02 + liveModifier + (momentum * 0.004);
+
+    if (Math.random() < chance) {
+      if (Math.random() < 0.5) s1++;
+      else s2++;
+    }
+
+    updateScoreboard(t1, t2, s1, s2);
+    updateTable();
+
+    if (minute >= 90) {
+      clearInterval(currentInterval);
+
+      updateStats(t1, t2, s1, s2);
+
+      addEvent(`Endstand: ${s1}:${s2}`);
+
+      setTimeout(cb, 800);
+    }
+
+  }, gameSpeed);
 }
+
+// ================= OTHER MATCHES =================
+function simulateOthers(matches) {
+  matches.forEach(([t1, t2]) => {
+    let s1 = Math.floor(Math.random() * 3);
+    let s2 = Math.floor(Math.random() * 3);
+
+    updateStats(t1, t2, s1, s2);
+  });
+
+  finishMatchday();
+}
+
+// ================= STATS =================
+function updateStats(t1, t2, s1, s2) {
+  t1.goals += s1;
+  t2.goals += s2;
+
+  if (s1 > s2) {
+    t1.points += 3;
+    t1.form++;
+    t2.form--;
+  } else if (s2 > s1) {
+    t2.points += 3;
+    t2.form++;
+    t1.form--;
+  } else {
+    t1.points++;
+    t2.points++;
+  }
+}
+
+// ================= SEASON =================
+function endSeason() {
+  teams.sort((a,b)=>b.points-a.points);
+
+  addEvent(`🏆 Meister: ${teams[0].name}`);
+
+  let action = prompt("reset / weiter");
+
+  if (action === "reset") location.reload();
+}
+
+// ================= FINISH =================
+function finishMatchday() {
+  currentMatchday++;
+  isSimulating = false;
+
+  if (currentMatchday >= schedule.length) {
+    endSeason();
+  }
+
+  document.getElementById("matchday").innerText =
+    "Spieltag: " + currentMatchday + " / " + schedule.length;
+
+  updateTable();
+}
+
+// ================= UI =================
+function updateScoreboard(t1, t2, s1, s2) {
+  document.getElementById("team1Name").innerText = t1.name;
+  document.getElementById("team2Name").innerText = t2.name;
+  document.getElementById("score").innerText = s1 + " : " + s2;
+}
+
+function updateTable() {
+  let tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";
+
+  teams.sort((a,b)=>b.points-a.points);
+
+  teams.forEach(t=>{
+    let name = t.name===selectedTeam ? "👉 "+t.name : t.name;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${name}</td>
+        <td>${t.points}</td>
+        <td>${t.goals}</td>
+      </tr>`;
+  });
+}
+
+// ================= INIT =================
+function populateTeamSelect() {
+  let s = document.getElementById("teamSelect");
+  s.innerHTML="";
+  teams.forEach(t=>{
+    let o=document.createElement("option");
+    o.value=t.name;
+    o.textContent=t.name;
+    s.appendChild(o);
+  });
+}
+
+function selectTeam() {
+  if (teamLocked) return;
+  selectedTeam = document.getElementById("teamSelect").value;
+  teamLocked = true;
+  leagueLocked = true;
+}
+
+// START
+teams = initTeams(leagues[currentLeague]);
+generateSchedule();
+populateTeamSelect();
+updateTable();
+
+document.getElementById("matchday").innerText =
+  "Spieltag: 0 / " + schedule.length;
