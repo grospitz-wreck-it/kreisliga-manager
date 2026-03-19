@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Kreisliga Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
 
 <h1>Kreisliga Manager</h1>
@@ -5,7 +12,7 @@
 <div class="container">
 
   <!-- LINKS -->
-  <div class="panel left">
+  <div class="panel">
     <h2>Team</h2>
     <select id="teamSelect"></select>
     <button onclick="selectTeam()">Übernehmen</button>
@@ -22,16 +29,19 @@
   </div>
 
   <!-- MITTE -->
-  <div class="panel center">
+  <div class="panel">
     <h2 id="matchday">Spieltag: 0</h2>
     <button onclick="simulateMatchday()">Spieltag simulieren</button>
+
+    <h3>Live-Spiel</h3>
+    <div id="liveMatch"></div>
 
     <h3>Letzter Spieltag</h3>
     <div id="results"></div>
   </div>
 
   <!-- RECHTS -->
-  <div class="panel right">
+  <div class="panel">
     <h2>Tabelle</h2>
     <table id="table">
       <thead>
@@ -49,3 +59,4 @@
 
 <script src="script.js"></script>
 </body>
+</html>
