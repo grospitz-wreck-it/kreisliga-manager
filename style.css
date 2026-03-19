@@ -79,7 +79,15 @@ table {
   background: white;
   color: black;
 }
-
+#ticker {
+  background: black;
+  height: 150px;
+  overflow-y: auto;
+  font-size: 12px;
+  padding: 8px;
+  margin-top: 10px;
+  text-align: left;
+}
 td, th {
   padding: 5px;
   border: 1px solid black;
