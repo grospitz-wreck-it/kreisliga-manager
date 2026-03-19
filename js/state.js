@@ -2,7 +2,6 @@ let teams = [];
 let schedule = [];
 let currentMatchday = 0;
 let selectedTeam = null;
-let selectedTactic = "normal";
 
 let isSimulating = false;
 let currentInterval = null;
