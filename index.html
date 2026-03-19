@@ -9,14 +9,12 @@
 
 <h1>Kreisliga Manager</h1>
 
-<div class="container">
+<div class="layout">
 
   <!-- LINKS -->
   <div class="panel">
     <h2>Liga</h2>
-    <select id="leagueSelect">
-      <option>Kreisliga A Herford</option>
-    </select>
+    <select id="leagueSelect"></select>
     <button onclick="selectLeague()">Liga starten</button>
 
     <h2>Team</h2>
@@ -31,61 +29,49 @@
     </select>
     <button onclick="setTactic()">Speichern</button>
 
-    <p id="currentTactic">Taktik: normal</p>
+    <p id="currentTactic"></p>
 
     <h3>Formation</h3>
-    <select>
+    <select id="formationSelect">
       <option>4-4-2</option>
       <option>4-3-3</option>
-      <option>3-5-2</option>
+      <option>5-3-2</option>
     </select>
   </div>
 
   <!-- MITTE -->
   <div class="panel center">
-    <h2 id="matchday">Spieltag: 0 / 30</h2>
-
+    <h2 id="matchday">Spieltag: 0</h2>
     <button onclick="simulateMatchday()">▶ Spiel starten</button>
 
-    <!-- SCOREBOARD -->
     <div class="scoreboard">
-      <span id="team1Name">Team 1</span>
+      <span id="team1Name"></span>
       <div id="score">0 : 0</div>
-      <span id="team2Name">Team 2</span>
+      <span id="team2Name"></span>
     </div>
 
-    <!-- TIMELINE -->
-    <div id="timeline">
+    <div class="timeline">
       <div id="timelineBar"></div>
     </div>
 
-    <!-- CONTROLS -->
-    <div>
-      <button id="btnAttack" onclick="setLiveMode('attack')">Druck</button>
-      <button id="btnCalm" onclick="setLiveMode('calm')">Ruhig</button>
-      <button onclick="makeSub()">Wechsel</button>
-      <span id="subsLeft">Wechsel: 3</span>
+    <div class="controls">
+      <button onclick="setLiveMode('attack')">🔥 Druck</button>
+      <button onclick="setLiveMode('calm')">🧊 Ruhig</button>
+      <button onclick="makeSub()">🔄 Wechsel</button>
+      <span id="subCount">Wechsel: 5</span>
     </div>
 
     <div>
       Geschwindigkeit:
-      <button class="speedBtn" onclick="setSpeed(event,200)">3x</button>
-      <button class="speedBtn" onclick="setSpeed(event,120)">5x</button>
-      <button class="speedBtn" onclick="setSpeed(event,60)">10x</button>
-      <button onclick="fastForward()">⏩</button>
+      <button onclick="setSpeed(event,100)">3x</button>
+      <button onclick="setSpeed(event,50)">5x</button>
+      <button onclick="setSpeed(event,20)">10x</button>
     </div>
 
-    <!-- LIVE -->
-    <div id="liveMatch" class="live-box"></div>
+    <div id="liveMatch" class="live"></div>
 
-    <!-- HALBZEIT -->
-    <div id="halftimePanel" class="halftime">
+    <div id="halftimePanel" style="display:none;">
       <h3>Halbzeit</h3>
-      <select id="halfTactic">
-        <option value="normal">Normal</option>
-        <option value="offensive">Offensiv</option>
-        <option value="defensive">Defensiv</option>
-      </select>
       <button onclick="applyHalftime()">Weiter</button>
     </div>
 
@@ -96,11 +82,7 @@
     <h2>Tabelle</h2>
     <table id="table">
       <thead>
-        <tr>
-          <th>Team</th>
-          <th>Punkte</th>
-          <th>Tore</th>
-        </tr>
+        <tr><th>Team</th><th>Punkte</th><th>Tore</th></tr>
       </thead>
       <tbody></tbody>
     </table>
@@ -108,6 +90,12 @@
 
 </div>
 
-<script src="script.js"></script>
+<script src="js/state.js"></script>
+<script src="js/league.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/matchEngine.js"></script>
+<script src="js/controls.js"></script>
+<script src="js/main.js"></script>
+
 </body>
 </html>
