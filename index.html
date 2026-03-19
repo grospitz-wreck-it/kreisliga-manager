@@ -1,39 +1,51 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <title>Kreisliga Manager</title>
-  <link rel="stylesheet" href="style.css">
-</head>
 <body>
 
 <h1>Kreisliga Manager</h1>
-<h2>Team auswählen</h2>
-<select id="teamSelect"></select>
-<button onclick="selectTeam()">Übernehmen</button>
-<h2>Taktik wählen</h2>
-<select id="tacticSelect">
-  <option value="normal">Normal</option>
-  <option value="offensive">Offensiv</option>
-  <option value="defensive">Defensiv</option>
-</select>
-<button onclick="setTactic()">Taktik speichern</button>
-<h2 id="matchday">Spieltag: 0</h2>
-<button onclick="simulateMatchday()">Spieltag simulieren</button>
-<h2>Letzter Spieltag</h2>
-<div id="results"></div>
-<h2>Tabelle</h2>
-<table id="table">
-  <thead>
-    <tr>
-      <th>Team</th>
-      <th>Punkte</th>
-      <th>Tore</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+
+<div class="container">
+
+  <!-- LINKS -->
+  <div class="panel left">
+    <h2>Team</h2>
+    <select id="teamSelect"></select>
+    <button onclick="selectTeam()">Übernehmen</button>
+
+    <h2>Taktik</h2>
+    <select id="tacticSelect">
+      <option value="normal">Normal</option>
+      <option value="offensive">Offensiv</option>
+      <option value="defensive">Defensiv</option>
+    </select>
+    <button onclick="setTactic()">Speichern</button>
+
+    <p id="currentTactic"></p>
+  </div>
+
+  <!-- MITTE -->
+  <div class="panel center">
+    <h2 id="matchday">Spieltag: 0</h2>
+    <button onclick="simulateMatchday()">Spieltag simulieren</button>
+
+    <h3>Letzter Spieltag</h3>
+    <div id="results"></div>
+  </div>
+
+  <!-- RECHTS -->
+  <div class="panel right">
+    <h2>Tabelle</h2>
+    <table id="table">
+      <thead>
+        <tr>
+          <th>Team</th>
+          <th>Punkte</th>
+          <th>Tore</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</div>
 
 <script src="script.js"></script>
 </body>
-</html>
