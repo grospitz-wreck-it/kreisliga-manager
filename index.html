@@ -45,6 +45,12 @@
 
     <h2 id="matchday">Spieltag: 0</h2>
     <button onclick="simulateMatchday()">▶ Spiel starten</button>
+    <div>
+  <button onclick="setLiveMode('attack')">🔥 Druck</button>
+  <button onclick="setLiveMode('calm')">🧊 Ruhig</button>
+  <button onclick="makeSub()">🔁 Wechsel</button>
+  <span id="subsLeft">Wechsel: 3</span>
+  </div>
 
     <!-- SCORE -->
     <div id="scoreWrapper">
