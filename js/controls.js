@@ -18,6 +18,7 @@ function selectLeague(){
   document.getElementById("teamSelect").disabled = false;
   document.getElementById("btnSelectTeam").disabled = false;
   document.getElementById("loggedTeam").innerText = "Kein Team gewählt";
+  document.getElementById("startBtn").innerText = "▶ Saison starten";
 }
 
 
