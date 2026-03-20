@@ -21,19 +21,29 @@
   <div class="layout">
 
     <!-- 🔥 SETUP PANEL -->
-    <div class="panel" id="setupPanel">
+  <div class="panel" id="setupPanel">
 
-      <h2>⚙️ Einstellungen</h2>
+  <h2>⚙️ Einstellungen</h2>
 
+  <div class="setupGrid">
+
+    <!-- Liga -->
+    <div class="setupBox">
       <h3>Liga</h3>
       <select id="leagueSelect"></select>
-      <button onclick="selectLeague()">Liga starten</button>
+      <button onclick="selectLeague()">Starten</button>
+    </div>
 
+    <!-- Team -->
+    <div class="setupBox">
       <h3>Team</h3>
       <select id="teamSelect"></select>
       <button id="btnSelectTeam" onclick="selectTeam()">Übernehmen</button>
-      <p id="selectedTeamText">Kein Team gewählt</p>
+      <p id="selectedTeamText">-</p>
+    </div>
 
+    <!-- Taktik -->
+    <div class="setupBox">
       <h3>Taktik</h3>
       <select id="tacticSelect">
         <option>Normal</option>
@@ -41,9 +51,12 @@
         <option>Defensiv</option>
       </select>
       <button onclick="setTactic()">Speichern</button>
-      <p id="currentTactic">Taktik: normal</p>
-
+      <p id="currentTactic">Normal</p>
     </div>
+
+  </div>
+
+</div>
 
     <!-- 🔥 GAME PANEL -->
     <div class="panel">
