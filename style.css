@@ -8,11 +8,14 @@ body {
 /* Layout */
 .layout {
   display: flex;
+  flex-direction: row;   /* 🔥 erzwingt nebeneinander */
   gap: 25px;
   padding: 25px;
 
-  max-width: 1400px;   /* 🔥 wichtig */
-  margin: 0 auto;      /* 🔥 zentriert alles */
+  max-width: 1400px;
+  margin: 0 auto;
+
+  align-items: flex-start; /* verhindert komisches Strecken */
 }
 
 .panel {
