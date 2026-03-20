@@ -8,40 +8,47 @@
 
 <body>
 
-  <!-- 🔥 HEADER MIT LOGO -->
-<h1 class="title">
-  <img src="logos/nw_logo.png" class="logo">
-  Kreisliga Manager
-</h1>
+  <h1 class="title">
+    <img src="logos/nw logo.png" class="logo">
+    Kreisliga Manager
+  </h1>
 
-    <!-- 🔵 LINKE SEITE -->
-    <div class="panel">
+  <!-- 🔥 Toggle Button -->
+  <button id="toggleSetupBtn" onclick="toggleSetup()" style="display:none;">
+    ⚙️ Einstellungen anzeigen
+  </button>
 
-      <h2>Liga</h2>
+  <div class="layout">
+
+    <!-- 🔥 SETUP PANEL -->
+    <div class="panel" id="setupPanel">
+
+      <h2>⚙️ Einstellungen</h2>
+
+      <h3>Liga</h3>
       <select id="leagueSelect"></select>
       <button onclick="selectLeague()">Liga starten</button>
 
-      <h2>Team</h2>
+      <h3>Team</h3>
       <select id="teamSelect"></select>
-      <button id="btnSelectTeam" onclick="lockTeam()">Übernehmen</button>
+      <button id="btnSelectTeam" onclick="selectTeam()">Übernehmen</button>
       <p id="selectedTeamText">Kein Team gewählt</p>
 
-      <h2>Taktik</h2>
+      <h3>Taktik</h3>
       <select id="tacticSelect">
-        <option value="normal">Normal</option>
-        <option value="offensive">Offensiv</option>
-        <option value="defensive">Defensiv</option>
+        <option>Normal</option>
+        <option>Offensiv</option>
+        <option>Defensiv</option>
       </select>
       <button onclick="setTactic()">Speichern</button>
       <p id="currentTactic">Taktik: normal</p>
 
     </div>
 
-    <!-- 🟢 MITTE -->
+    <!-- 🔥 GAME PANEL -->
     <div class="panel">
 
       <h2 id="matchday">Spieltag: 0 / 0</h2>
-
       <button id="startBtn" onclick="simulateMatchday()">▶ Saison starten</button>
 
       <div class="scoreboard">
@@ -70,7 +77,6 @@
 
       <div id="liveMatch" class="live"></div>
 
-      <!-- Halbzeit -->
       <div id="halftimePanel" style="display:none;">
         <h3>Halbzeit</h3>
         <button onclick="setLiveMode('attack')">Mehr Druck</button>
@@ -81,10 +87,9 @@
 
     </div>
 
-    <!-- 🟡 RECHTS -->
+    <!-- 🔥 TABLE PANEL -->
     <div class="panel">
       <h2>Tabelle</h2>
-
       <table id="table">
         <thead>
           <tr>
@@ -99,7 +104,6 @@
 
   </div>
 
-  <!-- SCRIPTS (Reihenfolge wichtig!) -->
   <script src="js/state.js"></script>
   <script src="js/league.js"></script>
   <script src="js/ui.js"></script>
