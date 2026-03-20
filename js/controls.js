@@ -10,9 +10,6 @@ function selectLeague(){
   generateSchedule();
   populateTeamSelect();
   updateTable();
-
-  document.getElementById("toggleSetupBtn").style.display = "none";
-  document.getElementById("setupPanel").style.display = "block";
 }
 
 function selectTeam(){
@@ -23,60 +20,26 @@ function selectTeam(){
     return;
   }
 
-  // 🔥 WICHTIG: nur Team speichern (wie vorher!)
   selectedTeam = team;
   teamLocked = true;
 
-  // UI wie vorher
   document.getElementById("selectedTeamText").innerText = "Dein Team: " + team;
   document.getElementById("teamSelect").disabled = true;
   document.getElementById("btnSelectTeam").disabled = true;
 
-  // 🔥 NEU: nur einklappen (kein anderer Eingriff!)
+  // Setup einklappen
   document.getElementById("setupPanel").style.display = "none";
   document.getElementById("toggleSetupBtn").style.display = "block";
 }
 
-  if(!tactic){
-    alert("Taktik wählen!");
-    return;
+function toggleSetup(){
+  const panel = document.getElementById("setupPanel");
+
+  if(panel.style.display === "none"){
+    panel.style.display = "block";
+  } else {
+    panel.style.display = "none";
   }
-  function resetGame(){
-
-  // 🔥 komplette Variablen zurücksetzen
-  selectedTeam = null;
-  teamLocked = false;
-  currentMatchday = 0;
-  schedule = [];
-
-  // UI zurücksetzen
-  document.getElementById("teamSelect").disabled = false;
-  document.getElementById("leagueSelect").disabled = false;
-  document.getElementById("tacticSelect").disabled = false;
-  document.getElementById("btnSelectTeam").disabled = false;
-
-  document.getElementById("selectedTeamText").innerText = "Kein Team gewählt";
-  document.getElementById("currentTactic").innerText = "Taktik: normal";
-
-  document.getElementById("setupPanel").style.display = "block";
-  document.getElementById("toggleSetupBtn").style.display = "none";
-
-  document.getElementById("startBtn").innerText = "▶ Saison starten";
-
-  document.getElementById("liveMatch").innerHTML = "";
-  updateTable();
-}
-  selectedTeam = team;
-  teamLocked = true;
-
-  document.getElementById("selectedTeamText").innerText = "Dein Team: " + team;
-  document.getElementById("teamSelect").disabled = true;
-  document.getElementById("btnSelectTeam").disabled = true;
-
-
-  // 🔥 ERST JETZT einklappen
-  document.getElementById("setupPanel").style.display = "none";
-  document.getElementById("toggleSetupBtn").style.display = "block";
 }
 
 function setTactic(){
