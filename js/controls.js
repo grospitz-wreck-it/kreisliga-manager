@@ -11,105 +11,78 @@ function selectLeague(){
   populateTeamSelect();
   updateTable();
 
-  selectedTeam = null;
-  teamLocked = false;
-
-  document.getElementById("teamSelect").disabled = false;
-  document.getElementById("btnSelectTeam").disabled = false;
-  document.getElementById("loggedTeam").innerText = "Kein Team gewählt";
-
-  document.getElementById("startBtn").innerText = "▶ Saison starten";
+  document.getElementById("toggleSetupBtn").style.display = "none";
+  document.getElementById("setupPanel").style.display = "block";
 }
-
 
 function selectTeam(){
-  if(teamLocked){
-    alert("Team bereits festgelegt!");
+  const team = document.getElementById("teamSelect").value;
+
+  if(!team){
+    alert("Team wählen!");
     return;
   }
 
-  const select = document.getElementById("teamSelect");
-
-  if(!select || !select.value){
-    alert("Bitte Team auswählen!");
-    return;
-  }
-
-  selectedTeam = select.value;
-
-  document.getElementById("loggedTeam").innerText =
-    "Dein Team: " + selectedTeam;
-
-  lockTeam();
-  updateTable();
-}
-
-
-function lockTeam(){
-  const teamSelect = document.getElementById("teamSelect");
-
-  if(!teamSelect.value){
-    alert("Bitte Team wählen!");
-    return;
-  }
-
-  // 🔥 Team speichern
-  selectedTeam = teamSelect.value;
-
-  // 🔒 Lock aktivieren
+  selectedTeam = team;
   teamLocked = true;
 
-  // UI sperren
-  teamSelect.disabled = true;
+  document.getElementById("selectedTeamText").innerText = "Dein Team: " + team;
+  document.getElementById("teamSelect").disabled = true;
   document.getElementById("btnSelectTeam").disabled = true;
 
-  // Anzeige aktualisieren
-  document.getElementById("selectedTeamText").innerText = "Dein Team: " + selectedTeam;
+  // 🔥 einklappen
+  document.getElementById("setupPanel").style.display = "none";
+  document.getElementById("toggleSetupBtn").style.display = "block";
 }
 
+function toggleSetup(){
+  const panel = document.getElementById("setupPanel");
+  const btn = document.getElementById("toggleSetupBtn");
+
+  if(panel.style.display === "none"){
+    panel.style.display = "block";
+    btn.innerText = "❌ Einstellungen schließen";
+  } else {
+    panel.style.display = "none";
+    btn.innerText = "⚙️ Einstellungen anzeigen";
+  }
+}
+
+function setTactic(){
+  const val=document.getElementById("tacticSelect").value;
+  document.getElementById("currentTactic").innerText="Taktik: "+val;
+}
 
 function setLiveMode(mode){
   document.getElementById("btnAttack").classList.remove("active");
   document.getElementById("btnCalm").classList.remove("active");
 
-  if(mode === "attack"){
-    liveModifier += 0.01;
+  if(mode==="attack"){
+    liveModifier+=0.01;
     document.getElementById("btnAttack").classList.add("active");
   } else {
-    liveModifier -= 0.01;
+    liveModifier-=0.01;
     document.getElementById("btnCalm").classList.add("active");
   }
 }
 
-
 function makeSub(){
-  if(!isSimulating){
-    alert("Spiel läuft nicht");
-    return;
-  }
+  if(!isSimulating){ alert("Spiel läuft nicht"); return; }
+  if(substitutions<=0){ alert("Keine Wechsel"); return; }
 
-  if(substitutions <= 0){
-    alert("Keine Wechsel mehr");
-    return;
-  }
-
-  let events = ["🔁 Wechsel","🔁 Defensivwechsel","🔁 Offensivwechsel"];
+  let events=["🔁 Wechsel","🔁 Defensivwechsel","🔁 Offensivwechsel"];
   addEvent(events[Math.floor(Math.random()*events.length)]);
 
   substitutions--;
-  document.getElementById("subCount").innerText =
-    "Wechsel: " + substitutions;
+  document.getElementById("subCount").innerText="Wechsel: "+substitutions;
 }
 
+function setSpeed(e,multi){
+  speedMultiplier=multi;
 
-function setSpeed(e, multi){
-  speedMultiplier = multi;
-
-  let buttons = e.target.parentElement.querySelectorAll("button");
-  buttons.forEach(b => b.classList.remove("active"));
+  let buttons=e.target.parentElement.querySelectorAll("button");
+  buttons.forEach(b=>b.classList.remove("active"));
   e.target.classList.add("active");
 
-  if(isSimulating){
-    restartInterval();
-  }
+  if(isSimulating){ restartInterval(); }
 }
