@@ -2,8 +2,8 @@
 let ads = [
   {
     name: "Sponsor A",
-    image: "ads/ad1.png",
-    link: "https://example.com",
+    image: "ads/ad1.jpg",
+    link: "https://ausbildung.hettich.com/",
     start: "2026-01-01",
     end: "2026-12-31",
     weight: 1
@@ -11,7 +11,7 @@ let ads = [
   {
     name: "Sponsor B",
     image: "ads/ad2.jpg",
-    link: "",
+    link: "https://www.haecker-kuechen.com/de/karriere",
     start: "2026-01-01",
     end: "2026-12-31",
     weight: 1
