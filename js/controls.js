@@ -20,12 +20,20 @@ function selectTeam(){
     return;
   }
 
+  // Team setzen
   selectedTeam = team;
   teamLocked = true;
 
+  // Anzeige aktualisieren
   document.getElementById("selectedTeamText").innerText = "Dein Team: " + team;
+
+  // Dropdown & Button sperren
   document.getElementById("teamSelect").disabled = true;
   document.getElementById("btnSelectTeam").disabled = true;
+
+  // 🔥 NEU: Menü automatisch schließen (Overlay)
+  document.getElementById("setupPanel").classList.remove("open");
+}
 
   // Setup einklappen
   document.getElementById("setupPanel").style.display = "none";
@@ -34,12 +42,8 @@ function selectTeam(){
 
 function toggleSetup(){
   const panel = document.getElementById("setupPanel");
-
-  if(panel.style.display === "none"){
-    panel.style.display = "block";
-  } else {
-    panel.style.display = "none";
-  }
+  panel.classList.toggle("open");
+}
 }
 
 function setTactic(){
