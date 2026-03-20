@@ -23,29 +23,38 @@ function selectTeam(){
     return;
   }
 
+  function selectTeam(){
+  const team = document.getElementById("teamSelect").value;
+  const league = document.getElementById("leagueSelect").value;
+  const tactic = document.getElementById("tacticSelect").value;
+
+  if(!league){
+    alert("Liga wählen!");
+    return;
+  }
+
+  if(!team){
+    alert("Team wählen!");
+    return;
+  }
+
+  if(!tactic){
+    alert("Taktik wählen!");
+    return;
+  }
+
   selectedTeam = team;
   teamLocked = true;
 
   document.getElementById("selectedTeamText").innerText = "Dein Team: " + team;
   document.getElementById("teamSelect").disabled = true;
   document.getElementById("btnSelectTeam").disabled = true;
+  document.getElementById("leagueSelect").disabled = true;
+  document.getElementById("tacticSelect").disabled = true;
 
-  // 🔥 einklappen
+  // 🔥 ERST JETZT einklappen
   document.getElementById("setupPanel").style.display = "none";
   document.getElementById("toggleSetupBtn").style.display = "block";
-}
-
-function toggleSetup(){
-  const panel = document.getElementById("setupPanel");
-  const btn = document.getElementById("toggleSetupBtn");
-
-  if(panel.style.display === "none"){
-    panel.style.display = "block";
-    btn.innerText = "❌ Einstellungen schließen";
-  } else {
-    panel.style.display = "none";
-    btn.innerText = "⚙️ Einstellungen anzeigen";
-  }
 }
 
 function setTactic(){
