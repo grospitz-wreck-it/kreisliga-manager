@@ -1,4 +1,56 @@
 <!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Kreisliga Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Kreisliga Manager</h1>
+
+<div class="layout">
+
+  <div class="panel">
+    <h2>Liga</h2>
+    <select id="leagueSelect"></select>
+    <button onclick="selectLeague()">Liga starten</button>
+
+    <h2>Team</h2>
+    <select id="teamSelect"></select>
+    <button id="btnSelectTeam" onclick="selectTeam()">Übernehmen</button>
+
+    <p id="loggedTeam">Kein Team gewählt</p>
+
+    <h2>Taktik</h2>
+    <select id="tacticSelect">
+      <option value="normal">Normal</option>
+      <option value="offensive">Offensiv</option>
+      <option value="defensive">Defensiv</option>
+    </select>
+    <button onclick="setTactic()">Speichern</button>
+
+    <p id="currentTactic"></p>
+  </div>
+
+  <div class="panel center">
+    <h2 id="matchday">Spieltag: 0 / 0</h2>
+    <button id="startBtn" onclick="simulateMatchday()">▶ Spiel starten</button>
+
+    <div class="scoreboard">
+      <span id="teamLeft"></span>
+      <div id="score">0 : 0</div>
+      <span id="teamRight"></span>
+    </div>
+
+    <div class="timeline">
+      <div id="timelineBar"></div>
+    </div>
+
+    <div class="controls">
+      <button id="btnAttack" onclick="setLiveMode('attack')">🔥 Druck</button>
+      <button id="btnCalm" onclick="setLiveMode('calm')">🧊 Ruhig</button>
       <button onclick="makeSub()">🔄 Wechsel</button>
       <span id="subCount">Wechsel: 5</span>
     </div>
