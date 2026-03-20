@@ -191,23 +191,26 @@ function makeSub(){
 // =========================
 //
 
-function setSpeed(multi, el){
+function setSpeed(e, multi){
 
+  // 🔥 FALLBACK falls kein echtes Event übergeben wird
+  if(!e || !e.target){
+    speedMultiplier = multi;
+
+    if(isSimulating){
+      restartInterval();
+    }
+    return;
+  }
+
+  // normaler Flow
   speedMultiplier = multi;
 
-  // Buttons visuell setzen
-  const container = document.getElementById("speedControls");
-  if(container){
-    let buttons = container.querySelectorAll("button");
-    buttons.forEach(b => b.classList.remove("active"));
-  }
+  let buttons = e.target.parentElement.querySelectorAll("button");
+  buttons.forEach(b => b.classList.remove("active"));
+  e.target.classList.add("active");
 
-  if(el){
-    el.classList.add("active");
-  }
-
-  // 🔥 WICHTIG: IMMER neu starten
-  if(isSimulating){
-    restartInterval();
+  if(isSimulating){ 
+    restartInterval(); 
   }
 }
