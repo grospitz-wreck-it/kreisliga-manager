@@ -1,103 +1,89 @@
 const words = {
 
-  positive: [
-    "Angriffslustig","Ballzauberer","Schussstark","Torgefährlich","Kombinationsspiel",
-    "Flankengott","Kopfballungeheuer","Dribbelkünstler","Spielmacher","Torjäger",
-    "Mannschaftsgeist","Einsatzfreudig","Passgenau","Kreativ","Dynamisch",
-    "Unbezwingbar","Abwehrbollwerk","Taktikfuchs","Pressing","Konterstark",
-    "Ballbesitz","Doppelpässe","Traumtor","Torinstinkt","Siegeswille",
-    "Flügelzange","Spielwitz","Teamplayer","Sturmlauf","Defensivkunst",
-    "Taktisch versiert","Fairplay","Schusspräzision","Ballkontrolle","Laufstark",
-    "Spielintelligenz","Spielverlagerung","Übersteiger","Hackentrick","Unhaltbar",
-    "Glanzparade","Reflexstark","Ausdauernd","Ballverteiler","Ballgewandt",
-    "Flügelspiel","Unerschütterlich","Zauberfuß","Spielübersicht","Matchwinner",
-    "Manndecker","Elfmeterkiller","Standardspezialist","Flankenläufer","Abwehrchef",
-    "Spielfreude","Tempofußball","Abgeklärt","Führungsspieler","Kopfballpräzision",
-    "Passsicherheit","Fallrückzieher","Offensivdrang","Schlitzohr","Distanzschütze",
-    "Spielverständnis","Flügelwechsel","Abwehrass","Raumdeckung","Angriffsfreude",
-    "Technisch versiert","Kombinationsfreudig","Spielaufbau","Ballstafetten",
-    "Torvorlage","Außenrist","Torwarttalent","Balljäger","Zweikampfstark",
-    "Torgarantie","Siegeshungrig","Passmaschine","Ballmagnet","Abgebrüht",
-    "Sturmspitze","Instinktfußballer","Taktikgenie","Auswärtsstark","Unnachgiebig",
-    "Jungtalent","Torpedo","Pressingmaschine","Trickreich","Wandspieler",
-    "Stehvermögen","Goalgetter","Spielkultur","Offensivfeuerwerk","Matchplan",
-    "Ballgefühl","Unberechenbar","Vorlagengeber","Ballzauber","Torhüterass",
-    "Vollstrecker","Innenverteidiger-Riese","Spielrhythmus"
+  // 🟢 Adjektive (für Beschreibungen)
+  adjPositive: [
+    "stark", "dominant", "überlegen", "souverän", "spielfreudig",
+    "effizient", "abgeklärt", "druckvoll", "kombinationssicher",
+    "laufstark", "zweikampfstark", "konzentriert"
   ],
 
-  negative: [
-    "Abseitsfalle gescheitert","Ballverlust","Chancentod","Fehlpass","Eigentor",
-    "Abschlussschwäche","Abschlusspanik","Konteranfällig","Abwehrlücke",
-    "Fehlentscheidung","Unsportlichkeit","Platzverweis","Gelb-Rot","Rote Karte",
-    "Unnötiges Foul","Unsicher","Unkonzentriert","Passiv","Ideenlos","Planlos",
-    "Harmlos","Hektisch","Ineffektiv","Lauffaul","Ballferner","Unmotiviert",
-    "Überheblich","Unbeherrscht","Strafraumverweigerer","Schwalbe",
-    "Ballverlustkönig","Auswärtsschwäche","Verunsichert","Angriffsarmut",
-    "Spielzerstörer","Hitzkopf","Kartenflut","Rückpassorgie","Flankenblind",
-    "Zweikampfschwach","Unkoordinierter Angriff","Konfusion in der Abwehr",
-    "Chancenlos","Ratlos","Verlegenheit","Rückstand","Verzweifelt",
-    "Distanzschwäche","Glücklos","Grobmotoriker","Torwartfehler","Torflaute",
-    "Schusspech","Unaufmerksam","Abwehrschwäche","Halbherzig","Stolperer",
-    "Verlegenheitslösung","Unnötiger Ballverlust","Abgerutscht",
-    "Torchancenmangel","Unnötiges Dribbling","Zögerlich","Auflösungserscheinungen",
-    "Fehlende Abstimmung","Missverständnis","Chancenwucher",
-    "Abseitsfalle misslungen","Eckballschwäche","Fehlende Kreativität",
-    "Spielverzögerung","Defensivchaos","Unordnung","Meckern",
-    "Vermeidbares Gegentor","Torwartpatzer","Zentrumsprobleme","Kartenproblem",
-    "Verzweifelter Versuch","Verlegenheitsschuss","Unnötiger Zweikampf",
-    "Eigensinnig","Zuviel Risiko","Torungefährlich","Hinten offen",
-    "Planloser Angriff","Schwunglos","Unstrukturierter Spielaufbau",
-    "Uninspirierte Leistung","Abwehrschwächen","Fehlender Spielwitz",
-    "Unentschlossen","Unnötige Härte","Hinten anfällig","Kein Zugriff",
-    "Fehlende Durchschlagskraft","Anfälligkeit bei Standards",
-    "Unpräziser Abschluss","Konteranfälligkeit","Lückenhaftes Mittelfeld",
-    "Fehlendes Spielverständnis","Zu spät reagiert","Unterlegen"
+  adjNegative: [
+    "schwach", "ideenlos", "verunsichert", "fehleranfällig",
+    "harmlos", "unstrukturiert", "hektisch", "unpräzise",
+    "anfällig", "planlos", "überfordert"
   ],
 
-  general: [
-    "Abseits","Abwehr","Angriff","Anstoß","Auswärtsspiel","Auswechslung",
-    "Ballbesitz","Ballkontrolle","Ballverlust","Bananenflanke","Dribbling",
-    "Eckball","Elfmeter","Endspiel","Fairplay","Flanke","Foul","Freistoß",
-    "Gelbe Karte","Grätsche","Halbzeit","Handspiel","Kopfball","Konter",
-    "Linienrichter","Manndeckung","Mittelfeld","Nachspielzeit","Offensiv",
-    "Schiedsrichter","Schienbeinschoner","Schlusspfiff","Schuss","Spielfeld",
-    "Standardsituation","Strafraum","Taktik","Tor","Torhüter","Tribüne",
-    "Unentschieden","Verteidigung","Viererkette","Wechsel","Weitschuss",
-    "Zeitspiel","Zweikampf","Trainerbank","Trikot","Teamgeist",
-    "Spielsystem","Rückpass","Pokal","Penalty","Passspiel",
-    "Match","Kapitän","Jubel","Heimspiel","Einwurf","Einwechslung",
-    "Aufstellung","Aufstieg","Abstieg","Spielminute","Rückrunde",
-    "Punktekonto","Meisterschaft","Mittellinie","Kader","Hinspiel",
-    "Heimvorteil","Flutlicht","Fanblock","Eckfahne","Doppelpass",
-    "Distanzschuss","Defensiv","Deckung","Ausgleichstreffer",
-    "Angriffspressing","Amateurliga","Trainerstab","Relegation",
-    "Pressing","Spielmacher","Kombinationsspiel","Kurzpassspiel"
+  // 🧠 Nomen (für Dinge im Spiel)
+  nouns: [
+    "Angriff", "Abwehr", "Mittelfeld", "Spielaufbau",
+    "Ballbesitz", "Zweikampf", "Offensive", "Defensive",
+    "Flügelspiel", "Passspiel", "Spielkontrolle"
   ],
 
+  // ⚡ Aktionen
+  actions: [
+    "dominiert das Spiel",
+    "kontrolliert die Partie",
+    "setzt sich durch",
+    "übernimmt früh die Kontrolle",
+    "bleibt spielbestimmend",
+    "drückt auf die Führung"
+  ],
+
+  // ❌ negative Aktionen
+  negActions: [
+    "findet kein Mittel",
+    "kommt nicht ins Spiel",
+    "wirkt ideenlos",
+    "bleibt ungefährlich",
+    "lässt Chancen liegen",
+    "offenbart große Lücken"
+  ],
+
+  // 🔥 besondere Ereignisse
+  highlights: [
+    "Traumtor",
+    "Distanzschuss",
+    "Kopfballtreffer",
+    "Kontertor",
+    "Elfmeter",
+    "Freistoßtreffer"
+  ],
+
+  // 🤪 crazy stuff (sparsam nutzen!)
   crazy: [
-    "Torwartkrake","Flipperfußball","Abseitsfallexperte","Luftloch",
-    "Grätschengott","Dosenöffner","Hackenschuss","Blutgrätsche",
-    "Torpedo-Kopfball","Wembley-Tor","Fallrückziehertor","Pfostenkuss",
-    "Rasenmähergrätsche","Slalomdribbler","Torjägerkanone","Betonabwehr",
-    "Zuckerpass","Flutlichtspiel","Gurkentor","Kunstschütze","Volleyhammer",
-    "Stehgeiger","Dribbelkönig","Abstaubertor","Außenristzauber",
-    "Zitterpartie","Schwalbenkönig","Knoten in den Beinen","Torhüterphantom",
-    "Halbes Eigentor","Grätschmeister","Abwehrschlacht","Riesenwumme",
-    "Latteknaller","Torschusspanik","Ballartist","Wunderheilung",
-    "Edeltechniker","Standfußball","Schlenzer","Hundertprozentige",
-    "Alutreffer","Schlachtross","Zeitlupenfußball","Kämpferherz",
-    "Last-Minute-Sieg","Schlendrian","Flutschfinger","Knotenschuss",
-    "Murmel","Hühnerhaufen","Kullerball","Duseltor","Rumpelfußball",
-    "Flatterball","Blitzstart","Holzfuß","Kampfzwerg","Gestocher",
-    "Freistoßgranate","Haifischbecken","Kopfballpendel","Abwehrmonster",
-    "Netzzerfetzer","Scharfschütze","Wundertüte","Kettenhund",
-    "Löwenherz","Pressschlag","Schusskanone","Raketenstart",
-    "Stehaufmännchen","Hechtsprung","Toralarm","Unhaltbarer",
-    "Doppelschlag","Schweißfußball","Tunneln","Zaubermaus",
-    "Schießbude","Fußballgott","Gummiband","Konterfalle",
-    "Heimfestung","Torwartlegende","Pressingfalle","Kunstschuss",
-    "Rumpftruppe","Wadenkrampf","Regenbogenflanke","Überzahlspiel",
-    "Wunderkind","Sturmlauf","Schattendasein"
-  ]
+    "Flipperfußball",
+    "Kullerball",
+    "Latteknaller",
+    "Gurkentor",
+    "Pfostenkuss",
+    "Slalomdribbling",
+    "Abwehrchaos"
+  ],
+
+  // 📰 typische Phrasen (GANZ WICHTIG!)
+  phrases: {
+    win: [
+      "setzt sich verdient durch",
+      "gewinnt am Ende souverän",
+      "entscheidet die Partie für sich",
+      "holt sich drei wichtige Punkte"
+    ],
+    draw: [
+      "trennt sich leistungsgerecht",
+      "teilt sich die Punkte",
+      "kommt nicht über ein Remis hinaus"
+    ],
+    intro: [
+      "Der Spieltag hatte einiges zu bieten.",
+      "Die Zuschauer sahen abwechslungsreiche Partien.",
+      "In der Liga ging es erneut heiß her."
+    ],
+    outro: [
+      "Die Liga bleibt spannend.",
+      "Im Tabellenkeller spitzt sich die Lage zu.",
+      "Der Kampf um die Spitze geht weiter."
+    ]
+  }
 
 };
