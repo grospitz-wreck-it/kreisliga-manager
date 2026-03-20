@@ -46,16 +46,25 @@ function selectTeam(){
 
 
 function lockTeam(){
+  const teamSelect = document.getElementById("teamSelect");
+
+  if(!teamSelect.value){
+    alert("Bitte Team wählen!");
+    return;
+  }
+
+  // 🔥 Team speichern
+  selectedTeam = teamSelect.value;
+
+  // 🔒 Lock aktivieren
   teamLocked = true;
 
-  document.getElementById("teamSelect").disabled = true;
+  // UI sperren
+  teamSelect.disabled = true;
   document.getElementById("btnSelectTeam").disabled = true;
-}
 
-
-function setTactic(){
-  const val = document.getElementById("tacticSelect").value;
-  document.getElementById("currentTactic").innerText = "Taktik: " + val;
+  // Anzeige aktualisieren
+  document.getElementById("selectedTeamText").innerText = "Dein Team: " + selectedTeam;
 }
 
 
