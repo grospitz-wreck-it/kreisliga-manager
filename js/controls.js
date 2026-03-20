@@ -39,7 +39,7 @@ function selectTeam(){
 function toggleSetup(){
   const panel = document.getElementById("setupPanel");
   panel.classList.toggle("open");
-}
+
 }
 
 function setTactic(){
