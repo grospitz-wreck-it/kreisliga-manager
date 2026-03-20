@@ -13,6 +13,11 @@ function createTeam(name){
 
 function loadLeague(name) {
 
+  // ✅ sauberer Reset
+  teams = [];
+  schedule = [];
+  currentMatchday = 0;
+
   if (name === "herford") {
     teams = [
       createTeam("Bünder SV"),
@@ -34,7 +39,6 @@ function loadLeague(name) {
     ];
   }
 
-  // 🔵 Kreisliga A Lübbecke
   if (name === "luebbecke") {
     teams = [
       createTeam("Gehlenbeck"),
@@ -56,7 +60,6 @@ function loadLeague(name) {
     ];
   }
 
-  // 🟢 Kreisliga A Bielefeld
   if (name === "bielefeld") {
     teams = [
       createTeam("TuS Jöllenbeck"),
@@ -78,7 +81,5 @@ function loadLeague(name) {
     ];
   }
 
-  // 🔥 RESET (sehr wichtig)
-  currentMatchday = 0;
-  schedule = [];
+  console.log("Teams geladen:", teams.length);
 }
