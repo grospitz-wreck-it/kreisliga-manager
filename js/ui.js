@@ -45,9 +45,17 @@ function updateTable() {
 function populateTeamSelect(){
   const select = document.getElementById("teamSelect");
 
-  if(!select) return;
+  if(!select){
+    console.warn("teamSelect nicht gefunden");
+    return;
+  }
 
   select.innerHTML = "";
+
+  if(!teams || teams.length === 0){
+    console.warn("Keine Teams zum Befüllen");
+    return;
+  }
 
   teams.forEach(t => {
     let o = document.createElement("option");
@@ -55,8 +63,13 @@ function populateTeamSelect(){
     o.textContent = t.name;
     select.appendChild(o);
   });
+
+  // ✅ UX Fix (neu, aber ungefährlich)
+  select.selectedIndex = 0;
 }
 
+// ⚠️ WICHTIG: Diese Version bleibt bewusst drin,
+// weil sie von matchEngine genutzt wird
 function addEvent(text){
   let box = document.getElementById("liveMatch");
 
