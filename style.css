@@ -9,7 +9,7 @@ body {
 }
 
 /* =========================
-   HEADER (FIXED)
+   HEADER (ZENTRIERT)
 ========================= */
 h1.title {
   display: flex;
@@ -31,15 +31,75 @@ h1.title {
 }
 
 /* =========================
-   LAYOUT
+   BURGER BUTTON
+========================= */
+#menuBtn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+
+  background: #e0e0e0;
+  color: #333;
+  font-size: 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
+
+  border: none;
+  cursor: pointer;
+
+  z-index: 1001;
+}
+
+#menuBtn:hover {
+  background: #d5d5d5;
+}
+
+/* =========================
+   SETUP OVERLAY (🔥 FIX)
+========================= */
+#setupPanel {
+  position: fixed;
+  top: 0;
+  right: -320px; /* versteckt */
+
+  width: 300px;
+  height: 100%;
+
+  background: #ffffff;
+  box-shadow: -5px 0 25px rgba(0,0,0,0.2);
+
+  padding: 20px;
+  z-index: 1000;
+
+  transition: right 0.3s ease;
+  overflow-y: auto;
+}
+
+/* geöffnet */
+#setupPanel.open {
+  right: 0;
+}
+
+/* Setup Boxen */
+#setupPanel > div {
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+/* =========================
+   LAYOUT (SPIEL + TABELLE)
 ========================= */
 .layout {
   display: flex;
-  flex-direction: row;
   gap: 25px;
   padding: 25px;
 
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
 
   align-items: flex-start;
@@ -48,25 +108,6 @@ h1.title {
 .panel {
   flex: 1;
   min-width: 300px;
-}
-
-/* =========================
-   SETUP INLINE (Liga/Team/Taktik)
-========================= */
-#setupPanel {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-#setupPanel > div {
-  background: #ffffff;
-  padding: 12px;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-  min-width: 160px;
-  text-align: center;
 }
 
 /* =========================
@@ -90,7 +131,6 @@ button:hover {
 
 button.active {
   background: #4caf50;
-  color: white;
 }
 
 /* =========================
@@ -234,22 +274,13 @@ select {
 }
 
 /* =========================
-   RESPONSIVE (🔥 WICHTIG)
+   RESPONSIVE
 ========================= */
 @media (max-width: 900px) {
 
   .layout {
     flex-direction: column;
     padding: 15px;
-  }
-
-  #setupPanel {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  #setupPanel > div {
-    width: 100%;
   }
 
   .panel {
@@ -264,54 +295,4 @@ select {
     font-size: 24px;
     padding: 10px 20px;
   }
-}
-/* =========================
-   BURGER BUTTON (oben rechts)
-========================= */
-#menuBtn {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-
-  background: #e0e0e0;
-  color: #333;
-  font-size: 20px;
-  padding: 8px 12px;
-  border-radius: 8px;
-
-  z-index: 1001;
-}
-
-#menuBtn:hover {
-  background: #d5d5d5;
-}
-
-/* =========================
-   SETUP OVERLAY (Slide-In)
-========================= */
-.setupOverlay {
-  position: fixed;
-  top: 0;
-  right: -350px; /* 🔥 versteckt */
-  width: 300px;
-  height: 100%;
-
-  background: white;
-  box-shadow: -5px 0 20px rgba(0,0,0,0.2);
-
-  padding: 20px;
-  z-index: 1000;
-
-  transition: right 0.3s ease;
-  overflow-y: auto;
-}
-
-/* sichtbar */
-.setupOverlay.open {
-  right: 0;
-}
-
-/* Setup Inhalt schöner */
-#setupPanel > div {
-  margin-bottom: 15px;
 }
