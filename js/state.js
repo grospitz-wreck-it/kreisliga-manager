@@ -7,7 +7,7 @@ let teamLocked = false;
 let isSimulating = false;
 let currentInterval = null;
 let currentMinute = 0;
-
+let matchdayResults = [];
 let speedMultiplier = 1;
 
 let liveModifier = 0;
