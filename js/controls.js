@@ -6,18 +6,18 @@ function selectLeague(){
     return;
   }
 
-  loadLeague(league);        // Teams laden
-  generateSchedule();        // Spielplan
-  populateTeamSelect();      // Team-Dropdown füllen
-  updateTable();             // Tabelle anzeigen
+  loadLeague(league);
+  generateSchedule();
+  populateTeamSelect();
+  updateTable();
 
-  // Reset UI
   selectedTeam = null;
   teamLocked = false;
 
   document.getElementById("teamSelect").disabled = false;
   document.getElementById("btnSelectTeam").disabled = false;
   document.getElementById("loggedTeam").innerText = "Kein Team gewählt";
+
   document.getElementById("startBtn").innerText = "▶ Saison starten";
 }
 
@@ -35,29 +35,15 @@ function selectTeam(){
     return;
   }
 
-  function selectTeam(){
-  if(teamLocked){
-    alert("Team bereits festgelegt!");
-    return;
-  }
-
-  const select = document.getElementById("teamSelect");
-
-  if(!select || !select.value){
-    alert("Bitte Team auswählen!");
-    return;
-  }
-
   selectedTeam = select.value;
 
   document.getElementById("loggedTeam").innerText =
     "Dein Team: " + selectedTeam;
 
-  // 🔥 TEAM SOFORT LOCKEN
   lockTeam();
-
   updateTable();
 }
+
 
 function lockTeam(){
   teamLocked = true;
@@ -98,17 +84,11 @@ function makeSub(){
     return;
   }
 
-  let events = [
-    "🔁 Wechsel",
-    "🔁 Defensivwechsel",
-    "🔁 Offensivwechsel"
-  ];
-
+  let events = ["🔁 Wechsel","🔁 Defensivwechsel","🔁 Offensivwechsel"];
   addEvent(events[Math.floor(Math.random()*events.length)]);
 
   substitutions--;
-  document.getElementById("subCount").innerText =
-    "Wechsel: " + substitutions;
+  document.getElementById("subCount").innerText = "Wechsel: " + substitutions;
 }
 
 
