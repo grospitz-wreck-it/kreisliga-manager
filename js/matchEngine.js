@@ -112,9 +112,13 @@ function simulateQuick(teamA, teamB){
     teamB.draws++;
   }
 
-  matchdayResults.push(
-    `${teamA.name} ${goalsA}:${goalsB} ${teamB.name}`
-  );
+  // 🔥 FIX: richtiges Datenformat
+  matchdayResults.push({
+    home: teamA.name,
+    away: teamB.name,
+    score1: goalsA,
+    score2: goalsB
+  });
 }
 
 
@@ -123,7 +127,7 @@ function simulateQuick(teamA, teamB){
 // =========================
 
 let matchCards = {};
-let halftimePlayed = false; // 🔥 NEU
+let halftimePlayed = false;
 
 function simulateLiveMatch(teamA, teamB, scoreA = liveScore?.s1 || 0, scoreB = liveScore?.s2 || 0){
 
@@ -132,7 +136,7 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore?.s1 || 0, scoreB = l
       [teamA.name]: 0,
       [teamB.name]: 0
     };
-    halftimePlayed = false; // 🔥 RESET
+    halftimePlayed = false;
   }
 
   liveScore = { t1: teamA, t2: teamB, s1: scoreA, s2: scoreB };
@@ -146,14 +150,14 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore?.s1 || 0, scoreB = l
     updateTimeline(currentMinute);
 
     // =========================
-    // ⏸ HALBZEIT (FIXED!)
+    // ⏸ HALBZEIT
     // =========================
     if(currentMinute === 45 && !halftimePlayed){
 
-      halftimePlayed = true; // 🔥 verhindert Loop-Bug
+      halftimePlayed = true;
 
       clearInterval(currentInterval);
-      isSimulating = false; // 🔥 GANZ WICHTIG
+      isSimulating = false;
 
       addEvent("⏸ Halbzeit");
 
@@ -166,7 +170,7 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore?.s1 || 0, scoreB = l
     }
 
     // =========================
-    // 🔥 EVENTS
+    // 🔥 EVENTS (UNVERÄNDERT)
     // =========================
     if(Math.random() < 0.3){
 
@@ -298,6 +302,21 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore?.s1 || 0, scoreB = l
 
       updateTable();
 
+      // 🔥 FIX: User-Spiel hinzufügen
+      matchdayResults.push({
+        home: teamA.name,
+        away: teamB.name,
+        score1: scoreA,
+        score2: scoreB
+      });
+
+      // 🔥 FIX: DEIN REPORT-SYSTEM
+      const report = generateMatchdayReport(matchdayResults);
+      const box = document.getElementById("newsBox");
+      if(box){
+        box.innerText = report;
+      }
+
       isSimulating = false;
 
       const startBtn = document.getElementById("startBtn");
@@ -307,11 +326,6 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore?.s1 || 0, scoreB = l
       }
 
       addEvent("🏁 Spiel beendet");
-
-      // 🔥 SPIELBERICHT FIX
-      if(typeof generateMatchdayNews === "function"){
-        generateMatchdayNews(matchdayResults);
-      }
     }
 
   }, 1000 / speedMultiplier);
