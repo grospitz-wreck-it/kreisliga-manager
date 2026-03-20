@@ -26,4 +26,10 @@ window.onload = function(){
     select.appendChild(option);
   });
 
+  // 🔥 Werbung starten (sicher!)
+  if(typeof startAds === "function"){
+    startAds();
+  } else {
+    console.warn("Ads nicht geladen");
+  }
 };
