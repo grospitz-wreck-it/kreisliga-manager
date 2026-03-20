@@ -42,7 +42,31 @@ function selectTeam(){
     alert("Taktik wählen!");
     return;
   }
+  function resetGame(){
 
+  // 🔥 komplette Variablen zurücksetzen
+  selectedTeam = null;
+  teamLocked = false;
+  currentMatchday = 0;
+  schedule = [];
+
+  // UI zurücksetzen
+  document.getElementById("teamSelect").disabled = false;
+  document.getElementById("leagueSelect").disabled = false;
+  document.getElementById("tacticSelect").disabled = false;
+  document.getElementById("btnSelectTeam").disabled = false;
+
+  document.getElementById("selectedTeamText").innerText = "Kein Team gewählt";
+  document.getElementById("currentTactic").innerText = "Taktik: normal";
+
+  document.getElementById("setupPanel").style.display = "block";
+  document.getElementById("toggleSetupBtn").style.display = "none";
+
+  document.getElementById("startBtn").innerText = "▶ Saison starten";
+
+  document.getElementById("liveMatch").innerHTML = "";
+  updateTable();
+}
   selectedTeam = team;
   teamLocked = true;
 
