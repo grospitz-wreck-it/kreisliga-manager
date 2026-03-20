@@ -5,7 +5,9 @@ function updateTable() {
   [...teams]
     .sort((a,b)=> b.points-a.points || b.goals-a.goals)
     .forEach(t=>{
-      let name = t.name === selectedTeam ? "👉 "+t.name : t.name;
+      let name = t.name === selectedTeam
+      ? `<span class="userTeam">👉 ${t.name}</span>`
+      : t.name;
       tbody.innerHTML += `<tr><td>${name}</td><td>${t.points}</td><td>${t.goals}</td></tr>`;
     });
 }
