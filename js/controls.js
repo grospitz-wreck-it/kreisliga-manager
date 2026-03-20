@@ -34,14 +34,29 @@ function selectTeam(){
     return;
   }
 
+  function selectTeam(){
+  if(teamLocked){
+    alert("Team bereits festgelegt!");
+    return;
+  }
+
+  const select = document.getElementById("teamSelect");
+
+  if(!select || !select.value){
+    alert("Bitte Team auswählen!");
+    return;
+  }
+
   selectedTeam = select.value;
 
   document.getElementById("loggedTeam").innerText =
     "Dein Team: " + selectedTeam;
 
+  // 🔥 TEAM SOFORT LOCKEN
+  lockTeam();
+
   updateTable();
 }
-
 
 function lockTeam(){
   teamLocked = true;
