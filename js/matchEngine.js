@@ -142,6 +142,9 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore?.s1 || 0, scoreB = l
 
   updateScoreboard(teamA, teamB, scoreA, scoreB);
 
+  // 🔥 FIX: immer vorher clearen
+  clearInterval(currentInterval);
+
   currentInterval = setInterval(() => {
 
     currentMinute++;
@@ -301,17 +304,14 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore?.s1 || 0, scoreB = l
         score2: scoreB
       });
 
-      // 🔥 FINAL FIX REPORT
       let report = "⚠️ Spielbericht konnte nicht generiert werden.";
 
       try{
         if(typeof generateMatchdayReport === "function"){
           report = generateMatchdayReport(matchdayResults);
-        } else {
-          console.error("generateMatchdayReport fehlt!");
         }
       } catch(e){
-        console.error("Report Error:", e);
+        console.error(e);
       }
 
       const box = document.getElementById("newsBox");
@@ -331,4 +331,47 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore?.s1 || 0, scoreB = l
     }
 
   }, 1000 / speedMultiplier);
+}
+
+
+// =========================
+// ▶️ 2. HALBZEIT
+// =========================
+
+function resumeMatch(){
+
+  const panel = document.getElementById("halftimePanel");
+  if(panel){
+    panel.style.display = "none";
+  }
+
+  addEvent("▶️ Zweite Halbzeit läuft");
+
+  isSimulating = true;
+
+  simulateLiveMatch(
+    liveScore.t1,
+    liveScore.t2,
+    liveScore.s1,
+    liveScore.s2
+  );
+}
+
+
+// =========================
+// ⚡ SPEED FIX
+// =========================
+
+window.restartInterval = function(){
+
+  if(!isSimulating) return;
+
+  clearInterval(currentInterval);
+
+  simulateLiveMatch(
+    liveScore.t1,
+    liveScore.t2,
+    liveScore.s1,
+    liveScore.s2
+  );
 }
