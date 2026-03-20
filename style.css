@@ -27,10 +27,11 @@ body {
 /* MOBILE */
 @media (max-width: 768px) {
 
-  .layout {
-    grid-template-columns: 1fr;
-    padding: 10px;
+  .setupGrid {
+    grid-template-columns: 1fr; /* untereinander auf Handy */
   }
+
+}
 
   .panel {
     padding: 15px;
