@@ -15,7 +15,7 @@ let ads = [
   {
     name: "Sponsor B",
     image: "ads/ad2.jpg",
-    link: "",
+    link: "https://www.haecker-kuechen.com/de/karriere",
     start: "2026-01-01",
     end: "2026-12-31",
     weight: 1
