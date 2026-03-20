@@ -161,8 +161,11 @@ function finishMatch(){
   else {
     t1.points++;
     t2.points++;
-  }
-
+    }
+  document.getElementById("startBtn").innerText = "▶ Nächstes Spiel starten";
+  document.getElementById("startBtn").disabled = false;
+}
+  
   currentMatchday++;
 
   document.getElementById("matchday").innerText =
