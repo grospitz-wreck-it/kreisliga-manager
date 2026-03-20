@@ -88,7 +88,8 @@ function makeSub(){
   addEvent(events[Math.floor(Math.random()*events.length)]);
 
   substitutions--;
-  document.getElementById("subCount").innerText = "Wechsel: " + substitutions;
+  document.getElementById("subCount").innerText =
+    "Wechsel: " + substitutions;
 }
 
 
