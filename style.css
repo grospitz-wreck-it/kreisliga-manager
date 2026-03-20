@@ -22,10 +22,17 @@ body {
 }
 
 /* Titel */
-h1 {
-  text-align: center;
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
   margin: 20px 0;
-  letter-spacing: 2px;
+  font-size: 32px;
+  font-weight: bold;
+  letter-spacing: 1px;
+
   color: #2e7d32;
 }
 
