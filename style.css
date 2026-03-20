@@ -19,8 +19,15 @@ body {
 }
 
 .panel {
-  flex: 1;              /* gleich breit */
-  min-width: 300px;     /* verhindert Umbruch */
+  flex: 1;
+  min-width: 300px;
+
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  border: 1px solid #e0e0e0;
 }
 
 /* Titel */
