@@ -7,9 +7,19 @@ function selectLeague(){
   }
 
   loadLeague(league);
+
+  // ✅ FIX: Absicherung
+  if(!teams || teams.length === 0){
+    console.error("Keine Teams geladen:", league);
+    alert("Fehler beim Laden der Liga");
+    return;
+  }
+
   generateSchedule();
   populateTeamSelect();
   updateTable();
+
+  console.log("Liga geladen:", league, teams.length, "Teams");
 }
 
 function selectTeam(){
@@ -41,6 +51,7 @@ function toggleSetup(){
 // =========================
 //
 
+// ⚠️ FIX: doppelte Funktion vereinheitlicht
 function addEvent(text, minute = currentMinute){
 
   const box = document.getElementById("liveMatch");
@@ -48,7 +59,6 @@ function addEvent(text, minute = currentMinute){
 
   let p = document.createElement("p");
 
-  // 👉 Minute IMMER einheitlich
   p.innerHTML = `<strong>${minute}'</strong> ${text}`;
 
   box.prepend(p);
@@ -112,7 +122,7 @@ function setFormation(){
 // =========================
 //
 
-liveModifier = 0; // 🔥 wichtig: reset möglich machen
+liveModifier = 0;
 
 function setLiveMode(mode){
 
@@ -122,7 +132,7 @@ function setLiveMode(mode){
   attackBtn.classList.remove("active");
   calmBtn.classList.remove("active");
 
-  // 👉 reset statt stacking (WICHTIG!)
+  // ✅ FIX: Reset statt stacking
   liveModifier = 0;
 
   if(mode==="attack"){
@@ -134,7 +144,10 @@ function setLiveMode(mode){
     calmBtn.classList.add("active");
   }
 
-  addEvent(mode === "attack" ? "🔥 Team erhöht den Druck" : "🧊 Team zieht sich zurück");
+  addEvent(mode === "attack"
+    ? "🔥 Team erhöht den Druck"
+    : "🧊 Team zieht sich zurück"
+  );
 }
 
 //
