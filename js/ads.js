@@ -38,6 +38,12 @@ function getActiveAds(){
     let start = new Date(ad.start);
     let end = new Date(ad.end);
 
+    // ✅ FIX: ungültige Daten abfangen
+    if(isNaN(start) || isNaN(end)){
+      console.warn("Ungültiges Datum bei Ad:", ad.name);
+      return true;
+    }
+
     return now >= start && now <= end;
   });
 }
@@ -87,6 +93,9 @@ function buildAdTrack(){
   // 🔥 Gewichtung anwenden
   active = expandAdsByWeight(active);
 
+  // ✅ DEBUG (hilft extrem)
+  console.log("Aktive Ads:", active.length);
+
   if(active.length === 0){
     track.innerHTML = "<span style='color:white'>Keine Werbung</span>";
     return;
@@ -129,6 +138,20 @@ function buildAdTrack(){
     track.appendChild(item);
   });
 
+  // ✅ FIX: kleine Verzögerung für CSS Animation (Render Bug vermeiden)
+  requestAnimationFrame(() => {
+    track.style.animation = "none";
+    track.offsetHeight; // reflow trigger
+    track.style.animation = "";
+  });
+}
+
+
+// =========================
+// 🔄 ADS NEU LADEN (NEU, aber safe)
+// =========================
+function refreshAds(){
+  buildAdTrack();
 }
 
 
@@ -139,6 +162,16 @@ function startAds(){
 
   console.log("Ads gestartet");
 
+  // ✅ FIX: mehrfaches Starten verhindern
+  if(window.adsInitialized){
+    console.log("Ads bereits initialisiert");
+    return;
+  }
+
+  window.adsInitialized = true;
+
   buildAdTrack();
 
+  // 🔁 optional später auto-refresh (zukunftssicher)
+  // setInterval(buildAdTrack, 60000);
 }
