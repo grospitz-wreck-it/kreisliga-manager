@@ -188,9 +188,6 @@ select {
 .live::-webkit-scrollbar {
   width: 6px;
 }
-body {
-  background: #f4f5f7;
-}
 .live::-webkit-scrollbar-thumb {
   background: #4fc3f7;
   border-radius: 3px;
