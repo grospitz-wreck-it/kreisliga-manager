@@ -8,63 +8,70 @@
 
 <body>
 
+  <!-- 🔥 HEADER -->
   <h1 class="title">
-  <img src="logos/nw_logo.png" class="logo">
-  <span>Kreisliga Manager</span>
+    <img src="logos/nw_logo.png" class="logo">
+    <span>Kreisliga Manager</span>
   </h1>
 
-  <!-- 🔥 Toggle Button -->
-<div class="panel" id="setupPanel">
-  <!-- DEIN GANZER SETUP INHALT BLEIBT UNVERÄNDERT -->
-</div>>
+  <!-- 🔥 BURGER BUTTON -->
+  <button id="menuBtn" onclick="toggleSetup()">☰</button>
 
+  <!-- 🔥 SETUP OVERLAY -->
+  <div id="setupPanel" class="setupOverlay">
+
+    <h2>⚙️ Einstellungen</h2>
+
+    <div class="setupGrid">
+
+      <!-- Liga -->
+      <div class="setupBox">
+        <h3>Liga</h3>
+        <select id="leagueSelect"></select>
+        <button onclick="selectLeague()">Starten</button>
+      </div>
+
+      <!-- Team -->
+      <div class="setupBox">
+        <h3>Team</h3>
+        <select id="teamSelect"></select>
+        <button id="btnSelectTeam" onclick="selectTeam()">Übernehmen</button>
+        <p id="selectedTeamText">-</p>
+      </div>
+
+      <!-- Taktik -->
+      <div class="setupBox">
+        <h3>Taktik</h3>
+        <select id="tacticSelect">
+          <option>Normal</option>
+          <option>Offensiv</option>
+          <option>Defensiv</option>
+        </select>
+        <button onclick="setTactic()">Speichern</button>
+        <p id="currentTactic">Normal</p>
+      </div>
+
+      <!-- Formation -->
+      <div class="setupBox">
+        <h3>Formation</h3>
+        <select id="formationSelect">
+          <option>4-4-2</option>
+          <option>4-3-3</option>
+          <option>3-5-2</option>
+          <option>5-3-2</option>
+        </select>
+        <button onclick="setFormation()">Setzen</button>
+        <p id="currentFormation">4-4-2</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 🔥 HAUPTLAYOUT -->
   <div class="layout">
 
-    <!-- 🔥 SETUP PANEL -->
-  <div class="panel" id="setupPanel">
-
-  <h2>⚙️ Einstellungen</h2>
-
-  <div class="setupGrid">
-    <!-- Liga -->
-    <div class="setupBox">
-      <h3>Liga</h3>
-      <select id="leagueSelect"></select>
-      <button onclick="selectLeague()">Starten</button>
-    </div>
-
-    <!-- Team -->
-    <div class="setupBox">
-      <h3>Team</h3>
-      <select id="teamSelect"></select>
-      <button id="btnSelectTeam" onclick="selectTeam()">Übernehmen</button>
-      <p id="selectedTeamText">-</p>
-    </div>
-
-    <!-- Taktik -->
-    <div class="setupBox">
-      <h3>Taktik</h3>
-      <select id="tacticSelect">
-        <option>Normal</option>
-        <option>Offensiv</option>
-        <option>Defensiv</option>
-      </select>
-      <button onclick="setTactic()">Speichern</button>
-      <p id="currentTactic">Normal</p>
-    </div>
-
-  </div>
-    <select id="formationSelect">
-    <option>4-4-2</option>
-    <option>4-3-3</option>
-    <option>3-5-2</option>
-    <option>5-3-2</option>
-  </select>
-  <button onclick="setFormation()">Formation</button>
-  <p id="currentFormation">4-4-2</p>
-  </div>
-
-    <!-- 🔥 GAME PANEL -->
+    <!-- GAME PANEL -->
     <div class="panel">
 
       <h2 id="matchday">Spieltag: 0 / 0</h2>
@@ -95,11 +102,14 @@
       </div>
 
       <div id="liveMatch" class="live"></div>
+
+      <!-- 📰 NEWS -->
       <div class="panel">
-      <h2>📰 Spieltagsbericht</h2>
-      <div id="newsBox" class="live"></div>
+        <h2>📰 Spieltagsbericht</h2>
+        <div id="newsBox" class="live"></div>
       </div>
 
+      <!-- HALBZEIT -->
       <div id="halftimePanel" style="display:none;">
         <h3>Halbzeit</h3>
         <button onclick="setLiveMode('attack')">Mehr Druck</button>
@@ -110,21 +120,21 @@
 
     </div>
 
-    <!-- 🔥 TABLE PANEL -->
+    <!-- TABELLE -->
     <div class="panel">
       <h2>Tabelle</h2>
       <table id="table">
         <thead>
-         <tr>
-  <th>Team</th>
-  <th>Sp</th>
-  <th>S</th>
-  <th>U</th>
-  <th>N</th>
-  <th>Tore</th>
-  <th>Diff</th>
-  <th>Punkte</th>
-</tr>
+          <tr>
+            <th>Team</th>
+            <th>Sp</th>
+            <th>S</th>
+            <th>U</th>
+            <th>N</th>
+            <th>Tore</th>
+            <th>Diff</th>
+            <th>Punkte</th>
+          </tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -132,6 +142,7 @@
 
   </div>
 
+  <!-- SCRIPTS -->
   <script src="js/state.js"></script>
   <script src="js/league.js"></script>
   <script src="js/ui.js"></script>
