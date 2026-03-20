@@ -27,7 +27,9 @@ function simulateMatchday(){
     alert("Team wählen!");
     return;
   }
-
+  currentMatchday++;
+  document.getElementById("matchday").innerText =
+  "Spieltag: " + currentMatchday + " / " + schedule.length;
   document.getElementById("startBtn").innerText = "⏸ Spiel läuft";
   document.getElementById("startBtn").disabled = true;
 
@@ -163,8 +165,6 @@ function finishMatch(){
     t1.points++;
     t2.points++;
   }
-
-  currentMatchday++;
 
   document.getElementById("matchday").innerText =
     "Spieltag: " + currentMatchday + " / " + schedule.length;
