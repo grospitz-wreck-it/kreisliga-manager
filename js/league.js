@@ -83,3 +83,56 @@ function loadLeague(name) {
 
   console.log("Teams geladen:", teams.length);
 }
+
+
+// =========================
+// ⚽ SPIELPLAN GENERIEREN
+// =========================
+
+function generateSchedule(){
+
+  if(!teams || teams.length === 0){
+    console.error("Keine Teams für Spielplan");
+    return;
+  }
+
+  schedule = [];
+
+  let tempTeams = [...teams];
+
+  // 🔥 Wenn ungerade Anzahl → Dummy Team
+  if(tempTeams.length % 2 !== 0){
+    tempTeams.push({ name: "SPIELFREI" });
+  }
+
+  const rounds = tempTeams.length - 1;
+  const half = tempTeams.length / 2;
+
+  for(let round = 0; round < rounds; round++){
+
+    let matchday = [];
+
+    for(let i = 0; i < half; i++){
+
+      let home = tempTeams[i];
+      let away = tempTeams[tempTeams.length - 1 - i];
+
+      // 👉 SPIELFREI überspringen
+      if(home.name !== "SPIELFREI" && away.name !== "SPIELFREI"){
+        matchday.push([home, away]);
+      }
+    }
+
+    schedule.push(matchday);
+
+    // 🔄 Rotation
+    let fixed = tempTeams[0];
+    let rest = tempTeams.slice(1);
+
+    rest.unshift(rest.pop());
+
+    tempTeams = [fixed, ...rest];
+  }
+
+  console.log("Spielplan erstellt:", schedule.length, "Spieltage");
+}
