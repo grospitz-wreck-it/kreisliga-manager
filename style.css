@@ -312,6 +312,166 @@ select {
   0% {
     transform: translateX(0%);
   }
+/* =========================
+   🎮 UI UPGRADE (Game Look)
+========================= */
+
+/* Panels etwas lebendiger */
+.panel {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+/* Headlines klarer */
+.panel h2, .panel h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+/* Scoreboard moderner */
+#score {
+  background: linear-gradient(145deg, #111, #222);
+  color: #fff;
+  padding: 15px 30px;
+  font-size: 32px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.1),
+              0 4px 15px rgba(0,0,0,0.4);
+}
+
+/* Buttons mehr „Game UI“ */
+button {
+  background: linear-gradient(145deg, #4fc3f7, #29b6f6);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* =========================
+   📊 SIDE PANEL FIX (wichtig)
+========================= */
+.sidePanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  min-width: 320px;
+}
+
+/* verhindert Springen */
+.sidePanel .panel {
+  width: 100%;
+}
+
+/* =========================
+   📢 ADS UPGRADE (LED STYLE)
+========================= */
+
+/* Container */
+#adBanner {
+  width: 100%;
+  height: 90px;
+  overflow: hidden;
+  background: #000;
+  border-radius: 12px;
+  position: relative;
+
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+}
+
+/* Glow Effekt (LED Feeling) */
+#adBanner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(255,255,255,0.08),
+    rgba(0,0,0,0.2)
+  );
+  pointer-events: none;
+}
+
+/* Track */
+.adTrack {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 80px;
+
+  will-change: transform;
+  animation: scrollAds 35s linear infinite;
+}
+
+/* Einzelne Ads */
+.adItem {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Klickbare Ads vorbereiten */
+.adItem a {
+  display: inline-block;
+}
+
+/* Bilder */
+.adItem img {
+  height: 65px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+
+  filter: brightness(1.15) contrast(1.05);
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+/* Hover Effekt = mehr „wertig“ */
+.adItem img:hover {
+  transform: scale(1.05);
+  filter: brightness(1.3);
+}
+
+/* =========================
+   🧠 PERFORMANCE FIX (kein Springen)
+========================= */
+
+/* verhindert Layout Shift */
+#adBanner,
+.live,
+table {
+  contain: content;
+}
+
+/* =========================
+   📱 MOBILE ADS FIX
+========================= */
+@media (max-width: 900px) {
+
+  #adBanner {
+    height: 70px;
+  }
+
+  .adItem img {
+    height: 50px;
+    max-width: 140px;
+  }
+
+  .adTrack {
+    gap: 40px;
+  }
+}
   100% {
     transform: translateX(-50%);
   }
