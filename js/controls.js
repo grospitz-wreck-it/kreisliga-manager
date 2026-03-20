@@ -191,15 +191,23 @@ function makeSub(){
 // =========================
 //
 
-function setSpeed(e,multi){
+function setSpeed(multi, el){
 
   speedMultiplier = multi;
 
-  let buttons = e.target.parentElement.querySelectorAll("button");
-  buttons.forEach(b=>b.classList.remove("active"));
-  e.target.classList.add("active");
+  // Buttons visuell setzen
+  const container = document.getElementById("speedControls");
+  if(container){
+    let buttons = container.querySelectorAll("button");
+    buttons.forEach(b => b.classList.remove("active"));
+  }
 
-  if(isSimulating){ 
-    restartInterval(); 
+  if(el){
+    el.classList.add("active");
+  }
+
+  // 🔥 WICHTIG: IMMER neu starten
+  if(isSimulating){
+    restartInterval();
   }
 }
