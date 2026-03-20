@@ -9,7 +9,7 @@ body {
 }
 
 /* =========================
-   HEADER (ZENTRIERT)
+   HEADER
 ========================= */
 h1.title {
   display: flex;
@@ -27,74 +27,56 @@ h1.title {
 
 .logo {
   height: 28px;
-  width: auto;
 }
 
 /* =========================
-   SETUP (DESKTOP = PANEL)
-========================= */
-#setupPanel {
-  position: relative;
-  right: 0;
-  height: auto;
-  width: auto;
-
-  display: block;
-
-  transition: none;
-}
-
-/* =========================
-   BURGER BUTTON
+   🔥 BURGER BUTTON (immer sichtbar)
 ========================= */
 #menuBtn {
   position: fixed;
   top: 15px;
   right: 15px;
 
-  background: #e0e0e0;
-  color: #333;
+  background: #333;
+  color: white;
   font-size: 20px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 8px;
 
   border: none;
   cursor: pointer;
 
-  z-index: 1001;
+  z-index: 2000;
 }
 
 /* =========================
-   🔥 MOBILE: Overlay aktivieren
+   🔥 SETUP PANEL = SIDEBAR
 ========================= */
-@media (max-width: 900px) {
+#setupPanel {
+  position: fixed;
+  top: 0;
+  right: -340px;
 
-  #setupPanel {
-    position: fixed;
-    top: 0;
-    right: -320px;
+  width: 320px;
+  height: 100%;
 
-    width: 300px;
-    height: 100%;
+  background: #ffffff;
+  box-shadow: -5px 0 25px rgba(0,0,0,0.2);
 
-    background: #ffffff;
-    box-shadow: -5px 0 25px rgba(0,0,0,0.2);
+  padding: 20px;
+  z-index: 1500;
 
-    padding: 20px;
-    z-index: 1000;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+}
 
-    transition: right 0.3s ease;
-    overflow-y: auto;
-  }
-
-  #setupPanel.open {
-    right: 0;
-  }
-
+/* geöffnet */
+#setupPanel.open {
+  right: 0;
 }
 
 /* =========================
-   LAYOUT (SPIEL + TABELLE)
+   LAYOUT
 ========================= */
 .layout {
   display: flex;
@@ -107,9 +89,25 @@ h1.title {
   align-items: flex-start;
 }
 
-.panel {
+/* linke Seite (Spiel) */
+.mainPanel {
+  flex: 2;
+}
+
+/* rechte Seite */
+.sidePanel {
   flex: 1;
-  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Panels */
+.panel {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 /* =========================
@@ -128,7 +126,6 @@ button {
 
 button:hover {
   background: #29b6f6;
-  transform: translateY(-1px);
 }
 
 button.active {
@@ -157,15 +154,6 @@ button.active {
   padding: 15px 30px;
   font-size: 32px;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-
-/* Führung */
-.leading {
-  color: #4caf50;
-}
-.losing {
-  color: #f44336;
 }
 
 /* =========================
@@ -182,7 +170,6 @@ button.active {
   height: 100%;
   width: 0%;
   background: linear-gradient(90deg, #4caf50, #ff9800);
-  transition: width 0.3s linear;
 }
 
 /* =========================
@@ -207,7 +194,6 @@ button.active {
   padding: 12px;
   border-radius: 12px;
   margin-top: 10px;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
 }
 
 .live p {
@@ -221,7 +207,6 @@ button.active {
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
 }
 
 th {
@@ -236,26 +221,13 @@ td {
   border-bottom: 1px solid #eee;
 }
 
-tr:nth-child(even) {
-  background: #fafafa;
-}
-
-/* =========================
-   TABELLEN LOGIK (NEU)
-========================= */
-
-/* Zebra bleibt */
-tr:nth-child(even) {
-  background: #fafafa;
-}
-
-/* 🟢 Platz 1 (Aufstieg) */
+/* Platz 1 */
 tbody tr:nth-child(1) {
   background: rgba(76,175,80,0.25);
   font-weight: bold;
 }
 
-/* 🔴 Letzte 2 Plätze (Abstieg) */
+/* Abstieg */
 tbody tr:nth-last-child(1),
 tbody tr:nth-last-child(2) {
   background: rgba(244,67,54,0.2);
@@ -272,35 +244,22 @@ tbody tr:nth-last-child(2) {
 ========================= */
 select {
   background: white;
-  color: #333;
   border: 1px solid #ccc;
   padding: 6px;
   border-radius: 6px;
 }
 
 /* =========================
-   SCROLLBAR
-========================= */
-.live::-webkit-scrollbar {
-  width: 6px;
-}
-
-.live::-webkit-scrollbar-thumb {
-  background: #4fc3f7;
-  border-radius: 3px;
-}
-
-/* =========================
-   RESPONSIVE
+   MOBILE
 ========================= */
 @media (max-width: 900px) {
 
   .layout {
     flex-direction: column;
-    padding: 15px;
   }
 
-  .panel {
+  .mainPanel,
+  .sidePanel {
     width: 100%;
   }
 
