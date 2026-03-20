@@ -211,21 +211,50 @@ button.active {
 /* =========================
    TABELLE
 ========================= */
+/* =========================
+   📊 TABLE FIX
+========================= */
+
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; /* 🔥 WICHTIG */
 }
 
+/* Header */
 th {
-  text-align: left;
-  padding: 8px;
+  text-align: center;
+  padding: 10px 6px;
   background: #f0f0f0;
+  font-size: 14px;
 }
 
+/* Zellen */
 td {
-  padding: 6px;
+  padding: 8px 6px;
   font-size: 14px;
+  text-align: center;
   border-bottom: 1px solid #eee;
+}
+
+/* 🔥 TEAM SPALTE LINKS + BREITER */
+th:first-child,
+td:first-child {
+  text-align: left;
+  width: 35%;
+}
+
+/* 🔥 ALLE ZAHLEN SPALTEN GLEICH */
+th:not(:first-child),
+td:not(:first-child) {
+  width: calc(65% / 7); /* 7 Spalten rechts */
+}
+
+/* verhindert Überlaufen */
+td, th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Platz 1 */
