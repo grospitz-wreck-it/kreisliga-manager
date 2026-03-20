@@ -1,55 +1,94 @@
 function updateTable() {
-let tbody = document.querySelector("#table tbody");
-tbody.innerHTML = "";
+  let tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";
 
-// Sortierung bleibt gleich
-teams.sort((a,b)=> b.points - a.points || (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst));
+  // 🔥 Sortierung (Punkte + Torverhältnis)
+  teams.sort((a, b) =>
+    b.points - a.points ||
+    (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst)
+  );
 
-teams.forEach(t => {
+  teams.forEach((t, index) => {
 
-  let name = t.name === selectedTeam
-    ? `<span class="userTeam">👉 ${t.name}</span>`
-    : t.name;
+    // 👉 Dein Team markieren
+    let name = t.name === selectedTeam
+      ? `<span class="userTeam">👉 ${t.name}</span>`
+      : t.name;
 
-  let goalDiff = t.goalsFor - t.goalsAgainst;
+    let goalDiff = t.goalsFor - t.goalsAgainst;
 
-  tbody.innerHTML += `
-    <tr>
-      <td>${name}</td>
-      <td>${t.played}</td>
-      <td>${t.wins}</td>
-      <td>${t.draws}</td>
-      <td>${t.losses}</td>
-      <td>${t.goalsFor}:${t.goalsAgainst}</td>
-      <td>${goalDiff}</td>
-      <td>${t.points}</td>
-    </tr>
-  `;
-});
+    // 👉 Tabellenplatz Klassen
+    let rowClass = "";
+
+    if(index === 0){
+      rowClass = "first"; // 🟢 Aufstieg
+    }
+    else if(index >= teams.length - 2){
+      rowClass = "relegation"; // 🔴 Abstieg
+    }
+
+    tbody.innerHTML += `
+      <tr class="${rowClass}">
+        <td>${name}</td>
+        <td>${t.played || 0}</td>
+        <td>${t.wins || 0}</td>
+        <td>${t.draws || 0}</td>
+        <td>${t.losses || 0}</td>
+        <td>${t.goalsFor || 0}:${t.goalsAgainst || 0}</td>
+        <td>${goalDiff}</td>
+        <td><strong>${t.points}</strong></td>
+      </tr>
+    `;
+  });
 }
 
 function populateTeamSelect(){
-  const select=document.getElementById("teamSelect");
-  select.innerHTML="";
-  teams.forEach(t=>{
-    let o=document.createElement("option");
-    o.value=t.name;
-    o.textContent=t.name;
+  const select = document.getElementById("teamSelect");
+
+  if(!select) return;
+
+  select.innerHTML = "";
+
+  teams.forEach(t => {
+    let o = document.createElement("option");
+    o.value = t.name;
+    o.textContent = t.name;
     select.appendChild(o);
   });
 }
 
 function addEvent(text){
-  let box=document.getElementById("liveMatch");
-  box.innerHTML=`<p>${text}</p>`+box.innerHTML;
+  let box = document.getElementById("liveMatch");
+
+  if(!box) return;
+
+  box.innerHTML = `<p>${text}</p>` + box.innerHTML;
 }
 
-function updateScoreboard(t1,t2,s1,s2){
-  document.getElementById("score").innerText=`${s1} : ${s2}`;
-  document.getElementById("teamLeft").innerText=t1.name;
-  document.getElementById("teamRight").innerText=t2.name;
+function updateScoreboard(t1, t2, s1, s2){
+  if(!t1 || !t2) return;
+
+  document.getElementById("score").innerText = `${s1} : ${s2}`;
+  document.getElementById("teamLeft").innerText = t1.name;
+  document.getElementById("teamRight").innerText = t2.name;
+
+  // 🔥 Führung hervorheben
+  document.getElementById("teamLeft").classList.remove("leading","losing");
+  document.getElementById("teamRight").classList.remove("leading","losing");
+
+  if(s1 > s2){
+    document.getElementById("teamLeft").classList.add("leading");
+    document.getElementById("teamRight").classList.add("losing");
+  }
+  else if(s2 > s1){
+    document.getElementById("teamRight").classList.add("leading");
+    document.getElementById("teamLeft").classList.add("losing");
+  }
 }
 
 function updateTimeline(minute){
-  document.getElementById("timelineBar").style.width=(minute/90)*100+"%";
+  const bar = document.getElementById("timelineBar");
+  if(!bar) return;
+
+  bar.style.width = (minute / 90) * 100 + "%";
 }
