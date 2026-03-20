@@ -8,30 +8,28 @@
 
 <body>
 
-  <!-- 🔥 HEADER -->
+  <!-- HEADER -->
   <h1 class="title">
     <img src="logos/nw_logo.png" class="logo">
     <span>Kreisliga Manager</span>
   </h1>
 
-  <!-- 🔥 BURGER BUTTON -->
+  <!-- BURGER -->
   <button id="menuBtn" onclick="toggleSetup()">☰</button>
 
-  <!-- 🔥 SETUP OVERLAY -->
-  <div id="setupPanel" class="setupOverlay">
+  <!-- 🔥 SETUP NUR HIER -->
+  <div id="setupPanel" class="setupOverlay open">
 
     <h2>⚙️ Einstellungen</h2>
 
     <div class="setupGrid">
 
-      <!-- Liga -->
       <div class="setupBox">
         <h3>Liga</h3>
         <select id="leagueSelect"></select>
         <button onclick="selectLeague()">Starten</button>
       </div>
 
-      <!-- Team -->
       <div class="setupBox">
         <h3>Team</h3>
         <select id="teamSelect"></select>
@@ -39,7 +37,6 @@
         <p id="selectedTeamText">-</p>
       </div>
 
-      <!-- Taktik -->
       <div class="setupBox">
         <h3>Taktik</h3>
         <select id="tacticSelect">
@@ -51,7 +48,6 @@
         <p id="currentTactic">Normal</p>
       </div>
 
-      <!-- Formation -->
       <div class="setupBox">
         <h3>Formation</h3>
         <select id="formationSelect">
@@ -68,25 +64,28 @@
 
   </div>
 
-  <!-- 🔥 HAUPTLAYOUT -->
+  <!-- 🔥 LAYOUT -->
   <div class="layout">
 
-    <!-- GAME PANEL -->
+    <!-- 🔥 LINKE SEITE -->
     <div class="panel">
 
       <h2 id="matchday">Spieltag: 0 / 0</h2>
       <button id="startBtn" onclick="simulateMatchday()">▶ Saison starten</button>
 
+      <!-- SCORE -->
       <div class="scoreboard">
         <div id="teamLeft">-</div>
         <div id="score">0 : 0</div>
         <div id="teamRight">-</div>
       </div>
 
+      <!-- TIMELINE -->
       <div class="timeline">
         <div id="timelineBar"></div>
       </div>
 
+      <!-- LIVE CONTROLS -->
       <div class="controls">
         <button id="btnAttack" onclick="setLiveMode('attack')">🔥 Druck</button>
         <button id="btnCalm" onclick="setLiveMode('calm')">🧊 Ruhig</button>
@@ -101,12 +100,17 @@
         <button onclick="setSpeed(event,10)">10x</button>
       </div>
 
+      <!-- LIVE FEED -->
       <div id="liveMatch" class="live"></div>
 
-      <!-- 📰 NEWS -->
+      <!-- 🔥 NEU: TAKTIKBLOCK UNTER LIVE -->
       <div class="panel">
-        <h2>📰 Spieltagsbericht</h2>
-        <div id="newsBox" class="live"></div>
+        <h3>⚙️ Spielanpassung</h3>
+
+        <div class="controls">
+          <button onclick="setLiveMode('attack')">🔥 Offensiver</button>
+          <button onclick="setLiveMode('calm')">🧊 Defensiver</button>
+        </div>
       </div>
 
       <!-- HALBZEIT -->
@@ -120,8 +124,10 @@
 
     </div>
 
-    <!-- TABELLE -->
+    <!-- 🔥 RECHTE SEITE -->
     <div class="panel">
+
+      <!-- TABELLE -->
       <h2>Tabelle</h2>
       <table id="table">
         <thead>
@@ -138,6 +144,13 @@
         </thead>
         <tbody></tbody>
       </table>
+
+      <!-- 🔥 NEWS JETZT UNTEN -->
+      <div class="panel">
+        <h2>📰 Spieltagsbericht</h2>
+        <div id="newsBox" class="live"></div>
+      </div>
+
     </div>
 
   </div>
