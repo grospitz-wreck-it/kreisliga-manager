@@ -7,7 +7,7 @@ let ads = [
   {
     name: "Sponsor A",
     image: "ads/ad1.jpg",
-    link: "",
+    link: "https://ausbildung.hettich.com/",
     start: "2026-01-01",
     end: "2026-12-31",
     weight: 1
