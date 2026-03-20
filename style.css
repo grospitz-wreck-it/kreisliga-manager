@@ -14,9 +14,6 @@ body {
   max-width: 1200px;
   margin: 0 auto;
 }
-.logo {
-  height: 26px;
-  width: auto;
 }
 #setupPanel {
   grid-column: 1 / -1;
@@ -62,9 +59,12 @@ body {
 /* Titel */
 .title {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: center;   /* 🔥 horizontal zentriert */
+  align-items: center;       /* 🔥 vertikal ausgerichtet */
   gap: 10px;
+
+  width: 100%;               /* 🔥 GANZ wichtig */
+  text-align: center;
 
   margin: 20px 0;
   font-size: 32px;
@@ -73,8 +73,9 @@ body {
 }
 
 .logo {
-  height: 28px;   /* 🔥 kleiner als Text */
+  height: 26px;              /* 🔥 kleiner als Schrift */
   width: auto;
+  display: block;
 }
 
 /* Buttons */
