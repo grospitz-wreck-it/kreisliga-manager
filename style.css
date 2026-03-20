@@ -14,7 +14,10 @@ body {
   max-width: 1200px;
   margin: 0 auto;
 }
-
+.logo {
+  height: 26px;
+  width: auto;
+}
 #setupPanel {
   grid-column: 1 / -1;
 }
