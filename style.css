@@ -265,3 +265,53 @@ select {
     padding: 10px 20px;
   }
 }
+/* =========================
+   BURGER BUTTON (oben rechts)
+========================= */
+#menuBtn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+
+  background: #e0e0e0;
+  color: #333;
+  font-size: 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
+
+  z-index: 1001;
+}
+
+#menuBtn:hover {
+  background: #d5d5d5;
+}
+
+/* =========================
+   SETUP OVERLAY (Slide-In)
+========================= */
+.setupOverlay {
+  position: fixed;
+  top: 0;
+  right: -350px; /* 🔥 versteckt */
+  width: 300px;
+  height: 100%;
+
+  background: white;
+  box-shadow: -5px 0 20px rgba(0,0,0,0.2);
+
+  padding: 20px;
+  z-index: 1000;
+
+  transition: right 0.3s ease;
+  overflow-y: auto;
+}
+
+/* sichtbar */
+.setupOverlay.open {
+  right: 0;
+}
+
+/* Setup Inhalt schöner */
+#setupPanel > div {
+  margin-bottom: 15px;
+}
