@@ -7,27 +7,52 @@ body {
 
 /* Layout */
 .layout {
-  display: flex;
-  flex-direction: row;   /* 🔥 erzwingt nebeneinander */
-  gap: 25px;
-  padding: 25px;
-
-  max-width: 1400px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
   margin: 0 auto;
-
-  align-items: flex-start; /* verhindert komisches Strecken */
 }
 
-.panel {
-  flex: 1;
-  min-width: 300px;
+#setupPanel {
+  grid-column: 1 / -1;
+}
 
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
+#toggleSetupBtn {
+  margin: 10px auto;
+  display: block;
+}
 
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-  border: 1px solid #e0e0e0;
+/* MOBILE */
+@media (max-width: 768px) {
+
+  .layout {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .panel {
+    padding: 15px;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .controls {
+    flex-wrap: wrap;
+  }
+
+  #score {
+    font-size: 24px;
+    padding: 10px;
+  }
+
+  .live {
+    height: 200px;
+  }
 }
 
 /* Titel */
