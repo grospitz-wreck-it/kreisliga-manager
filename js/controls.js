@@ -193,24 +193,18 @@ function makeSub(){
 
 function setSpeed(e, multi){
 
-  // 🔥 FALLBACK falls kein echtes Event übergeben wird
-  if(!e || !e.target){
-    speedMultiplier = multi;
-
-    if(isSimulating){
-      restartInterval();
-    }
-    return;
-  }
-
-  // normaler Flow
   speedMultiplier = multi;
 
-  let buttons = e.target.parentElement.querySelectorAll("button");
-  buttons.forEach(b => b.classList.remove("active"));
-  e.target.classList.add("active");
+  // 🔥 nur wenn echtes Event vorhanden
+  if(e && e.target && e.target.parentElement){
 
-  if(isSimulating){ 
-    restartInterval(); 
+    let buttons = e.target.parentElement.querySelectorAll("button");
+    buttons.forEach(b => b.classList.remove("active"));
+
+    e.target.classList.add("active");
+  }
+
+  if(isSimulating){
+    restartInterval();
   }
 }
