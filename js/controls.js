@@ -35,10 +35,6 @@ function selectTeam(){
   document.getElementById("setupPanel").classList.remove("open");
 }
 
-  // Setup einklappen
-  document.getElementById("setupPanel").style.display = "none";
-  document.getElementById("toggleSetupBtn").style.display = "block";
-}
 
 function toggleSetup(){
   const panel = document.getElementById("setupPanel");
