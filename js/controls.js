@@ -70,7 +70,7 @@ function addLiveEvent(text, minute = currentMinute){
 // =========================
 //
 
-let tacticModifier = 0;
+tacticModifier = 0;
 
 function setTactic(){
   const val = document.getElementById("tacticSelect").value;
@@ -94,7 +94,7 @@ function setTactic(){
 // =========================
 //
 
-let formationModifier = 0;
+formationModifier = 0;
 
 function setFormation(){
 
