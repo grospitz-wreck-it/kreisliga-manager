@@ -18,7 +18,6 @@ function generateSchedule(){
   schedule = schedule.concat(second);
 }
 
-
 function simulateMatchday(){
 
   if(isSimulating) return;
@@ -28,7 +27,6 @@ function simulateMatchday(){
     return;
   }
 
-  // 🔥 Spieltag-Reset für Bericht
   matchdayResults = [];
 
   currentMatchday++;
@@ -39,8 +37,7 @@ function simulateMatchday(){
   document.getElementById("startBtn").innerText = "⏸ Spiel läuft";
   document.getElementById("startBtn").disabled = true;
 
-  // ⚠️ FIX: Index korrigiert (war Fehlerquelle!)
-  let matches = schedule[currentMatchday - 1];
+  let matches = schedule[currentMatchday];
 
   let userMatch = matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
@@ -55,12 +52,20 @@ function simulateMatchday(){
   simulateLiveMatch(userMatch[0], userMatch[1]);
 }
 
-
+// 🔥 QUICK SIM (angepasst realistischer)
 function simulateQuick(t1, t2){
-  let s1 = Math.floor(Math.random()*3);
-  let s2 = Math.floor(Math.random()*3);
 
-  // 🔥 EINHEITLICHES FORMAT (wichtig für Report!)
+  let base = Math.random();
+
+  let s1 = Math.floor(base * 3);
+  let s2 = Math.floor(Math.random() * 3);
+
+  // weniger Tore insgesamt
+  if(Math.random() < 0.4){
+    s1 = Math.floor(Math.random()*2);
+    s2 = Math.floor(Math.random()*2);
+  }
+
   matchdayResults.push({
     home: t1.name,
     away: t2.name,
@@ -68,41 +73,23 @@ function simulateQuick(t1, t2){
     score2: s2
   });
 
-  t1.played++;
-  t2.played++;
-
-  t1.goalsFor += s1;
-  t1.goalsAgainst += s2;
-
-  t2.goalsFor += s2;
-  t2.goalsAgainst += s1;
-
-  if(s1 > s2){
-    t1.points += 3;
-    t1.wins++;
-    t2.losses++;
-  }
-  else if(s2 > s1){
-    t2.points += 3;
-    t2.wins++;
-    t1.losses++;
-  }
-  else{
-    t1.points++;
-    t2.points++;
-    t1.draws++;
-    t2.draws++;
-  }
+  updateStats(t1, t2, s1, s2);
 }
 
-
 function simulateLiveMatch(t1, t2){
+
   clearInterval(currentInterval);
 
   isSimulating = true;
   substitutions = 5;
   liveModifier = 0;
   currentMinute = 0;
+
+  // 🔥 NEU
+  t1.players = 11;
+  t2.players = 11;
+  t1.yellow = 0;
+  t2.yellow = 0;
 
   document.getElementById("liveMatch").innerHTML = "";
 
@@ -113,8 +100,19 @@ function simulateLiveMatch(t1, t2){
   startInterval();
 }
 
+// 🔥 TAKTIK EINFLUSS
+function getTacticModifier(){
+
+  let tactic = document.getElementById("tacticSelect").value;
+
+  if(tactic === "Offensiv") return 0.02;
+  if(tactic === "Defensiv") return -0.015;
+
+  return 0;
+}
 
 function startInterval(){
+
   clearInterval(currentInterval);
 
   let intervalTime = 1000 / speedMultiplier;
@@ -123,22 +121,89 @@ function startInterval(){
 
     currentMinute++;
 
+    let tacticMod = getTacticModifier();
     let rand = Math.random();
 
-    if(rand < 0.05 + liveModifier){
-      if(Math.random() < 0.5){
-        liveScore.s1++;
-        addEvent("⚽ " + currentMinute + "' " + liveScore.t1.name);
-      } else {
-        liveScore.s2++;
-        addEvent("⚽ " + currentMinute + "' " + liveScore.t2.name);
+    // 🔥 TOR (reduziert!)
+    if(rand < 0.025 + liveModifier + tacticMod){
+
+      let attackingTeam = Math.random() < 0.5 ? liveScore.t1 : liveScore.t2;
+
+      // 🔥 Unterzahl schwächt Team
+      let weakness = attackingTeam.players < 11 ? 0.5 : 1;
+
+      if(Math.random() < weakness){
+
+        if(attackingTeam === liveScore.t1){
+          liveScore.s1++;
+        } else {
+          liveScore.s2++;
+        }
+
+        addEvent("⚽ " + currentMinute + "' Tor für " + attackingTeam.name);
       }
     }
-    else if(rand < 0.10){
-      addEvent("🟨 " + currentMinute + "'");
+
+    // 🟨 GELB
+    else if(rand < 0.08){
+
+      let team = Math.random() < 0.5 ? liveScore.t1 : liveScore.t2;
+      team.yellow++;
+
+      addEvent("🟨 " + currentMinute + "' Gelbe Karte");
+
+      // 🔥 GELB-ROT
+      if(team.yellow >= 2 && Math.random() < 0.3){
+        team.players--;
+        addEvent("🟥 Gelb-Rot! " + team.name + " in Unterzahl");
+      }
     }
-    else if(rand < 0.15){
-      addEvent("💥 Chance");
+
+    // 🔴 ROT (sehr selten)
+    else if(rand < 0.095){
+      let team = Math.random() < 0.5 ? liveScore.t1 : liveScore.t2;
+      team.players--;
+      addEvent("🟥 Rote Karte für " + team.name);
+    }
+
+    // 🩹 VERLETZUNG
+    else if(rand < 0.11){
+
+      let team = Math.random() < 0.5 ? liveScore.t1 : liveScore.t2;
+
+      if(substitutions > 0){
+        substitutions--;
+        addEvent("🩹 Verletzung – Wechsel notwendig");
+      } else {
+        team.players--;
+        addEvent("🩹 Keine Wechsel mehr – Unterzahl!");
+      }
+
+      document.getElementById("subCount").innerText="Wechsel: "+substitutions;
+    }
+
+    // ⚠️ FOUL
+    else if(rand < 0.18){
+      addEvent("⚠️ Foulspiel im Mittelfeld");
+    }
+
+    // 🎯 ELFMETER (sehr selten)
+    else if(rand < 0.195){
+
+      let team = Math.random() < 0.5 ? liveScore.t1 : liveScore.t2;
+
+      addEvent("🎯 Elfmeter!");
+
+      if(Math.random() < 0.75){
+        if(team === liveScore.t1){
+          liveScore.s1++;
+        } else {
+          liveScore.s2++;
+        }
+        addEvent("⚽ Elfmeter verwandelt!");
+      } else {
+        addEvent("❌ Elfmeter vergeben!");
+      }
     }
 
     updateScoreboard(
@@ -165,11 +230,9 @@ function startInterval(){
   }, intervalTime);
 }
 
-
 function restartInterval(){
   startInterval();
 }
-
 
 function resumeMatch(){
   document.getElementById("halftimePanel").style.display = "none";
@@ -177,21 +240,8 @@ function resumeMatch(){
   startInterval();
 }
 
-
-function finishMatch(){
-  isSimulating = false;
-
-  let { t1, t2, s1, s2 } = liveScore;
-
-  addEvent("🏁 Endstand: " + s1 + ":" + s2);
-
-  // 🔥 Ergebnis speichern (gleiches Format!)
-  matchdayResults.push({
-    home: t1.name,
-    away: t2.name,
-    score1: s1,
-    score2: s2
-  });
+// 🔥 ZENTRALE STATS LOGIK (NEU)
+function updateStats(t1, t2, s1, s2){
 
   t1.played++;
   t2.played++;
@@ -218,10 +268,27 @@ function finishMatch(){
     t1.draws++;
     t2.draws++;
   }
+}
+
+function finishMatch(){
+
+  isSimulating = false;
+
+  let { t1, t2, s1, s2 } = liveScore;
+
+  addEvent("🏁 Endstand: " + s1 + ":" + s2);
+
+  matchdayResults.push({
+    home: t1.name,
+    away: t2.name,
+    score1: s1,
+    score2: s2
+  });
+
+  updateStats(t1, t2, s1, s2);
 
   updateTable();
 
-  // 🔥 Bericht erzeugen
   if(typeof generateMatchdayReport === "function"){
     let report = generateMatchdayReport(matchdayResults);
 
