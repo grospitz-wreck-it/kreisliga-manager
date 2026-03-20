@@ -112,7 +112,7 @@ function setFormation(){
 // =========================
 //
 
-let liveModifier = 0; // 🔥 wichtig: reset möglich machen
+liveModifier = 0; // 🔥 wichtig: reset möglich machen
 
 function setLiveMode(mode){
 
