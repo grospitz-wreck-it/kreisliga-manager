@@ -1,8 +1,15 @@
 window.onload = function(){
 
+  // 🔥 Setup-Menü beim Start öffnen
+  const setup = document.getElementById("setupPanel");
+  if(setup){
+    setup.classList.add("open");
+  }
+
+  // 🔥 League Select holen
   const select = document.getElementById("leagueSelect");
 
-  // 🔥 Schutz – verhindert kompletten Absturz
+  // 🔥 Schutz – verhindert Absturz
   if(!select){
     console.error("leagueSelect nicht gefunden");
     return;
@@ -11,6 +18,7 @@ window.onload = function(){
   // 🔥 vorher leeren (wichtig bei Reloads)
   select.innerHTML = "";
 
+  // 🔥 Ligen einfügen
   Object.keys(leagues).forEach(l => {
     let option = document.createElement("option");
     option.value = l;
