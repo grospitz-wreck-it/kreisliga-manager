@@ -23,20 +23,19 @@ function selectTeam(){
     return;
   }
 
-  function selectTeam(){
-  const team = document.getElementById("teamSelect").value;
-  const league = document.getElementById("leagueSelect").value;
-  const tactic = document.getElementById("tacticSelect").value;
+  // 🔥 WICHTIG: nur Team speichern (wie vorher!)
+  selectedTeam = team;
+  teamLocked = true;
 
-  if(!league){
-    alert("Liga wählen!");
-    return;
-  }
+  // UI wie vorher
+  document.getElementById("selectedTeamText").innerText = "Dein Team: " + team;
+  document.getElementById("teamSelect").disabled = true;
+  document.getElementById("btnSelectTeam").disabled = true;
 
-  if(!team){
-    alert("Team wählen!");
-    return;
-  }
+  // 🔥 NEU: nur einklappen (kein anderer Eingriff!)
+  document.getElementById("setupPanel").style.display = "none";
+  document.getElementById("toggleSetupBtn").style.display = "block";
+}
 
   if(!tactic){
     alert("Taktik wählen!");
