@@ -4,54 +4,85 @@ function r(arr){
 
 // 🧠 Bewertung eines Spiels
 function analyzeMatch(m){
-  let diff = Math.abs(m.s1 - m.s2);
-  let total = m.s1 + m.s2;
+  let diff = Math.abs(m.score1 - m.score2);
+  let total = m.score1 + m.score2;
 
   return {
     dominant: diff >= 3,
-    close: diff === 0 || diff === 1,
+    close: diff <= 1,
     crazy: total >= 5
   };
 }
 
-// 🧠 Einzelspiel-Satz
+// 🧠 Einzelspiel-Satz (DEUTLICH verbessert)
 function buildMatchText(match){
 
-  const team1 = match.home;
-  const team2 = match.away;
+  const t1 = match.home;
+  const t2 = match.away;
   const s1 = match.score1;
   const s2 = match.score2;
 
-  let text = `${team1} ${s1}:${s2} ${team2}`;
+  const analysis = analyzeMatch(match);
 
-  // Ergebnis bewerten
+  let text = `${t1} ${s1}:${s2} ${t2} – `;
+
   if(s1 > s2){
-    text += ` – ${team1} setzt sich durch.`;
+
+    if(analysis.dominant){
+      text += `${t1} ${r(words.actions)} und zeigt sich dabei ${r(words.adjPositive)}.`;
+    }
+    else if(analysis.close){
+      text += `${t1} ${r(words.phrases.win)}, ${t2} wirkt jedoch ${r(words.adjNegative)}.`;
+    }
+    else{
+      text += `${t1} ${r(words.phrases.win)}.`;
+    }
+
   }
   else if(s2 > s1){
-    text += ` – ${team2} gewinnt die Partie.`;
+
+    if(analysis.dominant){
+      text += `${t2} ${r(words.actions)} und tritt insgesamt ${r(words.adjPositive)} auf.`;
+    }
+    else if(analysis.close){
+      text += `${t2} ${r(words.phrases.win)}, während ${t1} ${r(words.negActions)}.`;
+    }
+    else{
+      text += `${t2} ${r(words.phrases.win)}.`;
+    }
+
   }
   else{
-    text += ` – Punkteteilung.`;
+    text += `Beide Teams ${r(words.phrases.draw)} und liefern sich ein ${r(words.adjPositive)} Duell.`;
+  }
+
+  // 🔥 Extra Würze bei torreichen Spielen
+  if(analysis.crazy){
+    text += ` Die Partie entwickelte sich zu einem echten ${r(words.crazy)}.`;
   }
 
   return text;
 }
 
-// 🧠 Tabellenanalyse
+
+// 🧠 Tabellenanalyse (komplett neu gedacht)
 function buildTableStory(){
 
   let leader = teams[0];
+  let second = teams[1];
   let bottom = teams.slice(-2);
 
   let text = "";
 
-  text += `${leader.name} bleibt weiterhin ${r(words.positive)} und setzt sich an der Tabellenspitze fest. `;
+  text += `${leader.name} präsentiert sich weiterhin ${r(words.adjPositive)} und behauptet die Tabellenführung. `;
 
-  text += `${bottom[0].name} und ${bottom[1].name} zeigen sich dagegen ${r(words.negative)} und stecken tief im Tabellenkeller fest.`;
+  text += `${second.name} bleibt in Lauerstellung und zeigt ${r(words.adjPositive)} Leistungen. `;
+
+  text += `Am Tabellenende haben ${bottom[0].name} und ${bottom[1].name} zu kämpfen und wirken zuletzt ${r(words.adjNegative)}.`;
 
   return text;
 }
+
 
 // 📰 HAUPTBERICHT
 function generateMatchdayReport(results){
@@ -60,7 +91,7 @@ function generateMatchdayReport(results){
     return "Noch keine Spiele gespielt.";
   }
 
-  // 🔥 Sortierung wichtig!
+  // 🔥 Tabelle sortieren
   teams.sort((a,b)=> 
     b.points - a.points || 
     (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst)
@@ -69,10 +100,11 @@ function generateMatchdayReport(results){
   let text = "";
 
   // 🧠 Headline
-  text += `📰 ${r(words.general).toUpperCase()}ER SPIELTAG\n\n`;
+  text += `📰 SPIELTAG-REPORT\n\n`;
 
-  // 🧠 Einleitung
-  text += `Der Spieltag bot viele ${r(words.general)} Szenen und zeigte einmal mehr die ${r(words.general)} Qualität der Liga.\n\n`;
+  // 🧠 Einleitung (natürlicher)
+  text += `${r(words.phrases.intro)} `;
+  text += `Vor allem im Bereich ${r(words.nouns)} zeigte sich die Liga von ihrer ${r(words.adjPositive)} Seite.\n\n`;
 
   // 🧠 Spiele
   let sample = results.slice(0, 4);
@@ -86,7 +118,8 @@ function generateMatchdayReport(results){
   text += buildTableStory() + "\n\n";
 
   // 🧠 Abschluss
-  text += `Insgesamt bleibt die Liga ${r(words.general)} und sorgt weiterhin für ${r(words.general)} Unterhaltung.`;
+  text += `${r(words.phrases.outro)} `;
+  text += `Besonders im Bereich ${r(words.nouns)} bleibt die Entwicklung spannend.`;
 
   return text;
 }
