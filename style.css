@@ -10,6 +10,9 @@ body {
   display: flex;
   gap: 25px;
   padding: 25px;
+
+  max-width: 1400px;   /* 🔥 wichtig */
+  margin: 0 auto;      /* 🔥 zentriert alles */
 }
 
 .panel {
