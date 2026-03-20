@@ -213,6 +213,21 @@ select {
 .live::-webkit-scrollbar {
   width: 6px;
 }
+/* 🔥 Setup Grid */
+.setupGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+/* Einzelne Box */
+.setupBox {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+}
 .live::-webkit-scrollbar-thumb {
   background: #4fc3f7;
   border-radius: 3px;
