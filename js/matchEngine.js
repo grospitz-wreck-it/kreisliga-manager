@@ -25,7 +25,8 @@ function simulateMatchday(){
     alert("Team wählen!");
     return;
   }
-
+  document.getElementById("startBtn").innerText = "⏸ Spiel läuft";
+  document.getElementById("startBtn").disabled = true;
   lockTeam();
 
   let matches = schedule[currentMatchday];
