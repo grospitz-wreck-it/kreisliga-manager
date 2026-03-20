@@ -1,68 +1,60 @@
 // 🔥 Werbe-Kampagnen
+// 🔥 Ads definieren
 let ads = [
-  {
-    name: "Sponsor A",
-    image: "ads/ad1.jpg",
-    link: "https://ausbildung.hettich.com/",
-    start: "2026-01-01",
-    end: "2026-12-31",
-    weight: 1
-  },
-  {
-    name: "Sponsor B",
-    image: "ads/ad2.jpg",
-    link: "https://www.haecker-kuechen.com/de/karriere",
-    start: "2026-01-01",
-    end: "2026-12-31",
-    weight: 1
-  }
+  { image: "ads/ad1.jpg", link: "https://ausbildung.hettich.com/" },
+  { image: "ads/ad2.jpg", link: "https://www.haecker-kuechen.com/de/karriere" }
 ];
 
-// 🔥 Aktives Banner ermitteln
-function getActiveAds(){
-  const now = new Date();
+// 🔥 LED Bande bauen
+function buildAdTrack(){
 
-  return ads.filter(ad => {
-    let start = new Date(ad.start);
-    let end = new Date(ad.end);
-    return now >= start && now <= end;
-  });
-}
+  const track = document.getElementById("adTrack");
+  if(!track) return;
 
-// 🔥 Rotation
-function rotateAds(){
-
-  const container = document.getElementById("adBanner");
-  if(!container) return;
+  track.innerHTML = "";
 
   let active = getActiveAds();
+
+  // 🔥 fallback
   if(active.length === 0){
-    container.innerHTML = "Keine Werbung";
+    track.innerHTML = "<span style='color:white'>Keine Werbung</span>";
     return;
   }
 
-  let ad = active[Math.floor(Math.random() * active.length)];
+  // 🔥 doppeln für Endlos-Loop!
+  let fullList = [...active, ...active];
 
-  let img = document.createElement("img");
-  img.src = ad.image;
-  img.style.width = "100%";
-  img.style.borderRadius = "10px";
+  fullList.forEach(ad => {
 
-  container.innerHTML = "";
+    let item = document.createElement("div");
+    item.className = "adItem";
 
-  if(ad.link){
-    let a = document.createElement("a");
-    a.href = ad.link;
-    a.target = "_blank";
-    a.appendChild(img);
-    container.appendChild(a);
-  } else {
-    container.appendChild(img);
-  }
+    let img = document.createElement("img");
+    img.src = ad.image;
+
+    img.onerror = function(){
+      this.src = "ads/fallback.png";
+    };
+
+    if(ad.link){
+      let a = document.createElement("a");
+      a.href = ad.link;
+      a.target = "_blank";
+      a.appendChild(img);
+      item.appendChild(a);
+    } else {
+      item.appendChild(img);
+    }
+
+    track.appendChild(item);
+  });
+
 }
 
-// 🔥 Startfunktion (die main.js aufruft!)
+// 🔥 Startfunktion
 function startAds(){
-  rotateAds();
-  setInterval(rotateAds, 8000);
+  buildAdTrack();
 }
+
+
+
