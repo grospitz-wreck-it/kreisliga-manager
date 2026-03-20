@@ -51,8 +51,8 @@ function toggleSetup(){
 // =========================
 //
 
-// ⚠️ FIX: doppelte Funktion vereinheitlicht
-function addEvent(text, minute = currentMinute){
+// ✅ FIX: umbenannt (kein Konflikt mehr mit ui.js)
+function addLiveEvent(text, minute = currentMinute){
 
   const box = document.getElementById("liveMatch");
   if(!box) return;
@@ -144,7 +144,8 @@ function setLiveMode(mode){
     calmBtn.classList.add("active");
   }
 
-  addEvent(mode === "attack"
+  // ✅ FIX: neuer Funktionsname
+  addLiveEvent(mode === "attack"
     ? "🔥 Team erhöht den Druck"
     : "🧊 Team zieht sich zurück"
   );
@@ -174,7 +175,8 @@ function makeSub(){
     "🔁 Offensivwechsel"
   ];
 
-  addEvent(events[Math.floor(Math.random()*events.length)]);
+  // ✅ FIX: neuer Funktionsname
+  addLiveEvent(events[Math.floor(Math.random()*events.length)]);
 
   substitutions--;
 
