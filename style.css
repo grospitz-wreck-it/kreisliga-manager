@@ -16,12 +16,11 @@ body {
 }
 
 .panel {
+  flex: 1; /* statt width: 33% */
   background: #ffffff;
   border-radius: 16px;
   padding: 20px;
-  width: 33%;
   box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-  border: 1px solid #e0e0e0;
 }
 
 /* Titel */
@@ -34,7 +33,6 @@ body {
   margin: 20px 0;
   font-size: 32px;
   font-weight: bold;
-  letter-spacing: 1px;
 
   color: #2e7d32;
 }
