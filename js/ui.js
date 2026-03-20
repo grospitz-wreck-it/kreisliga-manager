@@ -1,15 +1,31 @@
 function updateTable() {
-  let tbody = document.querySelector("#table tbody");
-  tbody.innerHTML = "";
+let tbody = document.querySelector("#table tbody");
+tbody.innerHTML = "";
 
-  [...teams]
-    .sort((a,b)=> b.points-a.points || b.goals-a.goals)
-    .forEach(t=>{
-      let name = t.name === selectedTeam
-      ? `<span class="userTeam">👉 ${t.name}</span>`
-      : t.name;
-      tbody.innerHTML += `<tr><td>${name}</td><td>${t.points}</td><td>${t.goals}</td></tr>`;
-    });
+// Sortierung bleibt gleich
+teams.sort((a,b)=> b.points - a.points || (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst));
+
+teams.forEach(t => {
+
+  let name = t.name === selectedTeam
+    ? `<span class="userTeam">👉 ${t.name}</span>`
+    : t.name;
+
+  let goalDiff = t.goalsFor - t.goalsAgainst;
+
+  tbody.innerHTML += `
+    <tr>
+      <td>${name}</td>
+      <td>${t.played}</td>
+      <td>${t.wins}</td>
+      <td>${t.draws}</td>
+      <td>${t.losses}</td>
+      <td>${t.goalsFor}:${t.goalsAgainst}</td>
+      <td>${goalDiff}</td>
+      <td>${t.points}</td>
+    </tr>
+  `;
+});
 }
 
 function populateTeamSelect(){
