@@ -20,18 +20,14 @@ function selectTeam(){
     return;
   }
 
-  // Team setzen
   selectedTeam = team;
   teamLocked = true;
 
-  // Anzeige
   document.getElementById("selectedTeamText").innerText = "Dein Team: " + team;
 
-  // Sperren
   document.getElementById("teamSelect").disabled = true;
   document.getElementById("btnSelectTeam").disabled = true;
 
-  // Setup schließen
   document.getElementById("setupPanel").classList.remove("open");
 }
 
@@ -39,9 +35,31 @@ function toggleSetup(){
   document.getElementById("setupPanel").classList.toggle("open");
 }
 
+//
+// =========================
+// 🔥 EVENT SYSTEM (NEU!)
+// =========================
+//
+
+function addEvent(text, minute = currentMinute){
+
+  const box = document.getElementById("liveMatch");
+  if(!box) return;
+
+  let p = document.createElement("p");
+
+  // 👉 Minute IMMER einheitlich
+  p.innerHTML = `<strong>${minute}'</strong> ${text}`;
+
+  box.prepend(p);
+}
+
+//
 // =========================
 // 🔥 TAKTIK
 // =========================
+//
+
 let tacticModifier = 0;
 
 function setTactic(){
@@ -60,9 +78,12 @@ function setTactic(){
   document.getElementById("currentTactic").innerText = "Taktik: " + val;
 }
 
+//
 // =========================
-// 🔥 FORMATION (NEU)
+// 🔥 FORMATION
 // =========================
+//
+
 let formationModifier = 0;
 
 function setFormation(){
@@ -85,26 +106,45 @@ function setFormation(){
   document.getElementById("currentFormation").innerText = "Formation: " + val;
 }
 
+//
 // =========================
 // 🔥 LIVE STEUERUNG
 // =========================
+//
+
+let liveModifier = 0; // 🔥 wichtig: reset möglich machen
+
 function setLiveMode(mode){
-  document.getElementById("btnAttack").classList.remove("active");
-  document.getElementById("btnCalm").classList.remove("active");
+
+  const attackBtn = document.getElementById("btnAttack");
+  const calmBtn = document.getElementById("btnCalm");
+
+  attackBtn.classList.remove("active");
+  calmBtn.classList.remove("active");
+
+  // 👉 reset statt stacking (WICHTIG!)
+  liveModifier = 0;
 
   if(mode==="attack"){
-    liveModifier += 0.01;
-    document.getElementById("btnAttack").classList.add("active");
-  } else {
-    liveModifier -= 0.01;
-    document.getElementById("btnCalm").classList.add("active");
+    liveModifier = 0.01;
+    attackBtn.classList.add("active");
+  } 
+  else {
+    liveModifier = -0.01;
+    calmBtn.classList.add("active");
   }
+
+  addEvent(mode === "attack" ? "🔥 Team erhöht den Druck" : "🧊 Team zieht sich zurück");
 }
 
+//
 // =========================
 // 🔁 WECHSEL
 // =========================
+//
+
 function makeSub(){
+
   if(!isSimulating){ 
     alert("Spiel läuft nicht"); 
     return; 
@@ -124,13 +164,18 @@ function makeSub(){
   addEvent(events[Math.floor(Math.random()*events.length)]);
 
   substitutions--;
+
   document.getElementById("subCount").innerText = "Wechsel: " + substitutions;
 }
 
+//
 // =========================
 // ⏩ SPEED
 // =========================
+//
+
 function setSpeed(e,multi){
+
   speedMultiplier = multi;
 
   let buttons = e.target.parentElement.querySelectorAll("button");
