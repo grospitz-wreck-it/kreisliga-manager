@@ -207,7 +207,7 @@ function simulateLiveMatch(teamA, teamB){
 // ⚡ SPEED FIX
 // =========================
 
-function restartInterval(){
+window.restartInterval = function(){
 
   if(!isSimulating) return;
 
