@@ -275,32 +275,36 @@ select {
 /* =========================
    ADS
 ========================= */
-/* Container */
 #adBanner {
   width: 100%;
-  height: 120px;
+  height: 100px;
   overflow: hidden;
   background: #111;
   border-radius: 12px;
   position: relative;
 }
 
-/* Laufband */
+/* Track stabil */
 .adTrack {
   display: flex;
-  gap: 40px;
   align-items: center;
   height: 100%;
+  gap: 60px;
 
-  animation: scrollAds 25s linear infinite;
+  will-change: transform;
+  animation: scrollAds 30s linear infinite;
 }
 
-/* Einzelne Ads */
+/* Ads fix */
+.adItem {
+  flex: 0 0 auto;
+}
+
 .adItem img {
-  height: 80px;
+  height: 70px;
   width: auto;
+  max-width: 200px;
   object-fit: contain;
-  filter: brightness(1.1);
 }
 
 /* Animation */
