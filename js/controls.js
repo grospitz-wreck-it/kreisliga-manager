@@ -72,8 +72,7 @@ function selectTeam(){
   document.getElementById("selectedTeamText").innerText = "Dein Team: " + team;
   document.getElementById("teamSelect").disabled = true;
   document.getElementById("btnSelectTeam").disabled = true;
-  document.getElementById("leagueSelect").disabled = true;
-  document.getElementById("tacticSelect").disabled = true;
+
 
   // 🔥 ERST JETZT einklappen
   document.getElementById("setupPanel").style.display = "none";
