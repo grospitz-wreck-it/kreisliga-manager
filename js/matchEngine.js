@@ -64,7 +64,7 @@ function simulateQuick(t1, t2){
 
 
 function simulateLiveMatch(t1, t2){
-  if(currentInterval) clearInterval(currentInterval);
+  clearInterval(currentInterval);
 
   isSimulating = true;
   substitutions = 5;
