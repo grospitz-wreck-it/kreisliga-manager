@@ -9,8 +9,9 @@ let currentInterval = null;
 let currentMinute = 0;
 let matchdayResults = [];
 let speedMultiplier = 1;
-
 let liveModifier = 0;
+let tacticModifier = 0;
+let formationModifier = 0;
 let substitutions = 5;
 
 let liveScore = { t1:null, t2:null, s1:0, s2:0 };
