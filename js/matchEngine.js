@@ -61,3 +61,39 @@ function simulateMatchday(){
 
   simulateLiveMatch(userMatch[0], userMatch[1]);
 }
+function simulateQuick(teamA, teamB){
+
+  let goalsA = Math.floor(Math.random() * 5);
+  let goalsB = Math.floor(Math.random() * 5);
+
+  teamA.played++;
+  teamB.played++;
+
+  teamA.goalsFor += goalsA;
+  teamA.goalsAgainst += goalsB;
+
+  teamB.goalsFor += goalsB;
+  teamB.goalsAgainst += goalsA;
+
+  if(goalsA > goalsB){
+    teamA.points += 3;
+    teamA.wins++;
+    teamB.losses++;
+  }
+  else if(goalsB > goalsA){
+    teamB.points += 3;
+    teamB.wins++;
+    teamA.losses++;
+  }
+  else{
+    teamA.points += 1;
+    teamB.points += 1;
+    teamA.draws++;
+    teamB.draws++;
+  }
+
+  // optional (für News etc.)
+  matchdayResults.push(
+    `${teamA.name} ${goalsA}:${goalsB} ${teamB.name}`
+  );
+}
