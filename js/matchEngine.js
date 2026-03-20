@@ -14,14 +14,20 @@ function simulateMatchday(){
 
   matchdayResults = [];
 
-  // 🔥 FIX: Events resetten
+  // 🔥 Events resetten
   const liveBox = document.getElementById("liveMatch");
   if(liveBox){
     liveBox.innerHTML = "";
   }
 
-  // 🔥 FIX: Timeline reset
+  // 🔥 Timeline reset
   updateTimeline(0);
+
+  // 🔥 Halbzeit-Panel sicher verstecken
+  const halftime = document.getElementById("halftimePanel");
+  if(halftime){
+    halftime.style.display = "none";
+  }
 
   currentMatchday++;
 
@@ -119,18 +125,17 @@ function simulateQuick(teamA, teamB){
 // 🎮 LIVE MATCH
 // =========================
 
-let matchCards = {}; // 🔥 NEU
+let matchCards = {};
 
-function simulateLiveMatch(teamA, teamB){
+function simulateLiveMatch(teamA, teamB, scoreA = liveScore?.s1 || 0, scoreB = liveScore?.s2 || 0){
 
-  let scoreA = 0;
-  let scoreB = 0;
-
-  // 🔥 Karten reset
-  matchCards = {
-    [teamA.name]: 0,
-    [teamB.name]: 0
-  };
+  // 🔥 nur beim ersten Start Karten resetten
+  if(currentMinute === 0){
+    matchCards = {
+      [teamA.name]: 0,
+      [teamB.name]: 0
+    };
+  }
 
   liveScore = { t1: teamA, t2: teamB, s1: scoreA, s2: scoreB };
 
@@ -143,7 +148,24 @@ function simulateLiveMatch(teamA, teamB){
     updateTimeline(currentMinute);
 
     // =========================
-    // 🔥 NEUES REALISTISCHES EVENT SYSTEM
+    // ⏸ HALBZEIT
+    // =========================
+    if(currentMinute === 45){
+
+      clearInterval(currentInterval);
+
+      addEvent("⏸ Halbzeit");
+
+      const panel = document.getElementById("halftimePanel");
+      if(panel){
+        panel.style.display = "block";
+      }
+
+      return;
+    }
+
+    // =========================
+    // 🔥 EVENTS
     // =========================
     if(Math.random() < 0.3){
 
@@ -156,12 +178,10 @@ function simulateLiveMatch(teamA, teamB){
 
       let type = Math.random();
 
-      // 🚫 Abseits
       if(type < 0.08){
         addEvent(`🚫 Abseits von ${atk.name}`);
       }
 
-      // 🟨 Foul + Freistoß
       else if(type < 0.18){
 
         addEvent(`🟨 Foul von ${def.name}`);
@@ -186,12 +206,10 @@ function simulateLiveMatch(teamA, teamB){
         }
       }
 
-      // 🟥 Rot direkt
       else if(type < 0.21){
         addEvent(`🟥 Platzverweis für ${def.name}`);
       }
 
-      // 📐 Ecke
       else if(type < 0.32){
 
         addEvent(`📐 Ecke für ${atk.name}`);
@@ -204,7 +222,6 @@ function simulateLiveMatch(teamA, teamB){
         }
       }
 
-      // ⚽ Elfmeter
       else if(type < 0.38){
 
         addEvent(`⚠️ Foul im Strafraum! Elfmeter für ${atk.name}`);
@@ -217,7 +234,6 @@ function simulateLiveMatch(teamA, teamB){
         }
       }
 
-      // 🔥 Große Chance
       else if(type < 0.55){
 
         addEvent(`🔥 Riesenchance für ${atk.name}`);
@@ -230,7 +246,6 @@ function simulateLiveMatch(teamA, teamB){
         }
       }
 
-      // 🎯 Schuss
       else{
 
         addEvent(`🎯 Schuss von ${atk.name}`);
@@ -241,7 +256,6 @@ function simulateLiveMatch(teamA, teamB){
         }
       }
 
-      // 🔥 Score speichern für Restart
       liveScore.s1 = scoreA;
       liveScore.s2 = scoreB;
 
@@ -295,6 +309,28 @@ function simulateLiveMatch(teamA, teamB){
     }
 
   }, 1000 / speedMultiplier);
+}
+
+
+// =========================
+// ▶️ 2. HALBZEIT
+// =========================
+
+function resumeMatch(){
+
+  const panel = document.getElementById("halftimePanel");
+  if(panel){
+    panel.style.display = "none";
+  }
+
+  addEvent("▶️ Zweite Halbzeit läuft");
+
+  isSimulating = true;
+
+  simulateLiveMatch(
+    liveScore.t1,
+    liveScore.t2
+  );
 }
 
 
