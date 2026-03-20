@@ -27,9 +27,15 @@ function simulateMatchday(){
     alert("Team wählen!");
     return;
   }
+
+  // 🔥 NEU: Spieltag-Daten zurücksetzen
+  matchdayResults = [];
+
   currentMatchday++;
+
   document.getElementById("matchday").innerText =
-  "Spieltag: " + currentMatchday + " / " + schedule.length;
+    "Spieltag: " + currentMatchday + " / " + schedule.length;
+
   document.getElementById("startBtn").innerText = "⏸ Spiel läuft";
   document.getElementById("startBtn").disabled = true;
 
@@ -41,7 +47,7 @@ function simulateMatchday(){
 
   matches.forEach(m => {
     if(m !== userMatch){
-      simulateQuick(m[0], m[1]);
+      simulateQuick(m[0], m[1]); // 🔥 speichert jetzt selbst
     }
   });
 
@@ -53,14 +59,39 @@ function simulateQuick(t1, t2){
   let s1 = Math.floor(Math.random()*3);
   let s2 = Math.floor(Math.random()*3);
 
-  t1.goals += s1;
-  t2.goals += s2;
+  // 🔥 NEU: Spiel speichern
+  matchdayResults.push({
+    t1: t1,
+    t2: t2,
+    s1: s1,
+    s2: s2
+  });
 
-  if(s1 > s2) t1.points += 3;
-  else if(s2 > s1) t2.points += 3;
-  else {
+  // 🔥 Stats erweitern (wie Live-Spiel!)
+  t1.played++;
+  t2.played++;
+
+  t1.goalsFor += s1;
+  t1.goalsAgainst += s2;
+
+  t2.goalsFor += s2;
+  t2.goalsAgainst += s1;
+
+  if(s1 > s2){
+    t1.points += 3;
+    t1.wins++;
+    t2.losses++;
+  }
+  else if(s2 > s1){
+    t2.points += 3;
+    t2.wins++;
+    t1.losses++;
+  }
+  else{
     t1.points++;
     t2.points++;
+    t1.draws++;
+    t2.draws++;
   }
 }
 
@@ -154,6 +185,19 @@ function finishMatch(){
 
   addEvent("🏁 Endstand: " + s1 + ":" + s2);
 
+  // 🔥 MatchdayResults sicherstellen
+  if(typeof matchdayResults === "undefined"){
+    matchdayResults = [];
+  }
+
+  // 🔥 Ergebnis speichern (für Bericht!)
+  matchdayResults.push({
+    home: t1.name,
+    away: t2.name,
+    score1: s1,
+    score2: s2
+  });
+
   // 🔥 Stats updaten
   t1.played++;
   t2.played++;
@@ -181,10 +225,11 @@ function finishMatch(){
     t2.draws++;
   }
 
+  // 🔥 Tabelle aktualisieren
   updateTable();
 
-  // 🔥 NEU: Spieltagsbericht erzeugen
-  if(typeof matchdayResults !== "undefined"){
+  // 🔥 Spieltagsbericht erzeugen
+  if(typeof generateMatchdayReport === "function"){
     let report = generateMatchdayReport(matchdayResults);
 
     let box = document.getElementById("newsBox");
@@ -193,7 +238,7 @@ function finishMatch(){
     }
   }
 
-  // Button zurücksetzen
+  // 🔥 Button zurücksetzen
   document.getElementById("startBtn").innerText = "▶ Nächstes Spiel starten";
   document.getElementById("startBtn").disabled = false;
 }
