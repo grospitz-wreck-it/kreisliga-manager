@@ -78,6 +78,9 @@ h1.title {
 /* =========================
    LAYOUT
 ========================= */
+/* =========================
+   LAYOUT (FIXED BALANCE)
+========================= */
 .layout {
   display: flex;
   gap: 25px;
@@ -89,17 +92,21 @@ h1.title {
   align-items: flex-start;
 }
 
-/* linke Seite (Spiel) */
-.mainPanel {
-  flex: 2;
+/* 🔥 WICHTIG: Spiel bekommt mehr Platz */
+.layout > .panel:first-child {
+  flex: 2;   /* vorher implizit 1 → jetzt doppelt so breit */
+  min-width: 400px;
 }
 
-/* rechte Seite */
+/* rechte Seite kompakter */
 .sidePanel {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  min-width: 320px;
+  max-width: 420px;
 }
 
 /* Panels */
