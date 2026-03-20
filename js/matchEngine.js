@@ -119,34 +119,126 @@ function simulateQuick(teamA, teamB){
 // 🎮 LIVE MATCH
 // =========================
 
-// 🔥 FIX: global speichern für Speed-Wechsel
+let matchCards = {}; // 🔥 NEU
+
 function simulateLiveMatch(teamA, teamB){
 
   let scoreA = 0;
   let scoreB = 0;
 
-  // 🔥 FIX: speichern für restart
+  // 🔥 Karten reset
+  matchCards = {
+    [teamA.name]: 0,
+    [teamB.name]: 0
+  };
+
   liveScore = { t1: teamA, t2: teamB, s1: scoreA, s2: scoreB };
 
   updateScoreboard(teamA, teamB, scoreA, scoreB);
 
-  // 🔥 FIX: globales Interval
   currentInterval = setInterval(() => {
 
     currentMinute++;
 
     updateTimeline(currentMinute);
 
-    if(Math.random() < 0.08){
+    // =========================
+    // 🔥 NEUES REALISTISCHES EVENT SYSTEM
+    // =========================
+    if(Math.random() < 0.3){
 
       let attackBoost = tacticModifier + formationModifier + liveModifier;
 
-      if(Math.random() + attackBoost > 0.5){
-        scoreA++;
-        addEvent("⚽ Tor für " + teamA.name);
-      } else {
-        scoreB++;
-        addEvent("⚽ Tor für " + teamB.name);
+      let attackingTeam = (Math.random() + attackBoost > 0.5) ? "A" : "B";
+
+      let atk = attackingTeam === "A" ? teamA : teamB;
+      let def = attackingTeam === "A" ? teamB : teamA;
+
+      let type = Math.random();
+
+      // 🚫 Abseits
+      if(type < 0.08){
+        addEvent(`🚫 Abseits von ${atk.name}`);
+      }
+
+      // 🟨 Foul + Freistoß
+      else if(type < 0.18){
+
+        addEvent(`🟨 Foul von ${def.name}`);
+
+        if(Math.random() < 0.4){
+
+          matchCards[def.name]++;
+
+          if(matchCards[def.name] === 2 && Math.random() < 0.5){
+            addEvent(`🟨🟥 Gelb-Rot für ${def.name}`);
+          }
+          else{
+            addEvent(`🟨 Gelbe Karte für ${def.name}`);
+          }
+        }
+
+        addEvent(`🎯 Freistoß für ${atk.name}`);
+
+        if(Math.random() < 0.12){
+          if(attackingTeam === "A") scoreA++; else scoreB++;
+          addEvent(`⚽ Traumtor per Freistoß! ${atk.name}`);
+        }
+      }
+
+      // 🟥 Rot direkt
+      else if(type < 0.21){
+        addEvent(`🟥 Platzverweis für ${def.name}`);
+      }
+
+      // 📐 Ecke
+      else if(type < 0.32){
+
+        addEvent(`📐 Ecke für ${atk.name}`);
+
+        if(Math.random() < 0.15){
+          if(attackingTeam === "A") scoreA++; else scoreB++;
+          addEvent(`⚽ Kopfballtor nach Ecke! ${atk.name}`);
+        } else {
+          addEvent(`🧤 geklärt von ${def.name}`);
+        }
+      }
+
+      // ⚽ Elfmeter
+      else if(type < 0.38){
+
+        addEvent(`⚠️ Foul im Strafraum! Elfmeter für ${atk.name}`);
+
+        if(Math.random() < 0.75){
+          if(attackingTeam === "A") scoreA++; else scoreB++;
+          addEvent(`⚽ Elfmeter verwandelt! ${atk.name}`);
+        } else {
+          addEvent(`❌ Elfmeter verschossen!`);
+        }
+      }
+
+      // 🔥 Große Chance
+      else if(type < 0.55){
+
+        addEvent(`🔥 Riesenchance für ${atk.name}`);
+
+        if(Math.random() < 0.45){
+          if(attackingTeam === "A") scoreA++; else scoreB++;
+          addEvent(`⚽ TOR! ${atk.name}`);
+        } else {
+          addEvent(`😱 Knapp vorbei!`);
+        }
+      }
+
+      // 🎯 Schuss
+      else{
+
+        addEvent(`🎯 Schuss von ${atk.name}`);
+
+        if(Math.random() < 0.2){
+          if(attackingTeam === "A") scoreA++; else scoreB++;
+          addEvent(`⚽ TOR! ${atk.name}`);
+        }
       }
 
       // 🔥 Score speichern für Restart
@@ -156,6 +248,9 @@ function simulateLiveMatch(teamA, teamB){
       updateScoreboard(teamA, teamB, scoreA, scoreB);
     }
 
+    // =========================
+    // 🏁 SPIELENDE
+    // =========================
     if(currentMinute >= 90){
 
       clearInterval(currentInterval);
