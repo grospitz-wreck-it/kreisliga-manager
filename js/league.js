@@ -1,67 +1,80 @@
+function createTeam(name){
+  return {
+    name: name,
+    points: 0,
+    goalsFor: 0,
+    goalsAgainst: 0,
+    wins: 0,
+    draws: 0,
+    losses: 0,
+    played: 0
+  };
+}
+
 function loadLeague(name) {
 
   if (name === "herford") {
     teams = [
-      { name: "Bünder SV", points: 0, goals: 0 },
-      { name: "SC Herford", points: 0, goals: 0 },
-      { name: "TuS Bruchmühlen", points: 0, goals: 0 },
-      { name: "SV Rödinghausen II", points: 0, goals: 0 },
-      { name: "FC Exter", points: 0, goals: 0 },
-      { name: "SV Enger-Westerenger", points: 0, goals: 0 },
-      { name: "TuRa Löhne", points: 0, goals: 0 },
-      { name: "FC Herford", points: 0, goals: 0 },
-      { name: "TSV Löhne", points: 0, goals: 0 },
-      { name: "SV Oetinghausen", points: 0, goals: 0 },
-      { name: "SC Vlotho", points: 0, goals: 0 },
-      { name: "SV Bischofshagen", points: 0, goals: 0 },
-      { name: "TuS Hunnebrock", points: 0, goals: 0 },
-      { name: "SV Hiddenhausen", points: 0, goals: 0 },
-      { name: "FC Schweicheln", points: 0, goals: 0 },
-      { name: "RW Kirchlengern II", points: 0, goals: 0 }
+      createTeam("Bünder SV"),
+      createTeam("SC Herford"),
+      createTeam("TuS Bruchmühlen"),
+      createTeam("SV Rödinghausen II"),
+      createTeam("FC Exter"),
+      createTeam("SV Enger-Westerenger"),
+      createTeam("TuRa Löhne"),
+      createTeam("FC Herford"),
+      createTeam("TSV Löhne"),
+      createTeam("SV Oetinghausen"),
+      createTeam("SC Vlotho"),
+      createTeam("SV Bischofshagen"),
+      createTeam("TuS Hunnebrock"),
+      createTeam("SV Hiddenhausen"),
+      createTeam("FC Schweicheln"),
+      createTeam("RW Kirchlengern II")
     ];
   }
 
   // 🔵 Kreisliga A Lübbecke
   if (name === "luebbecke") {
     teams = [
-      { name: "Gehlenbeck", points: 0, goals: 0 },
-      { name: "TuSpo Rahden", points: 0, goals: 0 },
-      { name: "TG Espelkamp", points: 0, goals: 0 },
-      { name: "SuS Holzhausen", points: 0, goals: 0 },
-      { name: "FC Lübbecke II", points: 0, goals: 0 },
-      { name: "FC Oppenwehe", points: 0, goals: 0 },
-      { name: "TuS Stemwede", points: 0, goals: 0 },
-      { name: "Union Varl", points: 0, goals: 0 },
-      { name: "SSV Ströhen", points: 0, goals: 0 },
-      { name: "Fabbenstedt", points: 0, goals: 0 },
-      { name: "TuS Tengern II", points: 0, goals: 0 },
-      { name: "Tonnenheide", points: 0, goals: 0 },
-      { name: "Pr Espelkamp II", points: 0, goals: 0 },
-      { name: "TuS Levern", points: 0, goals: 0 },
-      { name: "Isenstedt", points: 0, goals: 0 },
-      { name: "TuRa Espelk.", points: 0, goals: 0 }
+      createTeam("Gehlenbeck"),
+      createTeam("TuSpo Rahden"),
+      createTeam("TG Espelkamp"),
+      createTeam("SuS Holzhausen"),
+      createTeam("FC Lübbecke II"),
+      createTeam("FC Oppenwehe"),
+      createTeam("TuS Stemwede"),
+      createTeam("Union Varl"),
+      createTeam("SSV Ströhen"),
+      createTeam("Fabbenstedt"),
+      createTeam("TuS Tengern II"),
+      createTeam("Tonnenheide"),
+      createTeam("Pr Espelkamp II"),
+      createTeam("TuS Levern"),
+      createTeam("Isenstedt"),
+      createTeam("TuRa Espelk.")
     ];
   }
 
   // 🟢 Kreisliga A Bielefeld
   if (name === "bielefeld") {
     teams = [
-      { name: "TuS Jöllenbeck", points: 0, goals: 0 },
-      { name: "SC Bielefeld", points: 0, goals: 0 },
-      { name: "BV Werther", points: 0, goals: 0 },
-      { name: "SG Oesterweg", points: 0, goals: 0 },
-      { name: "TuS 08 Senne I", points: 0, goals: 0 },
-      { name: "Schildesche", points: 0, goals: 0 },
-      { name: "SV Häger", points: 0, goals: 0 },
-      { name: "Oldentrup", points: 0, goals: 0 },
-      { name: "TuS Jöllen. II", points: 0, goals: 0 },
-      { name: "SC Peckeloh II", points: 0, goals: 0 },
-      { name: "Kosova Bi", points: 0, goals: 0 },
-      { name: "Ubbedissen", points: 0, goals: 0 },
-      { name: "TuS Ost Bie.", points: 0, goals: 0 },
-      { name: "Amshausen", points: 0, goals: 0 },
-      { name: "TuS Quelle", points: 0, goals: 0 },
-      { name: "Gadderbaum", points: 0, goals: 0 }
+      createTeam("TuS Jöllenbeck"),
+      createTeam("SC Bielefeld"),
+      createTeam("BV Werther"),
+      createTeam("SG Oesterweg"),
+      createTeam("TuS 08 Senne I"),
+      createTeam("Schildesche"),
+      createTeam("SV Häger"),
+      createTeam("Oldentrup"),
+      createTeam("TuS Jöllen. II"),
+      createTeam("SC Peckeloh II"),
+      createTeam("Kosova Bi"),
+      createTeam("Ubbedissen"),
+      createTeam("TuS Ost Bie."),
+      createTeam("Amshausen"),
+      createTeam("TuS Quelle"),
+      createTeam("Gadderbaum")
     ];
   }
 
