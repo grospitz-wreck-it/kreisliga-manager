@@ -15,30 +15,27 @@ function analyzeMatch(m){
 }
 
 // 🧠 Einzelspiel-Satz
-function buildMatchText(m){
-  let a = analyzeMatch(m);
+function buildMatchText(match){
 
-  // Gewinner / Verlierer bestimmen
-  let winner = m.s1 > m.s2 ? m.t1.name : m.t2.name;
-  let loser  = m.s1 > m.s2 ? m.t2.name : m.t1.name;
+  const team1 = match.home;
+  const team2 = match.away;
+  const s1 = match.score1;
+  const s2 = match.score2;
 
-  // Unentschieden
-  if(m.s1 === m.s2){
-    return `${m.t1.name} und ${m.t2.name} trennten sich ${m.s1}:${m.s2} nach einem ${r(words.general)} Spiel.`;
+  let text = `${team1} ${s1}:${s2} ${team2}`;
+
+  // Ergebnis bewerten
+  if(s1 > s2){
+    text += ` – ${team1} setzt sich durch.`;
+  }
+  else if(s2 > s1){
+    text += ` – ${team2} gewinnt die Partie.`;
+  }
+  else{
+    text += ` – Punkteteilung.`;
   }
 
-  // Dominanter Sieg
-  if(a.dominant){
-    return `${winner} zeigte sich ${r(words.positive)} und ließ ${loser} beim ${m.s1}:${m.s2} kaum eine Chance.`;
-  }
-
-  // Verrücktes Spiel
-  if(a.crazy){
-    return `Das ${m.s1}:${m.s2} zwischen ${m.t1.name} und ${m.t2.name} entwickelte sich zu einem ${r(words.crazy)} Spiel mit vielen Momenten im ${r(words.general)} Stil.`;
-  }
-
-  // Normales Spiel
-  return `${winner} gewann ${m.s1}:${m.s2} gegen ${loser} und überzeugte mit ${r(words.positive)}, während ${loser} teilweise ${r(words.negative)} wirkte.`;
+  return text;
 }
 
 // 🧠 Tabellenanalyse
