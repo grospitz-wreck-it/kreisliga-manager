@@ -240,11 +240,26 @@ tr:nth-child(even) {
   background: #fafafa;
 }
 
-/* Platzfarben */
-tr:nth-child(1) { background: rgba(76,175,80,0.2); }
-tr:nth-child(2) { background: rgba(76,175,80,0.1); }
-tr:nth-child(3) { background: rgba(255,152,0,0.15); }
-tr:nth-last-child(1) { background: rgba(244,67,54,0.2); }
+/* =========================
+   TABELLEN LOGIK (NEU)
+========================= */
+
+/* Zebra bleibt */
+tr:nth-child(even) {
+  background: #fafafa;
+}
+
+/* 🟢 Platz 1 (Aufstieg) */
+tbody tr:nth-child(1) {
+  background: rgba(76,175,80,0.25);
+  font-weight: bold;
+}
+
+/* 🔴 Letzte 2 Plätze (Abstieg) */
+tbody tr:nth-last-child(1),
+tbody tr:nth-last-child(2) {
+  background: rgba(244,67,54,0.2);
+}
 
 /* Dein Team */
 .userTeam {
