@@ -1,3 +1,6 @@
+/* =========================
+   BASIS
+========================= */
 body {
   margin: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
@@ -5,80 +8,70 @@ body {
   color: #333;
 }
 
-/* Layout */
-.layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-}
-#setupPanel {
-  grid-column: 1 / -1;
-}
-
-#toggleSetupBtn {
-  margin: 10px auto;
-  display: block;
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-
-  .setupGrid {
-    grid-template-columns: 1fr; /* untereinander auf Handy */
-  }
-
-}
-
-  .panel {
-    padding: 15px;
-  }
-
-  button {
-    width: 100%;
-    margin-top: 5px;
-  }
-
-  .controls {
-    flex-wrap: wrap;
-  }
-
-  #score {
-    font-size: 24px;
-    padding: 10px;
-  }
-
-  .live {
-    height: 200px;
-  }
-}
-
-/* Titel */
-.title {
+/* =========================
+   HEADER (FIXED)
+========================= */
+h1.title {
   display: flex;
-  justify-content: center;   /* 🔥 horizontal zentriert */
-  align-items: center;       /* 🔥 vertikal ausgerichtet */
+  justify-content: center;
+  align-items: center;
   gap: 10px;
 
-  width: 100%;               /* 🔥 GANZ wichtig */
-  text-align: center;
-
+  width: 100%;
   margin: 20px 0;
+
   font-size: 32px;
   font-weight: bold;
   color: #2e7d32;
 }
 
 .logo {
-  height: 26px;              /* 🔥 kleiner als Schrift */
+  height: 28px;
   width: auto;
-  display: block;
 }
 
-/* Buttons */
+/* =========================
+   LAYOUT
+========================= */
+.layout {
+  display: flex;
+  flex-direction: row;
+  gap: 25px;
+  padding: 25px;
+
+  max-width: 1400px;
+  margin: 0 auto;
+
+  align-items: flex-start;
+}
+
+.panel {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* =========================
+   SETUP INLINE (Liga/Team/Taktik)
+========================= */
+#setupPanel {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#setupPanel > div {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  min-width: 160px;
+  text-align: center;
+}
+
+/* =========================
+   BUTTONS
+========================= */
 button {
   background: #4fc3f7;
   border: none;
@@ -100,7 +93,9 @@ button.active {
   color: white;
 }
 
-/* SCOREBOARD */
+/* =========================
+   SCOREBOARD
+========================= */
 .scoreboard {
   display: flex;
   justify-content: space-between;
@@ -112,7 +107,6 @@ button.active {
 #teamLeft, #teamRight {
   width: 30%;
   text-align: center;
-  color: #333;
 }
 
 #score {
@@ -124,16 +118,17 @@ button.active {
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
-/* 🔥 OPTION: Führung einfärben */
+/* Führung */
 .leading {
   color: #4caf50;
 }
-
 .losing {
   color: #f44336;
 }
 
-/* Timeline */
+/* =========================
+   TIMELINE
+========================= */
 .timeline {
   height: 10px;
   background: #ddd;
@@ -148,15 +143,20 @@ button.active {
   transition: width 0.3s linear;
 }
 
-/* Controls */
+/* =========================
+   CONTROLS
+========================= */
 .controls {
   display: flex;
   gap: 10px;
   margin: 12px 0;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
-/* Live Feed */
+/* =========================
+   LIVE FEED
+========================= */
 .live {
   background: #111;
   color: #eee;
@@ -173,7 +173,9 @@ button.active {
   font-size: 14px;
 }
 
-/* Tabelle */
+/* =========================
+   TABELLE
+========================= */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -184,7 +186,6 @@ th {
   text-align: left;
   padding: 8px;
   background: #f0f0f0;
-  color: #333;
 }
 
 td {
@@ -197,7 +198,7 @@ tr:nth-child(even) {
   background: #fafafa;
 }
 
-/* Tabellenplatz Farben (modernisiert) */
+/* Platzfarben */
 tr:nth-child(1) { background: rgba(76,175,80,0.2); }
 tr:nth-child(2) { background: rgba(76,175,80,0.1); }
 tr:nth-child(3) { background: rgba(255,152,0,0.15); }
@@ -209,7 +210,9 @@ tr:nth-last-child(1) { background: rgba(244,67,54,0.2); }
   font-weight: bold;
 }
 
-/* Select */
+/* =========================
+   SELECTS
+========================= */
 select {
   background: white;
   color: #333;
@@ -218,26 +221,47 @@ select {
   border-radius: 6px;
 }
 
-/* Scrollbar */
+/* =========================
+   SCROLLBAR
+========================= */
 .live::-webkit-scrollbar {
   width: 6px;
 }
-/* 🔥 Setup Grid */
-.setupGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 15px;
-  margin-top: 10px;
-}
 
-/* Einzelne Box */
-.setupBox {
-  background: #f9f9f9;
-  padding: 10px;
-  border-radius: 10px;
-  text-align: center;
-}
 .live::-webkit-scrollbar-thumb {
   background: #4fc3f7;
   border-radius: 3px;
+}
+
+/* =========================
+   RESPONSIVE (🔥 WICHTIG)
+========================= */
+@media (max-width: 900px) {
+
+  .layout {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  #setupPanel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #setupPanel > div {
+    width: 100%;
+  }
+
+  .panel {
+    width: 100%;
+  }
+
+  h1.title {
+    font-size: 24px;
+  }
+
+  #score {
+    font-size: 24px;
+    padding: 10px 20px;
+  }
 }
