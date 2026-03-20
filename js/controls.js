@@ -1,5 +1,15 @@
 function selectLeague(){
-  updateTable();
+  const league = document.getElementById("leagueSelect").value;
+
+  if(!league){
+    alert("Liga wählen");
+    return;
+  }
+
+  loadLeague(league);        // 🔥 lädt deine Teams
+  generateSchedule();        // 🔥 erstellt Spielplan
+  populateTeamSelect();      // 🔥 füllt Team-Dropdown
+  updateTable();             // 🔥 zeigt Tabelle
 }
 
 function lockTeam(){
