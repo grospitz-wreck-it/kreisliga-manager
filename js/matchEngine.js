@@ -14,6 +14,15 @@ function simulateMatchday(){
 
   matchdayResults = [];
 
+  // 🔥 FIX: Events resetten
+  const liveBox = document.getElementById("liveMatch");
+  if(liveBox){
+    liveBox.innerHTML = "";
+  }
+
+  // 🔥 FIX: Timeline reset
+  updateTimeline(0);
+
   currentMatchday++;
 
   let matches = schedule[currentMatchday - 1];
@@ -45,14 +54,12 @@ function simulateMatchday(){
     return;
   }
 
-  // 🔥 andere Spiele sofort simulieren
   matches.forEach(m => {
     if(m !== userMatch){
       simulateQuick(m[0], m[1]);
     }
   });
 
-  // 🔥 Tabelle direkt aktualisieren (wichtig!)
   updateTable();
 
   if(!userMatch[0] || !userMatch[1]){
@@ -60,7 +67,6 @@ function simulateMatchday(){
     return;
   }
 
-  // 🔥 Live-Spiel starten
   isSimulating = true;
   currentMinute = 0;
 
@@ -110,24 +116,27 @@ function simulateQuick(teamA, teamB){
 
 
 // =========================
-// 🎮 LIVE MATCH (FEHLTE STABIL)
+// 🎮 LIVE MATCH
 // =========================
 
+// 🔥 FIX: global speichern für Speed-Wechsel
 function simulateLiveMatch(teamA, teamB){
 
   let scoreA = 0;
   let scoreB = 0;
 
+  // 🔥 FIX: speichern für restart
+  liveScore = { t1: teamA, t2: teamB, s1: scoreA, s2: scoreB };
+
   updateScoreboard(teamA, teamB, scoreA, scoreB);
 
-  const interval = setInterval(() => {
+  // 🔥 FIX: globales Interval
+  currentInterval = setInterval(() => {
 
     currentMinute++;
 
-    // 🔥 Timeline updaten
     updateTimeline(currentMinute);
 
-    // 🔥 Zufällige Events
     if(Math.random() < 0.08){
 
       let attackBoost = tacticModifier + formationModifier + liveModifier;
@@ -140,13 +149,16 @@ function simulateLiveMatch(teamA, teamB){
         addEvent("⚽ Tor für " + teamB.name);
       }
 
+      // 🔥 Score speichern für Restart
+      liveScore.s1 = scoreA;
+      liveScore.s2 = scoreB;
+
       updateScoreboard(teamA, teamB, scoreA, scoreB);
     }
 
-    // 🔥 Spielende
     if(currentMinute >= 90){
 
-      clearInterval(interval);
+      clearInterval(currentInterval);
 
       teamA.played++;
       teamB.played++;
@@ -188,4 +200,21 @@ function simulateLiveMatch(teamA, teamB){
     }
 
   }, 1000 / speedMultiplier);
+}
+
+
+// =========================
+// ⚡ SPEED FIX
+// =========================
+
+function restartInterval(){
+
+  if(!isSimulating) return;
+
+  clearInterval(currentInterval);
+
+  simulateLiveMatch(
+    liveScore.t1,
+    liveScore.t2
+  );
 }
