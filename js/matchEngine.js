@@ -20,16 +20,19 @@ function generateSchedule(){
 
 
 function simulateMatchday(){
+
   if(isSimulating) return;
+
   if(!selectedTeam){
     alert("Team wählen!");
     return;
   }
+
   document.getElementById("startBtn").innerText = "⏸ Spiel läuft";
   document.getElementById("startBtn").disabled = true;
-  lockTeam();
 
   let matches = schedule[currentMatchday];
+
   let userMatch = matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
@@ -99,13 +102,10 @@ function startInterval(){
       }
     }
     else if(rand < 0.10){
-      addEvent("🟨 " + currentMinute + "' Gelbe Karte");
+      addEvent("🟨 " + currentMinute + "'");
     }
     else if(rand < 0.15){
-      addEvent("💥 " + currentMinute + "' Große Chance");
-    }
-    else if(rand < 0.20){
-      addEvent("🧤 " + currentMinute + "' Parade");
+      addEvent("💥 Chance");
     }
 
     updateScoreboard(
@@ -121,7 +121,6 @@ function startInterval(){
       clearInterval(currentInterval);
       isSimulating = false;
       document.getElementById("halftimePanel").style.display = "block";
-      addEvent("⏸️ Halbzeit");
       return;
     }
 
@@ -156,21 +155,22 @@ function finishMatch(){
   t1.goals += s1;
   t2.goals += s2;
 
-  if(s1 > s2) t1.points += 3;
-  else if(s2 > s1) t2.points += 3;
-  else {
+  if(s1 > s2){
+    t1.points += 3;
+  } else if(s2 > s1){
+    t2.points += 3;
+  } else {
     t1.points++;
     t2.points++;
-    }
-  document.getElementById("startBtn").innerText = "▶ Nächstes Spiel starten";
-  document.getElementById("startBtn").disabled = false;
-}
-  
+  }
+
   currentMatchday++;
 
   document.getElementById("matchday").innerText =
     "Spieltag: " + currentMatchday + " / " + schedule.length;
 
   updateTable();
+
+  document.getElementById("startBtn").innerText = "▶ Nächstes Spiel starten";
   document.getElementById("startBtn").disabled = false;
 }
