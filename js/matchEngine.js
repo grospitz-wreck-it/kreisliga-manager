@@ -154,23 +154,46 @@ function finishMatch(){
 
   addEvent("🏁 Endstand: " + s1 + ":" + s2);
 
-  t1.goals += s1;
-  t2.goals += s2;
+  // 🔥 Stats updaten
+  t1.played++;
+  t2.played++;
+
+  t1.goalsFor += s1;
+  t1.goalsAgainst += s2;
+
+  t2.goalsFor += s2;
+  t2.goalsAgainst += s1;
 
   if(s1 > s2){
     t1.points += 3;
-  } else if(s2 > s1){
+    t1.wins++;
+    t2.losses++;
+  }
+  else if(s2 > s1){
     t2.points += 3;
-  } else {
+    t2.wins++;
+    t1.losses++;
+  }
+  else{
     t1.points++;
     t2.points++;
+    t1.draws++;
+    t2.draws++;
   }
-
-  document.getElementById("matchday").innerText =
-    "Spieltag: " + currentMatchday + " / " + schedule.length;
 
   updateTable();
 
+  // 🔥 NEU: Spieltagsbericht erzeugen
+  if(typeof matchdayResults !== "undefined"){
+    let report = generateMatchdayReport(matchdayResults);
+
+    let box = document.getElementById("newsBox");
+    if(box){
+      box.innerHTML = `<p>${report.replace(/\n/g,"<br>")}</p>`;
+    }
+  }
+
+  // Button zurücksetzen
   document.getElementById("startBtn").innerText = "▶ Nächstes Spiel starten";
   document.getElementById("startBtn").disabled = false;
 }
