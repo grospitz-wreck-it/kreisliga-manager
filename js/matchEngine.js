@@ -24,18 +24,26 @@ function simulateMatchday(){
     return;
   }
 
-  document.getElementById("matchday").innerText =
-    "Spieltag: " + currentMatchday + " / " + schedule.length;
+  // ✅ FIX: DOM Safety (verhindert silent crashes)
+  const matchdayEl = document.getElementById("matchday");
+  const startBtn = document.getElementById("startBtn");
 
-  document.getElementById("startBtn").innerText = "⏸ Spiel läuft";
-  document.getElementById("startBtn").disabled = true;
+  if(matchdayEl){
+    matchdayEl.innerText =
+      "Spieltag: " + currentMatchday + " / " + schedule.length;
+  }
+
+  if(startBtn){
+    startBtn.innerText = "⏸ Spiel läuft";
+    startBtn.disabled = true;
+  }
 
   let userMatch = matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
 
   if(!userMatch){
-    console.error("User-Match nicht gefunden!", selectedTeam);
+    console.error("User-Match nicht gefunden!", selectedTeam, matches);
     return;
   }
 
@@ -44,6 +52,12 @@ function simulateMatchday(){
       simulateQuick(m[0], m[1]);
     }
   });
+
+  // ✅ FIX: zusätzliche Absicherung
+  if(!userMatch[0] || !userMatch[1]){
+    console.error("UserMatch kaputt:", userMatch);
+    return;
+  }
 
   simulateLiveMatch(userMatch[0], userMatch[1]);
 }
