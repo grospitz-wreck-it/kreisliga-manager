@@ -28,7 +28,7 @@ function simulateMatchday(){
     return;
   }
 
-  // 🔥 NEU: Spieltag-Daten zurücksetzen
+  // 🔥 Spieltag-Reset für Bericht
   matchdayResults = [];
 
   currentMatchday++;
@@ -39,7 +39,8 @@ function simulateMatchday(){
   document.getElementById("startBtn").innerText = "⏸ Spiel läuft";
   document.getElementById("startBtn").disabled = true;
 
-  let matches = schedule[currentMatchday];
+  // ⚠️ FIX: Index korrigiert (war Fehlerquelle!)
+  let matches = schedule[currentMatchday - 1];
 
   let userMatch = matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
@@ -47,7 +48,7 @@ function simulateMatchday(){
 
   matches.forEach(m => {
     if(m !== userMatch){
-      simulateQuick(m[0], m[1]); // 🔥 speichert jetzt selbst
+      simulateQuick(m[0], m[1]);
     }
   });
 
@@ -59,15 +60,14 @@ function simulateQuick(t1, t2){
   let s1 = Math.floor(Math.random()*3);
   let s2 = Math.floor(Math.random()*3);
 
-  // 🔥 NEU: Spiel speichern
+  // 🔥 EINHEITLICHES FORMAT (wichtig für Report!)
   matchdayResults.push({
-    t1: t1,
-    t2: t2,
-    s1: s1,
-    s2: s2
+    home: t1.name,
+    away: t2.name,
+    score1: s1,
+    score2: s2
   });
 
-  // 🔥 Stats erweitern (wie Live-Spiel!)
   t1.played++;
   t2.played++;
 
@@ -185,12 +185,7 @@ function finishMatch(){
 
   addEvent("🏁 Endstand: " + s1 + ":" + s2);
 
-  // 🔥 MatchdayResults sicherstellen
-  if(typeof matchdayResults === "undefined"){
-    matchdayResults = [];
-  }
-
-  // 🔥 Ergebnis speichern (für Bericht!)
+  // 🔥 Ergebnis speichern (gleiches Format!)
   matchdayResults.push({
     home: t1.name,
     away: t2.name,
@@ -198,7 +193,6 @@ function finishMatch(){
     score2: s2
   });
 
-  // 🔥 Stats updaten
   t1.played++;
   t2.played++;
 
@@ -225,10 +219,9 @@ function finishMatch(){
     t2.draws++;
   }
 
-  // 🔥 Tabelle aktualisieren
   updateTable();
 
-  // 🔥 Spieltagsbericht erzeugen
+  // 🔥 Bericht erzeugen
   if(typeof generateMatchdayReport === "function"){
     let report = generateMatchdayReport(matchdayResults);
 
@@ -238,7 +231,6 @@ function finishMatch(){
     }
   }
 
-  // 🔥 Button zurücksetzen
   document.getElementById("startBtn").innerText = "▶ Nächstes Spiel starten";
   document.getElementById("startBtn").disabled = false;
 }
