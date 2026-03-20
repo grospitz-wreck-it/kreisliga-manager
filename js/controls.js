@@ -63,7 +63,9 @@ function addLiveEvent(text, minute = currentMinute){
 
   box.prepend(p);
 }
-
+function addEvent(text, minute = currentMinute){
+  addLiveEvent(text, minute);
+}
 //
 // =========================
 // 🔥 TAKTIK
