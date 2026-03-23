@@ -2,7 +2,6 @@
 // 🌍 GLOBAL STATE (SAFE)
 // =========================
 
-// 👉 verhindert doppelte Initialisierung
 if(!window.__GAME_STATE__){
 
   window.__GAME_STATE__ = {
@@ -30,10 +29,8 @@ if(!window.__GAME_STATE__){
 }
 
 // =========================
-// 🔗 SHORTCUTS (GLOBAL VARS)
+// 🔗 SHORTCUTS
 // =========================
-
-// 👉 Zugriff wie vorher möglich (kein Refactor nötig)
 
 let teams = window.__GAME_STATE__.teams;
 let schedule = window.__GAME_STATE__.schedule;
@@ -52,7 +49,9 @@ let tacticModifier = window.__GAME_STATE__.tacticModifier;
 let formationModifier = window.__GAME_STATE__.formationModifier;
 let substitutions = window.__GAME_STATE__.substitutions;
 
-window.liveScore = window.__GAME_STATE__.liveScore;
+// 🔥 FIX: richtige Variable deklarieren
+let liveScore = window.__GAME_STATE__.liveScore;
+
 
 // =========================
 // 🏆 LIGEN
@@ -64,9 +63,11 @@ const leagues = {
   bielefeld: "Kreisliga A Bielefeld"
 };
 
+
 // =========================
 // 💾 SAVE GAME STATE
 // =========================
+
 function saveGameState(){
 
   const state = {
@@ -88,6 +89,7 @@ function saveGameState(){
 // =========================
 // 📦 LOAD GAME STATE
 // =========================
+
 function loadGameState(){
 
   const saved = localStorage.getItem("gameState");
@@ -105,7 +107,10 @@ function loadGameState(){
     currentMatchday = state.currentMatchday || 0;
     selectedTeam = state.selectedTeam || null;
     matchdayResults = state.matchdayResults || [];
-    liveScore = state.liveScore || null;
+
+    // 🔥 FIX: sauberer fallback
+    liveScore = state.liveScore || { t1:null, t2:null, s1:0, s2:0 };
+
     currentMinute = state.currentMinute || 0;
 
     console.log("📦 Game geladen");
