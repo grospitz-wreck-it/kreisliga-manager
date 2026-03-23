@@ -250,7 +250,7 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
         score1: scoreA,
         score2: scoreB
       });
-
+          
       // 📰 REPORT
       try{
         if(typeof generateMatchdayReport === "function"){
@@ -260,7 +260,7 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
       } catch(e){
         console.error("Report Fehler:", e);
       }
-
+      
       isSimulating = false;
 
       document.getElementById("startBtn").innerText = "▶ Nächster Spieltag";
@@ -268,7 +268,8 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
 
       addEvent("🏁 Spiel beendet");
     }
-
+  // 💾 JETZT SPEICHERN (GANZ AM ENDE!)
+saveGameState();
   }, 1000 / speedMultiplier);
 }
 
