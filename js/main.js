@@ -3,20 +3,42 @@ window.onload = function(){
   // =========================
   // 💾 SAVE LADEN
   // =========================
-  if(typeof loadGameState === "function"){
-    loadGameState();
+  function loadGameState(){
+
+  const saved = localStorage.getItem("gameState");
+
+  if(!saved){
+    console.log("Kein Save gefunden");
+    return;
   }
 
-  // 🔥 STATE SYNC (WICHTIG!)
-  if(window.__GAME_STATE__){
-    window.__GAME_STATE__.teams = teams;
-    window.__GAME_STATE__.schedule = schedule;
-    window.__GAME_STATE__.currentMatchday = currentMatchday;
-    window.__GAME_STATE__.selectedTeam = selectedTeam;
-    window.__GAME_STATE__.matchdayResults = matchdayResults;
-    window.__GAME_STATE__.liveScore = liveScore;
-    window.__GAME_STATE__.currentMinute = currentMinute;
+  try{
+    const state = JSON.parse(saved);
+
+    // 🔥 WICHTIG: Arrays NICHT ersetzen
+    if(state.teams){
+      teams.length = 0;
+      teams.push(...state.teams);
+    }
+
+    if(state.schedule){
+      schedule.length = 0;
+      schedule.push(...state.schedule);
+    }
+
+    currentMatchday = state.currentMatchday || 0;
+    selectedTeam = state.selectedTeam || null;
+    matchdayResults = state.matchdayResults || [];
+
+    liveScore = state.liveScore || { t1:null, t2:null, s1:0, s2:0 };
+    currentMinute = state.currentMinute || 0;
+
+    console.log("📦 Game geladen", state);
+
+  } catch(e){
+    console.error("Save kaputt:", e);
   }
+}
 
   // =========================
   // 🔥 SETUP PANEL
