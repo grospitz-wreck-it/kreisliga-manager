@@ -1,5 +1,16 @@
 window.onload = function(){
+   loadGameState();   // 🔥 HIER
 
+   updateTable();
+   if(selectedTeam){
+   document.getElementById("selectedTeamText").innerText =
+   "Dein Team: " + selectedTeam;
+  }
+
+  startAds();
+  };
+
+  
   // 🔥 Setup-Menü beim Start öffnen
   const setup = document.getElementById("setupPanel");
   if(setup){
