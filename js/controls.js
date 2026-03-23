@@ -43,6 +43,10 @@ function selectTeam(){
 
 function toggleSetup(){
   document.getElementById("setupPanel").classList.toggle("open");
+
+    // 💾 NEU: SOFORT SPEICHERN
+ if(typeof saveGameState === "function"){
+    saveGameState();
 }
 
 //
