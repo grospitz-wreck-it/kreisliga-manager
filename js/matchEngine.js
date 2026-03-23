@@ -16,14 +16,14 @@ async function saveScoreToLeaderboard(name, team, score, matchday){
     return;
   }
 
-  const { error } = await supabase
-    .from("leaderboard")
-    .insert([{
-      name,
-      team,
-      score,
-      matchday
-    }]);
+  const { error } = await supabaseClient
+  .from("leaderboard")
+  .insert([{
+    name,
+    team,
+    score,
+    matchday
+  }]);
 
   if(error){
     console.error("❌ Fehler beim Speichern:", error);
