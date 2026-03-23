@@ -1,9 +1,10 @@
 // =========================
-// 🔥 MATCH ENGINE (FINAL STABLE + AUTOSAVE)
+// 🔥 MATCH ENGINE (CLEAN FINAL)
 // =========================
 
 let matchCards = {};
 let halftimePlayed = false;
+
 
 // =========================
 // ▶️ SPIELTAG STARTEN
@@ -23,7 +24,11 @@ function simulateMatchday(){
     return;
   }
 
+  // 🔥 WICHTIG: RESET ALLES
   matchdayResults = [];
+  liveScore = { t1:null, t2:null, s1:0, s2:0 };
+  currentMinute = 0;
+  halftimePlayed = false;
 
   const liveBox = document.getElementById("liveMatch");
   if(liveBox) liveBox.innerHTML = "";
@@ -60,6 +65,7 @@ function simulateMatchday(){
     return;
   }
 
+  // ⚡ andere Spiele simulieren
   matches.forEach(m => {
     if(m !== userMatch){
       simulateQuick(m[0], m[1]);
@@ -72,9 +78,8 @@ function simulateMatchday(){
   saveGameState();
 
   isSimulating = true;
-  currentMinute = 0;
 
-  simulateLiveMatch(userMatch[0], userMatch[1]);
+  simulateLiveMatch(userMatch[0], userMatch[1], 0, 0);
 }
 
 
@@ -126,7 +131,7 @@ function simulateQuick(teamA, teamB){
 // 🎮 LIVE MATCH
 // =========================
 
-function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveScore.s2){
+function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
 
   if(currentMinute === 0){
     matchCards = {
@@ -147,9 +152,6 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
     currentMinute++;
     updateTimeline(currentMinute);
 
-    // 💾 SAVE JEDE MINUTE (leichtgewichtig genug)
-    saveGameState();
-
     // =========================
     // ⏸ HALBZEIT
     // =========================
@@ -165,7 +167,7 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
       const panel = document.getElementById("halftimePanel");
       if(panel) panel.style.display = "block";
 
-      // 💾 SAVE BEI HALBZEIT
+      // 💾 SAVE
       saveGameState();
 
       return;
@@ -177,7 +179,6 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
     if(Math.random() < 0.3){
 
       let attackBoost = tacticModifier + formationModifier + liveModifier;
-
       let attackingTeam = (Math.random() + attackBoost > 0.5) ? "A" : "B";
 
       let atk = attackingTeam === "A" ? teamA : teamB;
@@ -185,30 +186,19 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
 
       let type = Math.random();
 
-      if(type < 0.08){
+      if(type < 0.1){
         addEvent(`🚫 Abseits von ${atk.name}`);
       }
-      else if(type < 0.18){
-        addEvent(`🟨 Foul von ${def.name}`);
-        addEvent(`🎯 Freistoß für ${atk.name}`);
-
-        if(Math.random() < 0.12){
-          if(attackingTeam === "A") scoreA++; else scoreB++;
-          addEvent(`⚽ Freistoßtor! ${atk.name}`);
-        }
-      }
-      else if(type < 0.32){
+      else if(type < 0.3){
         addEvent(`📐 Ecke für ${atk.name}`);
-
-        if(Math.random() < 0.15){
+        if(Math.random() < 0.2){
           if(attackingTeam === "A") scoreA++; else scoreB++;
           addEvent(`⚽ Tor nach Ecke! ${atk.name}`);
         }
       }
       else{
         addEvent(`🔥 Chance für ${atk.name}`);
-
-        if(Math.random() < 0.25){
+        if(Math.random() < 0.3){
           if(attackingTeam === "A") scoreA++; else scoreB++;
           addEvent(`⚽ TOR! ${atk.name}`);
         }
@@ -279,7 +269,7 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
 
       addEvent("🏁 Spiel beendet");
 
-      // 💾 FINAL SAVE (WICHTIGSTER!)
+      // 💾 FINAL SAVE
       saveGameState();
     }
 
@@ -299,7 +289,7 @@ function resumeMatch(){
 
   isSimulating = true;
 
-  saveGameState(); // 💾 auch hier sichern
+  saveGameState();
 
   simulateLiveMatch(
     liveScore.t1,
