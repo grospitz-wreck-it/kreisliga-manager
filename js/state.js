@@ -63,3 +63,54 @@ const leagues = {
   luebbecke: "Kreisliga A Lübbecke",
   bielefeld: "Kreisliga A Bielefeld"
 };
+
+// =========================
+// 💾 SAVE GAME STATE
+// =========================
+function saveGameState(){
+
+  const state = {
+    teams,
+    schedule,
+    currentMatchday,
+    selectedTeam,
+    matchdayResults,
+    liveScore,
+    currentMinute
+  };
+
+  localStorage.setItem("gameState", JSON.stringify(state));
+
+  console.log("💾 Game gespeichert");
+}
+
+
+// =========================
+// 📦 LOAD GAME STATE
+// =========================
+function loadGameState(){
+
+  const saved = localStorage.getItem("gameState");
+
+  if(!saved){
+    console.log("Kein Save gefunden");
+    return;
+  }
+
+  try{
+    const state = JSON.parse(saved);
+
+    teams = state.teams || teams;
+    schedule = state.schedule || schedule;
+    currentMatchday = state.currentMatchday || 0;
+    selectedTeam = state.selectedTeam || null;
+    matchdayResults = state.matchdayResults || [];
+    liveScore = state.liveScore || null;
+    currentMinute = state.currentMinute || 0;
+
+    console.log("📦 Game geladen");
+
+  } catch(e){
+    console.error("Save kaputt:", e);
+  }
+}
