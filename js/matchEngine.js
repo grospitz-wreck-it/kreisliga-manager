@@ -269,20 +269,30 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
 
       updateTable();
 
-      // 🔥 LEADERBOARD SAVE
-      if(typeof saveScoreToLeaderboard === "function"){
-        saveScoreToLeaderboard(
-          "Spieler",
-          selectedTeam,
-          teams.find(t => t.name === selectedTeam)?.points || 0,
-          currentMatchday
-        );
-      }
+      // 🏆 SCORE SPEICHERN
+try{
 
-      // 🔄 Leaderboard neu laden
-      if(typeof loadLeaderboard === "function"){
-        loadLeaderboard();
-      }
+  if(typeof supabaseClient !== "undefined"){
+
+    await supabaseClient
+      .from("leaderboard")
+      .insert([{
+        name: selectedTeam || "Unbekannt",
+        team: selectedTeam,
+        score: teamA.name === selectedTeam ? scoreA : scoreB,
+        matchday: currentMatchday
+      }]);
+
+    console.log("🏆 Score gespeichert!");
+
+  } else {
+    console.warn("Supabase Client fehlt");
+  }
+
+} catch(e){
+  console.error("❌ Leaderboard Fehler:", e);
+}
+    
 
       matchdayResults.push({
         home: teamA.name,
