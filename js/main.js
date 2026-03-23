@@ -1,5 +1,12 @@
 window.onload = function(){
 
+  let playerId = localStorage.getItem("playerId");
+
+if(!playerId){
+  playerId = crypto.randomUUID();
+  localStorage.setItem("playerId", playerId);
+}
+  
   // =========================
   // 💾 SAVE LADEN (JETZT RICHTIG!)
   // =========================
