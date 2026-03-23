@@ -119,3 +119,38 @@ function loadGameState(){
     console.error("Save kaputt:", e);
   }
 }
+function resetGame(){
+
+  if(!confirm("Spiel wirklich zurücksetzen?")){
+    return;
+  }
+
+  // 💾 LocalStorage löschen
+  localStorage.removeItem("gameState");
+
+  // 🔥 GLOBAL STATE RESET
+  teams.length = 0;
+  schedule.length = 0;
+
+  currentMatchday = 0;
+  selectedTeam = null;
+  teamLocked = false;
+
+  isSimulating = false;
+  clearInterval(currentInterval);
+
+  currentMinute = 0;
+  matchdayResults = [];
+
+  liveScore = { t1:null, t2:null, s1:0, s2:0 };
+
+  tacticModifier = 0;
+  formationModifier = 0;
+  liveModifier = 0;
+  substitutions = 5;
+
+  console.log("🧨 Spiel komplett zurückgesetzt");
+
+  // 🔄 Seite neu laden (sauberster Zustand)
+  location.reload();
+}
