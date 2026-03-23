@@ -74,7 +74,7 @@ async function loadLeaderboard(){
       <span style="color:${entry.color || '#fff'}">
         ${entry.name || "Unbekannt"}
       </span>
-      <small> [${getPlayerTitle(entry.score)}]</small>
+      <small> [${typeof getPlayerTitle === "function" ? getPlayerTitle(entry.score) : "Freizeitkicker"}]</small>
       <br>
       <small>(${entry.team})</small>
       - <strong>${entry.score}</strong> Punkte
