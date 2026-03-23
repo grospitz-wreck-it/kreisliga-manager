@@ -51,7 +51,7 @@ if(selectedTeam){
 
     if(teamSelect) teamSelect.disabled = true;
     if(btn) btn.disabled = true;
-  }
+  
 
   // Tabelle aktualisieren
   if(typeof updateTable === "function"){
