@@ -547,3 +547,68 @@ table {
 .leaderboard-row span {
   flex: 1;
 }
+/* =========================
+🏆 LEADERBOARD STYLE
+========================= */
+
+#leaderboard {
+  background: #111;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.lb-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  margin: 4px 0;
+  border-radius: 6px;
+  background: #1a1a1a;
+  transition: 0.2s;
+}
+
+.lb-row:hover {
+  background: #2a2a2a;
+}
+
+/* Top 3 */
+.lb-1 {
+  background: linear-gradient(90deg, gold, #ffd70033);
+  color: black;
+  font-weight: bold;
+}
+
+.lb-2 {
+  background: linear-gradient(90deg, silver, #ffffff33);
+  color: black;
+  font-weight: bold;
+}
+
+.lb-3 {
+  background: linear-gradient(90deg, #cd7f32, #cd7f3233);
+  color: black;
+  font-weight: bold;
+}
+
+/* eigener Spieler */
+.lb-me {
+  border: 2px solid #00ffcc;
+  background: #003333;
+}
+
+/* Rank */
+.lb-rank {
+  width: 30px;
+}
+
+/* Name */
+.lb-name {
+  flex: 1;
+  text-align: left;
+}
+
+/* Score */
+.lb-score {
+  font-weight: bold;
+}
