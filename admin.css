@@ -1,0 +1,33 @@
+body {
+  font-family: Arial;
+  padding: 20px;
+  background: #111;
+  color: white;
+}
+
+input, button {
+  margin: 5px;
+  padding: 8px;
+}
+
+#preview img {
+  max-height: 80px;
+  margin-top: 10px;
+}
+
+.adRow {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 10px 0;
+  background: #222;
+  padding: 10px;
+}
+
+.adRow img {
+  height: 50px;
+}
+
+button {
+  cursor: pointer;
+}
