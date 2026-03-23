@@ -102,5 +102,7 @@ window.onload = function(){
   } else {
     console.warn("Ads nicht geladen");
   }
-
+if(typeof loadLeaderboard === "function"){
+  loadLeaderboard();
+}
 };
