@@ -2,8 +2,10 @@ async function loadLeaderboard(){
 
   const box = document.getElementById("leaderboard");
 
-  if(!box) return;
-
+  if(!box){
+  console.error("❌ #leaderboard nicht gefunden!");
+  return;
+  }
   box.innerHTML = "Lade Daten...";
 
   const { data, error } = await supabaseClient
