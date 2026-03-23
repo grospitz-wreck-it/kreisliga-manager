@@ -1,11 +1,11 @@
 /* =========================
-   BASIS
+   🌍 BASIS (FOOTBALL LOOK)
 ========================= */
 body {
   margin: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f4f5f7;
-  color: #333;
+  background: #eef1ee;
+  color: #2b2b2b;
 }
 
 /* =========================
@@ -20,29 +20,28 @@ h1.title {
   width: 100%;
   margin: 20px 0;
 
-  font-size: 32px;
+  font-size: 28px;
   font-weight: bold;
-  color: #2e7d32;
+  color: #1b5e20;
 }
 
 .logo {
-  height: 28px;
+  height: 26px;
 }
 
 /* =========================
-   🔥 BURGER BUTTON (immer sichtbar)
+   BURGER
 ========================= */
 #menuBtn {
   position: fixed;
   top: 15px;
   right: 15px;
 
-  background: #333;
+  background: #1b5e20;
   color: white;
   font-size: 20px;
   padding: 10px 14px;
   border-radius: 8px;
-
   border: none;
   cursor: pointer;
 
@@ -50,7 +49,7 @@ h1.title {
 }
 
 /* =========================
-   🔥 SETUP PANEL = SIDEBAR
+   SETUP PANEL
 ========================= */
 #setupPanel {
   position: fixed;
@@ -61,7 +60,7 @@ h1.title {
   height: 100%;
 
   background: #ffffff;
-  box-shadow: -5px 0 25px rgba(0,0,0,0.2);
+  box-shadow: -5px 0 25px rgba(0,0,0,0.15);
 
   padding: 20px;
   z-index: 1500;
@@ -70,7 +69,6 @@ h1.title {
   overflow-y: auto;
 }
 
-/* geöffnet */
 #setupPanel.open {
   right: 0;
 }
@@ -78,65 +76,56 @@ h1.title {
 /* =========================
    LAYOUT
 ========================= */
-/* =========================
-   LAYOUT (FIXED BALANCE)
-========================= */
 .layout {
   display: flex;
-  gap: 25px;
-  padding: 25px;
-
-  max-width: 1200px;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1100px;
   margin: 0 auto;
-
-  align-items: flex-start;
 }
 
-/* 🔥 WICHTIG: Spiel bekommt mehr Platz */
 .layout > .panel:first-child {
-  flex: 2;   /* vorher implizit 1 → jetzt doppelt so breit */
-  min-width: 400px;
+  flex: 2;
+  min-width: 320px;
 }
 
-/* rechte Seite kompakter */
 .sidePanel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-
-  min-width: 320px;
-  max-width: 420px;
+  gap: 15px;
 }
 
-/* Panels */
+/* =========================
+   PANELS
+========================= */
 .panel {
-  background: white;
-  padding: 15px;
+  background: #ffffff;
+  padding: 14px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 /* =========================
-   BUTTONS
+   BUTTONS (FOOTBALL GREEN)
 ========================= */
 button {
-  background: #4fc3f7;
+  background: linear-gradient(145deg, #2e7d32, #1b5e20);
   border: none;
   color: white;
-  padding: 6px 12px;
+  padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  transition: 0.2s;
+  min-height: 42px;
 }
 
 button:hover {
-  background: #29b6f6;
+  background: linear-gradient(145deg, #388e3c, #2e7d32);
 }
 
 button.active {
-  background: #4caf50;
+  background: #66bb6a;
 }
 
 /* =========================
@@ -146,7 +135,7 @@ button.active {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 0;
+  margin: 15px 0;
   font-weight: bold;
 }
 
@@ -156,19 +145,19 @@ button.active {
 }
 
 #score {
-  background: #111;
+  background: #1b5e20;
   color: white;
-  padding: 15px 30px;
-  font-size: 32px;
-  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 28px;
+  border-radius: 10px;
 }
 
 /* =========================
    TIMELINE
 ========================= */
 .timeline {
-  height: 10px;
-  background: #ddd;
+  height: 12px;
+  background: #c8e6c9;
   border-radius: 6px;
   overflow: hidden;
 }
@@ -176,7 +165,7 @@ button.active {
 #timelineBar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #4caf50, #ff9800);
+  background: linear-gradient(90deg, #2e7d32, #66bb6a);
 }
 
 /* =========================
@@ -184,8 +173,8 @@ button.active {
 ========================= */
 .controls {
   display: flex;
-  gap: 10px;
-  margin: 12px 0;
+  gap: 8px;
+  margin: 10px 0;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -194,477 +183,159 @@ button.active {
    LIVE FEED
 ========================= */
 .live {
-  background: #111;
-  color: #eee;
-  height: 260px;
+  background: #263238;
+  color: #e0f2f1;
+  height: 240px;
   overflow-y: auto;
-  padding: 12px;
-  border-radius: 12px;
-  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .live p {
   margin: 4px 0;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* =========================
-   TABELLE
+   TABLE
 ========================= */
-/* =========================
-   📊 TABLE FIX
-========================= */
-
 table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; /* 🔥 WICHTIG */
+  table-layout: fixed;
 }
 
-/* Header */
 th {
-  text-align: center;
-  padding: 10px 6px;
-  background: #f0f0f0;
-  font-size: 14px;
+  background: #e8f5e9;
+  padding: 8px;
+  font-size: 13px;
 }
 
-/* Zellen */
 td {
-  padding: 8px 6px;
-  font-size: 14px;
+  padding: 6px;
+  font-size: 13px;
+  border-bottom: 1px solid #ddd;
   text-align: center;
-  border-bottom: 1px solid #eee;
 }
 
-/* 🔥 TEAM SPALTE LINKS + BREITER */
-th:first-child,
-td:first-child {
+td:first-child, th:first-child {
   text-align: left;
   width: 35%;
 }
 
-/* 🔥 ALLE ZAHLEN SPALTEN GLEICH */
-th:not(:first-child),
-td:not(:first-child) {
-  width: calc(65% / 7); /* 7 Spalten rechts */
-}
-
-/* verhindert Überlaufen */
-td, th {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Platz 1 */
 tbody tr:nth-child(1) {
   background: rgba(76,175,80,0.25);
   font-weight: bold;
 }
 
-/* Abstieg */
 tbody tr:nth-last-child(1),
 tbody tr:nth-last-child(2) {
-  background: rgba(244,67,54,0.2);
+  background: rgba(244,67,54,0.15);
 }
 
-/* Dein Team */
 .userTeam {
-  color: #4caf50;
+  color: #2e7d32;
   font-weight: bold;
 }
 
 /* =========================
-   SELECTS
+   LEADERBOARD
 ========================= */
-select {
-  background: white;
-  border: 1px solid #ccc;
+#leaderboard {
+  background: #f1f8f4;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.lb-row {
+  display: flex;
+  justify-content: space-between;
   padding: 6px;
+  margin: 4px 0;
+  background: #ffffff;
   border-radius: 6px;
+  border-left: 4px solid #2e7d32;
+}
+
+.lb-1 { border-left: 4px solid gold; }
+.lb-2 { border-left: 4px solid silver; }
+.lb-3 { border-left: 4px solid #cd7f32; }
+
+.lb-me {
+  background: #c8e6c9;
+}
+
+/* =========================
+   ADS (STADIUM STYLE)
+========================= */
+#adBanner {
+  width: 100%;
+  height: 80px;
+  overflow: hidden;
+  background: #1b5e20;
+  border-radius: 10px;
+}
+
+.adTrack {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 50px;
+  animation: scrollAds 35s linear infinite;
+}
+
+.adItem img {
+  height: 50px;
 }
 
 /* =========================
    MOBILE
 ========================= */
-/* =========================
-📱 MOBILE FIRST FIX
-========================= */
-
 @media (max-width: 768px){
 
   .layout{
     flex-direction: column;
   }
 
-  .sidePanel{
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .panel{
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* Buttons größer */
   button{
+    font-size: 15px;
     padding: 10px;
+  }
+
+  .controls{
+    flex-direction: column;
+  }
+
+  .scoreboard{
     font-size: 16px;
   }
 
-  /* Scoreboard kompakt */
-  .scoreboard{
-    font-size: 18px;
+  #score{
+    font-size: 24px;
   }
 
-  /* Controls umbrechen */
-  .controls{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  /* Timeline höher für Finger */
   .timeline{
     height: 14px;
   }
 
-  /* Leaderboard lesbarer */
-  #leaderboard div{
-    padding: 8px;
-    border-bottom: 1px solid #333;
-  }
-
-  /* Setup Overlay scrollbar */
-  .setupOverlay{
-    overflow-y: auto;
-  }
-
 }
+
 /* =========================
-   ADS
+   ANIMATION
 ========================= */
-#adBanner {
-  width: 100%;
-  height: 100px;
-  overflow: hidden;
-  background: #111;
-  border-radius: 12px;
-  position: relative;
-}
-
-/* Track stabil */
-.adTrack {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  gap: 60px;
-
-  will-change: transform;
-  animation: scrollAds 30s linear infinite;
-}
-
-/* Ads fix */
-.adItem {
-  flex: 0 0 auto;
-}
-
-.adItem img {
-  height: 70px;
-  width: auto;
-  max-width: 200px;
-  object-fit: contain;
-}
-
-/* Animation */
 @keyframes scrollAds {
-  0% {
-    transform: translateX(0%);
-  }
-/* =========================
-   🎮 UI UPGRADE (Game Look)
-========================= */
-
-/* Panels etwas lebendiger */
-.panel {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.panel:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-}
-
-/* Headlines klarer */
-.panel h2, .panel h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-}
-
-/* Scoreboard moderner */
-#score {
-  background: linear-gradient(145deg, #111, #222);
-  color: #fff;
-  padding: 15px 30px;
-  font-size: 32px;
-  border-radius: 12px;
-  box-shadow: inset 0 0 10px rgba(255,255,255,0.1),
-              0 4px 15px rgba(0,0,0,0.4);
-}
-
-/* Buttons mehr „Game UI“ */
-button {
-  background: linear-gradient(145deg, #4fc3f7, #29b6f6);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-}
-
-button:hover {
-  transform: translateY(-1px);
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
 }
 
 /* =========================
-   📊 SIDE PANEL FIX (wichtig)
+   DANGER BUTTON
 ========================= */
-.sidePanel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-
-  min-width: 320px;
-}
-
-/* verhindert Springen */
-.sidePanel .panel {
-  width: 100%;
-}
-
-/* =========================
-   📢 ADS UPGRADE (LED STYLE)
-========================= */
-
-/* Container */
-#adBanner {
-  width: 100%;
-  height: 90px;
-  overflow: hidden;
-  background: #000;
-  border-radius: 12px;
-  position: relative;
-
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-}
-
-/* Glow Effekt (LED Feeling) */
-#adBanner::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    rgba(255,255,255,0.08),
-    rgba(0,0,0,0.2)
-  );
-  pointer-events: none;
-}
-
-/* Track */
-.adTrack {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  gap: 80px;
-
-  will-change: transform;
-  animation: scrollAds 35s linear infinite;
-}
-
-/* Einzelne Ads */
-.adItem {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Klickbare Ads vorbereiten */
-.adItem a {
-  display: inline-block;
-}
-
-/* Bilder */
-.adItem img {
-  height: 65px;
-  width: auto;
-  max-width: 220px;
-  object-fit: contain;
-
-  filter: brightness(1.15) contrast(1.05);
-  transition: transform 0.2s ease, filter 0.2s ease;
-}
-
-/* Hover Effekt = mehr „wertig“ */
-.adItem img:hover {
-  transform: scale(1.05);
-  filter: brightness(1.3);
-}
-
-/* =========================
-   🧠 PERFORMANCE FIX (kein Springen)
-========================= */
-
-/* verhindert Layout Shift */
-#adBanner,
-.live,
-table {
-  contain: content;
-}
-
-/* =========================
-   📱 MOBILE ADS FIX
-========================= */
-@media (max-width: 900px) {
-
-  #adBanner {
-    height: 70px;
-  }
-
-  .adItem img {
-    height: 50px;
-    max-width: 140px;
-  }
-
-  .adTrack {
-    gap: 40px;
-  }
-}
-  100% {
-    transform: translateX(-50%);
-  }
-}
-.menu-section{
-  margin-top: 10px;
-}
-
 .danger{
   width: 100%;
-  padding: 10px;
-  background: #b30000;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  background: #c62828;
 }
 
 .danger:hover{
-  background: #e60000;
-}
-#leaderboardBox {
-  background: #111;
-  color: #fff;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
-}
-
-.leaderboard-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-  border-bottom: 1px solid #333;
-}
-
-.leaderboard-row span {
-  flex: 1;
-}
-/* =========================
-🏆 LEADERBOARD STYLE
-========================= */
-
-#leaderboard {
-  background: #111;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 14px;
-}
-
-.lb-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 10px;
-  margin: 4px 0;
-  border-radius: 6px;
-  background: #1a1a1a;
-  transition: 0.2s;
-}
-
-.lb-row:hover {
-  background: #2a2a2a;
-}
-
-/* Top 3 */
-.lb-1 {
-  background: linear-gradient(90deg, gold, #ffd70033);
-  color: black;
-  font-weight: bold;
-}
-
-.lb-2 {
-  background: linear-gradient(90deg, silver, #ffffff33);
-  color: black;
-  font-weight: bold;
-}
-
-.lb-3 {
-  background: linear-gradient(90deg, #cd7f32, #cd7f3233);
-  color: black;
-  font-weight: bold;
-}
-
-/* eigener Spieler */
-.lb-me {
-  border: 2px solid #00ffcc;
-  background: #003333;
-}
-
-/* Rank */
-.lb-rank {
-  width: 30px;
-}
-
-/* Name */
-.lb-name {
-  flex: 1;
-  text-align: left;
-}
-#leaderboard {
-  background: #111;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.lb-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px;
-  margin: 4px 0;
-  background: #1a1a1a;
-  border-radius: 6px;
-}
-
-.lb-1 { background: gold; color: black; }
-.lb-2 { background: silver; color: black; }
-.lb-3 { background: #cd7f32; color: black; }
-
-.lb-me {
-  border: 2px solid cyan;
-}
-/* Score */
-.lb-score {
-  font-weight: bold;
+  background: #e53935;
 }
