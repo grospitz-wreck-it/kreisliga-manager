@@ -1,44 +1,11 @@
 window.onload = function(){
 
   // =========================
-  // 💾 SAVE LADEN
+  // 💾 SAVE LADEN (JETZT RICHTIG!)
   // =========================
-  function loadGameState(){
-
-  const saved = localStorage.getItem("gameState");
-
-  if(!saved){
-    console.log("Kein Save gefunden");
-    return;
+  if(typeof loadGameState === "function"){
+    loadGameState(); // 🔥 DAS HAT GEFÄHLT!
   }
-
-  try{
-    const state = JSON.parse(saved);
-
-    // 🔥 WICHTIG: Arrays NICHT ersetzen
-    if(state.teams){
-      teams.length = 0;
-      teams.push(...state.teams);
-    }
-
-    if(state.schedule){
-      schedule.length = 0;
-      schedule.push(...state.schedule);
-    }
-
-    currentMatchday = state.currentMatchday || 0;
-    selectedTeam = state.selectedTeam || null;
-    matchdayResults = state.matchdayResults || [];
-
-    liveScore = state.liveScore || { t1:null, t2:null, s1:0, s2:0 };
-    currentMinute = state.currentMinute || 0;
-
-    console.log("📦 Game geladen", state);
-
-  } catch(e){
-    console.error("Save kaputt:", e);
-  }
-}
 
   // =========================
   // 🔥 SETUP PANEL
@@ -80,7 +47,6 @@ window.onload = function(){
       label.innerText = "Dein Team: " + selectedTeam;
     }
 
-    // 🔒 nur locken wenn wirklich gewählt
     const teamSelect = document.getElementById("teamSelect");
     const btn = document.getElementById("btnSelectTeam");
 
@@ -112,7 +78,7 @@ window.onload = function(){
   if(
     liveScore &&
     liveScore.t1 &&
-    typeof liveScore.t1 === "object" && // 🔥 WICHTIG
+    typeof liveScore.t1 === "object" &&
     currentMinute > 0 &&
     currentMinute < 90
   ){
