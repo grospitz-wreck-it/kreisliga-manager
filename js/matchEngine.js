@@ -245,6 +245,24 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
 
       updateTable();
 
+      async function saveScoreToLeaderboard(name, team, score, matchday){
+
+  const { error } = await supabase
+    .from("leaderboard")
+    .insert([{
+      name,
+      team,
+      score,
+      matchday
+    }]);
+
+  if(error){
+    console.error("❌ Fehler beim Speichern:", error);
+  } else {
+    console.log("🏆 Score gespeichert!");
+  }
+}
+      
       matchdayResults.push({
         home: teamA.name,
         away: teamB.name,
