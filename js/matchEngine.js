@@ -1,9 +1,36 @@
 // =========================
-// 🔥 MATCH ENGINE (CLEAN FINAL)
+// 🔥 MATCH ENGINE (CLEAN FINAL FIXED)
 // =========================
 
 let matchCards = {};
 let halftimePlayed = false;
+
+
+// =========================
+// 🏆 LEADERBOARD SAVE (GLOBAL!)
+// =========================
+async function saveScoreToLeaderboard(name, team, score, matchday){
+
+  if(typeof supabase === "undefined"){
+    console.warn("Supabase nicht geladen");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("leaderboard")
+    .insert([{
+      name,
+      team,
+      score,
+      matchday
+    }]);
+
+  if(error){
+    console.error("❌ Fehler beim Speichern:", error);
+  } else {
+    console.log("🏆 Score gespeichert!");
+  }
+}
 
 
 // =========================
@@ -24,7 +51,7 @@ function simulateMatchday(){
     return;
   }
 
-  // 🔥 WICHTIG: RESET ALLES
+  // 🔥 RESET
   matchdayResults = [];
   liveScore = { t1:null, t2:null, s1:0, s2:0 };
   currentMinute = 0;
@@ -65,7 +92,7 @@ function simulateMatchday(){
     return;
   }
 
-  // ⚡ andere Spiele simulieren
+  // ⚡ andere Spiele
   matches.forEach(m => {
     if(m !== userMatch){
       simulateQuick(m[0], m[1]);
@@ -74,7 +101,7 @@ function simulateMatchday(){
 
   updateTable();
 
-  // 💾 SAVE NACH SPIELTAG START
+  // 💾 SAVE
   saveGameState();
 
   isSimulating = true;
@@ -167,9 +194,7 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
       const panel = document.getElementById("halftimePanel");
       if(panel) panel.style.display = "block";
 
-      // 💾 SAVE
       saveGameState();
-
       return;
     }
 
@@ -182,7 +207,6 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
       let attackingTeam = (Math.random() + attackBoost > 0.5) ? "A" : "B";
 
       let atk = attackingTeam === "A" ? teamA : teamB;
-      let def = attackingTeam === "A" ? teamB : teamA;
 
       let type = Math.random();
 
@@ -245,24 +269,21 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
 
       updateTable();
 
-      async function saveScoreToLeaderboard(name, team, score, matchday){
+      // 🔥 LEADERBOARD SAVE
+      if(typeof saveScoreToLeaderboard === "function"){
+        saveScoreToLeaderboard(
+          "Spieler",
+          selectedTeam,
+          teams.find(t => t.name === selectedTeam)?.points || 0,
+          currentMatchday
+        );
+      }
 
-  const { error } = await supabase
-    .from("leaderboard")
-    .insert([{
-      name,
-      team,
-      score,
-      matchday
-    }]);
+      // 🔄 Leaderboard neu laden
+      if(typeof loadLeaderboard === "function"){
+        loadLeaderboard();
+      }
 
-  if(error){
-    console.error("❌ Fehler beim Speichern:", error);
-  } else {
-    console.log("🏆 Score gespeichert!");
-  }
-}
-      
       matchdayResults.push({
         home: teamA.name,
         away: teamB.name,
