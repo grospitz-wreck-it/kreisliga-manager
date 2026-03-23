@@ -13,7 +13,7 @@ let lastNameChange = localStorage.getItem("lastNameChange");
 
 // 🎨 Farbe + Titel
 let playerColor = localStorage.getItem("playerColor") || "#00ffcc";
-let playerTitle = localStorage.getItem("playerTitle") || "Rookie";
+let playerTitle = localStorage.getItem("playerTitle") || "Freizeitkicker";
 
 
 // =========================
