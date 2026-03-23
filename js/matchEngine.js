@@ -1,9 +1,6 @@
 // =========================
-// 🔥 MATCH ENGINE (FINAL FIXED)
+// 🔥 MATCH ENGINE (FINAL STABLE + AUTOSAVE)
 // =========================
-
-// ⚠️ KEINE globalen Variablen doppelt deklarieren!
-// currentInterval, speedMultiplier etc. kommen aus state.js
 
 let matchCards = {};
 let halftimePlayed = false;
@@ -71,6 +68,9 @@ function simulateMatchday(){
 
   updateTable();
 
+  // 💾 SAVE NACH SPIELTAG START
+  saveGameState();
+
   isSimulating = true;
   currentMinute = 0;
 
@@ -128,7 +128,6 @@ function simulateQuick(teamA, teamB){
 
 function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveScore.s2){
 
-  // 🔥 nur beim ersten Start reset
   if(currentMinute === 0){
     matchCards = {
       [teamA.name]: 0,
@@ -148,7 +147,12 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
     currentMinute++;
     updateTimeline(currentMinute);
 
+    // 💾 SAVE JEDE MINUTE (leichtgewichtig genug)
+    saveGameState();
+
+    // =========================
     // ⏸ HALBZEIT
+    // =========================
     if(currentMinute === 45 && !halftimePlayed){
 
       halftimePlayed = true;
@@ -161,10 +165,15 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
       const panel = document.getElementById("halftimePanel");
       if(panel) panel.style.display = "block";
 
+      // 💾 SAVE BEI HALBZEIT
+      saveGameState();
+
       return;
     }
 
+    // =========================
     // 🔥 EVENTS
+    // =========================
     if(Math.random() < 0.3){
 
       let attackBoost = tacticModifier + formationModifier + liveModifier;
@@ -211,7 +220,9 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
       updateScoreboard(teamA, teamB, scoreA, scoreB);
     }
 
+    // =========================
     // 🏁 SPIELENDE
+    // =========================
     if(currentMinute >= 90){
 
       clearInterval(currentInterval);
@@ -250,7 +261,7 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
         score1: scoreA,
         score2: scoreB
       });
-          
+
       // 📰 REPORT
       try{
         if(typeof generateMatchdayReport === "function"){
@@ -260,16 +271,18 @@ function simulateLiveMatch(teamA, teamB, scoreA = liveScore.s1, scoreB = liveSco
       } catch(e){
         console.error("Report Fehler:", e);
       }
-      
+
       isSimulating = false;
 
       document.getElementById("startBtn").innerText = "▶ Nächster Spieltag";
       document.getElementById("startBtn").disabled = false;
 
       addEvent("🏁 Spiel beendet");
+
+      // 💾 FINAL SAVE (WICHTIGSTER!)
+      saveGameState();
     }
-  // 💾 JETZT SPEICHERN (GANZ AM ENDE!)
-saveGameState();
+
   }, 1000 / speedMultiplier);
 }
 
@@ -286,6 +299,8 @@ function resumeMatch(){
 
   isSimulating = true;
 
+  saveGameState(); // 💾 auch hier sichern
+
   simulateLiveMatch(
     liveScore.t1,
     liveScore.t2,
@@ -296,7 +311,7 @@ function resumeMatch(){
 
 
 // =========================
-// ⚡ SPEED FIX (FINAL)
+// ⚡ SPEED FIX
 // =========================
 
 window.restartInterval = function(){
