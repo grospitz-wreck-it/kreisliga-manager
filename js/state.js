@@ -52,7 +52,7 @@ let tacticModifier = window.__GAME_STATE__.tacticModifier;
 let formationModifier = window.__GAME_STATE__.formationModifier;
 let substitutions = window.__GAME_STATE__.substitutions;
 
-let liveScore = window.__GAME_STATE__.liveScore;
+window.liveScore = window.__GAME_STATE__.liveScore;
 
 // =========================
 // 🏆 LIGEN
