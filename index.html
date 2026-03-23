@@ -17,9 +17,8 @@
   <!-- BURGER -->
   <button id="menuBtn" onclick="toggleSetup()">☰</button>
 
-  <!-- 🔥 SETUP -->
+  <!-- SETUP -->
   <div id="setupPanel" class="setupOverlay open">
-
     <h2>⚙️ Einstellungen</h2>
 
     <div class="setupGrid">
@@ -69,10 +68,10 @@
     </div>
   </div>
 
-  <!-- 🔥 LAYOUT -->
+  <!-- LAYOUT -->
   <div class="layout">
 
-  <!-- 🎮 GAME -->
+  <!-- GAME -->
   <div class="panel">
 
     <h2 id="matchday">Spieltag: 0 / 0</h2>
@@ -89,8 +88,8 @@
     </div>
 
     <div class="controls">
-      <button id="btnAttack" onclick="setLiveMode('attack')">🔥 Druck</button>
-      <button id="btnCalm" onclick="setLiveMode('calm')">🧊 Ruhig</button>
+      <button onclick="setLiveMode('attack')">🔥 Druck</button>
+      <button onclick="setLiveMode('calm')">🧊 Ruhig</button>
       <button onclick="makeSub()">🔄 Wechsel</button>
       <span id="subCount">Wechsel: 5</span>
     </div>
@@ -104,14 +103,12 @@
 
     <div id="liveMatch" class="live"></div>
 
-    <!-- TAKTIK -->
     <div class="panel">
       <h3>🎮 Spielanpassung</h3>
       <button onclick="setLiveMode('attack')">Mehr Druck</button>
       <button onclick="setLiveMode('calm')">Defensiver</button>
     </div>
 
-    <!-- HALBZEIT -->
     <div id="halftimePanel" style="display:none;">
       <h3>Halbzeit</h3>
       <button onclick="resumeMatch()">2. Halbzeit starten</button>
@@ -119,7 +116,7 @@
 
   </div>
 
-  <!-- 📊 RECHTE SEITE -->
+  <!-- SIDE -->
   <div class="sidePanel">
 
     <!-- Tabelle -->
@@ -156,25 +153,43 @@
       <div id="newsBox" class="live"></div>
     </div>
 
-    <!-- 🏆 LEADERBOARD (NEU & ERWEITERT) -->
+    <!-- 🏆 LEADERBOARD -->
     <div class="panel">
 
       <h2>🏆 Top 10 Manager</h2>
 
-      <!-- MODUS -->
+      <!-- 👤 PROFIL -->
+      <div style="margin-bottom:12px;">
+        <strong>👤 Dein Profil</strong><br>
+
+        <input id="nameInput" placeholder="Dein Name">
+        <button onclick="changeName()">Speichern</button>
+
+        <br><br>
+
+        Farbe:
+        <input type="color" id="colorInput" value="#00ffcc">
+        <button onclick="changeColor()">OK</button>
+      </div>
+
+      <!-- 👥 FREUNDE -->
+      <div style="margin-bottom:12px; font-size:12px;">
+        <strong>👥 Freunde</strong><br>
+
+        Dein Code: <b id="friendCodeDisplay">---</b>
+        <button onclick="copyFriendCode()">📋</button>
+
+        <br>
+
+        <input id="friendCodeInput" placeholder="Freundescode eingeben">
+        <button onclick="joinFriendCode()">Beitreten</button>
+      </div>
+
+      <!-- 🌍 FILTER -->
       <div style="margin-bottom:10px;">
         <button onclick="setLeaderboardMode('global')">🌍 Global</button>
         <button onclick="setLeaderboardMode('league')">🏟️ Liga</button>
         <button onclick="setLeaderboardMode('friends')">👥 Freunde</button>
-      </div>
-
-      <!-- FREUNDE SYSTEM -->
-      <div style="margin-bottom:10px; font-size:12px;">
-        Dein Code: <b id="friendCodeDisplay">---</b>
-        <button onclick="copyFriendCode()">📋</button>
-        <br>
-        <input id="friendCodeInput" placeholder="Freundescode eingeben">
-        <button onclick="joinFriendCode()">Beitreten</button>
       </div>
 
       <!-- LISTE -->
@@ -183,7 +198,6 @@
     </div>
 
   </div>
-
   </div>
 
   <!-- SCRIPTS -->
