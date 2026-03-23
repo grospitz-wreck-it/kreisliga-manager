@@ -1,9 +1,3 @@
-// 🔥 LOCAL STORAGE LADEN
-const storedAds = localStorage.getItem("ads");
-if(storedAds){
-  ads = JSON.parse(storedAds);
-}
-
 // =========================
 // 📢 ADS SYSTEM (LED BANDE)
 // =========================
@@ -27,6 +21,11 @@ let ads = [
     weight: 1
   }
 ];
+// 🔥 LOCAL STORAGE LADEN
+const storedAds = localStorage.getItem("ads");
+if(storedAds){
+  ads = JSON.parse(storedAds);
+}
 
 
 // =========================
