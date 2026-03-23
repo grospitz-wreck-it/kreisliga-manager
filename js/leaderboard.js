@@ -2,10 +2,10 @@ async function loadLeaderboard(){
 
   console.log("🚀 Lade Leaderboard...");
 
-  const box = document.getElementById("leaderboardList");
+  const box = document.getElementById("leaderboard");
 
   if(!box){
-    console.error("❌ leaderboardList nicht gefunden");
+    console.error("❌ leaderboard nicht gefunden");
     return;
   }
 
