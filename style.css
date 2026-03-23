@@ -529,3 +529,21 @@ table {
 .danger:hover{
   background: #e60000;
 }
+#leaderboardBox {
+  background: #111;
+  color: #fff;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+.leaderboard-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid #333;
+}
+
+.leaderboard-row span {
+  flex: 1;
+}
