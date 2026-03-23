@@ -1,7 +1,5 @@
 async function loadLeaderboard(){
 
-  console.log("🚀 Lade Leaderboard...");
-
   const box = document.getElementById("leaderboard");
 
   if(!box){
@@ -14,8 +12,6 @@ async function loadLeaderboard(){
   const { data, error } = await supabaseClient
     .from("leaderboard")
     .select("*");
-
-  console.log("📊 Antwort:", data);
 
   if(error){
     console.error("❌ Leaderboard Fehler:", error);
@@ -67,20 +63,28 @@ async function loadLeaderboard(){
       div.style.background = "gold";
       div.style.color = "black";
       div.style.fontWeight = "bold";
+      div.style.borderRadius = "6px";
+      div.style.padding = "4px";
     }
+
+    div.style.marginBottom = "6px";
 
     div.innerHTML = `
       <strong>#${i+1}</strong> 
-      ${entry.name || "Unbekannt"} 
-      (${entry.team}) - 
-      ${entry.score} Punkte
+      <span style="color:${entry.color || '#fff'}">
+        ${entry.name || "Unbekannt"}
+      </span>
+      <small> [${entry.title || "Rookie"}]</small>
+      <br>
+      <small>(${entry.team})</small>
+      - <strong>${entry.score}</strong> Punkte
     `;
 
     box.appendChild(div);
   });
 
   // =========================
-  // 🏆 EIGENER RANG (JETZT RICHTIG!)
+  // 🏆 EIGENER RANG
   // =========================
   const myRank = bestPerPlayer.findIndex(e => e.player_id === playerId);
 
@@ -95,9 +99,3 @@ async function loadLeaderboard(){
     box.appendChild(rankDiv);
   }
 }
-
-
-// 👉 AUTO LOAD BEIM START
-document.addEventListener("DOMContentLoaded", () => {
-  loadLeaderboard();
-});
