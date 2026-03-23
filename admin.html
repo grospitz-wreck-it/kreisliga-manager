@@ -2,35 +2,42 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Panel</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Ad Admin</title>
+  <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
-<h1>🔧 Admin – Werbung verwalten</h1>
+<h1>📢 Ad Verwaltung</h1>
 
-<!-- LOGIN -->
-<div id="loginBox">
-  <input type="password" id="adminPass" placeholder="Passwort">
-  <button onclick="login()">Login</button>
-</div>
+<div class="form">
 
-<!-- ADMIN PANEL -->
-<div id="adminPanel" style="display:none;">
+  <input type="text" id="adName" placeholder="Name">
 
-  <h2>➕ Neue Werbung</h2>
+  <input type="text" id="adLink" placeholder="Link (optional)">
 
-  <input id="adTitle" placeholder="Titel"><br>
-  <input id="adText" placeholder="Text"><br>
-  <input id="adLink" placeholder="Link"><br>
+  <input type="date" id="adStart">
+  <input type="date" id="adEnd">
 
-  <button onclick="addAd()">Speichern</button>
+  <input type="number" id="adWeight" placeholder="Gewichtung" value="1">
 
-  <h2>📋 Bestehende Ads</h2>
-  <div id="adList"></div>
+  <input type="file" id="adImageUpload" accept="image/*">
+
+  <button onclick="saveAd()">➕ Ad speichern</button>
 
 </div>
 
-<script src="js/admin.js"></script>
+<hr>
+
+<h2>📺 Vorschau</h2>
+<div id="preview"></div>
+
+<hr>
+
+<h2>📋 Aktive Ads</h2>
+<div id="adList"></div>
+
+<script src="js/ads.js"></script>
+<script src="js/adminAds.js"></script>
+
 </body>
 </html>
