@@ -3,9 +3,10 @@ async function loadLeaderboard(){
   const box = document.getElementById("leaderboard");
 
   if(!box){
-  console.error("❌ #leaderboard nicht gefunden!");
-  return;
+    console.error("❌ #leaderboard nicht gefunden!");
+    return;
   }
+
   box.innerHTML = "Lade Daten...";
 
   const { data, error } = await supabaseClient
@@ -25,7 +26,6 @@ async function loadLeaderboard(){
     return;
   }
 
-  // 🔥 Anzeige bauen
   box.innerHTML = "";
 
   data.forEach((entry, i) => {
@@ -42,3 +42,9 @@ async function loadLeaderboard(){
     box.appendChild(div);
   });
 }
+
+
+// 👇 HIER HIN (GANZ UNTEN)
+document.addEventListener("DOMContentLoaded", () => {
+  loadLeaderboard();
+});
