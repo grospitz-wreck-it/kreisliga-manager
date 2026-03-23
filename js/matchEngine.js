@@ -276,12 +276,15 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
       updateTable();
 
       // ✅ FIX: saubere Nutzung deiner Funktion
-      await saveScoreToLeaderboard(
-        selectedTeam || "Unbekannt",
-        selectedTeam,
-        teamA.name === selectedTeam ? scoreA : scoreB,
-        currentMatchday
-      );
+ const playerName = localStorage.getItem("playerName") || "Unbekannt";
+const playerColor = localStorage.getItem("playerColor") || "#ffffff";
+
+await saveScoreToLeaderboard(
+  playerName,
+  selectedTeam,
+  teamA.name === selectedTeam ? scoreA : scoreB,
+  currentMatchday
+);
 
       matchdayResults.push({
         home: teamA.name,
