@@ -11,22 +11,30 @@ body {
 /* =========================
    HEADER
 ========================= */
-h1.title {
+
+/* =========================
+   🏟️ MAIN LOGO HEADER
+========================= */
+
+.header {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
 
-  width: 100%;
-  margin: 20px 0;
-
-  font-size: 28px;
-  font-weight: bold;
-  color: #1b5e20;
+  padding: 15px 10px;
 }
 
-.logo {
-  height: 26px;
+.mainLogo {
+  max-width: 260px;
+  width: 80%;
+  height: auto;
+}
+
+/* 📱 Mobile */
+@media (max-width: 768px){
+  .mainLogo {
+    max-width: 200px;
+  }
 }
 
 /* =========================
