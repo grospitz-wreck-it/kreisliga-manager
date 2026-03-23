@@ -22,7 +22,8 @@ async function saveScoreToLeaderboard(name, team, score, matchday){
     name,
     team,
     score,
-    matchday
+    matchday,
+    player_id: playerId
   }]);
 
   if(error){
