@@ -17,7 +17,7 @@
   <!-- BURGER -->
   <button id="menuBtn" onclick="toggleSetup()">☰</button>
 
-  <!-- 🔥 SETUP NUR HIER -->
+  <!-- 🔥 SETUP -->
   <div id="setupPanel" class="setupOverlay open">
 
     <h2>⚙️ Einstellungen</h2>
@@ -27,8 +27,6 @@
       <div class="setupBox">
         <h3>Liga</h3>
         <select id="leagueSelect"></select>
-      
-      </select>
         <button onclick="selectLeague()">Starten</button>
       </div>
 
@@ -61,19 +59,20 @@
         <button onclick="setFormation()">Setzen</button>
         <p id="currentFormation">4-4-2</p>
       </div>
-    <div class="menu-section">
-  <button class="danger" onclick="resetGame()">
-    🧨 Neues Spiel starten
-  </button>
-</div>
-    </div>
 
+      <div class="menu-section">
+        <button class="danger" onclick="resetGame()">
+          🧨 Neues Spiel starten
+        </button>
+      </div>
+
+    </div>
   </div>
 
   <!-- 🔥 LAYOUT -->
   <div class="layout">
 
-  <!-- 🎮 GAME (MITTE) -->
+  <!-- 🎮 GAME -->
   <div class="panel">
 
     <h2 id="matchday">Spieltag: 0 / 0</h2>
@@ -105,7 +104,7 @@
 
     <div id="liveMatch" class="live"></div>
 
-    <!-- 🔥 TAKTIK UNTER LIVE -->
+    <!-- TAKTIK -->
     <div class="panel">
       <h3>🎮 Spielanpassung</h3>
       <button onclick="setLiveMode('attack')">Mehr Druck</button>
@@ -142,22 +141,51 @@
         <tbody></tbody>
       </table>
     </div>
+
+    <!-- Werbung -->
     <div class="panel">
-  
-  <h2>📢 Bandenwerbung</h2>
-<div id="adBanner">
-  <div class="adTrack" id="adTrack"></div>
-</div>
-    <!-- 📰 NEWS UNTER TABELLE -->
+      <h2>📢 Bandenwerbung</h2>
+      <div id="adBanner">
+        <div class="adTrack" id="adTrack"></div>
+      </div>
+    </div>
+
+    <!-- News -->
     <div class="panel">
       <h2>📰 Spieltagsbericht</h2>
       <div id="newsBox" class="live"></div>
     </div>
+
+    <!-- 🏆 LEADERBOARD (NEU & ERWEITERT) -->
+    <div class="panel">
+
+      <h2>🏆 Top 10 Manager</h2>
+
+      <!-- MODUS -->
+      <div style="margin-bottom:10px;">
+        <button onclick="setLeaderboardMode('global')">🌍 Global</button>
+        <button onclick="setLeaderboardMode('league')">🏟️ Liga</button>
+        <button onclick="setLeaderboardMode('friends')">👥 Freunde</button>
+      </div>
+
+      <!-- FREUNDE SYSTEM -->
+      <div style="margin-bottom:10px; font-size:12px;">
+        Dein Code: <b id="friendCodeDisplay">---</b>
+        <button onclick="copyFriendCode()">📋</button>
+        <br>
+        <input id="friendCodeInput" placeholder="Freundescode eingeben">
+        <button onclick="joinFriendCode()">Beitreten</button>
+      </div>
+
+      <!-- LISTE -->
+      <div id="leaderboard">Lade Daten...</div>
+
+    </div>
+
   </div>
-<div id="leaderboardBox">
-  <h3>🏆 Top 10 Manager</h3>
-  <div id="leaderboard">Lade Daten...</div>
-</div>
+
+  </div>
+
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="js/supabase.js"></script>
