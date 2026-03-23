@@ -23,7 +23,9 @@ async function saveScoreToLeaderboard(name, team, score, matchday){
     team,
     score,
     matchday,
-    player_id: playerId
+    player_id: playerId,
+    league: currentLeague,
+    friend_code: friendCode
   }]);
 
   if(error){
