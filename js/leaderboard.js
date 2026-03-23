@@ -1,18 +1,19 @@
 async function loadLeaderboard(){
 
-  const box = document.getElementById("leaderboardList");
+  const box = document.getElementById("leaderboard");
+
   if(!box) return;
 
-  box.innerHTML = "Lade...";
+  box.innerHTML = "Lade Daten...";
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("leaderboard")
     .select("*")
     .order("score", { ascending: false })
     .limit(10);
 
   if(error){
-    console.error(error);
+    console.error("Leaderboard Fehler:", error);
     box.innerHTML = "Fehler beim Laden";
     return;
   }
@@ -22,20 +23,20 @@ async function loadLeaderboard(){
     return;
   }
 
+  // 🔥 Anzeige bauen
   box.innerHTML = "";
 
-  data.forEach((entry, index) => {
+  data.forEach((entry, i) => {
 
-    let row = document.createElement("div");
-    row.className = "leaderboard-row";
+    let div = document.createElement("div");
 
-    row.innerHTML = `
-      <span>${index + 1}.</span>
-      <span>${entry.name}</span>
-      <span>${entry.team}</span>
-      <span>${entry.score} Pkt</span>
+    div.innerHTML = `
+      <strong>#${i+1}</strong> 
+      ${entry.name || "Unbekannt"} 
+      (${entry.team}) - 
+      ${entry.score} Punkte
     `;
 
-    box.appendChild(row);
+    box.appendChild(div);
   });
 }
