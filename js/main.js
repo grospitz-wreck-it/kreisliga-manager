@@ -40,11 +40,10 @@ window.onload = function(){
   // =========================
 
   // Team anzeigen
-  if(selectedTeam){
-    const el = document.getElementById("selectedTeamText");
-    if(el){
-      el.innerText = "Dein Team: " + selectedTeam;
-    }
+if(selectedTeam){
+  document.getElementById("selectedTeamText").innerText =
+    "Dein Team: " + selectedTeam;
+}
 
     // UI sperren wie vorher
     const teamSelect = document.getElementById("teamSelect");
