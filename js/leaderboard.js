@@ -14,10 +14,10 @@ async function loadLeaderboard(){
     .select("*");
 
   if(error){
-    console.error("Leaderboard Fehler:", error);
-    box.innerHTML = "Fehler beim Laden";
-    return;
-  }
+  console.error("❌ Leaderboard Fehler:", error);
+  box.innerHTML = "Fehler: " + error.message;
+  return;
+}
 
   if(!data || data.length === 0){
     box.innerHTML = "Noch keine Einträge";
