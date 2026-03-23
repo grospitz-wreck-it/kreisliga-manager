@@ -1,9 +1,9 @@
 async function loadLeaderboard(){
 
-  const box = document.getElementById("leaderboard");
+  const box = document.getElementById("leaderboardList");
 
   if(!box){
-    console.error("❌ #leaderboard nicht gefunden!");
+    console.error("❌ leaderboardList nicht gefunden");
     return;
   }
 
@@ -11,9 +11,7 @@ async function loadLeaderboard(){
 
   const { data, error } = await supabaseClient
     .from("leaderboard")
-    .select("*")
-    .order("score", { ascending: false })
-    .limit(10);
+    .select("*");
 
   if(error){
     console.error("Leaderboard Fehler:", error);
@@ -26,11 +24,46 @@ async function loadLeaderboard(){
     return;
   }
 
+  // =========================
+  // 🧠 BESTEN SCORE PRO SPIELER
+  // =========================
+  const bestPerPlayer = Object.values(
+    data.reduce((acc, entry) => {
+
+      if(
+        !acc[entry.player_id] ||
+        acc[entry.player_id].score < entry.score
+      ){
+        acc[entry.player_id] = entry;
+      }
+
+      return acc;
+
+    }, {})
+  );
+
+  // =========================
+  // 📈 SORTIEREN
+  // =========================
+  bestPerPlayer.sort((a, b) => b.score - a.score);
+
+  // =========================
+  // 🏆 TOP 10
+  // =========================
+  const top10 = bestPerPlayer.slice(0, 10);
+
   box.innerHTML = "";
 
-  data.forEach((entry, i) => {
+  top10.forEach((entry, i) => {
 
     let div = document.createElement("div");
+
+    // 🥇 Eigener Spieler hervorheben
+    if(entry.player_id === playerId){
+      div.style.background = "gold";
+      div.style.color = "black";
+      div.style.fontWeight = "bold";
+    }
 
     div.innerHTML = `
       <strong>#${i+1}</strong> 
@@ -42,9 +75,3 @@ async function loadLeaderboard(){
     box.appendChild(div);
   });
 }
-
-
-// 👇 HIER HIN (GANZ UNTEN)
-document.addEventListener("DOMContentLoaded", () => {
-  loadLeaderboard();
-});
