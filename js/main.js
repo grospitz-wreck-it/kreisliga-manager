@@ -1,17 +1,26 @@
-window.onload = function(){
-
-  let playerId = localStorage.getItem("playerId");
+// =========================
+// 🌍 GLOBAL PLAYER ID (FIX!)
+// =========================
+let playerId = localStorage.getItem("playerId");
 
 if(!playerId){
   playerId = crypto.randomUUID();
   localStorage.setItem("playerId", playerId);
 }
-  
+
+
+// =========================
+// 🚀 APP START
+// =========================
+window.onload = function(){
+
+  console.log("🚀 App gestartet");
+
   // =========================
-  // 💾 SAVE LADEN (JETZT RICHTIG!)
+  // 💾 SAVE LADEN
   // =========================
   if(typeof loadGameState === "function"){
-    loadGameState(); // 🔥 DAS HAT GEFÄHLT!
+    loadGameState();
   }
 
   // =========================
@@ -19,7 +28,6 @@ if(!playerId){
   // =========================
   const setup = document.getElementById("setupPanel");
 
-  // 👉 nur öffnen wenn KEIN Team gewählt
   if(setup && !selectedTeam){
     setup.classList.add("open");
   }
@@ -46,7 +54,6 @@ if(!playerId){
   // =========================
   // 🔁 UI WIEDERHERSTELLEN
   // =========================
-
   if(selectedTeam){
 
     const label = document.getElementById("selectedTeamText");
@@ -80,7 +87,7 @@ if(!playerId){
   }
 
   // =========================
-  // ▶️ MATCH RESUME (SAFE)
+  // ▶️ MATCH RESUME
   // =========================
   if(
     liveScore &&
@@ -109,7 +116,14 @@ if(!playerId){
   } else {
     console.warn("Ads nicht geladen");
   }
-if(typeof loadLeaderboard === "function"){
-  loadLeaderboard();
-}
+
+  // =========================
+  // 🏆 LEADERBOARD LADEN
+  // =========================
+  if(typeof loadLeaderboard === "function"){
+    loadLeaderboard();
+  } else {
+    console.warn("Leaderboard nicht geladen");
+  }
+
 };
