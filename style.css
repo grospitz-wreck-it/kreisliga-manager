@@ -339,3 +339,57 @@ tbody tr:nth-last-child(2) {
 .danger:hover{
   background: #e53935;
 }
+/* =========================
+🖥️ DESKTOP + RESPONSIVE FIX
+========================= */
+
+/* 🔥 Zentrale Begrenzung (App-Look) */
+.layout{
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 🖥️ Desktop Layout */
+@media (min-width: 769px){
+
+  .layout{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  /* 🎮 Game Bereich größer */
+  .layout > .panel:first-child{
+    flex: 2;
+    max-width: 65%;
+  }
+
+  /* 📊 Rechte Seite */
+  .sidePanel{
+    flex: 1;
+    max-width: 35%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* Panels sauber */
+  .sidePanel .panel{
+    width: 100%;
+  }
+
+}
+
+/* 📱 Mobile bleibt wie gehabt */
+@media (max-width: 768px){
+
+  .layout{
+    flex-direction: column;
+  }
+
+  .sidePanel{
+    width: 100%;
+  }
+
+}
