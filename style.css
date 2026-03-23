@@ -607,7 +607,28 @@ table {
   flex: 1;
   text-align: left;
 }
+#leaderboard {
+  background: #111;
+  padding: 10px;
+  border-radius: 10px;
+}
 
+.lb-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px;
+  margin: 4px 0;
+  background: #1a1a1a;
+  border-radius: 6px;
+}
+
+.lb-1 { background: gold; color: black; }
+.lb-2 { background: silver; color: black; }
+.lb-3 { background: #cd7f32; color: black; }
+
+.lb-me {
+  border: 2px solid cyan;
+}
 /* Score */
 .lb-score {
   font-weight: bold;
