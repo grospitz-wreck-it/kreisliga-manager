@@ -7,8 +7,6 @@
 
 let matchCards = {};
 let halftimePlayed = false;
-let liveScore = { t1: null, t2: null, s1: 0, s2: 0 };
-
 
 // =========================
 // ▶️ SPIELTAG STARTEN
