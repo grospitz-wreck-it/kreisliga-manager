@@ -512,3 +512,20 @@ table {
     transform: translateX(-50%);
   }
 }
+.menu-section{
+  margin-top: 10px;
+}
+
+.danger{
+  width: 100%;
+  padding: 10px;
+  background: #b30000;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.danger:hover{
+  background: #e60000;
+}
