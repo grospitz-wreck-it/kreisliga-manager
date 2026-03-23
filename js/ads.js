@@ -2,7 +2,7 @@
 // 📢 ADS SYSTEM (LED BANDE)
 // =========================
 
-// 🔥 Werbeanzeigen
+// 🔥 Werbeanzeigen (Fallback / Default)
 let ads = [
   {
     name: "Sponsor A",
@@ -24,13 +24,41 @@ let ads = [
 
 
 // =========================
+// 🔥 NEU: ADMIN ADS LADEN
+// =========================
+function getAdminAds(){
+
+  try{
+    const stored = JSON.parse(localStorage.getItem("ads") || "[]");
+
+    // 🔥 Mapping auf dein bestehendes Format
+    return stored.map(ad => ({
+      name: ad.title || "Anzeige",
+      image: ad.image || "ads/fallback.png", // optional später erweitern
+      link: ad.link || "",
+      start: null,
+      end: null,
+      weight: 1
+    }));
+
+  } catch(e){
+    console.error("Admin Ads Fehler:", e);
+    return [];
+  }
+}
+
+
+// =========================
 // 🧠 AKTIVE ADS FILTERN
 // =========================
 function getActiveAds(){
 
   const now = new Date();
 
-  return ads.filter(ad => {
+  // 🔥 NEU: beide Quellen kombinieren
+  let allAds = [...ads, ...getAdminAds()];
+
+  return allAds.filter(ad => {
 
     // 🔥 keine Laufzeit → immer aktiv
     if(!ad.start || !ad.end) return true;
@@ -141,7 +169,7 @@ function buildAdTrack(){
   // ✅ FIX: kleine Verzögerung für CSS Animation (Render Bug vermeiden)
   requestAnimationFrame(() => {
     track.style.animation = "none";
-    track.offsetHeight; // reflow trigger
+    track.offsetHeight;
     track.style.animation = "";
   });
 }
