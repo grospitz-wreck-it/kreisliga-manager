@@ -1,10 +1,161 @@
 // =========================
-// 🌍 GLOBAL PLAYER DATA
+// 👤 PLAYER SYSTEM (FINAL)
 // =========================
+
 let playerId = localStorage.getItem("playerId");
 if(!playerId){
   playerId = crypto.randomUUID();
   localStorage.setItem("playerId", playerId);
+}
+
+let playerName = localStorage.getItem("playerName");
+let lastNameChange = localStorage.getItem("lastNameChange");
+
+// 🎨 Farbe + Titel
+let playerColor = localStorage.getItem("playerColor") || "#00ffcc";
+let playerTitle = localStorage.getItem("playerTitle") || "Rookie";
+
+
+// =========================
+// 🛑 BLACKLIST
+// =========================
+const bannedWords = [
+  "nazi","hitler","ss","reich",
+  "sex","porn","xxx","fick","fuck","hure","bitch",
+  "admin","moderator","support",
+  "polizei","fbi","cia"
+];
+
+// =========================
+// 🔍 NAME VALIDATION
+// =========================
+function isValidName(name){
+
+  if(!name || name.length < 3) return false;
+  if(name.length > 20) return false;
+
+  const lower = name.toLowerCase();
+
+  // 🚫 blacklist
+  if(bannedWords.some(word => lower.includes(word))){
+    return false;
+  }
+
+  // 🚫 nur zahlen vermeiden
+  if(/^\d+$/.test(name)) return false;
+
+  return true;
+}
+
+
+// =========================
+// ⏱️ COOLDOWN (1x pro Minute)
+// =========================
+function canChangeName(){
+  if(!lastNameChange) return true;
+
+  const diff = Date.now() - parseInt(lastNameChange);
+  return diff > 60000; // 60 Sekunden
+}
+
+
+// =========================
+// 👤 INIT NAME
+// =========================
+async function initPlayerName(){
+
+  if(!playerName){
+
+    let name = prompt("Wie heißt du Manager?");
+
+    if(!isValidName(name)){
+      name = "Manager_" + Math.floor(Math.random() * 1000);
+    }
+
+    playerName = name;
+    localStorage.setItem("playerName", playerName);
+  }
+
+  updateNameUI();
+}
+
+
+// =========================
+// 🎨 UI UPDATE
+// =========================
+function updateNameUI(){
+
+  const input = document.getElementById("nameInput");
+  if(input) input.value = playerName;
+
+  const colorInput = document.getElementById("colorInput");
+  if(colorInput) colorInput.value = playerColor;
+}
+
+
+// =========================
+// ✏️ NAME ÄNDERN
+// =========================
+async function changeName(){
+
+  const input = document.getElementById("nameInput").value.trim();
+
+  if(!isValidName(input)){
+    alert("Ungültiger Name!");
+    return;
+  }
+
+  if(!canChangeName()){
+    alert("Du kannst deinen Namen nur 1x pro Minute ändern!");
+    return;
+  }
+
+  // 🔍 DUPLIKAT CHECK
+  const { data } = await supabaseClient
+    .from("leaderboard")
+    .select("name")
+    .eq("name", input);
+
+  if(data && data.length > 0){
+    alert("Name bereits vergeben!");
+    return;
+  }
+
+  playerName = input;
+  lastNameChange = Date.now();
+
+  localStorage.setItem("playerName", playerName);
+  localStorage.setItem("lastNameChange", lastNameChange);
+
+  alert("Name gespeichert!");
+
+  loadLeaderboard();
+}
+
+
+// =========================
+// 🎨 FARBE ÄNDERN
+// =========================
+function changeColor(){
+
+  const color = document.getElementById("colorInput").value;
+
+  playerColor = color;
+  localStorage.setItem("playerColor", color);
+
+  loadLeaderboard();
+}
+
+
+// =========================
+// 🏅 TITEL SYSTEM
+// =========================
+function getPlayerTitle(score){
+
+  if(score >= 50) return "Schwalbengott";
+  if(score >= 30) return "Kampfschwein";
+  if(score >= 15) return "Platzwart";
+  return "Freizeitkicker";
 }
 
 let friendCode = localStorage.getItem("friendCode");
