@@ -1,34 +1,31 @@
 // =========================
-// 🔥 MATCH ENGINE (CLEAN FINAL FIXED)
+// 🔥 MATCH ENGINE (REFACTORED CLEAN VERSION)
 // =========================
 
 let matchCards = {};
 let halftimePlayed = false;
 
-
 // =========================
-// 🏆 LEADERBOARD SAVE (GLOBAL!)
+// 🏆 LEADERBOARD SERVICE
 // =========================
-async function saveScoreToLeaderboard(name, team, score, matchday){
 
-  if(typeof supabase === "undefined"){
-    console.warn("Supabase nicht geladen");
-    return;
-  }
+async function saveScore(name, team, score, matchday){
+  try{
+    if(typeof supabaseClient === "undefined"){
+      console.warn("Supabase Client fehlt");
+      return;
+    }
 
-  const { error } = await supabaseClient
-  .from("leaderboard")
-  .insert([{
-    name,
-    team,
-    score,
-    matchday
-  }]);
+    const { error } = await supabaseClient
+      .from("leaderboard")
+      .insert([{ name, team, score, matchday }]);
 
-  if(error){
-    console.error("❌ Fehler beim Speichern:", error);
-  } else {
+    if(error) throw error;
+
     console.log("🏆 Score gespeichert!");
+
+  } catch(e){
+    console.error("❌ Leaderboard Fehler:", e);
   }
 }
 
@@ -51,7 +48,42 @@ function simulateMatchday(){
     return;
   }
 
-  // 🔥 RESET
+  resetMatchState();
+
+  currentMatchday++;
+
+  const matches = schedule[currentMatchday - 1];
+
+  if(!matches){
+    alert("Keine weiteren Spieltage vorhanden");
+    return;
+  }
+
+  updateMatchdayUI();
+
+  const userMatch = findUserMatch(matches);
+
+  if(!userMatch){
+    console.error("User-Match nicht gefunden!");
+    return;
+  }
+
+  simulateOtherMatches(matches, userMatch);
+
+  updateTable();
+  saveGameState();
+
+  isSimulating = true;
+
+  simulateLiveMatch(userMatch[0], userMatch[1]);
+}
+
+
+// =========================
+// 🧹 RESET
+// =========================
+
+function resetMatchState(){
   matchdayResults = [];
   liveScore = { t1:null, t2:null, s1:0, s2:0 };
   currentMinute = 0;
@@ -64,49 +96,30 @@ function simulateMatchday(){
 
   const halftime = document.getElementById("halftimePanel");
   if(halftime) halftime.style.display = "none";
+}
 
-  currentMatchday++;
 
-  let matches = schedule[currentMatchday - 1];
+// =========================
+// 🔍 USER MATCH FINDEN
+// =========================
 
-  if(!matches){
-    alert("Keine weiteren Spieltage vorhanden");
-    return;
-  }
-
-  document.getElementById("matchday").innerText =
-    "Spieltag: " + currentMatchday + " / " + schedule.length;
-
-  const startBtn = document.getElementById("startBtn");
-  if(startBtn){
-    startBtn.innerText = "⏸ Spiel läuft";
-    startBtn.disabled = true;
-  }
-
-  let userMatch = matches.find(m =>
+function findUserMatch(matches){
+  return matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
+}
 
-  if(!userMatch){
-    console.error("User-Match nicht gefunden!");
-    return;
-  }
 
-  // ⚡ andere Spiele
+// =========================
+// ⚡ ANDERE SPIELE
+// =========================
+
+function simulateOtherMatches(matches, userMatch){
   matches.forEach(m => {
     if(m !== userMatch){
       simulateQuick(m[0], m[1]);
     }
   });
-
-  updateTable();
-
-  // 💾 SAVE
-  saveGameState();
-
-  isSimulating = true;
-
-  simulateLiveMatch(userMatch[0], userMatch[1], 0, 0);
 }
 
 
@@ -116,34 +129,10 @@ function simulateMatchday(){
 
 function simulateQuick(teamA, teamB){
 
-  let goalsA = Math.floor(Math.random() * 5);
-  let goalsB = Math.floor(Math.random() * 5);
+  const goalsA = Math.floor(Math.random() * 5);
+  const goalsB = Math.floor(Math.random() * 5);
 
-  teamA.played++;
-  teamB.played++;
-
-  teamA.goalsFor += goalsA;
-  teamA.goalsAgainst += goalsB;
-
-  teamB.goalsFor += goalsB;
-  teamB.goalsAgainst += goalsA;
-
-  if(goalsA > goalsB){
-    teamA.points += 3;
-    teamA.wins++;
-    teamB.losses++;
-  }
-  else if(goalsB > goalsA){
-    teamB.points += 3;
-    teamB.wins++;
-    teamA.losses++;
-  }
-  else{
-    teamA.points += 1;
-    teamB.points += 1;
-    teamA.draws++;
-    teamB.draws++;
-  }
+  applyMatchStats(teamA, teamB, goalsA, goalsB);
 
   matchdayResults.push({
     home: teamA.name,
@@ -151,6 +140,40 @@ function simulateQuick(teamA, teamB){
     score1: goalsA,
     score2: goalsB
   });
+}
+
+
+// =========================
+// 📊 STATS UPDATE
+// =========================
+
+function applyMatchStats(teamA, teamB, scoreA, scoreB){
+
+  teamA.played++;
+  teamB.played++;
+
+  teamA.goalsFor += scoreA;
+  teamA.goalsAgainst += scoreB;
+
+  teamB.goalsFor += scoreB;
+  teamB.goalsAgainst += scoreA;
+
+  if(scoreA > scoreB){
+    teamA.points += 3;
+    teamA.wins++;
+    teamB.losses++;
+  }
+  else if(scoreB > scoreA){
+    teamB.points += 3;
+    teamB.wins++;
+    teamA.losses++;
+  }
+  else{
+    teamA.points++;
+    teamB.points++;
+    teamA.draws++;
+    teamB.draws++;
+  }
 }
 
 
@@ -174,155 +197,133 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
 
   clearInterval(currentInterval);
 
-  currentInterval = setInterval(() => {
+  currentInterval = setInterval(async () => {
 
     currentMinute++;
     updateTimeline(currentMinute);
 
-    // =========================
-    // ⏸ HALBZEIT
-    // =========================
     if(currentMinute === 45 && !halftimePlayed){
-
       halftimePlayed = true;
-
       clearInterval(currentInterval);
       isSimulating = false;
-
       addEvent("⏸ Halbzeit");
-
-      const panel = document.getElementById("halftimePanel");
-      if(panel) panel.style.display = "block";
-
+      document.getElementById("halftimePanel").style.display = "block";
       saveGameState();
       return;
     }
 
-    // =========================
-    // 🔥 EVENTS
-    // =========================
-    if(Math.random() < 0.3){
+    handleRandomEvents(teamA, teamB);
 
-      let attackBoost = tacticModifier + formationModifier + liveModifier;
-      let attackingTeam = (Math.random() + attackBoost > 0.5) ? "A" : "B";
-
-      let atk = attackingTeam === "A" ? teamA : teamB;
-
-      let type = Math.random();
-
-      if(type < 0.1){
-        addEvent(`🚫 Abseits von ${atk.name}`);
-      }
-      else if(type < 0.3){
-        addEvent(`📐 Ecke für ${atk.name}`);
-        if(Math.random() < 0.2){
-          if(attackingTeam === "A") scoreA++; else scoreB++;
-          addEvent(`⚽ Tor nach Ecke! ${atk.name}`);
-        }
-      }
-      else{
-        addEvent(`🔥 Chance für ${atk.name}`);
-        if(Math.random() < 0.3){
-          if(attackingTeam === "A") scoreA++; else scoreB++;
-          addEvent(`⚽ TOR! ${atk.name}`);
-        }
-      }
-
-      liveScore.s1 = scoreA;
-      liveScore.s2 = scoreB;
-
-      updateScoreboard(teamA, teamB, scoreA, scoreB);
-    }
-
-    // =========================
-    // 🏁 SPIELENDE
-    // =========================
     if(currentMinute >= 90){
 
       clearInterval(currentInterval);
 
-      teamA.played++;
-      teamB.played++;
-
-      teamA.goalsFor += scoreA;
-      teamA.goalsAgainst += scoreB;
-
-      teamB.goalsFor += scoreB;
-      teamB.goalsAgainst += scoreA;
-
-      if(scoreA > scoreB){
-        teamA.points += 3;
-        teamA.wins++;
-        teamB.losses++;
-      }
-      else if(scoreB > scoreA){
-        teamB.points += 3;
-        teamB.wins++;
-        teamA.losses++;
-      }
-      else{
-        teamA.points += 1;
-        teamB.points += 1;
-        teamA.draws++;
-        teamB.draws++;
-      }
+      applyMatchStats(teamA, teamB, scoreA, scoreB);
 
       updateTable();
 
-      // 🏆 SCORE SPEICHERN
-try{
+      await saveScore(
+        selectedTeam || "Unbekannt",
+        selectedTeam,
+        teamA.name === selectedTeam ? scoreA : scoreB,
+        currentMatchday
+      );
 
-  if(typeof supabaseClient !== "undefined"){
-
-    await supabaseClient
-      .from("leaderboard")
-      .insert([{
-        name: selectedTeam || "Unbekannt",
-        team: selectedTeam,
-        score: teamA.name === selectedTeam ? scoreA : scoreB,
-        matchday: currentMatchday
-      }]);
-
-    console.log("🏆 Score gespeichert!");
-
-  } else {
-    console.warn("Supabase Client fehlt");
-  }
-
-} catch(e){
-  console.error("❌ Leaderboard Fehler:", e);
-}
-    
-
-      matchdayResults.push({
-        home: teamA.name,
-        away: teamB.name,
-        score1: scoreA,
-        score2: scoreB
-      });
-
-      // 📰 REPORT
-      try{
-        if(typeof generateMatchdayReport === "function"){
-          document.getElementById("newsBox").innerText =
-            generateMatchdayReport(matchdayResults);
-        }
-      } catch(e){
-        console.error("Report Fehler:", e);
-      }
-
-      isSimulating = false;
-
-      document.getElementById("startBtn").innerText = "▶ Nächster Spieltag";
-      document.getElementById("startBtn").disabled = false;
-
-      addEvent("🏁 Spiel beendet");
-
-      // 💾 FINAL SAVE
-      saveGameState();
+      finalizeMatch(teamA, teamB, scoreA, scoreB);
     }
 
   }, 1000 / speedMultiplier);
+}
+
+
+// =========================
+// 🔥 EVENTS
+// =========================
+
+function handleRandomEvents(teamA, teamB){
+
+  if(Math.random() >= 0.3) return;
+
+  let attackBoost = tacticModifier + formationModifier + liveModifier;
+  let attackingTeam = (Math.random() + attackBoost > 0.5) ? "A" : "B";
+
+  let atk = attackingTeam === "A" ? teamA : teamB;
+
+  let type = Math.random();
+
+  if(type < 0.1){
+    addEvent(`🚫 Abseits von ${atk.name}`);
+  }
+  else if(type < 0.3){
+    addEvent(`📐 Ecke für ${atk.name}`);
+
+    if(Math.random() < 0.2){
+      if(attackingTeam === "A"){
+        liveScore.s1++;
+      } else {
+        liveScore.s2++;
+      }
+
+      addEvent(`⚽ Tor nach Ecke! ${atk.name}`);
+    }
+  }
+  else{
+    addEvent(`🔥 Chance für ${atk.name}`);
+
+    if(Math.random() < 0.3){
+      if(attackingTeam === "A"){
+        liveScore.s1++;
+      } else {
+        liveScore.s2++;
+      }
+
+      addEvent(`⚽ TOR! ${atk.name}`);
+    }
+  }
+
+  updateScoreboard(teamA, teamB, liveScore.s1, liveScore.s2);
+}`);
+  }
+  else if(type < 0.3){
+    addEvent(`📐 Ecke für ${atk.name}`);
+  }
+  else{
+    addEvent(`🔥 Chance für ${atk.name}`);
+  }
+}
+
+
+// =========================
+// 🏁 MATCH ENDE
+// =========================
+
+function finalizeMatch(teamA, teamB, scoreA, scoreB){
+
+  matchdayResults.push({
+    home: teamA.name,
+    away: teamB.name,
+    score1: scoreA,
+    score2: scoreB
+  });
+
+  try{
+    if(typeof generateMatchdayReport === "function"){
+      document.getElementById("newsBox").innerText =
+        generateMatchdayReport(matchdayResults);
+    }
+  } catch(e){
+    console.error("Report Fehler:", e);
+  }
+
+  isSimulating = false;
+
+  const btn = document.getElementById("startBtn");
+  btn.innerText = "▶ Nächster Spieltag";
+  btn.disabled = false;
+
+  addEvent("🏁 Spiel beendet");
+
+  saveGameState();
 }
 
 
