@@ -1,35 +1,33 @@
 window.onload = function(){
-   loadGameState();   // 🔥 HIER
 
-   updateTable();
-   if(selectedTeam){
-   document.getElementById("selectedTeamText").innerText =
-   "Dein Team: " + selectedTeam;
+  // =========================
+  // 💾 SAVE LADEN
+  // =========================
+  if(typeof loadGameState === "function"){
+    loadGameState();
   }
 
-  startAds();
-  };
-
-  
-  // 🔥 Setup-Menü beim Start öffnen
+  // =========================
+  // 🔥 SETUP PANEL
+  // =========================
   const setup = document.getElementById("setupPanel");
   if(setup){
     setup.classList.add("open");
   }
 
-  // 🔥 League Select holen
+  // =========================
+  // 🏆 LEAGUE SELECT
+  // =========================
   const select = document.getElementById("leagueSelect");
 
-  // 🔥 Schutz – verhindert Absturz
   if(!select){
     console.error("leagueSelect nicht gefunden");
     return;
   }
 
-  // 🔥 vorher leeren (wichtig bei Reloads)
+  // neu befüllen (wichtig bei Reload)
   select.innerHTML = "";
 
-  // 🔥 Ligen einfügen
   Object.keys(leagues).forEach(l => {
     let option = document.createElement("option");
     option.value = l;
@@ -37,10 +35,63 @@ window.onload = function(){
     select.appendChild(option);
   });
 
-  // 🔥 Werbung starten (sicher!)
+  // =========================
+  // 🔁 UI WIEDERHERSTELLEN
+  // =========================
+
+  // Team anzeigen
+  if(selectedTeam){
+    const el = document.getElementById("selectedTeamText");
+    if(el){
+      el.innerText = "Dein Team: " + selectedTeam;
+    }
+
+    // UI sperren wie vorher
+    const teamSelect = document.getElementById("teamSelect");
+    const btn = document.getElementById("btnSelectTeam");
+
+    if(teamSelect) teamSelect.disabled = true;
+    if(btn) btn.disabled = true;
+  }
+
+  // Tabelle aktualisieren
+  if(typeof updateTable === "function"){
+    updateTable();
+  }
+
+  // Spieltag anzeigen
+  if(currentMatchday){
+    const matchdayEl = document.getElementById("matchday");
+    if(matchdayEl){
+      matchdayEl.innerText =
+        "Spieltag: " + currentMatchday + " / " + (schedule?.length || "?");
+    }
+  }
+
+  // =========================
+  // ▶️ OPTIONAL: LIVE MATCH RESUME
+  // =========================
+  if(liveScore && currentMinute > 0 && currentMinute < 90){
+
+    console.log("▶️ Resume Match bei Minute", currentMinute);
+
+    if(typeof simulateLiveMatch === "function"){
+      simulateLiveMatch(
+        liveScore.t1,
+        liveScore.t2,
+        liveScore.s1,
+        liveScore.s2
+      );
+    }
+  }
+
+  // =========================
+  // 📢 ADS STARTEN
+  // =========================
   if(typeof startAds === "function"){
     startAds();
   } else {
     console.warn("Ads nicht geladen");
   }
+
 };
