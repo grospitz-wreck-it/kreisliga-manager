@@ -1,11 +1,16 @@
 // =========================
-// 🌍 GLOBAL PLAYER ID (FIX!)
+// 🌍 GLOBAL PLAYER DATA
 // =========================
 let playerId = localStorage.getItem("playerId");
-
 if(!playerId){
   playerId = crypto.randomUUID();
   localStorage.setItem("playerId", playerId);
+}
+
+let friendCode = localStorage.getItem("friendCode");
+if(!friendCode){
+  friendCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+  localStorage.setItem("friendCode", friendCode);
 }
 
 
@@ -16,27 +21,16 @@ window.onload = function(){
 
   console.log("🚀 App gestartet");
 
-  // =========================
-  // 💾 SAVE LADEN
-  // =========================
   if(typeof loadGameState === "function"){
     loadGameState();
   }
 
-  // =========================
-  // 🔥 SETUP PANEL
-  // =========================
   const setup = document.getElementById("setupPanel");
-
   if(setup && !selectedTeam){
     setup.classList.add("open");
   }
 
-  // =========================
-  // 🏆 LEAGUE SELECT
-  // =========================
   const select = document.getElementById("leagueSelect");
-
   if(!select){
     console.error("leagueSelect nicht gefunden");
     return;
@@ -51,15 +45,9 @@ window.onload = function(){
     select.appendChild(option);
   });
 
-  // =========================
-  // 🔁 UI WIEDERHERSTELLEN
-  // =========================
   if(selectedTeam){
-
     const label = document.getElementById("selectedTeamText");
-    if(label){
-      label.innerText = "Dein Team: " + selectedTeam;
-    }
+    if(label) label.innerText = "Dein Team: " + selectedTeam;
 
     const teamSelect = document.getElementById("teamSelect");
     const btn = document.getElementById("btnSelectTeam");
@@ -68,16 +56,10 @@ window.onload = function(){
     if(btn) btn.disabled = true;
   }
 
-  // =========================
-  // 📊 TABELLE
-  // =========================
   if(typeof updateTable === "function"){
     updateTable();
   }
 
-  // =========================
-  // 📅 SPIELTAG
-  // =========================
   if(currentMatchday){
     const matchdayEl = document.getElementById("matchday");
     if(matchdayEl){
@@ -86,9 +68,6 @@ window.onload = function(){
     }
   }
 
-  // =========================
-  // ▶️ MATCH RESUME
-  // =========================
   if(
     liveScore &&
     liveScore.t1 &&
@@ -96,8 +75,6 @@ window.onload = function(){
     currentMinute > 0 &&
     currentMinute < 90
   ){
-    console.log("▶️ Resume Match bei Minute", currentMinute);
-
     if(typeof simulateLiveMatch === "function"){
       simulateLiveMatch(
         liveScore.t1,
@@ -108,22 +85,40 @@ window.onload = function(){
     }
   }
 
-  // =========================
-  // 📢 ADS STARTEN
-  // =========================
   if(typeof startAds === "function"){
     startAds();
-  } else {
-    console.warn("Ads nicht geladen");
   }
 
-  // =========================
-  // 🏆 LEADERBOARD LADEN
-  // =========================
+  // 🏆 Leaderboard starten
   if(typeof loadLeaderboard === "function"){
     loadLeaderboard();
-  } else {
-    console.warn("Leaderboard nicht geladen");
   }
 
+  // 👥 Friend UI init
+  initFriendUI();
 };
+
+
+// =========================
+// 👥 FRIEND UI
+// =========================
+function initFriendUI(){
+
+  const codeEl = document.getElementById("friendCodeDisplay");
+  if(codeEl){
+    codeEl.innerText = friendCode;
+  }
+}
+
+function copyFriendCode(){
+  navigator.clipboard.writeText(friendCode);
+  alert("Freundescode kopiert!");
+}
+
+function joinFriendCode(){
+  const input = document.getElementById("friendCodeInput").value.trim().toUpperCase();
+  if(!input) return;
+
+  localStorage.setItem("friendCode", input);
+  location.reload();
+}
