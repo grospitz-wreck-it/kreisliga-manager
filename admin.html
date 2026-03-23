@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<h1>🔧 Admin – Werbung verwalten</h1>
+
+<!-- LOGIN -->
+<div id="loginBox">
+  <input type="password" id="adminPass" placeholder="Passwort">
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display:none;">
+
+  <h2>➕ Neue Werbung</h2>
+
+  <input id="adTitle" placeholder="Titel"><br>
+  <input id="adText" placeholder="Text"><br>
+  <input id="adLink" placeholder="Link"><br>
+
+  <button onclick="addAd()">Speichern</button>
+
+  <h2>📋 Bestehende Ads</h2>
+  <div id="adList"></div>
+
+</div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>
