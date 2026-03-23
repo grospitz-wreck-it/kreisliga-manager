@@ -293,7 +293,7 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
       // 📰 REPORT
       try{
         if(typeof generateMatchdayReport === "function"){
-          document.getElementById("newsBox").innerText =
+          document.getElementById("newsBox").innerHTML =
             generateMatchdayReport(matchdayResults);
         }
       } catch(e){
