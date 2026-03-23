@@ -1,5 +1,7 @@
 async function loadLeaderboard(){
 
+  console.log("🚀 Lade Leaderboard...");
+
   const box = document.getElementById("leaderboardList");
 
   if(!box){
@@ -13,11 +15,13 @@ async function loadLeaderboard(){
     .from("leaderboard")
     .select("*");
 
+  console.log("📊 Antwort:", data);
+
   if(error){
-  console.error("❌ Leaderboard Fehler:", error);
-  box.innerHTML = "Fehler: " + error.message;
-  return;
-}
+    console.error("❌ Leaderboard Fehler:", error);
+    box.innerHTML = "Fehler: " + error.message;
+    return;
+  }
 
   if(!data || data.length === 0){
     box.innerHTML = "Noch keine Einträge";
@@ -74,19 +78,26 @@ async function loadLeaderboard(){
 
     box.appendChild(div);
   });
+
+  // =========================
+  // 🏆 EIGENER RANG (JETZT RICHTIG!)
+  // =========================
+  const myRank = bestPerPlayer.findIndex(e => e.player_id === playerId);
+
+  if(myRank !== -1){
+
+    const rankDiv = document.createElement("div");
+
+    rankDiv.innerHTML = `👉 Dein Rang: #${myRank + 1}`;
+    rankDiv.style.marginTop = "10px";
+    rankDiv.style.fontWeight = "bold";
+
+    box.appendChild(rankDiv);
+  }
 }
-// =========================
-// 🏆 EIGENER RANG
-// =========================
-const myRank = bestPerPlayer.findIndex(e => e.player_id === playerId);
 
-if(myRank !== -1){
 
-  const rankDiv = document.createElement("div");
-
-  rankDiv.innerHTML = `👉 Dein Rang: #${myRank + 1}`;
-  rankDiv.style.marginTop = "10px";
-  rankDiv.style.fontWeight = "bold";
-
-  box.appendChild(rankDiv);
-}
+// 👉 AUTO LOAD BEIM START
+document.addEventListener("DOMContentLoaded", () => {
+  loadLeaderboard();
+});
