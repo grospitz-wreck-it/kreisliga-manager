@@ -48,7 +48,7 @@ function toggleSetup(){
  if(typeof saveGameState === "function"){
     saveGameState();
 }
-
+}
 //
 // =========================
 // 🔥 EVENT SYSTEM (NEU!)
