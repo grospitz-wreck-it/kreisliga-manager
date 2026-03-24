@@ -1,4 +1,9 @@
+// =========================
+// 🏟️ LIGA AUSWAHL
+// =========================
+
 function selectLeague(){ 
+
   const league = document.getElementById("leagueSelect").value;
 
   if(!league){
@@ -6,9 +11,10 @@ function selectLeague(){
     return;
   }
 
+  localStorage.setItem("selectedLeague", league);
+
   loadLeague(league);
 
-  // ✅ FIX: Absicherung
   if(!teams || teams.length === 0){
     console.error("Keine Teams geladen:", league);
     alert("Fehler beim Laden der Liga");
@@ -19,10 +25,20 @@ function selectLeague(){
   populateTeamSelect();
   updateTable();
 
-  console.log("Liga geladen:", league, teams.length, "Teams");
+  updateHeader();
+
+  gameState.phase = "idle";
+  updateMainButton();
+
+  console.log("Liga geladen:", league);
 }
 
+// =========================
+// 🧍 TEAM AUSWAHL
+// =========================
+
 function selectTeam(){
+
   const team = document.getElementById("teamSelect").value;
 
   if(!team){
@@ -33,182 +49,178 @@ function selectTeam(){
   selectedTeam = team;
   teamLocked = true;
 
-  document.getElementById("selectedTeamText").innerText = "Dein Team: " + team;
-
-  document.getElementById("teamSelect").disabled = true;
-  document.getElementById("btnSelectTeam").disabled = true;
+  localStorage.setItem("selectedTeam", team);
 
   document.getElementById("setupPanel").classList.remove("open");
+
+  updateHeader();
+
+  gameState.phase = "idle";
+  updateMainButton();
 }
 
-function toggleSetup(){
-  document.getElementById("setupPanel").classList.toggle("open");
-
-    // 💾 NEU: SOFORT SPEICHERN
- if(typeof saveGameState === "function"){
-    saveGameState();
-}
-}
-//
 // =========================
-// 🔥 EVENT SYSTEM (NEU!)
+// 🔥 EVENT SYSTEM
 // =========================
-//
 
-// ✅ FIX: umbenannt (kein Konflikt mehr mit ui.js)
 function addLiveEvent(text, minute = currentMinute){
 
   const box = document.getElementById("liveMatch");
   if(!box) return;
 
-  let p = document.createElement("p");
-
+  const p = document.createElement("p");
   p.innerHTML = `<strong>${minute}'</strong> ${text}`;
 
   box.prepend(p);
+
+  // Limit (Performance + UI)
+  if(box.children.length > 50){
+    box.removeChild(box.lastChild);
+  }
 }
-function addEvent(text, minute = currentMinute){
+
+function addEvent(text, minute){
   addLiveEvent(text, minute);
 }
-//
-// =========================
-// 🔥 TAKTIK
-// =========================
-//
 
-tacticModifier = 0;
+// =========================
+// 🎯 TAKTIK
+// =========================
+
+let tacticModifier = 0;
 
 function setTactic(){
+
   const val = document.getElementById("tacticSelect").value;
 
-  if(val === "Offensiv"){
-    tacticModifier = 0.02;
-  }
-  else if(val === "Defensiv"){
-    tacticModifier = -0.015;
-  }
-  else{
-    tacticModifier = 0;
-  }
+  if(val === "Offensiv") tacticModifier = 0.02;
+  else if(val === "Defensiv") tacticModifier = -0.015;
+  else tacticModifier = 0;
 
-  document.getElementById("currentTactic").innerText = "Taktik: " + val;
+  addLiveEvent("📋 Taktik geändert: " + val);
 }
 
-//
 // =========================
-// 🔥 FORMATION
+// 📐 FORMATION
 // =========================
-//
 
-formationModifier = 0;
+let formationModifier = 0;
 
 function setFormation(){
 
   const val = document.getElementById("formationSelect").value;
 
-  if(val === "4-3-3"){
-    formationModifier = 0.01;
-  }
-  else if(val === "3-5-2"){
-    formationModifier = 0.005;
-  }
-  else if(val === "5-3-2"){
-    formationModifier = -0.015;
-  }
-  else{
-    formationModifier = 0;
-  }
+  if(val === "4-3-3") formationModifier = 0.01;
+  else if(val === "3-5-2") formationModifier = 0.005;
+  else if(val === "5-3-2") formationModifier = -0.015;
+  else formationModifier = 0;
 
-  document.getElementById("currentFormation").innerText = "Formation: " + val;
+  addLiveEvent("📐 Formation: " + val);
 }
 
-//
 // =========================
-// 🔥 LIVE STEUERUNG
+// ⚡ LIVE MODES (FIXED)
 // =========================
-//
 
-liveModifier = 0;
+let liveModifier = 0;
 
 function setLiveMode(mode){
 
-  const attackBtn = document.getElementById("btnAttack");
-  const calmBtn = document.getElementById("btnCalm");
-
-  attackBtn.classList.remove("active");
-  calmBtn.classList.remove("active");
-
-  // ✅ FIX: Reset statt stacking
   liveModifier = 0;
 
-  if(mode==="attack"){
+  // 👉 Button Highlight (NEU - generisch)
+  document.querySelectorAll(".quickActions .btn")
+    .forEach(b => b.classList.remove("active"));
+
+  const btns = document.querySelectorAll(".quickActions .btn");
+
+  if(mode === "attack"){
     liveModifier = 0.01;
-    attackBtn.classList.add("active");
-  } 
-  else {
-    liveModifier = -0.01;
-    calmBtn.classList.add("active");
+    btns[0]?.classList.add("active");
+    addLiveEvent("🔥 Mehr Druck nach vorne");
   }
 
-  // ✅ FIX: neuer Funktionsname
-  addLiveEvent(mode === "attack"
-    ? "🔥 Team erhöht den Druck"
-    : "🧊 Team zieht sich zurück"
-  );
+  else if(mode === "calm"){
+    liveModifier = -0.01;
+    btns[1]?.classList.add("active");
+    addLiveEvent("🧊 Team wird defensiver");
+  }
+
+  else if(mode === "counter"){
+    liveModifier = 0.005;
+    btns[2]?.classList.add("active");
+    addLiveEvent("⚡ Umschaltspiel aktiviert");
+  }
 }
 
-//
 // =========================
 // 🔁 WECHSEL
 // =========================
-//
 
 function makeSub(){
 
-  if(!isSimulating){ 
-    alert("Spiel läuft nicht"); 
-    return; 
+  if(!isSimulating){
+    alert("Spiel läuft nicht");
+    return;
   }
 
-  if(substitutions <= 0){ 
-    alert("Keine Wechsel"); 
-    return; 
+  if(substitutions <= 0){
+    alert("Keine Wechsel mehr");
+    return;
   }
 
-  let events=[
-    "🔁 Wechsel",
-    "🔁 Defensivwechsel",
-    "🔁 Offensivwechsel"
+  const events = [
+    "🔁 Frischer Stürmer kommt",
+    "🔁 Defensiver Wechsel",
+    "🔁 Mittelfeld wird verstärkt"
   ];
 
-  // ✅ FIX: neuer Funktionsname
   addLiveEvent(events[Math.floor(Math.random()*events.length)]);
 
   substitutions--;
-
-  document.getElementById("subCount").innerText = "Wechsel: " + substitutions;
 }
 
-//
 // =========================
-// ⏩ SPEED
+// 🎚️ INTENSITY (NEU)
 // =========================
-//
+
+let intensityModifier = 0;
+
+function setIntensity(val){
+
+  if(val == 1) intensityModifier = -0.01;
+  if(val == 2) intensityModifier = 0;
+  if(val == 3) intensityModifier = 0.02;
+
+  addLiveEvent("⚙️ Intensität angepasst");
+}
+
+// =========================
+// ⏩ SPEED (FIXED - KEIN KONFLIKT)
+// =========================
 
 function setSpeed(e, multi){
 
   speedMultiplier = multi;
 
-  // 🔥 nur wenn echtes Event vorhanden
-  if(e && e.target && e.target.parentElement){
-
-    let buttons = e.target.parentElement.querySelectorAll("button");
-    buttons.forEach(b => b.classList.remove("active"));
-
-    e.target.classList.add("active");
-  }
+  document.querySelectorAll(".speed").forEach(b => b.classList.remove("active"));
+  e.target.classList.add("active");
 
   if(isSimulating){
     restartInterval();
   }
+}
+
+// =========================
+// ⏸️ PAUSE (NEU)
+// =========================
+
+function pauseMatch(){
+
+  isSimulating = false;
+
+  gameState.phase = "matchday_ready";
+  updateMainButton();
+
+  addLiveEvent("⏸ Spiel pausiert");
 }
