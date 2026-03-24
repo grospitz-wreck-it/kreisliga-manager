@@ -1,5 +1,5 @@
 // =========================
-// 👤 PLAYER SYSTEM (FINAL)
+// 👤 PLAYER SYSTEM
 // =========================
 
 let playerId = localStorage.getItem("playerId");
@@ -11,15 +11,20 @@ if(!playerId){
 let playerName = localStorage.getItem("playerName");
 let lastNameChange = localStorage.getItem("lastNameChange");
 
-// 🎨 Farbe + Titel
-let playerColor = localStorage.getItem("playerColor") || "#00ffcc";
+// ❌ Farbe entfernt (wie gewünscht)
 let playerTitle = localStorage.getItem("playerTitle") || "Freizeitkicker";
 
 // =========================
-// 🆕 LEAGUE FIX
+// 🆕 GAME STATE (NEU)
+// =========================
+let gameState = window.gameState || {
+  phase: "idle" // idle | matchday_ready | live | halftime
+};
+
+// =========================
+// 🆕 LEAGUE
 // =========================
 let currentLeague = localStorage.getItem("selectedLeague") || null;
-
 
 // =========================
 // 🛑 BLACKLIST
@@ -40,10 +45,7 @@ function isValidName(name){
 
   const lower = name.toLowerCase();
 
-  if(bannedWords.some(word => lower.includes(word))){
-    return false;
-  }
-
+  if(bannedWords.some(word => lower.includes(word))) return false;
   if(/^\d+$/.test(name)) return false;
 
   return true;
@@ -54,9 +56,7 @@ function isValidName(name){
 // =========================
 function canChangeName(){
   if(!lastNameChange) return true;
-
-  const diff = Date.now() - parseInt(lastNameChange);
-  return diff > 60000;
+  return (Date.now() - parseInt(lastNameChange)) > 60000;
 }
 
 // =========================
@@ -65,13 +65,10 @@ function canChangeName(){
 async function initPlayerName(){
 
   if(!playerName){
-
     let name = prompt("Wie heißt du Manager?");
-
     if(!isValidName(name)){
       name = "Manager_" + Math.floor(Math.random() * 1000);
     }
-
     playerName = name;
     localStorage.setItem("playerName", playerName);
   }
@@ -84,23 +81,13 @@ async function initPlayerName(){
 // 📱 PANEL CONTROL
 // =========================
 function toggleSetup(){
-  const panel = document.getElementById("setupPanel");
-  const overlay = document.getElementById("overlay");
-
-  if(!panel || !overlay) return;
-
-  panel.classList.toggle("open");
-  overlay.classList.toggle("active");
+  document.getElementById("setupPanel")?.classList.toggle("open");
+  document.getElementById("overlay")?.classList.toggle("active");
 }
 
 function closeSetup(){
-  const panel = document.getElementById("setupPanel");
-  const overlay = document.getElementById("overlay");
-
-  if(!panel || !overlay) return;
-
-  panel.classList.remove("open");
-  overlay.classList.remove("active");
+  document.getElementById("setupPanel")?.classList.remove("open");
+  document.getElementById("overlay")?.classList.remove("active");
 }
 
 // =========================
@@ -115,58 +102,11 @@ function openTab(evt, tabId){
 }
 
 // =========================
-// 👉 SWIPE
-// =========================
-window.addEventListener("load", () => {
-
-  const panel = document.getElementById("setupPanel");
-  if(!panel) return;
-
-  let startX = 0;
-
-  panel.addEventListener("touchstart", (e)=>{
-    startX = e.touches[0].clientX;
-  });
-
-  panel.addEventListener("touchmove", (e)=>{
-    let diff = e.touches[0].clientX - startX;
-
-    if(diff > 0){
-      panel.style.transform = `translateX(${diff}px)`;
-    }
-  });
-
-  panel.addEventListener("touchend", (e)=>{
-    let diff = e.changedTouches[0].clientX - startX;
-
-    if(diff > 100){
-      closeSetup();
-    } else {
-      panel.style.transform = "";
-    }
-  });
-
-});
-
-// =========================
-// ESC SUPPORT
-// =========================
-document.addEventListener("keydown", (e)=>{
-  if(e.key === "Escape"){
-    closeSetup();
-  }
-});
-
-// =========================
 // 🎨 UI UPDATE
 // =========================
 function updateNameUI(){
-
   const input = document.getElementById("nameInput");
   if(input) input.value = playerName;
-
-  const colorInput = document.getElementById("colorInput");
-  if(colorInput) colorInput.value = playerColor;
 }
 
 // =========================
@@ -176,24 +116,16 @@ async function changeName(){
 
   const input = document.getElementById("nameInput").value.trim();
 
-  if(!isValidName(input)){
-    alert("Ungültiger Name!");
-    return;
-  }
-
-  if(!canChangeName()){
-    alert("Du kannst deinen Namen nur 1x pro Minute ändern!");
-    return;
-  }
+  if(!isValidName(input)) return alert("Ungültiger Name!");
+  if(!canChangeName()) return alert("Nur 1x pro Minute!");
 
   const { data } = await supabaseClient
     .from("leaderboard")
     .select("name")
     .eq("name", input);
 
-  if(data && data.length > 0){
-    alert("Name bereits vergeben!");
-    return;
+  if(data?.length > 0){
+    return alert("Name bereits vergeben!");
   }
 
   playerName = input;
@@ -202,27 +134,12 @@ async function changeName(){
   localStorage.setItem("playerName", playerName);
   localStorage.setItem("lastNameChange", lastNameChange);
 
-  alert("Name gespeichert!");
-
   updateHeader();
   loadLeaderboard();
 }
 
 // =========================
-// 🎨 FARBE ÄNDERN
-// =========================
-function changeColor(){
-
-  const color = document.getElementById("colorInput").value;
-
-  playerColor = color;
-  localStorage.setItem("playerColor", color);
-
-  loadLeaderboard();
-}
-
-// =========================
-// 🏅 TITEL SYSTEM
+// 🏅 TITEL
 // =========================
 function getPlayerTitle(score){
   if(score >= 50) return "Schwalbengott";
@@ -231,6 +148,9 @@ function getPlayerTitle(score){
   return "Freizeitkicker";
 }
 
+// =========================
+// 👥 FRIEND SYSTEM
+// =========================
 let friendCode = localStorage.getItem("friendCode");
 if(!friendCode){
   friendCode = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -248,86 +168,73 @@ function updateHeader(){
   const titleEl = document.getElementById("gameTitle");
   const subEl = document.getElementById("leagueTitle");
 
-  if(titleEl){
-    titleEl.textContent = playerName || "Kreisliga Manager";
+  if(titleEl) titleEl.textContent = playerName || "Kreisliga Manager";
+  if(subEl) subEl.textContent = team ? `${league} • ${team}` : league;
+}
+
+// =========================
+// 🎮 ⭐ PRIMARY BUTTON SYSTEM
+// =========================
+function handleMainAction(){
+
+  if (gameState.phase === "idle") {
+    startSeason?.();
+    gameState.phase = "matchday_ready";
   }
 
-  if(subEl){
-    subEl.textContent = team ? `${league} • ${team}` : league;
+  else if (gameState.phase === "matchday_ready") {
+    simulateMatchdayWrapper();
+    gameState.phase = "live";
+  }
+
+  else if (gameState.phase === "halftime") {
+    resumeMatch?.();
+    gameState.phase = "live";
+  }
+
+  else if (gameState.phase === "live") {
+    pauseMatch?.();
+  }
+
+  updateMainButton();
+}
+
+// =========================
+// 🔄 BUTTON UPDATE
+// =========================
+function updateMainButton(){
+
+  const btn = document.getElementById("mainActionBtn");
+  if(!btn) return;
+
+  btn.classList.remove("pause");
+
+  if (gameState.phase === "idle") {
+    btn.innerText = "▶ Saison starten";
+  }
+
+  else if (gameState.phase === "matchday_ready") {
+    btn.innerText = "▶ Nächster Spieltag";
+  }
+
+  else if (gameState.phase === "halftime") {
+    btn.innerText = "▶ 2. Halbzeit starten";
+  }
+
+  else if (gameState.phase === "live") {
+    btn.innerText = "⏸ Pause";
+    btn.classList.add("pause");
   }
 }
 
 // =========================
-// 🚀 APP START
-// =========================
-window.onload = function(){
-
-  console.log("🚀 App gestartet");
-
-  if(typeof loadGameState === "function"){
-    loadGameState();
-  }
-
-  const setup = document.getElementById("setupPanel");
-  if(setup && !selectedTeam){
-    setup.classList.add("open");
-  }
-
-  const select = document.getElementById("leagueSelect");
-  if(!select){
-    console.error("leagueSelect nicht gefunden");
-    return;
-  }
-
-  select.innerHTML = "";
-
-  Object.keys(leagues).forEach(l => {
-    let option = document.createElement("option");
-    option.value = l;
-    option.textContent = leagues[l];
-    select.appendChild(option);
-  });
-
-  if(selectedTeam){
-    const label = document.getElementById("selectedTeamText");
-    if(label) label.innerText = "Dein Team: " + selectedTeam;
-
-    const teamSelect = document.getElementById("teamSelect");
-    const btn = document.getElementById("btnSelectTeam");
-
-    if(teamSelect) teamSelect.disabled = true;
-    if(btn) btn.disabled = true;
-  }
-
-  if(typeof updateTable === "function"){
-    updateTable();
-  }
-
-  // 🔥 MATCHDAY FIX
-  updateMatchdayUI();
-
-  if(typeof startAds === "function"){
-    startAds();
-  }
-
-  if(typeof loadLeaderboard === "function"){
-    loadLeaderboard();
-  }
-
-  initPlayerName();
-  updateHeader();
-  initFriendUI();
-};
-
-// =========================
-// 🆕 MATCHDAY UI FIX
+// 🆕 MATCHDAY UI
 // =========================
 function updateMatchdayUI(){
-
   const el = document.getElementById("matchday");
   if(!el) return;
 
-  el.innerText = "Spieltag: " + (currentMatchday || 0) + " / " + (schedule?.length || 0);
+  el.innerText = "Spieltag: " + (currentMatchday || 0) + " / " + (schedule?.length || 30);
 }
 
 // =========================
@@ -335,31 +242,47 @@ function updateMatchdayUI(){
 // =========================
 function simulateMatchdayWrapper(){
 
-  if(typeof simulateMatchday === "function"){
-    simulateMatchday();
-  }
-
-  // 🔥 WICHTIG
-  if(typeof updateTable === "function"){
-    updateTable();
-  }
-
+  simulateMatchday?.();
+  updateTable?.();
   updateMatchdayUI();
+
+  gameState.phase = "matchday_ready";
+  updateMainButton();
+}
+
+// =========================
+// 📊 MOMENTUM SYSTEM (NEU)
+// =========================
+function updateMomentum(value){
+  const bar = document.getElementById("momentumBar");
+  if(bar){
+    bar.style.width = value + "%";
+  }
+}
+
+// =========================
+// ⚡ SPEED UI FIX
+// =========================
+function setSpeed(e, speed){
+  document.querySelectorAll(".speed").forEach(b => b.classList.remove("active"));
+  e.target.classList.add("active");
+
+  if(typeof window.setGameSpeed === "function"){
+    setGameSpeed(speed);
+  }
 }
 
 // =========================
 // 👥 FRIEND UI
 // =========================
 function initFriendUI(){
-  const codeEl = document.getElementById("friendCodeDisplay");
-  if(codeEl){
-    codeEl.innerText = friendCode;
-  }
+  const el = document.getElementById("friendCodeDisplay");
+  if(el) el.innerText = friendCode;
 }
 
 function copyFriendCode(){
   navigator.clipboard.writeText(friendCode);
-  alert("Freundescode kopiert!");
+  alert("Code kopiert!");
 }
 
 function joinFriendCode(){
@@ -369,3 +292,33 @@ function joinFriendCode(){
   localStorage.setItem("friendCode", input);
   location.reload();
 }
+
+// =========================
+// 🚀 APP START
+// =========================
+window.onload = function(){
+
+  console.log("🚀 App gestartet");
+
+  loadGameState?.();
+  updateTable?.();
+  startAds?.();
+  loadLeaderboard?.();
+
+  initPlayerName();
+  updateHeader();
+  initFriendUI();
+  updateMatchdayUI();
+  updateMainButton();
+
+  const select = document.getElementById("leagueSelect");
+  if(select){
+    select.innerHTML = "";
+    Object.keys(leagues).forEach(l => {
+      let option = document.createElement("option");
+      option.value = l;
+      option.textContent = leagues[l];
+      select.appendChild(option);
+    });
+  }
+};
