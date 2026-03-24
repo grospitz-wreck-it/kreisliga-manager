@@ -15,6 +15,11 @@ let lastNameChange = localStorage.getItem("lastNameChange");
 let playerColor = localStorage.getItem("playerColor") || "#00ffcc";
 let playerTitle = localStorage.getItem("playerTitle") || "Freizeitkicker";
 
+// =========================
+// 🆕 🔥 LEAGUE FIX (NEU – WICHTIG)
+// =========================
+let currentLeague = localStorage.getItem("selectedLeague") || null;
+
 
 // =========================
 // 🛑 BLACKLIST
@@ -36,28 +41,24 @@ function isValidName(name){
 
   const lower = name.toLowerCase();
 
-  // 🚫 blacklist
   if(bannedWords.some(word => lower.includes(word))){
     return false;
   }
 
-  // 🚫 nur zahlen vermeiden
   if(/^\d+$/.test(name)) return false;
 
   return true;
 }
 
-
 // =========================
-// ⏱️ COOLDOWN (1x pro Minute)
+// ⏱️ COOLDOWN
 // =========================
 function canChangeName(){
   if(!lastNameChange) return true;
 
   const diff = Date.now() - parseInt(lastNameChange);
-  return diff > 60000; // 60 Sekunden
+  return diff > 60000;
 }
-
 
 // =========================
 // 👤 INIT NAME
@@ -79,7 +80,6 @@ async function initPlayerName(){
   updateNameUI();
 }
 
-
 // =========================
 // 🎨 UI UPDATE
 // =========================
@@ -91,7 +91,6 @@ function updateNameUI(){
   const colorInput = document.getElementById("colorInput");
   if(colorInput) colorInput.value = playerColor;
 }
-
 
 // =========================
 // ✏️ NAME ÄNDERN
@@ -110,7 +109,6 @@ async function changeName(){
     return;
   }
 
-  // 🔍 DUPLIKAT CHECK
   const { data } = await supabaseClient
     .from("leaderboard")
     .select("name")
@@ -132,7 +130,6 @@ async function changeName(){
   loadLeaderboard();
 }
 
-
 // =========================
 // 🎨 FARBE ÄNDERN
 // =========================
@@ -145,7 +142,6 @@ function changeColor(){
 
   loadLeaderboard();
 }
-
 
 // =========================
 // 🏅 TITEL SYSTEM
@@ -164,13 +160,15 @@ if(!friendCode){
   localStorage.setItem("friendCode", friendCode);
 }
 
-
 // =========================
 // 🚀 APP START
 // =========================
 window.onload = function(){
 
   console.log("🚀 App gestartet");
+
+  // 🔥 LEAGUE DEBUG (optional)
+  console.log("Aktuelle Liga:", currentLeague);
 
   if(typeof loadGameState === "function"){
     loadGameState();
@@ -240,15 +238,15 @@ window.onload = function(){
     startAds();
   }
 
-  // 🏆 Leaderboard starten
   if(typeof loadLeaderboard === "function"){
     loadLeaderboard();
   }
 
-  // 👥 Friend UI init
+  // 👤 NAME INIT (WICHTIG für Anzeige)
+  initPlayerName();
+
   initFriendUI();
 };
-
 
 // =========================
 // 👥 FRIEND UI
