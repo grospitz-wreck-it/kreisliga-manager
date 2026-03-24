@@ -423,8 +423,9 @@ tbody tr:nth-last-child(2) {
 
 /* 👉 dein Team (dezent!) */
 .userTeamRow {
-  background: rgba(0, 200, 150, 0.08);
-  font-weight: 600;
+  background: rgba(0, 200, 150, 0.06);
+  font-weight: normal;
+  border-left: 3px solid #00c896;
 }
 
 /* 👉 Live-Spiel (SEHR subtil) */
