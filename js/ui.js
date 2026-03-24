@@ -25,11 +25,29 @@ function updateTable(isLive = false, liveT1 = null, liveT2 = null) {
   // =========================
   // 🔥 SORTIERUNG
   // =========================
-  tableData.sort((a, b) =>
-    b.points - a.points ||
-    (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst) ||
-    b.goalsFor - a.goalsFor
-  );
+tableData.sort((a, b) => {
+
+  // 1️⃣ Punkte
+  if(b.points !== a.points){
+    return b.points - a.points;
+  }
+
+  // 2️⃣ Tordifferenz
+  let diffA = (a.goalsFor || 0) - (a.goalsAgainst || 0);
+  let diffB = (b.goalsFor || 0) - (b.goalsAgainst || 0);
+
+  if(diffB !== diffA){
+    return diffB - diffA;
+  }
+
+  // 3️⃣ erzielte Tore
+  if((b.goalsFor || 0) !== (a.goalsFor || 0)){
+    return (b.goalsFor || 0) - (a.goalsFor || 0);
+  }
+
+  // 4️⃣ stabil halten (kein Springen)
+  return a.name.localeCompare(b.name);
+});
 
   // =========================
   // 🧱 RENDER
