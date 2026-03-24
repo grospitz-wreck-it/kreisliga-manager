@@ -1,21 +1,20 @@
 // =========================
-// 📊 TABELLE (LIVE READY)
+// 📊 TABELLE (FINAL CLEAN)
 // =========================
 function updateTable(isLive = false, liveT1 = null, liveT2 = null) {
 
-  let tbody = document.querySelector("#table tbody");
+  const tbody = document.querySelector("#table tbody");
   if(!tbody) return;
 
   tbody.innerHTML = "";
 
-  // 👉 Kopie, damit Original nicht zerstört wird
+  // 👉 KEIN originales Array zerstören!
   let tableData = teams.map(t => ({ ...t }));
 
   // =========================
   // 🔥 LIVE OVERRIDE
   // =========================
   if(isLive && liveT1 && liveT2){
-
     tableData = tableData.map(t => {
       if(t.name === liveT1.name) return liveT1;
       if(t.name === liveT2.name) return liveT2;
@@ -37,31 +36,33 @@ function updateTable(isLive = false, liveT1 = null, liveT2 = null) {
   // =========================
   tableData.forEach((t, index) => {
 
-    let name = t.name === selectedTeam
-      ? `<span class="userTeam">👉 ${t.name}</span>`
-      : t.name;
-
     let goalDiff = (t.goalsFor || 0) - (t.goalsAgainst || 0);
 
     let rowClass = "";
 
+    // 👉 Tabellenplatz
     if(index === 0){
-      rowClass = "first";
+      rowClass += " first";
     }
     else if(index >= tableData.length - 2){
-      rowClass = "relegation";
+      rowClass += " relegation";
     }
 
-    // 🔥 LIVE HIGHLIGHT
+    // 👉 eigenes Team
+    if(t.name === selectedTeam){
+      rowClass += " userTeamRow";
+    }
+
+    // 👉 Live Match Teams
     if(isLive && (t.name === liveT1?.name || t.name === liveT2?.name)){
       rowClass += " live";
     }
 
-    let row = document.createElement("tr");
-    row.className = rowClass;
+    const row = document.createElement("tr");
+    row.className = rowClass.trim();
 
     row.innerHTML = `
-      <td>${name}</td>
+      <td>${t.name}</td>
       <td>${t.played || 0}</td>
       <td>${t.wins || 0}</td>
       <td>${t.draws || 0}</td>
@@ -82,18 +83,11 @@ function updateTable(isLive = false, liveT1 = null, liveT2 = null) {
 function populateTeamSelect(){
 
   const select = document.getElementById("teamSelect");
-
-  if(!select){
-    console.warn("teamSelect nicht gefunden");
-    return;
-  }
+  if(!select) return;
 
   select.innerHTML = "";
 
-  if(!teams || teams.length === 0){
-    console.warn("Keine Teams zum Befüllen");
-    return;
-  }
+  if(!teams || teams.length === 0) return;
 
   teams.forEach(t => {
     let o = document.createElement("option");
@@ -107,17 +101,16 @@ function populateTeamSelect(){
 
 
 // =========================
-// 📢 LIVE EVENTS (MIT ABSÄTZEN)
+// 📢 LIVE EVENTS (FIX)
 // =========================
 function addEvent(text){
 
-  let box = document.getElementById("liveMatch");
+  const box = document.getElementById("liveMatch");
   if(!box) return;
 
-  let p = document.createElement("p");
+  const p = document.createElement("p");
   p.textContent = text;
 
-  // 👉 neu oben einfügen
   box.prepend(p);
 }
 
