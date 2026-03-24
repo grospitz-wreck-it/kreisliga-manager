@@ -1,15 +1,4 @@
 <!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <title>Kreisliga Manager</title>
-  <link rel="stylesheet" href="style.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body>
-
-  <!DOCTYPE html>
 
 <html lang="de">
 <head>
@@ -38,7 +27,7 @@
 
   <div class="setupGrid">
 
-    <!-- 👤 PROFIL (NEU) -->
+    <!-- 👤 PROFIL -->
     <div class="setupBox">
       <h3>👤 Profil</h3>
 
@@ -52,7 +41,7 @@
       <button onclick="changeColor()">🎨 Übernehmen</button>
     </div>
 
-    <!-- 👥 FREUNDE (NEU) -->
+    <!-- 👥 FREUNDE -->
     <div class="setupBox">
       <h3>👥 Freunde</h3>
 
@@ -66,13 +55,14 @@
       <button onclick="joinFriendCode()">➕ Beitreten</button>
     </div>
 
-    <!-- ORIGINAL -->
+    <!-- LIGA -->
     <div class="setupBox">
       <h3>Liga</h3>
       <select id="leagueSelect"></select>
       <button onclick="selectLeague()">Starten</button>
     </div>
 
+    <!-- TEAM -->
     <div class="setupBox">
       <h3>Team</h3>
       <select id="teamSelect"></select>
@@ -80,6 +70,7 @@
       <p id="selectedTeamText">-</p>
     </div>
 
+    <!-- TAKTIK -->
     <div class="setupBox">
       <h3>Taktik</h3>
       <select id="tacticSelect">
@@ -91,6 +82,7 @@
       <p id="currentTactic">Normal</p>
     </div>
 
+    <!-- FORMATION -->
     <div class="setupBox">
       <h3>Formation</h3>
       <select id="formationSelect">
@@ -103,6 +95,7 @@
       <p id="currentFormation">4-4-2</p>
     </div>
 
+    <!-- RESET -->
     <div class="menu-section">
       <button class="danger" onclick="resetGame()">
         🧨 Neues Spiel starten
@@ -202,24 +195,6 @@
 
       <h2>🏆 Top 10 Manager</h2>
 
-      <!-- 👤 ALT (BLEIBT, ABER VERSTECKT) -->
-      <div style="display:none;">
-        <input id="nameInput" placeholder="Dein Name">
-        <button onclick="changeName()">Speichern</button>
-
-        <input type="color" id="colorInput" value="#00ffcc">
-        <button onclick="changeColor()">OK</button>
-      </div>
-
-      <!-- 👥 ALT (BLEIBT, ABER VERSTECKT) -->
-      <div style="display:none;">
-        <b id="friendCodeDisplay">---</b>
-        <button onclick="copyFriendCode()">📋</button>
-
-        <input id="friendCodeInput" placeholder="Freundescode eingeben">
-        <button onclick="joinFriendCode()">Beitreten</button>
-      </div>
-
       <!-- 🌍 FILTER -->
       <div style="margin-bottom:10px;">
         <button onclick="setLeaderboardMode('global')">🌍 Global</button>
@@ -227,7 +202,6 @@
         <button onclick="setLeaderboardMode('friends')">👥 Freunde</button>
       </div>
 
-      <!-- LISTE -->
       <div id="leaderboard">Lade Daten...</div>
 
     </div>
@@ -262,24 +236,6 @@
 
   <script src="js/main.js"></script>
 
-  <script src="js/leaderboard.js"></script>
-
-</body>
-</html>
-
-
-  <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="js/supabase.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/league.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/floskeln.js"></script>
-  <script src="js/news.js"></script>
-  <script src="js/matchEngine.js"></script>
-  <script src="js/controls.js"></script>
-  <script src="js/ads.js"></script>
-  <script src="js/main.js"></script>
   <script src="js/leaderboard.js"></script>
 
 </body>
