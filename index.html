@@ -9,15 +9,30 @@
 
 <body>
 
-<!-- 🏟️ FULL WIDTH HEADER -->
 <div class="header">
-  <img src="logos/logo.png" class="mainLogo">
+
+  <div class="headerOverlay"></div>
+
+  <div class="headerContent">
+
+    <!-- LINKS: Titel -->
+    <div class="headerLeft">
+      <div class="gameTitle" id="gameTitle">
+        Kreisliga Manager
+      </div>
+      <div class="subTitle" id="leagueTitle">
+        Keine Liga gewählt
+      </div>
+    </div>
+
+    <!-- RECHTS: Burger -->
+    <div class="headerRight">
+      <button id="menuBtn" onclick="toggleSetup()">☰</button>
+    </div>
+
+  </div>
+
 </div>
-
-<div class="app">
-
-  <!-- BURGER -->
-  <button id="menuBtn" onclick="toggleSetup()">☰</button>
 
   <!-- SETUP PANEL -->
   <div id="setupPanel" class="setupOverlay open">
