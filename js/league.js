@@ -1,3 +1,6 @@
+// =========================
+// 🏗️ TEAM ERSTELLEN
+// =========================
 function createTeam(name){
   return {
     name: name,
@@ -11,9 +14,11 @@ function createTeam(name){
   };
 }
 
+// =========================
+// 🏟️ LIGA LADEN
+// =========================
 function loadLeague(name) {
 
-  // ✅ sauberer Reset
   teams = [];
   schedule = [];
   currentMatchday = 0;
@@ -82,13 +87,13 @@ function loadLeague(name) {
   }
 
   console.log("Teams geladen:", teams.length);
+
+  generateSchedule(); // 🔥 automatisch erzeugen
 }
 
-
 // =========================
-// ⚽ SPIELPLAN GENERIEREN
+// ⚽ SPIELPLAN (30 SPIELTAGE)
 // =========================
-
 function generateSchedule(){
 
   if(!teams || teams.length === 0){
@@ -100,7 +105,7 @@ function generateSchedule(){
 
   let tempTeams = [...teams];
 
-  // 🔥 Wenn ungerade Anzahl → Dummy Team
+  // 👉 Dummy bei ungerade
   if(tempTeams.length % 2 !== 0){
     tempTeams.push({ name: "SPIELFREI" });
   }
@@ -108,6 +113,11 @@ function generateSchedule(){
   const rounds = tempTeams.length - 1;
   const half = tempTeams.length / 2;
 
+  let firstLeg = [];
+
+  // =========================
+  // 🔁 HINRUNDE
+  // =========================
   for(let round = 0; round < rounds; round++){
 
     let matchday = [];
@@ -117,15 +127,14 @@ function generateSchedule(){
       let home = tempTeams[i];
       let away = tempTeams[tempTeams.length - 1 - i];
 
-      // 👉 SPIELFREI überspringen
       if(home.name !== "SPIELFREI" && away.name !== "SPIELFREI"){
         matchday.push([home, away]);
       }
     }
 
-    schedule.push(matchday);
+    firstLeg.push(matchday);
 
-    // 🔄 Rotation
+    // Rotation (stabil)
     let fixed = tempTeams[0];
     let rest = tempTeams.slice(1);
 
@@ -133,6 +142,27 @@ function generateSchedule(){
 
     tempTeams = [fixed, ...rest];
   }
+
+  // =========================
+  // 🔁 RÜCKRUNDE
+  // =========================
+  let secondLeg = firstLeg.map(matchday =>
+    matchday.map(match => [match[1], match[0]])
+  );
+
+  // =========================
+  // 🧩 KOMBINIEREN
+  // =========================
+  schedule = [...firstLeg, ...secondLeg];
+
+  // =========================
+  // 🔥 AUF 30 SPIELTAGE FIXEN
+  // =========================
+  while(schedule.length < 30){
+    schedule = schedule.concat(schedule);
+  }
+
+  schedule = schedule.slice(0, 30);
 
   console.log("Spielplan erstellt:", schedule.length, "Spieltage");
 }
