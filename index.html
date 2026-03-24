@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
   <meta charset="UTF-8">
@@ -10,233 +9,236 @@
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-```
-<!-- HEADER -->
-<div class="header">
-  <img src="logos/logo.png" class="mainLogo">
-</div>
+  <!-- HEADER -->
+  <div class="header">
+    <img src="logos/logo.png" class="mainLogo">
+  </div>
 
-<!-- BURGER -->
-<button id="menuBtn" onclick="toggleSetup()">☰</button>
+  <!-- BURGER -->
+  <button id="menuBtn" onclick="toggleSetup()">☰</button>
 
-<!-- SETUP -->
-<div id="setupPanel" class="setupOverlay open">
-  <h2>⚙️ Einstellungen</h2>
+  <!-- SETUP PANEL -->
+  <div id="setupPanel" class="setupOverlay open">
 
-  <div class="setupGrid">
+    <h2>⚙️ Einstellungen</h2>
 
     <!-- 👤 PROFIL -->
     <div class="setupBox">
       <h3>👤 Profil</h3>
 
-      <input id="nameInput" placeholder="Dein Name">
-      <button onclick="changeName()">💾 Speichern</button>
+      <label>Dein Name</label>
+      <input id="nameInput" placeholder="Manager Name">
 
-      <br><br>
+      <button onclick="changeName()" class="primary">
+        💾 Speichern
+      </button>
 
       <label>Farbe</label>
       <input type="color" id="colorInput" value="#00ffcc">
-      <button onclick="changeColor()">🎨 Übernehmen</button>
+
+      <button onclick="changeColor()">
+        🎨 Farbe übernehmen
+      </button>
     </div>
 
     <!-- 👥 FREUNDE -->
     <div class="setupBox">
       <h3>👥 Freunde</h3>
 
-      Dein Code:
-      <b id="friendCodeDisplay">---</b>
-      <button onclick="copyFriendCode()">📋 Kopieren</button>
+      <div class="infoRow">
+        <span>Dein Code:</span>
+        <strong id="friendCodeDisplay">---</strong>
+      </div>
 
-      <br><br>
+      <button onclick="copyFriendCode()">📋 Code kopieren</button>
 
       <input id="friendCodeInput" placeholder="Freundescode eingeben">
+
       <button onclick="joinFriendCode()">➕ Beitreten</button>
     </div>
 
-    <!-- LIGA -->
+    <!-- 🏟️ LIGA -->
     <div class="setupBox">
       <h3>Liga</h3>
+
       <select id="leagueSelect"></select>
+
       <button onclick="selectLeague()">Starten</button>
     </div>
 
-    <!-- TEAM -->
+    <!-- 🏟️ TEAM -->
     <div class="setupBox">
       <h3>Team</h3>
+
       <select id="teamSelect"></select>
+
       <button id="btnSelectTeam" onclick="selectTeam()">Übernehmen</button>
+
       <p id="selectedTeamText">-</p>
     </div>
 
-    <!-- TAKTIK -->
+    <!-- ⚙️ TAKTIK -->
     <div class="setupBox">
       <h3>Taktik</h3>
+
       <select id="tacticSelect">
         <option>Normal</option>
         <option>Offensiv</option>
         <option>Defensiv</option>
       </select>
+
       <button onclick="setTactic()">Speichern</button>
+
       <p id="currentTactic">Normal</p>
     </div>
 
-    <!-- FORMATION -->
+    <!-- ⚙️ FORMATION -->
     <div class="setupBox">
       <h3>Formation</h3>
+
       <select id="formationSelect">
         <option>4-4-2</option>
         <option>4-3-3</option>
         <option>3-5-2</option>
         <option>5-3-2</option>
       </select>
+
       <button onclick="setFormation()">Setzen</button>
+
       <p id="currentFormation">4-4-2</p>
     </div>
 
     <!-- RESET -->
-    <div class="menu-section">
+    <div class="setupBox">
       <button class="danger" onclick="resetGame()">
         🧨 Neues Spiel starten
       </button>
     </div>
 
   </div>
-</div>
 
-<!-- LAYOUT -->
-<div class="layout">
+  <!-- MAIN LAYOUT -->
+  <div class="layout">
 
-  <!-- GAME -->
-  <div class="panel">
-
-    <h2 id="matchday">Spieltag: 0 / 0</h2>
-    <button id="startBtn" onclick="simulateMatchday()">▶ Saison starten</button>
-
-    <div class="scoreboard">
-      <div id="teamLeft">-</div>
-      <div id="score">0 : 0</div>
-      <div id="teamRight">-</div>
-    </div>
-
-    <div class="timeline">
-      <div id="timelineBar"></div>
-    </div>
-
-    <div class="controls">
-      <button onclick="setLiveMode('attack')">🔥 Druck</button>
-      <button onclick="setLiveMode('calm')">🧊 Ruhig</button>
-      <button onclick="makeSub()">🔄 Wechsel</button>
-      <span id="subCount">Wechsel: 5</span>
-    </div>
-
-    <div class="controls">
-      Geschwindigkeit:
-      <button onclick="setSpeed(event, 1)">1x</button>
-      <button onclick="setSpeed(event, 2)">2x</button>
-      <button onclick="setSpeed(event, 4)">4x</button>
-    </div>
-
-    <div id="liveMatch" class="live"></div>
-
-    <div class="panel">
-      <h3>🎮 Spielanpassung</h3>
-      <button onclick="setLiveMode('attack')">Mehr Druck</button>
-      <button onclick="setLiveMode('calm')">Defensiver</button>
-    </div>
-
-    <div id="halftimePanel" style="display:none;">
-      <h3>Halbzeit</h3>
-      <button onclick="resumeMatch()">2. Halbzeit starten</button>
-    </div>
-
-  </div>
-
-  <!-- SIDE -->
-  <div class="sidePanel">
-
-    <!-- Tabelle -->
-    <div class="panel">
-      <h2>Tabelle</h2>
-      <table id="table">
-        <thead>
-          <tr>
-            <th>Team</th>
-            <th>Sp</th>
-            <th>S</th>
-            <th>U</th>
-            <th>N</th>
-            <th>Tore</th>
-            <th>Diff</th>
-            <th>Punkte</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <!-- Werbung -->
-    <div class="panel">
-      <h2>📢 Bandenwerbung</h2>
-      <div id="adBanner">
-        <div class="adTrack" id="adTrack"></div>
-      </div>
-    </div>
-
-    <!-- News -->
-    <div class="panel">
-      <h2>📰 Spieltagsbericht</h2>
-      <div id="newsBox" class="live"></div>
-    </div>
-
-    <!-- 🏆 LEADERBOARD -->
+    <!-- GAME -->
     <div class="panel">
 
-      <h2>🏆 Top 10 Manager</h2>
+      <h2 id="matchday">Spieltag: 0 / 0</h2>
 
-      <!-- 🌍 FILTER -->
-      <div style="margin-bottom:10px;">
-        <button onclick="setLeaderboardMode('global')">🌍 Global</button>
-        <button onclick="setLeaderboardMode('league')">🏟️ Liga</button>
-        <button onclick="setLeaderboardMode('friends')">👥 Freunde</button>
+      <button id="startBtn" onclick="simulateMatchday()">
+        ▶ Saison starten
+      </button>
+
+      <div class="scoreboard">
+        <div id="teamLeft">-</div>
+        <div id="score">0 : 0</div>
+        <div id="teamRight">-</div>
       </div>
 
-      <div id="leaderboard">Lade Daten...</div>
+      <div class="timeline">
+        <div id="timelineBar"></div>
+      </div>
+
+      <div class="controls">
+        <button onclick="setLiveMode('attack')">🔥 Druck</button>
+        <button onclick="setLiveMode('calm')">🧊 Ruhig</button>
+        <button onclick="makeSub()">🔄 Wechsel</button>
+        <span id="subCount">Wechsel: 5</span>
+      </div>
+
+      <div class="controls">
+        Geschwindigkeit:
+        <button onclick="setSpeed(event, 1)">1x</button>
+        <button onclick="setSpeed(event, 2)">2x</button>
+        <button onclick="setSpeed(event, 4)">4x</button>
+      </div>
+
+      <div id="liveMatch" class="live"></div>
+
+      <div class="panel">
+        <h3>🎮 Spielanpassung</h3>
+        <button onclick="setLiveMode('attack')">Mehr Druck</button>
+        <button onclick="setLiveMode('calm')">Defensiver</button>
+      </div>
+
+      <div id="halftimePanel" style="display:none;">
+        <h3>Halbzeit</h3>
+        <button onclick="resumeMatch()">2. Halbzeit starten</button>
+      </div>
+
+    </div>
+
+    <!-- SIDE -->
+    <div class="sidePanel">
+
+      <!-- TABLE -->
+      <div class="panel">
+        <h2>Tabelle</h2>
+        <table id="table">
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Sp</th>
+              <th>S</th>
+              <th>U</th>
+              <th>N</th>
+              <th>Tore</th>
+              <th>Diff</th>
+              <th>Punkte</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- ADS -->
+      <div class="panel">
+        <h2>📢 Bandenwerbung</h2>
+        <div id="adBanner">
+          <div class="adTrack" id="adTrack"></div>
+        </div>
+      </div>
+
+      <!-- NEWS -->
+      <div class="panel">
+        <h2>📰 Spieltagsbericht</h2>
+        <div id="newsBox" class="live"></div>
+      </div>
+
+      <!-- LEADERBOARD -->
+      <div class="panel">
+        <h2>🏆 Top 10 Manager</h2>
+
+        <div style="margin-bottom:10px;">
+          <button onclick="setLeaderboardMode('global')">🌍 Global</button>
+          <button onclick="setLeaderboardMode('league')">🏟️ Liga</button>
+          <button onclick="setLeaderboardMode('friends')">👥 Freunde</button>
+        </div>
+
+        <div id="leaderboard">Lade Daten...</div>
+      </div>
 
     </div>
 
   </div>
+
 </div>
-```
 
-  </div>
-
-  <!-- SCRIPTS -->
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-  <script src="js/supabase.js"></script>
-
-  <script src="js/state.js"></script>
-
-  <script src="js/league.js"></script>
-
-  <script src="js/ui.js"></script>
-
-  <script src="js/floskeln.js"></script>
-
-  <script src="js/news.js"></script>
-
-  <script src="js/matchEngine.js"></script>
-
-  <script src="js/controls.js"></script>
-
-  <script src="js/ads.js"></script>
-
-  <script src="js/main.js"></script>
-
-  <script src="js/leaderboard.js"></script>
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/state.js"></script>
+<script src="js/league.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/floskeln.js"></script>
+<script src="js/news.js"></script>
+<script src="js/matchEngine.js"></script>
+<script src="js/controls.js"></script>
+<script src="js/ads.js"></script>
+<script src="js/main.js"></script>
+<script src="js/leaderboard.js"></script>
 
 </body>
 </html>
