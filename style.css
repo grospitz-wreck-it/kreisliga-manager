@@ -410,15 +410,16 @@ tbody tr:nth-last-child(2) {
 /* =========================
    📊 TABLE FIX
 ========================= */
-
+#table td {
+  white-space: nowrap;
+}
 /* =========================
    📊 TABLE CLEAN FIX
 ========================= */
 
 #table td {
-  padding: 6px 8px;
-  line-height: 1.2;
-  vertical-align: middle;
+  padding: 4px 8px;
+  line-height: 1;
 }
 
 /* 👉 dein Team (dezent!) */
