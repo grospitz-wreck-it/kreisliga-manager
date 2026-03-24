@@ -343,17 +343,16 @@ button.active {
 /* =========================
    LIVE FEED
 ========================= */
-.live {
+#liveMatch {
   background: #263238;
   color: #e0f2f1;
   height: 260px;
-  min-height: 260px;
   overflow-y: auto;
   padding: 10px;
   border-radius: 10px;
 }
 
-.live p {
+#liveMatch p {
   margin: 4px 0;
   font-size: 13px;
 }
