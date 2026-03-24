@@ -1,14 +1,40 @@
 // =========================
-// 🔥 MATCH ENGINE (STABLE CORE)
+// 🔥 MATCH ENGINE (FINAL STABLE)
 // =========================
 
-// ✅ FIX: sauber deklariert
+// ❗ KEIN let → globale Nutzung
 currentInterval = null;
 halftimePlayed = false;
 
-// ✅ SAFETY
-if(typeof speedMultiplier === "undefined"){
-  speedMultiplier = 1;
+// Fallback (ohne Re-Declaration)
+if(typeof speedMultiplier === "undefined") speedMultiplier = 1;
+
+// =========================
+// 📊 LIVE TABLE UPDATE
+// =========================
+function updateLiveTable(team1, team2, goals1, goals2){
+
+  if(typeof updateTable !== "function") return;
+
+  let t1 = {...team1};
+  let t2 = {...team2};
+
+  t1.goalsFor += goals1;
+  t1.goalsAgainst += goals2;
+
+  t2.goalsFor += goals2;
+  t2.goalsAgainst += goals1;
+
+  if(goals1 > goals2){
+    t1.points += 3;
+  } else if(goals2 > goals1){
+    t2.points += 3;
+  } else {
+    t1.points += 1;
+    t2.points += 1;
+  }
+
+  updateTable(true, t1, t2);
 }
 
 // =========================
@@ -18,7 +44,6 @@ function simulateMatchday(){
 
   console.log("🔥 simulateMatchday");
 
-  // 🔥 HARD RESET
   clearInterval(currentInterval);
   isSimulating = false;
 
@@ -49,7 +74,6 @@ function simulateMatchday(){
 
   updateTimeline(0);
 
-  // 👉 User Match
   let userMatch = matches.find(m =>
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
@@ -59,7 +83,7 @@ function simulateMatchday(){
     return;
   }
 
-  // 👉 andere Matches
+  // andere Matches simulieren
   matches.forEach(m => {
     if(m !== userMatch){
       simulateQuick(m[0], m[1]);
@@ -91,7 +115,6 @@ function startMatchLoop(){
 
   currentInterval = setInterval(()=>{
 
-    // 🔥 SAFETY
     if(!isSimulating) return;
 
     currentMinute++;
@@ -100,10 +123,8 @@ function startMatchLoop(){
 
     simulateMinute();
 
-    // ⏸ HALBZEIT
+    // Halbzeit
     if(currentMinute === 45 && !halftimePlayed){
-
-      console.log("⏸ Halbzeit");
 
       halftimePlayed = true;
       isSimulating = false;
@@ -116,13 +137,12 @@ function startMatchLoop(){
       return;
     }
 
-    // 🏁 ENDE
+    // Ende
     if(currentMinute >= 90){
-
       endMatch();
     }
 
-  }, Math.max(100, 1000 / speedMultiplier)); // ✅ FIX: nie NaN / 0
+  }, Math.max(100, 1000 / speedMultiplier));
 }
 
 // =========================
@@ -149,14 +169,17 @@ function simulateMinute(){
         liveScore.s2
       );
 
-      updateLiveTable(
-        liveScore.t1,
-        liveScore.t2,
-        liveScore.s1,
-        liveScore.s2
-      );
-    }
-    else{
+      // 🔥 FIX: Safe Call
+      if(typeof updateLiveTable === "function"){
+        updateLiveTable(
+          liveScore.t1,
+          liveScore.t2,
+          liveScore.s1,
+          liveScore.s2
+        );
+      }
+
+    } else {
       addLiveEvent(`🔥 Chance für ${atk.name}`);
     }
   }
@@ -166,8 +189,6 @@ function simulateMinute(){
 // ▶️ RESUME
 // =========================
 function resumeMatch(){
-
-  console.log("▶️ Resume");
 
   addLiveEvent("▶️ Zweite Halbzeit läuft");
 
@@ -183,8 +204,6 @@ function resumeMatch(){
 // 🏁 MATCH ENDE
 // =========================
 async function endMatch(){
-
-  console.log("🏁 Spielende");
 
   clearInterval(currentInterval);
 
@@ -254,6 +273,16 @@ async function endMatch(){
   updateMainButton();
 
   saveGameState?.();
+}
+
+// =========================
+// ⚡ SPEED FIX (für controls.js)
+// =========================
+function restartInterval(){
+
+  if(!isSimulating) return;
+
+  startMatchLoop();
 }
 
 // =========================
