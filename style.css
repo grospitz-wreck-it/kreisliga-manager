@@ -412,35 +412,35 @@ tbody tr:nth-last-child(2) {
    📊 TABLE FIX
 ========================= */
 
+/* =========================
+   📊 TABLE CLEAN FIX
+========================= */
+
 #table td {
   padding: 6px 8px;
   line-height: 1.2;
   vertical-align: middle;
 }
 
-#table tr {
-  height: auto;
-}
-
-/* 👉 eigenes Team */
+/* 👉 dein Team (dezent!) */
 .userTeamRow {
-  background: rgba(0, 255, 200, 0.12);
+  background: rgba(0, 200, 150, 0.08);
   font-weight: 600;
 }
 
-/* 👉 Live-Spiel */
+/* 👉 Live-Spiel (SEHR subtil) */
 .live {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.03);
 }
 
-/* 👉 Platz 1 */
+/* 👉 Tabellenführer */
 .first {
-  background: rgba(0, 255, 0, 0.12);
+  background: rgba(0, 255, 0, 0.08);
 }
 
-/* 👉 Abstieg */
+/* 👉 Abstiegszone */
 .relegation {
-  background: rgba(255, 0, 0, 0.12);
+  background: rgba(255, 0, 0, 0.06);
 }
 /* =========================
    LEADERBOARD
