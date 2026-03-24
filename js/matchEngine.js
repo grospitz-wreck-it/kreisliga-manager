@@ -2,7 +2,7 @@
 // 🔥 MATCH ENGINE (NEW CORE)
 // =========================
 
-let currentInterval = null;
+currentInterval = null;
 let halftimePlayed = false;
 
 // =========================
