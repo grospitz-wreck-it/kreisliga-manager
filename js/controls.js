@@ -87,7 +87,7 @@ function addEvent(text, minute){
 // 🎯 TAKTIK
 // =========================
 
-let tacticModifier = 0;
+tacticModifier = 0;
 
 function setTactic(){
 
@@ -104,7 +104,7 @@ function setTactic(){
 // 📐 FORMATION
 // =========================
 
-let formationModifier = 0;
+formationModifier = 0;
 
 function setFormation(){
 
@@ -122,7 +122,7 @@ function setFormation(){
 // ⚡ LIVE MODES (FIXED)
 // =========================
 
-let liveModifier = 0;
+liveModifier = 0;
 
 function setLiveMode(mode){
 
@@ -184,7 +184,7 @@ function makeSub(){
 // 🎚️ INTENSITY (NEU)
 // =========================
 
-let intensityModifier = 0;
+intensityModifier = 0;
 
 function setIntensity(val){
 
