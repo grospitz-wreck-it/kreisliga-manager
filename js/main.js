@@ -78,6 +78,7 @@ async function initPlayerName(){
   }
 
   updateNameUI();
+  updateHeader(); // 🔥 NEU
 }
 
 // =========================
@@ -127,6 +128,7 @@ async function changeName(){
 
   alert("Name gespeichert!");
 
+  updateHeader(); // 🔥 NEU
   loadLeaderboard();
 }
 
@@ -158,6 +160,26 @@ let friendCode = localStorage.getItem("friendCode");
 if(!friendCode){
   friendCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   localStorage.setItem("friendCode", friendCode);
+}
+
+// =========================
+// 🆕 AAA HEADER UPDATE
+// =========================
+function updateHeader(){
+
+  const league = localStorage.getItem("selectedLeague") || "Keine Liga";
+  const team = localStorage.getItem("selectedTeam") || "";
+
+  const titleEl = document.getElementById("gameTitle");
+  const subEl = document.getElementById("leagueTitle");
+
+  if(titleEl){
+    titleEl.textContent = playerName || "Kreisliga Manager";
+  }
+
+  if(subEl){
+    subEl.textContent = team ? `${league} • ${team}` : league;
+  }
 }
 
 // =========================
@@ -242,8 +264,11 @@ window.onload = function(){
     loadLeaderboard();
   }
 
-  // 👤 NAME INIT (WICHTIG für Anzeige)
+  // 👤 NAME INIT
   initPlayerName();
+
+  // 🔥 HEADER INIT (NEU)
+  updateHeader();
 
   initFriendUI();
 };
