@@ -84,6 +84,9 @@ async function initPlayerName(){
 // =========================
 // 📱 SETUP PANEL CONTROL
 // =========================
+// =========================
+// 📱 PANEL CONTROL (AAA)
+// =========================
 function toggleSetup(){
 
   const panel = document.getElementById("setupPanel");
@@ -94,21 +97,62 @@ function toggleSetup(){
 }
 
 function closeSetup(){
-
-  const panel = document.getElementById("setupPanel");
-  const overlay = document.getElementById("overlay");
-
-  panel.classList.remove("open");
-  overlay.classList.remove("active");
+  document.getElementById("setupPanel").classList.remove("open");
+  document.getElementById("overlay").classList.remove("active");
 }
 
-// ESC Support (Desktop + Android Back Gefühl)
-document.addEventListener("keydown", (e) => {
+// =========================
+// 📑 TABS
+// =========================
+function openTab(evt, tabId){
+
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tabContent").forEach(c => c.classList.remove("active"));
+
+  evt.currentTarget.classList.add("active");
+  document.getElementById(tabId).classList.add("active");
+}
+
+// =========================
+// 👉 SWIPE TO CLOSE
+// =========================
+let startX = 0;
+
+const panel = document.getElementById("setupPanel");
+
+if(panel){
+
+  panel.addEventListener("touchstart", (e)=>{
+    startX = e.touches[0].clientX;
+  });
+
+  panel.addEventListener("touchmove", (e)=>{
+    let diff = e.touches[0].clientX - startX;
+
+    if(diff > 0){
+      panel.style.transform = `translateX(${diff}px)`;
+    }
+  });
+
+  panel.addEventListener("touchend", (e)=>{
+    let diff = e.changedTouches[0].clientX - startX;
+
+    if(diff > 100){
+      closeSetup();
+    } else {
+      panel.style.transform = "";
+    }
+  });
+}
+
+// =========================
+// ESC SUPPORT
+// =========================
+document.addEventListener("keydown", (e)=>{
   if(e.key === "Escape"){
     closeSetup();
   }
 });
-
 // =========================
 // 🎨 UI UPDATE
 // =========================
