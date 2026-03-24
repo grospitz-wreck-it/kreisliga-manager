@@ -16,7 +16,7 @@ let playerColor = localStorage.getItem("playerColor") || "#00ffcc";
 let playerTitle = localStorage.getItem("playerTitle") || "Freizeitkicker";
 
 // =========================
-// 🆕 🔥 LEAGUE FIX (NEU – WICHTIG)
+// 🆕 LEAGUE FIX
 // =========================
 let currentLeague = localStorage.getItem("selectedLeague") || null;
 
@@ -35,7 +35,6 @@ const bannedWords = [
 // 🔍 NAME VALIDATION
 // =========================
 function isValidName(name){
-
   if(!name || name.length < 3) return false;
   if(name.length > 20) return false;
 
@@ -78,17 +77,13 @@ async function initPlayerName(){
   }
 
   updateNameUI();
-  updateHeader(); // 🔥 NEU
+  updateHeader();
 }
 
 // =========================
-// 📱 SETUP PANEL CONTROL
-// =========================
-// =========================
-// 📱 PANEL CONTROL (FIXED)
+// 📱 PANEL CONTROL
 // =========================
 function toggleSetup(){
-
   const panel = document.getElementById("setupPanel");
   const overlay = document.getElementById("overlay");
 
@@ -99,7 +94,6 @@ function toggleSetup(){
 }
 
 function closeSetup(){
-
   const panel = document.getElementById("setupPanel");
   const overlay = document.getElementById("overlay");
 
@@ -113,7 +107,6 @@ function closeSetup(){
 // 📑 TABS
 // =========================
 function openTab(evt, tabId){
-
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   document.querySelectorAll(".tabContent").forEach(c => c.classList.remove("active"));
 
@@ -122,7 +115,7 @@ function openTab(evt, tabId){
 }
 
 // =========================
-// 👉 SWIPE (SAFE INIT)
+// 👉 SWIPE
 // =========================
 window.addEventListener("load", () => {
 
@@ -211,7 +204,7 @@ async function changeName(){
 
   alert("Name gespeichert!");
 
-  updateHeader(); // 🔥 NEU
+  updateHeader();
   loadLeaderboard();
 }
 
@@ -232,7 +225,6 @@ function changeColor(){
 // 🏅 TITEL SYSTEM
 // =========================
 function getPlayerTitle(score){
-
   if(score >= 50) return "Schwalbengott";
   if(score >= 30) return "Kampfschwein";
   if(score >= 15) return "Platzwart";
@@ -246,7 +238,7 @@ if(!friendCode){
 }
 
 // =========================
-// 🆕 AAA HEADER UPDATE
+// 🆕 HEADER UPDATE
 // =========================
 function updateHeader(){
 
@@ -271,9 +263,6 @@ function updateHeader(){
 window.onload = function(){
 
   console.log("🚀 App gestartet");
-
-  // 🔥 LEAGUE DEBUG (optional)
-  console.log("Aktuelle Liga:", currentLeague);
 
   if(typeof loadGameState === "function"){
     loadGameState();
@@ -314,30 +303,8 @@ window.onload = function(){
     updateTable();
   }
 
-  if(currentMatchday){
-    const matchdayEl = document.getElementById("matchday");
-    if(matchdayEl){
-      matchdayEl.innerText =
-        "Spieltag: " + currentMatchday + " / " + (schedule?.length || "?");
-    }
-  }
-
-  if(
-    liveScore &&
-    liveScore.t1 &&
-    typeof liveScore.t1 === "object" &&
-    currentMinute > 0 &&
-    currentMinute < 90
-  ){
-    if(typeof simulateLiveMatch === "function"){
-      simulateLiveMatch(
-        liveScore.t1,
-        liveScore.t2,
-        liveScore.s1,
-        liveScore.s2
-      );
-    }
-  }
+  // 🔥 MATCHDAY FIX
+  updateMatchdayUI();
 
   if(typeof startAds === "function"){
     startAds();
@@ -347,20 +314,43 @@ window.onload = function(){
     loadLeaderboard();
   }
 
-  // 👤 NAME INIT
   initPlayerName();
-
-  // 🔥 HEADER INIT (NEU)
   updateHeader();
-
   initFriendUI();
 };
+
+// =========================
+// 🆕 MATCHDAY UI FIX
+// =========================
+function updateMatchdayUI(){
+
+  const el = document.getElementById("matchday");
+  if(!el) return;
+
+  el.innerText = "Spieltag: " + (currentMatchday || 0) + " / " + (schedule?.length || 0);
+}
+
+// =========================
+// 🆕 MATCHDAY WRAPPER
+// =========================
+function simulateMatchdayWrapper(){
+
+  if(typeof simulateMatchday === "function"){
+    simulateMatchday();
+  }
+
+  // 🔥 WICHTIG
+  if(typeof updateTable === "function"){
+    updateTable();
+  }
+
+  updateMatchdayUI();
+}
 
 // =========================
 // 👥 FRIEND UI
 // =========================
 function initFriendUI(){
-
   const codeEl = document.getElementById("friendCodeDisplay");
   if(codeEl){
     codeEl.innerText = friendCode;
