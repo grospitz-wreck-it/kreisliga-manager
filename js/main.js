@@ -17,7 +17,7 @@ let playerTitle = localStorage.getItem("playerTitle") || "Freizeitkicker";
 // 🎮 GAME STATE
 // =========================
 let gameState = window.gameState || {
-  phase: "idle" // idle | matchday_ready | live | halftime
+  phase: "idle"
 };
 
 // =========================
@@ -185,16 +185,30 @@ function startSeason(){
 }
 
 // =========================
-// ▶️ MATCH START
+// ▶️ MATCH START (FIXED!!!)
 // =========================
 function startMatch(){
 
   console.log("⚽ Spiel startet");
 
-  simulateMatchday?.();
+  // 🔥 WICHTIG: Reset gegen Blocker
+  isSimulating = false;
+
+  // 🔥 garantiert richtiger Start
+  if(typeof simulateMatchday === "function"){
+    simulateMatchday();
+  }
+
+  // 👉 FALLBACK: falls Engine verkackt
+  setTimeout(()=>{
+    if(!isSimulating && typeof startMatchLoop === "function"){
+      console.warn("⚠️ Loop war nicht aktiv → starte manuell");
+      isSimulating = true;
+      startMatchLoop();
+    }
+  }, 300);
 
   gameState.phase = "live";
-
   updateMainButton();
 }
 
@@ -207,7 +221,9 @@ function resumeMatch(){
 
   isSimulating = true;
 
-  restartInterval?.();
+  if(typeof startMatchLoop === "function"){
+    startMatchLoop();
+  }
 
   gameState.phase = "live";
   updateMainButton();
@@ -217,6 +233,8 @@ function resumeMatch(){
 // 🎮 MAIN BUTTON
 // =========================
 function handleMainAction(){
+
+  console.log("STATE:", gameState.phase);
 
   switch(gameState.phase){
 
