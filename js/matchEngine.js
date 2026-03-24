@@ -8,7 +8,7 @@ halftimePlayed = false;
 
 // ✅ SAFETY
 if(typeof speedMultiplier === "undefined"){
-  var speedMultiplier = 1;
+  speedMultiplier = 1;
 }
 
 // =========================
