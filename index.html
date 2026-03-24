@@ -9,33 +9,33 @@
 
 <body>
 
+<!-- 🔥 OVERLAY (NEU) -->
+<div id="overlay" onclick="toggleSetup()"></div>
+
+<!-- 🏆 HEADER -->
 <div class="header">
 
   <div class="headerOverlay"></div>
 
   <div class="headerContent">
 
-    <!-- LINKS: Titel -->
     <div class="headerLeft">
-      <div class="gameTitle" id="gameTitle">
-        Kreisliga Manager
-      </div>
-      <div class="subTitle" id="leagueTitle">
-        Keine Liga gewählt
-      </div>
+      <div class="gameTitle" id="gameTitle">Kreisliga Manager</div>
+      <div class="subTitle" id="leagueTitle">Keine Liga gewählt</div>
     </div>
 
-    <!-- RECHTS: Burger -->
     <div class="headerRight">
       <button id="menuBtn" onclick="toggleSetup()">☰</button>
     </div>
 
   </div>
-
 </div>
 
-  <!-- SETUP PANEL -->
-  <div id="setupPanel" class="setupOverlay open">
+<!-- ⚙️ SETUP PANEL -->
+<div id="setupPanel">
+
+  <!-- ❌ CLOSE BUTTON (NEU) -->
+  <button class="closeBtn" onclick="closeSetup()">✖</button>
 
     <h2>⚙️ Einstellungen</h2>
 
