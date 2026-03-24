@@ -4,7 +4,7 @@
 
 // ✅ FIX: sauber deklariert
 currentInterval = null;
-let halftimePlayed = false;
+halftimePlayed = false;
 
 // ✅ SAFETY
 if(typeof speedMultiplier === "undefined"){
