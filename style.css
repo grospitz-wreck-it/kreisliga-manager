@@ -408,7 +408,40 @@ tbody tr:nth-last-child(2) {
   color: #2e7d32;
   font-weight: bold;
 }
+/* =========================
+   📊 TABLE FIX
+========================= */
 
+#table td {
+  padding: 6px 8px;
+  line-height: 1.2;
+  vertical-align: middle;
+}
+
+#table tr {
+  height: auto;
+}
+
+/* 👉 eigenes Team */
+.userTeamRow {
+  background: rgba(0, 255, 200, 0.12);
+  font-weight: 600;
+}
+
+/* 👉 Live-Spiel */
+.live {
+  background: rgba(255,255,255,0.05);
+}
+
+/* 👉 Platz 1 */
+.first {
+  background: rgba(0, 255, 0, 0.12);
+}
+
+/* 👉 Abstieg */
+.relegation {
+  background: rgba(255, 0, 0, 0.12);
+}
 /* =========================
    LEADERBOARD
 ========================= */
