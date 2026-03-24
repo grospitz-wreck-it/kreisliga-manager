@@ -89,50 +89,93 @@
   <!-- 🎮 GAME (LINKS) -->
   <div class="panel mainPanel">
 
-    <h2 id="matchday">Spieltag: 0 / 30</h2>
+  <!-- SCOREBOARD -->
+  <div class="scoreboard big">
+    <div id="teamLeft">-</div>
+    <div id="score">0 : 0</div>
+    <div id="teamRight">-</div>
+  </div>
 
-    <button id="startBtn" onclick="simulateMatchdayWrapper()">
-      ▶ Saison starten
-    </button>
+  <!-- MOMENTUM -->
+  <div class="momentum">
+    <div id="momentumBar"></div>
+  </div>
 
-    <div class="scoreboard">
-      <div id="teamLeft">-</div>
-      <div id="score">0 : 0</div>
-      <div id="teamRight">-</div>
+  <!-- LIVE EVENTS -->
+  <div id="liveMatch" class="live"></div>
+
+  <!-- 🎮 CONTROL DESK -->
+  <div class="controlDesk">
+
+    <!-- ACTION BUTTONS -->
+    <div class="quickActions">
+      <button onclick="setLiveMode('attack')" class="btn attack">🔥 Druck</button>
+      <button onclick="setLiveMode('calm')" class="btn calm">❄️ Ruhig</button>
+      <button onclick="setLiveMode('counter')" class="btn counter">⚡ Konter</button>
     </div>
 
-    <div class="timeline">
-      <div id="timelineBar"></div>
+    <!-- SETTINGS -->
+    <div class="settingsRow">
+      <div>
+        <label>Taktik</label>
+        <select id="tacticSelect" onchange="setTactic()">
+          <option>Normal</option>
+          <option>Offensiv</option>
+          <option>Defensiv</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Formation</label>
+        <select id="formationSelect" onchange="setFormation()">
+          <option>4-4-2</option>
+          <option>4-3-3</option>
+          <option>3-5-2</option>
+          <option>5-3-2</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Wechsel</label>
+        <button onclick="makeSub()">🔄</button>
+      </div>
     </div>
 
-    <div class="controls">
-      <button onclick="setLiveMode('attack')">🔥 Druck</button>
-      <button onclick="setLiveMode('calm')">🧊 Ruhig</button>
-      <button onclick="makeSub()">🔄 Wechsel</button>
+    <!-- INTENSITY -->
+    <div class="intensity">
+      <label>Intensität</label>
+      <input type="range" min="1" max="3" value="2" id="intensitySlider" onchange="setIntensity(this.value)">
+      <div class="labels">
+        <span>Defensiv</span>
+        <span>Balanced</span>
+        <span>All-in</span>
+      </div>
     </div>
 
-    <div class="controls">
-      Geschwindigkeit:
-      <button onclick="setSpeed(event, 1)">1x</button>
-      <button onclick="setSpeed(event, 2)">2x</button>
-      <button onclick="setSpeed(event, 4)">4x</button>
+    <!-- SPEED -->
+    <div class="speedControl">
+      <span>⏱</span>
+      <button onclick="setSpeed(event,1)" class="speed active">1x</button>
+      <button onclick="setSpeed(event,2)" class="speed">2x</button>
+      <button onclick="setSpeed(event,4)" class="speed">4x</button>
     </div>
 
-    <!-- LIVE MATCH -->
-    <div id="liveMatch"></div>
-
-    <!-- SPIELBERICHT -->
-    <div class="panel">
-      <h2>📰 Spieltagsbericht</h2>
-      <div id="newsBox"></div>
-    </div>
-
-    <div id="halftimePanel" style="display:none;">
-      <h3>Halbzeit</h3>
-      <button onclick="resumeMatch()">2. Halbzeit starten</button>
+    <!-- ⭐ PRIMARY BUTTON -->
+    <div class="primaryAction">
+      <button id="mainActionBtn" onclick="handleMainAction()">
+        ▶ Saison starten
+      </button>
     </div>
 
   </div>
+
+  <!-- 📰 SPIELBERICHT -->
+  <div class="panel">
+    <h2>📰 Spieltagsbericht</h2>
+    <div id="newsBox"></div>
+  </div>
+
+</div>
 
   <!-- 📊 SEITE (RECHTS) -->
   <div class="sidePanel">
