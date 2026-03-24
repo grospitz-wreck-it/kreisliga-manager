@@ -403,3 +403,12 @@ tbody tr:nth-last-child(2) {
   margin: 0 auto;
   padding: 10px;
 }
+.setupBox input,
+.setupBox select{
+  width: 100%;
+}
+
+.setupBox button{
+  min-width: 120px;
+  text-align: center;
+}
