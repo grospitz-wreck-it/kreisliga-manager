@@ -85,20 +85,28 @@ async function initPlayerName(){
 // 📱 SETUP PANEL CONTROL
 // =========================
 // =========================
-// 📱 PANEL CONTROL (AAA)
+// 📱 PANEL CONTROL (FIXED)
 // =========================
 function toggleSetup(){
 
   const panel = document.getElementById("setupPanel");
   const overlay = document.getElementById("overlay");
 
+  if(!panel || !overlay) return;
+
   panel.classList.toggle("open");
   overlay.classList.toggle("active");
 }
 
 function closeSetup(){
-  document.getElementById("setupPanel").classList.remove("open");
-  document.getElementById("overlay").classList.remove("active");
+
+  const panel = document.getElementById("setupPanel");
+  const overlay = document.getElementById("overlay");
+
+  if(!panel || !overlay) return;
+
+  panel.classList.remove("open");
+  overlay.classList.remove("active");
 }
 
 // =========================
@@ -114,13 +122,14 @@ function openTab(evt, tabId){
 }
 
 // =========================
-// 👉 SWIPE TO CLOSE
+// 👉 SWIPE (SAFE INIT)
 // =========================
-let startX = 0;
+window.addEventListener("load", () => {
 
-const panel = document.getElementById("setupPanel");
+  const panel = document.getElementById("setupPanel");
+  if(!panel) return;
 
-if(panel){
+  let startX = 0;
 
   panel.addEventListener("touchstart", (e)=>{
     startX = e.touches[0].clientX;
@@ -143,7 +152,8 @@ if(panel){
       panel.style.transform = "";
     }
   });
-}
+
+});
 
 // =========================
 // ESC SUPPORT
@@ -153,6 +163,7 @@ document.addEventListener("keydown", (e)=>{
     closeSetup();
   }
 });
+
 // =========================
 // 🎨 UI UPDATE
 // =========================
