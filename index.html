@@ -30,43 +30,57 @@
 <div id="setupPanel">
   <button class="closeBtn" onclick="closeSetup()">✖</button>
 
+  <!-- TABS -->
   <div class="menuTabs">
     <button class="tab active" onclick="openTab(event,'profil')">👤</button>
     <button class="tab" onclick="openTab(event,'freunde')">👥</button>
-    <button class="tab" onclick="openTab(event,'game')">⚙️</button>
   </div>
 
+  <!-- 👤 PROFIL + GAME -->
   <div class="tabContent active" id="profil">
+
     <div class="setupBox">
-      <h3>Profil</h3>
+      <h3>👤 Profil</h3>
       <input id="nameInput" placeholder="Manager Name">
       <button onclick="changeName()">Speichern</button>
     </div>
+
+    <div class="setupBox">
+      <h3>🏆 Liga</h3>
+      <select id="leagueSelect"></select>
+      <button onclick="selectLeague()">Liga starten</button>
+    </div>
+
+    <div class="setupBox">
+      <h3>⚽ Team</h3>
+      <select id="teamSelect"></select>
+      <button onclick="selectTeam()">Team übernehmen</button>
+      <p id="selectedTeamText">-</p>
+    </div>
+
+    <div class="setupBox">
+      <button class="danger" onclick="resetGame()">🧨 Neues Spiel starten</button>
+    </div>
+
   </div>
 
+  <!-- 👥 FREUNDE -->
   <div class="tabContent" id="freunde">
     <div class="setupBox">
-      <h3>Freunde</h3>
-      <strong id="friendCodeDisplay">---</strong>
-      <button onclick="copyFriendCode()">Kopieren</button>
-      <input id="friendCodeInput" placeholder="Code">
+      <h3>👥 Freunde</h3>
+
+      <div class="infoRow">
+        <span>Dein Code:</span>
+        <strong id="friendCodeDisplay">---</strong>
+      </div>
+
+      <button onclick="copyFriendCode()">📋 Kopieren</button>
+
+      <input id="friendCodeInput" placeholder="Freundescode">
       <button onclick="joinFriendCode()">Beitreten</button>
     </div>
   </div>
 
-  <div class="tabContent" id="game">
-    <div class="setupBox">
-      <h3>Liga</h3>
-      <select id="leagueSelect"></select>
-      <button onclick="selectLeague()">Starten</button>
-    </div>
-
-    <div class="setupBox">
-      <h3>Team</h3>
-      <select id="teamSelect"></select>
-      <button onclick="selectTeam()">Übernehmen</button>
-    </div>
-  </div>
 </div>
 
 <!-- MAIN -->
@@ -107,7 +121,7 @@
     <!-- LIVE MATCH -->
     <div id="liveMatch"></div>
 
-    <!-- 📰 SPIELBERICHT (JETZT RICHTIG) -->
+    <!-- SPIELBERICHT -->
     <div class="panel">
       <h2>📰 Spieltagsbericht</h2>
       <div id="newsBox"></div>
@@ -167,6 +181,7 @@
   </div>
 
 </div>
+
 <!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="js/supabase.js"></script>
