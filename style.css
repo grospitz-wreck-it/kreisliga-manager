@@ -397,38 +397,9 @@ tbody tr:nth-last-child(2) {
 .danger:hover{
   background: #e53935;
 }
-<h2>👤 Profil</h2>
 
-<label>Dein Name</label> <input id="nameInput" type="text" placeholder="Manager Name">
-
-<label>Farbe</label> <input id="colorInput" type="color">
-
-<button onclick="changeName()">💾 Name speichern</button>
-
-<hr>
-
-<h3>👥 Freunde</h3>
-
-<div class="friendBox">
-  <div>
-    Dein Code:
-    <strong id="friendCodeDisplay"></strong>
-  </div>
-
-<button onclick="copyFriendCode()">📋 Kopieren</button>
-
-</div>
-
-<input id="friendCodeInput" placeholder="Freundescode eingeben">
-
-<button onclick="joinFriendCode()">➕ Beitreten</button>
-
-<hr>
-
-<h3>⚙️ Einstellungen</h3>
-
-<label>Liga wählen</label> <select id="leagueSelect"></select>
-
-<label>Team wählen</label> <select id="teamSelect"></select>
-
-<button id="btnSelectTeam">✅ Team wählen</button>
+.app{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px;
+}
