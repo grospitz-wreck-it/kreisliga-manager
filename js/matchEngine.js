@@ -1,13 +1,43 @@
 // =========================
-// 🔥 MATCH ENGINE (CLEAN FINAL FIXED)
+// 🔥 MATCH ENGINE (LIVE + STABLE)
 // =========================
 
 let matchCards = {};
 let halftimePlayed = false;
 
+// =========================
+// 🔥 LIVE TABLE UPDATE
+// =========================
+function updateLiveTable(team1, team2, goals1, goals2){
+
+  if(!team1 || !team2) return;
+
+  let t1 = {...team1};
+  let t2 = {...team2};
+
+  // 👉 nur Anzeige (kein echtes State!)
+  t1.goalsFor += goals1;
+  t1.goalsAgainst += goals2;
+
+  t2.goalsFor += goals2;
+  t2.goalsAgainst += goals1;
+
+  if(goals1 > goals2){
+    t1.points += 3;
+  } else if(goals2 > goals1){
+    t2.points += 3;
+  } else {
+    t1.points += 1;
+    t2.points += 1;
+  }
+
+  if(typeof updateTable === "function"){
+    updateTable(true, t1, t2);
+  }
+}
 
 // =========================
-// 🏆 LEADERBOARD SAVE (GLOBAL!)
+// 🏆 LEADERBOARD SAVE
 // =========================
 async function saveScoreToLeaderboard(name, team, score, matchday){
 
@@ -17,33 +47,27 @@ async function saveScoreToLeaderboard(name, team, score, matchday){
   }
 
   const { error } = await supabaseClient
-  .from("leaderboard")
-  .insert([{
-    name,
-    team,
-    score,
-    matchday,
-    league: typeof currentLeague !== "undefined"
-      ? currentLeague
-      : localStorage.getItem("selectedLeague"),
-    player_id: playerId,
-    friend_code: friendCode,
-    color: playerColor,
-    title: getPlayerTitle(score)
-  }]);
+    .from("leaderboard")
+    .insert([{
+      name,
+      team,
+      score,
+      matchday,
+      league: currentLeague || localStorage.getItem("selectedLeague"),
+      player_id: playerId,
+      friend_code: friendCode,
+      color: playerColor,
+      title: getPlayerTitle(score)
+    }]);
 
   if(error){
     console.error("❌ Fehler beim Speichern:", error);
-  } else {
-    console.log("🏆 Score gespeichert!");
   }
 }
 
-
 // =========================
-// ▶️ SPIELTAG STARTEN
+// ▶️ SPIELTAG
 // =========================
-
 function simulateMatchday(){
 
   if(isSimulating) return;
@@ -58,7 +82,6 @@ function simulateMatchday(){
     return;
   }
 
-  // 🔥 RESET
   matchdayResults = [];
   liveScore = { t1:null, t2:null, s1:0, s2:0 };
   currentMinute = 0;
@@ -94,12 +117,7 @@ function simulateMatchday(){
     m[0].name === selectedTeam || m[1].name === selectedTeam
   );
 
-  if(!userMatch){
-    console.error("User-Match nicht gefunden!");
-    return;
-  }
-
-  // ⚡ andere Spiele
+  // 👉 andere Spiele direkt berechnen
   matches.forEach(m => {
     if(m !== userMatch){
       simulateQuick(m[0], m[1]);
@@ -107,8 +125,6 @@ function simulateMatchday(){
   });
 
   updateTable();
-
-  // 💾 SAVE
   saveGameState();
 
   isSimulating = true;
@@ -116,11 +132,9 @@ function simulateMatchday(){
   simulateLiveMatch(userMatch[0], userMatch[1], 0, 0);
 }
 
-
 // =========================
-// ⚡ SCHNELLSIMULATION
+// ⚡ QUICK MATCH
 // =========================
-
 function simulateQuick(teamA, teamB){
 
   let goalsA = Math.floor(Math.random() * 5);
@@ -160,11 +174,9 @@ function simulateQuick(teamA, teamB){
   });
 }
 
-
 // =========================
 // 🎮 LIVE MATCH
 // =========================
-
 function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
 
   if(currentMinute === 0){
@@ -181,15 +193,12 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
 
   clearInterval(currentInterval);
 
-  // ✅ FIX: async hinzugefügt
   currentInterval = setInterval(async () => {
 
     currentMinute++;
     updateTimeline(currentMinute);
 
-    // =========================
     // ⏸ HALBZEIT
-    // =========================
     if(currentMinute === 45 && !halftimePlayed){
 
       halftimePlayed = true;
@@ -206,34 +215,24 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
       return;
     }
 
-    // =========================
     // 🔥 EVENTS
-    // =========================
     if(Math.random() < 0.3){
 
-      let attackBoost = tacticModifier + formationModifier + liveModifier;
-      let attackingTeam = (Math.random() + attackBoost > 0.5) ? "A" : "B";
+      let atk = Math.random() > 0.5 ? teamA : teamB;
 
-      let atk = attackingTeam === "A" ? teamA : teamB;
+      let isA = atk === teamA;
 
-      let type = Math.random();
+      if(Math.random() < 0.3){
 
-      if(type < 0.1){
-        addEvent(`🚫 Abseits von ${atk.name}`);
-      }
-      else if(type < 0.3){
-        addEvent(`📐 Ecke für ${atk.name}`);
-        if(Math.random() < 0.2){
-          if(attackingTeam === "A") scoreA++; else scoreB++;
-          addEvent(`⚽ Tor nach Ecke! ${atk.name}`);
-        }
+        if(isA) scoreA++; else scoreB++;
+
+        addEvent(`⚽ TOR! ${atk.name}`);
+
+        // 🔥 LIVE TABLE UPDATE
+        updateLiveTable(teamA, teamB, scoreA, scoreB);
       }
       else{
         addEvent(`🔥 Chance für ${atk.name}`);
-        if(Math.random() < 0.3){
-          if(attackingTeam === "A") scoreA++; else scoreB++;
-          addEvent(`⚽ TOR! ${atk.name}`);
-        }
       }
 
       liveScore.s1 = scoreA;
@@ -242,9 +241,7 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
       updateScoreboard(teamA, teamB, scoreA, scoreB);
     }
 
-    // =========================
-    // 🏁 SPIELENDE
-    // =========================
+    // 🏁 ENDE
     if(currentMinute >= 90){
 
       clearInterval(currentInterval);
@@ -275,18 +272,16 @@ function simulateLiveMatch(teamA, teamB, scoreA = 0, scoreB = 0){
         teamB.draws++;
       }
 
-      updateTable();
+      updateTable(); // 🔥 final echte Tabelle
 
-      // ✅ FIX: saubere Nutzung deiner Funktion
- const playerName = localStorage.getItem("playerName") || "Unbekannt";
-const playerColor = localStorage.getItem("playerColor") || "#ffffff";
+      const playerName = localStorage.getItem("playerName") || "Unbekannt";
 
-await saveScoreToLeaderboard(
-  playerName,
-  selectedTeam,
-  teamA.name === selectedTeam ? scoreA : scoreB,
-  currentMatchday
-);
+      await saveScoreToLeaderboard(
+        playerName,
+        selectedTeam,
+        teamA.name === selectedTeam ? scoreA : scoreB,
+        currentMatchday
+      );
 
       matchdayResults.push({
         home: teamA.name,
@@ -295,7 +290,6 @@ await saveScoreToLeaderboard(
         score2: scoreB
       });
 
-      // 📰 REPORT
       try{
         if(typeof generateMatchdayReport === "function"){
           document.getElementById("newsBox").innerHTML =
@@ -312,18 +306,15 @@ await saveScoreToLeaderboard(
 
       addEvent("🏁 Spiel beendet");
 
-      // 💾 FINAL SAVE
       saveGameState();
     }
 
   }, 1000 / speedMultiplier);
 }
 
-
 // =========================
 // ▶️ 2. HALBZEIT
 // =========================
-
 function resumeMatch(){
 
   document.getElementById("halftimePanel").style.display = "none";
@@ -331,8 +322,6 @@ function resumeMatch(){
   addEvent("▶️ Zweite Halbzeit läuft");
 
   isSimulating = true;
-
-  saveGameState();
 
   simulateLiveMatch(
     liveScore.t1,
@@ -342,11 +331,9 @@ function resumeMatch(){
   );
 }
 
-
 // =========================
 // ⚡ SPEED FIX
 // =========================
-
 window.restartInterval = function(){
 
   if(!isSimulating) return;
