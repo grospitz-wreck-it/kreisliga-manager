@@ -24,9 +24,9 @@ async function saveScoreToLeaderboard(name, team, score, matchday){
     score,
     matchday,
     league: typeof currentLeague !== "undefined"
-  ? currentLeague
-  : localStorage.getItem("selectedLeague"),
-    league: currentLeague,
+      ? currentLeague
+      : localStorage.getItem("selectedLeague"),
+    player_id: playerId,
     friend_code: friendCode,
     color: playerColor,
     title: getPlayerTitle(score)
