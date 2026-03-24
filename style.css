@@ -151,7 +151,8 @@ body {
 #setupPanel{
   position: fixed;
   top: 0;
-  right: -100%;
+  right: 0; /* 🔥 WICHTIG */
+
   width: 85%;
   max-width: 360px;
   height: 100%;
@@ -159,17 +160,17 @@ body {
   background: #ffffff;
   z-index: 1500;
 
-  transition: transform 0.35s cubic-bezier(.22,.9,.3,1);
   transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(.22,.9,.3,1);
 
   box-shadow: -10px 0 30px rgba(0,0,0,0.25);
-  overflow: hidden;
+  overflow-y: auto;
 }
 
+/* ✅ OPEN STATE */
 #setupPanel.open{
   transform: translateX(0);
 }
-
 /* =========================
    CLOSE BUTTON
 ========================= */
