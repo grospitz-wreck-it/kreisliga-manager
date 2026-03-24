@@ -412,3 +412,60 @@ tbody tr:nth-last-child(2) {
   min-width: 120px;
   text-align: center;
 }
+/* =========================
+   SETUP BOX CLEAN UI
+========================= */
+.setupBox{
+  background: #f9fbf9;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Titel */
+.setupBox h3{
+  margin: 0 0 6px 0;
+  font-size: 18px;
+}
+
+/* Labels */
+.setupBox label{
+  font-size: 13px;
+  color: #666;
+}
+
+/* Inputs */
+.setupBox input,
+.setupBox select{
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* Buttons → FULL WIDTH (wichtig!) */
+.setupBox button{
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+/* Primary Button */
+.setupBox button.primary{
+  background: #2e7d32;
+}
+
+/* Info Row (Code Anzeige) */
+.infoRow{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
