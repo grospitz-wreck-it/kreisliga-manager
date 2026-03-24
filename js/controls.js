@@ -73,7 +73,7 @@ function addLiveEvent(text, minute = currentMinute){
 
   box.prepend(p);
 
-  // Limit (Performance + UI)
+  // Limit für Performance
   if(box.children.length > 50){
     box.removeChild(box.lastChild);
   }
@@ -119,7 +119,7 @@ function setFormation(){
 }
 
 // =========================
-// ⚡ LIVE MODES (FIXED)
+// ⚡ LIVE MODES
 // =========================
 
 liveModifier = 0;
@@ -128,7 +128,7 @@ function setLiveMode(mode){
 
   liveModifier = 0;
 
-  // 👉 Button Highlight (NEU - generisch)
+  // Buttons resetten
   document.querySelectorAll(".quickActions .btn")
     .forEach(b => b.classList.remove("active"));
 
@@ -181,7 +181,7 @@ function makeSub(){
 }
 
 // =========================
-// 🎚️ INTENSITY (NEU)
+// 🎚️ INTENSITÄT
 // =========================
 
 intensityModifier = 0;
@@ -196,7 +196,7 @@ function setIntensity(val){
 }
 
 // =========================
-// ⏩ SPEED (FIXED - KEIN KONFLIKT)
+// ⏩ SPEED
 // =========================
 
 function setSpeed(e, multi){
@@ -212,7 +212,7 @@ function setSpeed(e, multi){
 }
 
 // =========================
-// ⏸️ PAUSE (NEU)
+// ⏸️ PAUSE
 // =========================
 
 function pauseMatch(){
