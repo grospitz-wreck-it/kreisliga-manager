@@ -3,7 +3,7 @@
 // =========================
 
 // ✅ FIX: sauber deklariert
-let currentInterval = null;
+currentInterval = null;
 let halftimePlayed = false;
 
 // ✅ SAFETY
