@@ -9,67 +9,111 @@
 
 <body>
 
-  <!-- HEADER -->
-  <div class="header">
+  <!DOCTYPE html>
+
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Kreisliga Manager</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+  <div class="app">
+
+```
+<!-- HEADER -->
+<div class="header">
   <img src="logos/logo.png" class="mainLogo">
 </div>
 
-  <!-- BURGER -->
-  <button id="menuBtn" onclick="toggleSetup()">☰</button>
+<!-- BURGER -->
+<button id="menuBtn" onclick="toggleSetup()">☰</button>
 
-  <!-- SETUP -->
-  <div id="setupPanel" class="setupOverlay open">
-    <h2>⚙️ Einstellungen</h2>
+<!-- SETUP -->
+<div id="setupPanel" class="setupOverlay open">
+  <h2>⚙️ Einstellungen</h2>
 
-    <div class="setupGrid">
+  <div class="setupGrid">
 
-      <div class="setupBox">
-        <h3>Liga</h3>
-        <select id="leagueSelect"></select>
-        <button onclick="selectLeague()">Starten</button>
-      </div>
+    <!-- 👤 PROFIL (NEU) -->
+    <div class="setupBox">
+      <h3>👤 Profil</h3>
 
-      <div class="setupBox">
-        <h3>Team</h3>
-        <select id="teamSelect"></select>
-        <button id="btnSelectTeam" onclick="selectTeam()">Übernehmen</button>
-        <p id="selectedTeamText">-</p>
-      </div>
+      <input id="nameInput" placeholder="Dein Name">
+      <button onclick="changeName()">💾 Speichern</button>
 
-      <div class="setupBox">
-        <h3>Taktik</h3>
-        <select id="tacticSelect">
-          <option>Normal</option>
-          <option>Offensiv</option>
-          <option>Defensiv</option>
-        </select>
-        <button onclick="setTactic()">Speichern</button>
-        <p id="currentTactic">Normal</p>
-      </div>
+      <br><br>
 
-      <div class="setupBox">
-        <h3>Formation</h3>
-        <select id="formationSelect">
-          <option>4-4-2</option>
-          <option>4-3-3</option>
-          <option>3-5-2</option>
-          <option>5-3-2</option>
-        </select>
-        <button onclick="setFormation()">Setzen</button>
-        <p id="currentFormation">4-4-2</p>
-      </div>
-
-      <div class="menu-section">
-        <button class="danger" onclick="resetGame()">
-          🧨 Neues Spiel starten
-        </button>
-      </div>
-
+      <label>Farbe</label>
+      <input type="color" id="colorInput" value="#00ffcc">
+      <button onclick="changeColor()">🎨 Übernehmen</button>
     </div>
-  </div>
 
-  <!-- LAYOUT -->
-  <div class="layout">
+    <!-- 👥 FREUNDE (NEU) -->
+    <div class="setupBox">
+      <h3>👥 Freunde</h3>
+
+      Dein Code:
+      <b id="friendCodeDisplay">---</b>
+      <button onclick="copyFriendCode()">📋 Kopieren</button>
+
+      <br><br>
+
+      <input id="friendCodeInput" placeholder="Freundescode eingeben">
+      <button onclick="joinFriendCode()">➕ Beitreten</button>
+    </div>
+
+    <!-- ORIGINAL -->
+    <div class="setupBox">
+      <h3>Liga</h3>
+      <select id="leagueSelect"></select>
+      <button onclick="selectLeague()">Starten</button>
+    </div>
+
+    <div class="setupBox">
+      <h3>Team</h3>
+      <select id="teamSelect"></select>
+      <button id="btnSelectTeam" onclick="selectTeam()">Übernehmen</button>
+      <p id="selectedTeamText">-</p>
+    </div>
+
+    <div class="setupBox">
+      <h3>Taktik</h3>
+      <select id="tacticSelect">
+        <option>Normal</option>
+        <option>Offensiv</option>
+        <option>Defensiv</option>
+      </select>
+      <button onclick="setTactic()">Speichern</button>
+      <p id="currentTactic">Normal</p>
+    </div>
+
+    <div class="setupBox">
+      <h3>Formation</h3>
+      <select id="formationSelect">
+        <option>4-4-2</option>
+        <option>4-3-3</option>
+        <option>3-5-2</option>
+        <option>5-3-2</option>
+      </select>
+      <button onclick="setFormation()">Setzen</button>
+      <p id="currentFormation">4-4-2</p>
+    </div>
+
+    <div class="menu-section">
+      <button class="danger" onclick="resetGame()">
+        🧨 Neues Spiel starten
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
 
   <!-- GAME -->
   <div class="panel">
@@ -158,28 +202,19 @@
 
       <h2>🏆 Top 10 Manager</h2>
 
-      <!-- 👤 PROFIL -->
-      <div style="margin-bottom:12px;">
-        <strong>👤 Dein Profil</strong><br>
-
+      <!-- 👤 ALT (BLEIBT, ABER VERSTECKT) -->
+      <div style="display:none;">
         <input id="nameInput" placeholder="Dein Name">
         <button onclick="changeName()">Speichern</button>
 
-        <br><br>
-
-        Farbe:
         <input type="color" id="colorInput" value="#00ffcc">
         <button onclick="changeColor()">OK</button>
       </div>
 
-      <!-- 👥 FREUNDE -->
-      <div style="margin-bottom:12px; font-size:12px;">
-        <strong>👥 Freunde</strong><br>
-
-        Dein Code: <b id="friendCodeDisplay">---</b>
+      <!-- 👥 ALT (BLEIBT, ABER VERSTECKT) -->
+      <div style="display:none;">
+        <b id="friendCodeDisplay">---</b>
         <button onclick="copyFriendCode()">📋</button>
-
-        <br>
 
         <input id="friendCodeInput" placeholder="Freundescode eingeben">
         <button onclick="joinFriendCode()">Beitreten</button>
@@ -198,7 +233,40 @@
     </div>
 
   </div>
+</div>
+```
+
   </div>
+
+  <!-- SCRIPTS -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script src="js/supabase.js"></script>
+
+  <script src="js/state.js"></script>
+
+  <script src="js/league.js"></script>
+
+  <script src="js/ui.js"></script>
+
+  <script src="js/floskeln.js"></script>
+
+  <script src="js/news.js"></script>
+
+  <script src="js/matchEngine.js"></script>
+
+  <script src="js/controls.js"></script>
+
+  <script src="js/ads.js"></script>
+
+  <script src="js/main.js"></script>
+
+  <script src="js/leaderboard.js"></script>
+
+</body>
+</html>
+
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
