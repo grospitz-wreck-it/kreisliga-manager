@@ -82,6 +82,34 @@ async function initPlayerName(){
 }
 
 // =========================
+// 📱 SETUP PANEL CONTROL
+// =========================
+function toggleSetup(){
+
+  const panel = document.getElementById("setupPanel");
+  const overlay = document.getElementById("overlay");
+
+  panel.classList.toggle("open");
+  overlay.classList.toggle("active");
+}
+
+function closeSetup(){
+
+  const panel = document.getElementById("setupPanel");
+  const overlay = document.getElementById("overlay");
+
+  panel.classList.remove("open");
+  overlay.classList.remove("active");
+}
+
+// ESC Support (Desktop + Android Back Gefühl)
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape"){
+    closeSetup();
+  }
+});
+
+// =========================
 // 🎨 UI UPDATE
 // =========================
 function updateNameUI(){
