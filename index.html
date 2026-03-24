@@ -72,7 +72,7 @@
 <!-- MAIN -->
 <div class="layout">
 
-  <!-- GAME -->
+  <!-- 🎮 GAME (LINKS) -->
   <div class="panel mainPanel">
 
     <h2 id="matchday">Spieltag: 0 / 30</h2>
@@ -104,31 +104,26 @@
       <button onclick="setSpeed(event, 4)">4x</button>
     </div>
 
-    <!-- ✅ NUR ID, KEINE .live -->
+    <!-- LIVE MATCH -->
     <div id="liveMatch"></div>
 
-    <!-- ❌ Panel im Panel entfernt -->
-    <div class="controls">
-      <button onclick="setLiveMode('attack')">Mehr Druck</button>
-      <button onclick="setLiveMode('calm')">Defensiver</button>
+    <!-- 📰 SPIELBERICHT (JETZT RICHTIG) -->
+    <div class="panel">
+      <h2>📰 Spieltagsbericht</h2>
+      <div id="newsBox"></div>
     </div>
 
     <div id="halftimePanel" style="display:none;">
       <h3>Halbzeit</h3>
       <button onclick="resumeMatch()">2. Halbzeit starten</button>
     </div>
-  </div>
-    <div class="panel">
-      <h2>📰 Spieltagsbericht</h2>
-      <!-- ❌ .live entfernt -->
-      <div id="newsBox"></div>
-    </div>
-</div>
+
   </div>
 
-  <!-- SIDE -->
+  <!-- 📊 SEITE (RECHTS) -->
   <div class="sidePanel">
 
+    <!-- Tabelle -->
     <div class="panel">
       <h2>Tabelle</h2>
       <table id="table">
@@ -147,23 +142,31 @@
         <tbody></tbody>
       </table>
     </div>
-<div class="panel">
-  <h2>📢 Bandenwerbung</h2>
-  <div id="adBanner">
-    <div class="adTrack" id="adTrack"></div>
-  </div>
-<div class="panel">
-  <h2>🏆 Top 10 Manager</h2>
 
-  <div>
-    <button onclick="setLeaderboardMode('global')">🌍</button>
-    <button onclick="setLeaderboardMode('league')">🏟️</button>
-    <button onclick="setLeaderboardMode('friends')">👥</button>
+    <!-- Werbung -->
+    <div class="panel">
+      <h2>📢 Bandenwerbung</h2>
+      <div id="adBanner">
+        <div class="adTrack" id="adTrack"></div>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="panel">
+      <h2>🏆 Top 10 Manager</h2>
+
+      <div>
+        <button onclick="setLeaderboardMode('global')">🌍</button>
+        <button onclick="setLeaderboardMode('league')">🏟️</button>
+        <button onclick="setLeaderboardMode('friends')">👥</button>
+      </div>
+
+      <div id="leaderboard">Lade...</div>
+    </div>
+
   </div>
-  <div id="leaderboard">Lade...</div>
+
 </div>
-  </div>
-
 <!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="js/supabase.js"></script>
