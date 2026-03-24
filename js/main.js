@@ -11,11 +11,10 @@ if(!playerId){
 let playerName = localStorage.getItem("playerName");
 let lastNameChange = localStorage.getItem("lastNameChange");
 
-// ❌ Farbe entfernt (wie gewünscht)
 let playerTitle = localStorage.getItem("playerTitle") || "Freizeitkicker";
 
 // =========================
-// 🆕 GAME STATE (NEU)
+// 🎮 GAME STATE
 // =========================
 let gameState = window.gameState || {
   phase: "idle" // idle | matchday_ready | live | halftime
@@ -27,7 +26,7 @@ let gameState = window.gameState || {
 let currentLeague = localStorage.getItem("selectedLeague") || null;
 
 // =========================
-// 🛑 BLACKLIST
+// 🛑 NAME FILTER
 // =========================
 const bannedWords = [
   "nazi","hitler","ss","reich",
@@ -37,23 +36,19 @@ const bannedWords = [
 ];
 
 // =========================
-// 🔍 NAME VALIDATION
+// 🔍 VALIDATION
 // =========================
 function isValidName(name){
   if(!name || name.length < 3) return false;
   if(name.length > 20) return false;
 
   const lower = name.toLowerCase();
-
   if(bannedWords.some(word => lower.includes(word))) return false;
   if(/^\d+$/.test(name)) return false;
 
   return true;
 }
 
-// =========================
-// ⏱️ COOLDOWN
-// =========================
 function canChangeName(){
   if(!lastNameChange) return true;
   return (Date.now() - parseInt(lastNameChange)) > 60000;
@@ -78,7 +73,7 @@ async function initPlayerName(){
 }
 
 // =========================
-// 📱 PANEL CONTROL
+// 📱 PANEL
 // =========================
 function toggleSetup(){
   document.getElementById("setupPanel")?.classList.toggle("open");
@@ -102,7 +97,7 @@ function openTab(evt, tabId){
 }
 
 // =========================
-// 🎨 UI UPDATE
+// 🎨 UI
 // =========================
 function updateNameUI(){
   const input = document.getElementById("nameInput");
@@ -110,7 +105,7 @@ function updateNameUI(){
 }
 
 // =========================
-// ✏️ NAME ÄNDERN
+// ✏️ NAME
 // =========================
 async function changeName(){
 
@@ -135,7 +130,7 @@ async function changeName(){
   localStorage.setItem("lastNameChange", lastNameChange);
 
   updateHeader();
-  loadLeaderboard();
+  loadLeaderboard?.();
 }
 
 // =========================
@@ -149,7 +144,7 @@ function getPlayerTitle(score){
 }
 
 // =========================
-// 👥 FRIEND SYSTEM
+// 👥 FRIENDS
 // =========================
 let friendCode = localStorage.getItem("friendCode");
 if(!friendCode){
@@ -158,7 +153,7 @@ if(!friendCode){
 }
 
 // =========================
-// 🆕 HEADER UPDATE
+// 🆕 HEADER
 // =========================
 function updateHeader(){
 
@@ -173,34 +168,80 @@ function updateHeader(){
 }
 
 // =========================
-// 🎮 ⭐ PRIMARY BUTTON SYSTEM
+// 🚀 SAISON START
+// =========================
+function startSeason(){
+
+  console.log("🏁 Saison gestartet");
+
+  currentMatchday = 0;
+
+  generateSchedule?.();
+
+  gameState.phase = "matchday_ready";
+
+  updateMatchdayUI();
+  updateMainButton();
+}
+
+// =========================
+// ▶️ MATCH START
+// =========================
+function startMatch(){
+
+  console.log("⚽ Spiel startet");
+
+  simulateMatchday?.();
+
+  gameState.phase = "live";
+
+  updateMainButton();
+}
+
+// =========================
+// ▶️ RESUME
+// =========================
+function resumeMatch(){
+
+  console.log("▶️ Spiel läuft weiter");
+
+  isSimulating = true;
+
+  restartInterval?.();
+
+  gameState.phase = "live";
+  updateMainButton();
+}
+
+// =========================
+// 🎮 MAIN BUTTON
 // =========================
 function handleMainAction(){
 
-  if (gameState.phase === "idle") {
-    startSeason?.();
-    gameState.phase = "matchday_ready";
-  }
+  switch(gameState.phase){
 
-  else if (gameState.phase === "matchday_ready") {
-    simulateMatchdayWrapper();
-    gameState.phase = "live";
-  }
+    case "idle":
+      startSeason();
+      break;
 
-  else if (gameState.phase === "halftime") {
-    resumeMatch?.();
-    gameState.phase = "live";
-  }
+    case "matchday_ready":
+      startMatch();
+      break;
 
-  else if (gameState.phase === "live") {
-    pauseMatch?.();
+    case "halftime":
+      resumeMatch();
+      break;
+
+    case "live":
+      pauseMatch?.();
+      break;
   }
 
   updateMainButton();
 }
 
 // =========================
-// 🔄 BUTTON UPDATE
+// 🔄 BUTTON TEXT
 // =========================
 function updateMainButton(){
 
@@ -209,26 +250,23 @@ function updateMainButton(){
 
   btn.classList.remove("pause");
 
-  if (gameState.phase === "idle") {
+  if(gameState.phase === "idle"){
     btn.innerText = "▶ Saison starten";
   }
-
-  else if (gameState.phase === "matchday_ready") {
+  else if(gameState.phase === "matchday_ready"){
     btn.innerText = "▶ Nächster Spieltag";
   }
-
-  else if (gameState.phase === "halftime") {
-    btn.innerText = "▶ 2. Halbzeit starten";
+  else if(gameState.phase === "halftime"){
+    btn.innerText = "▶ 2. Halbzeit";
   }
-
-  else if (gameState.phase === "live") {
+  else if(gameState.phase === "live"){
     btn.innerText = "⏸ Pause";
     btn.classList.add("pause");
   }
 }
 
 // =========================
-// 🆕 MATCHDAY UI
+// 📅 MATCHDAY UI
 // =========================
 function updateMatchdayUI(){
   const el = document.getElementById("matchday");
@@ -238,37 +276,12 @@ function updateMatchdayUI(){
 }
 
 // =========================
-// 🆕 MATCHDAY WRAPPER
-// =========================
-function simulateMatchdayWrapper(){
-
-  simulateMatchday?.();
-  updateTable?.();
-  updateMatchdayUI();
-
-  gameState.phase = "matchday_ready";
-  updateMainButton();
-}
-
-// =========================
-// 📊 MOMENTUM SYSTEM (NEU)
+// 📊 MOMENTUM
 // =========================
 function updateMomentum(value){
   const bar = document.getElementById("momentumBar");
   if(bar){
     bar.style.width = value + "%";
-  }
-}
-
-// =========================
-// ⚡ SPEED UI FIX
-// =========================
-function setSpeed(e, speed){
-  document.querySelectorAll(".speed").forEach(b => b.classList.remove("active"));
-  e.target.classList.add("active");
-
-  if(typeof window.setGameSpeed === "function"){
-    setGameSpeed(speed);
   }
 }
 
@@ -314,6 +327,7 @@ window.onload = function(){
   const select = document.getElementById("leagueSelect");
   if(select){
     select.innerHTML = "";
+
     Object.keys(leagues).forEach(l => {
       let option = document.createElement("option");
       option.value = l;
