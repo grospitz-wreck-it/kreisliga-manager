@@ -22,24 +22,24 @@ body {
   overflow: hidden;
 }
 
-/* 🔥 FIX: Klicks nicht blocken */
+/* Logo */
 .header::before {
   content: "";
   position: absolute;
   inset: 0;
   background: url("logos/manager_logo.png") center/contain no-repeat;
   opacity: 0.9;
-  pointer-events: none;
+  pointer-events: none; /* 🔥 FIX */
 }
 
+/* Overlay */
 .headerOverlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+  pointer-events: none; /* 🔥 FIX */
 }
-.headerOverlay {
-  pointer-events: none;
-}
+
 .headerContent {
   position: relative;
   z-index: 2;
@@ -67,21 +67,16 @@ body {
 #menuBtn {
   width: 52px;
   height: 52px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 22px;
-
   background: rgba(0,0,0,0.55);
   backdrop-filter: blur(6px);
-
   border-radius: 14px;
   cursor: pointer;
-
-  z-index: 1600; /* 🔥 FIX */
   position: relative;
+  z-index: 1600;
 }
 
 #menuBtn:active {
@@ -95,15 +90,12 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-
   opacity: 0;
   pointer-events: none;
-
   transition: opacity 0.3s;
   z-index: 1400;
 }
 
-/* 🔥 FIX: nur aktiv klickbar */
 #overlay.active {
   opacity: 1;
   pointer-events: auto;
@@ -116,16 +108,13 @@ body {
   position: fixed;
   right: 0;
   top: 0;
-
   width: 85%;
   max-width: 360px;
   height: 100%;
-
   background: #fff;
   transform: translateX(100%);
   transition: 0.3s;
   z-index: 1500;
-
   overflow-y: auto;
 }
 
@@ -210,8 +199,10 @@ body {
   overflow-y: auto;
   border-radius: 12px;
   background: url("gfx/field.svg") center/cover no-repeat;
+  z-index: 1;
 }
 
+/* 🔥 FIX: blockiert keine Klicks mehr */
 .live::before {
   content: "";
   position: absolute;
@@ -239,6 +230,8 @@ body {
   background: #263238;
   padding: 12px;
   border-radius: 12px;
+  position: relative;
+  z-index: 5; /* 🔥 über live */
 }
 
 .quickActions {
@@ -318,6 +311,7 @@ button {
   border: none;
   padding: 10px;
   border-radius: 10px;
+  cursor: pointer;
 }
 
 /* =========================
@@ -332,13 +326,8 @@ button {
     padding: 20px;
   }
 
-  .mainPanel {
-    flex: 2;
-  }
-
-  .sidePanel {
-    flex: 1;
-  }
+  .mainPanel { flex: 2; }
+  .sidePanel { flex: 1; }
 }
 
 /* =========================
