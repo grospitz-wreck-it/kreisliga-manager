@@ -139,7 +139,7 @@ function simulateMinute(){
     var index = Math.floor(Math.random() * texts.length);
     addLiveEvent(texts[index], m);
   }
-}
+
 
 // andere Spiele
 if(window.currentMatchdayMatches){
