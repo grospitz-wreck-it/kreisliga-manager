@@ -201,26 +201,39 @@ body {
 /* =========================
    📺 LIVE MATCH
 ========================= */
+/* =========================
+   📺 LIVE MATCH (FIXED)
+========================= */
 .live {
-  background: #111;
-  color: #eaeaea;
+  position: relative;
 
-  border-radius: 12px;
-  padding: 10px;
-  max-height: 260px;
+  height: 220px; /* FIXE HÖHE */
   overflow-y: auto;
 
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
+  padding: 10px;
+  border-radius: 12px;
+
+  /* Spielfeld Hintergrund */
+  background: url("/gfx/field.svg") center/cover no-repeat;
+
+  /* dunkler Overlay für Lesbarkeit */
+  box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.65);
+
+  color: #fff;
 }
 
+/* Events */
 .live p {
-  background: rgba(255,255,255,0.05);
-  border-radius: 6px;
-  padding: 6px 8px;
   margin: 4px 0;
+  padding: 6px 8px;
+
+  border-radius: 6px;
+
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(2px);
+
   font-size: 13px;
 }
-
 /* =========================
    🎮 CONTROL DESK
 ========================= */
