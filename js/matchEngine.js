@@ -220,7 +220,6 @@ function endMatch(){
 
   if(typeof updateMainButton === "function") updateMainButton();
 }
-
 // =========================
 // 📊 TABELLE UPDATEN
 // =========================
@@ -229,6 +228,36 @@ function updateTableData(match){
   const home = game.league.teams.find(t => t.name === match.home);
   const away = game.league.teams.find(t => t.name === match.away);
 
-  if(!home
-  console.log("ENGINE ENDE");
-```
+  if(!home || !away){
+    console.warn("⚠️ Team nicht gefunden", match);
+    return;
+  }
+
+  home.goalsFor += match.score.home;
+  home.goalsAgainst += match.score.away;
+
+  away.goalsFor += match.score.away;
+  away.goalsAgainst += match.score.home;
+
+  home.played++;
+  away.played++;
+
+  if(match.score.home > match.score.away){
+    home.points += 3;
+    home.wins++;
+    away.losses++;
+  }
+  else if(match.score.home < match.score.away){
+    away.points += 3;
+    away.wins++;
+    home.losses++;
+  }
+  else{
+    home.points += 1;
+    away.points += 1;
+    home.draws++;
+    away.draws++;
+  }
+}
+
+console.log("ENGINE ENDE");
