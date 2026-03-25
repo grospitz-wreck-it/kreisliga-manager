@@ -120,3 +120,28 @@ function updateHeader(){
       : league;
   }
 }
+// =========================
+// 🎮 UI EVENT SYSTEM (MOBILE FIX)
+// =========================
+function bindUI(){
+
+  function bindButton(el, handler){
+    if(!el) return;
+
+    let triggered = false;
+
+    el.addEventListener("touchstart", () => {
+      triggered = true;
+      handler();
+    }, { passive: true });
+
+    el.addEventListener("click", () => {
+      if (!triggered) handler();
+      triggered = false;
+    });
+  }
+
+  bindButton(document.getElementById("mainActionBtn"), handleMainAction);
+  bindButton(document.getElementById("menuBtn"), toggleSetup);
+  bindButton(document.getElementById("overlay"), closeSetup);
+}
