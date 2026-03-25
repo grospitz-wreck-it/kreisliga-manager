@@ -55,6 +55,7 @@ function startLiveMatch(matches){
   updateProgressBar();
 
   startInterval();
+  if(typeof updateMainButton === "function") updateMainButton();
 }
 
 // =========================
@@ -75,7 +76,8 @@ function restartInterval(){
 // ⏱️ INTERVAL
 // =========================
 function startInterval(){
-
+game.phase = "live";
+if(typeof updateMainButton === "function") updateMainButton();
   if(interval){
     clearInterval(interval);
   }
@@ -125,7 +127,7 @@ function resumeMatch(){
 
   startInterval();
 
-  if(typeof updateMainButton === "function") updateMainButton();
+  if(typeof updateMainButton === "function") updateMainButton(); // 🔥 WICHTIG
 }
 
 // =========================
