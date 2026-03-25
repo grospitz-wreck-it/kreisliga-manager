@@ -25,11 +25,25 @@ window.onload = function(){
   console.log("✅ App vollständig geladen");
 };
 function toggleSetup(){
-
   const panel = document.getElementById("setupPanel");
-  if(!panel) return;
+  const overlay = document.getElementById("overlay");
 
-  panel.classList.toggle("open");
+  const isOpen = panel.classList.contains("open");
+
+  if(isOpen){
+    closeSetup();
+  } else {
+    panel.classList.add("open");
+    overlay.classList.add("active");
+  }
+}
+
+function closeSetup(){
+  const panel = document.getElementById("setupPanel");
+  const overlay = document.getElementById("overlay");
+
+  panel.classList.remove("open");
+  overlay.classList.remove("active");
 }
 // =========================
 // 👤 PLAYER
