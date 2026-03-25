@@ -24,17 +24,23 @@ window.onload = function(){
 // =========================
 // 👤 PLAYER
 // =========================
-function initPlayer(){
+function initPlayerName(){
 
   if(!game.player.name){
+
     let name = prompt("Manager Name?");
-    if(!name) name = "Manager_" + Math.floor(Math.random()*1000);
+    if(!name){
+      name = "Manager_" + Math.floor(Math.random() * 1000);
+    }
 
     game.player.name = name;
     localStorage.setItem("playerName", name);
   }
 
-  document.getElementById("nameInput").value = game.player.name;
+  const input = document.getElementById("nameInput");
+  if(input){
+    input.value = game.player.name;
+  }
 }
 
 // =========================
