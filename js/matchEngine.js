@@ -100,7 +100,27 @@ function startInterval(){
 
   }, 1000 / (window.speedMultiplier || 1));
 }
+// =========================
+// 🔁 INTERVAL NEUSTARTEN
+// =========================
+function restartInterval(){
 
+  console.log("🔁 restartInterval");
+
+  // nur neu starten, wenn Spiel läuft
+  if(!game.match || !game.match.isRunning){
+    console.warn("⏸ kein laufendes Spiel");
+    return;
+  }
+
+  // aktuellen Interval killen
+  if(interval){
+    clearInterval(interval);
+  }
+
+  // neu starten mit aktueller Geschwindigkeit
+  startInterval();
+}
 // =========================
 // ▶️ RESUME
 // =========================
@@ -213,3 +233,4 @@ window.startLiveMatch = startLiveMatch;
 window.resumeMatch = resumeMatch;
 window.restartInterval = restartInterval; // 🔥 DAS IST DER WICHTIGE
 console.log("ENGINE END");
+window.restartInterval = restartInterval;
