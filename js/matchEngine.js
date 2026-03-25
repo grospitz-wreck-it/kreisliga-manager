@@ -1,4 +1,3 @@
-```javascript
 // =========================
 // ⚽ MATCH ENGINE (FINAL FIX)
 // =========================
@@ -208,4 +207,3 @@ function updateTableData(match){
 }
 
 console.log("ENGINE END");
-```
