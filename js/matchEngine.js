@@ -205,5 +205,11 @@ function updateTableData(match){
     away.points++;
   }
 }
-
+// =========================
+// 🌍 GLOBAL EXPORTS
+// =========================
+window.simulateMatchday = simulateMatchday;
+window.startLiveMatch = startLiveMatch;
+window.resumeMatch = resumeMatch;
+window.restartInterval = restartInterval; // 🔥 DAS IST DER WICHTIGE
 console.log("ENGINE END");
