@@ -207,60 +207,94 @@ body {
 /* =========================
    📊 TABLE (FINAL FIX)
 ========================= */
-#table {
+/* =========================
+   📊 MODERN TABLE (UPGRADE)
+========================= */
+
+.modernTable {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  font-size: 14px;
+  color: #eaeaea;
 }
 
-#table th {
-  background: #e8f5e9;
-  padding: 6px;
-  font-size: 13px;
+.modernTable thead {
+  background: rgba(255,255,255,0.05);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
 }
 
-#table td {
-  padding: 6px;
-  font-size: 13px;
-  border-bottom: 1px solid #ddd;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.modernTable th {
+  padding: 10px 6px;
+  text-align: center;
+  opacity: 0.7;
 }
 
-/* feste Höhe → KEIN aufblasen */
-#table tr {
-  height: 34px;
+.modernTable td {
+  padding: 10px 6px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  position: relative;
 }
 
-/* erste Spalte */
-#table td:first-child,
-#table th:first-child {
+/* Team linksbündig */
+.modernTable td:nth-child(2) {
   text-align: left;
-  width: 40%;
+  padding-left: 12px;
 }
 
-/* Tabellenlogik */
-.first {
-  background: rgba(76,175,80,0.15);
+/* Hover */
+.modernTable tbody tr:hover {
+  background: rgba(255,255,255,0.04);
 }
 
-.relegation {
-  background: rgba(244,67,54,0.1);
+/* =========================
+   🟢 PLATZ 1 (GRÜN)
+========================= */
+.modernTable tr.rank-1 {
+  background: rgba(76, 175, 80, 0.15);
+  font-weight: bold;
 }
 
-/* dein Team */
-.userTeamRow {
-  background: rgba(0,200,150,0.08);
-  border-left: 3px solid #00c896;
+/* =========================
+   🔴 ABSTIEG (15 + 16)
+========================= */
+.modernTable tr.relegation {
+  background: rgba(244, 67, 54, 0.15);
 }
 
-/* LIVE MATCH TEAMS */
-.liveRow {
-  background: rgba(255,255,255,0.03);
+/* =========================
+   🟩 PLAYER TEAM (LINKER BALKEN)
+========================= */
+.modernTable tr.playerTeam td:first-child::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: #4caf50;
+  border-radius: 2px;
 }
 
+/* Punkte Highlight */
+.modernTable td:last-child {
+  font-weight: bold;
+  color: #4caf50;
+}
+
+/* Mobile */
+@media (max-width: 600px){
+  .modernTable {
+    font-size: 12px;
+  }
+
+  .modernTable th,
+  .modernTable td {
+    padding: 6px 4px;
+  }
+}
 /* =========================
    BUTTONS
 ========================= */
