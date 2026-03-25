@@ -174,6 +174,33 @@ function updateProgressBar(){
   bar.style.width = percent + "%";
 }
 // =========================
+// 📢 LIVE EVENTS UI
+// =========================
+function addLiveEvent(text, minute){
+
+  const box = document.getElementById("liveMatch");
+  if(!box) return;
+
+  const el = document.createElement("div");
+  el.innerText = `${minute}' ${text}`;
+
+  box.prepend(el);
+}
+
+function clearLiveEvents(){
+
+  const box = document.getElementById("liveMatch");
+  if(!box) return;
+
+  box.innerHTML = "";
+}
+
+// =========================
+// 🌍 EXPORT
+// =========================
+window.addLiveEvent = addLiveEvent;
+window.clearLiveEvents = clearLiveEvents;
+// =========================
 // 🌍 GLOBAL EXPORTS (FIX)
 // =========================
 window.updateTable = updateTable;
