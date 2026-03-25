@@ -347,12 +347,8 @@ button:hover {
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-/* =========================
-   📱 MOBILE
-========================= */
-/* =========================
-   📱 MOBILE FULL WIDTH FIX
-========================= */
+
+
 /* =========================
    📱 MOBILE LAYOUT FIX
 ========================= */
@@ -399,6 +395,37 @@ button:hover {
   #adBanner {
     border-radius: 0;
   }
+   /* =========================
+   📱 MOBILE STABILITY FIX
+========================= */
+@media (max-width: 768px){
+
+  /* ❌ Hover-Effekte deaktivieren */
+  .modernTable tbody tr:hover {
+    transform: none;
+    background: rgba(0,0,0,0.02);
+  }
+
+  /* ❌ Animationen killen (Ads etc.) */
+  .adTrack {
+    animation: none;
+  }
+
+  /* ❌ Kein Subpixel-Gezitter */
+  * {
+    transform: none !important;
+  }
+
+  /* ✅ Stabilere Darstellung */
+  .panel {
+    will-change: auto;
+  }
+
+  /* ✅ Live-Feed ruhiger */
+  .live {
+    -webkit-overflow-scrolling: touch;
+  }
+   
 }
 /* =========================
    📢 ADS (FINAL FIX)
