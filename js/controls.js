@@ -159,3 +159,19 @@ if(!panel) return;
 
 panel.classList.toggle("open");
 }
+function setLiveMode(mode){
+
+  liveModifier = 0;
+
+  if(mode === "attack"){
+    liveModifier = 0.05;
+  }
+  else if(mode === "calm"){
+    liveModifier = -0.03;
+  }
+  else if(mode === "counter"){
+    liveModifier = 0.02;
+  }
+
+  console.log("Live Mode:", mode, liveModifier);
+}
