@@ -192,8 +192,8 @@ function triggerMatchEvent(match, minute){
 function buildChanceEvent(team, opponent, minute){
 
   var t1 = [
-    team + baut ruhig auf",
-    team + kombiniert stark",
+    team + "baut ruhig auf",
+    team + "kombiniert stark",
     "Geduldiger Angriff von " + team
   ];
 
