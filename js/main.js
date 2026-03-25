@@ -123,8 +123,28 @@ function startSeason(){
 // ⚽ MATCH
 // =========================
 function startMatch(){
+
+  if(!game.team.selected){
+    alert("Bitte zuerst ein Team wählen!");
+    return;
+  }
+
+  if(!game.league.schedule || game.league.schedule.length === 0){
+    alert("Keine Liga gestartet!");
+    return;
+  }
+
+  if(game.match.isRunning){
+    console.warn("Spiel läuft bereits");
+    return;
+  }
+
   simulateMatchday();
+
+  game.match.isRunning = true;
   game.phase = "live";
+
+  updateMainButton();
 }
 
 // =========================
