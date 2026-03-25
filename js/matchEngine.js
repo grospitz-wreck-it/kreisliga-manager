@@ -230,4 +230,5 @@ function updateTableData(match){
   const away = game.league.teams.find(t => t.name === match.away);
 
   if(!home
+  console.log("ENGINE ENDE");
 ```
