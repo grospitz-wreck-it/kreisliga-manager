@@ -203,10 +203,7 @@ game.phase = "ready";
 const match = window.currentMatch;
 if(!match) return;
 
-addLiveEvent(
-`🏁 Endstand: ${match.home} ${match.score.home} - ${match.score.away} ${match.away}`,
-90
-);
+addLiveEvent(`Endstand: ${match.home} ${match.score.home} - ${match.score.away} ${match.away}`, 90);
 
 // 👉 ALLE Spiele auswerten
 if(window.currentMatchdayMatches){
