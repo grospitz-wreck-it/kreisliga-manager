@@ -205,6 +205,7 @@ function endMatch(){
   if(typeof updateTable === "function") updateTable();
 
   addMatchReport(match);
+  if(typeof updateMainButton === "function") updateMainButton();
 }
 
 // =========================
