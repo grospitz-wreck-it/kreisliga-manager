@@ -3,9 +3,12 @@
 ========================= */
 body {
   margin: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #eef1ee;
-  color: #2b2b2b;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  background: linear-gradient(180deg, #eef1ee 0%, #e3e8e3 100%);
+  color: #1f1f1f;
+
+  -webkit-font-smoothing: antialiased;
 }
 
 /* =========================
@@ -104,7 +107,7 @@ body {
 }
 
 /* =========================
-   🧱 LAYOUT FIX (WICHTIG)
+   🧱 LAYOUT
 ========================= */
 .layout {
   display: flex;
@@ -115,13 +118,11 @@ body {
   align-items: flex-start;
 }
 
-/* 🎮 HAUPTSPIEL */
 .mainPanel {
   flex: 2;
   min-width: 0;
 }
 
-/* 📊 SEITE (TABELLE ETC.) */
 .sidePanel {
   flex: 1;
   min-width: 280px;
@@ -132,301 +133,31 @@ body {
 }
 
 /* =========================
-   SCOREBOARD
+   🧊 PANEL (CARD STYLE)
 ========================= */
-.scoreboard {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.panel {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+
+  border-radius: 16px;
+  padding: 16px;
+
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.08),
+    0 1px 2px rgba(0,0,0,0.05);
+
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
-#score {
-  background: #1b5e20;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-size: 26px;
-}
-
-/* =========================
-   TIMELINE
-========================= */
-.timeline {
-  height: 12px;
-  background: #c8e6c9;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-#timelineBar {
-  height: 100%;
-  width: 0%;
-  background: #2e7d32;
-}
-
-/* =========================
-   CONTROLS
-========================= */
-.controls {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-/* =========================
-   LIVE MATCH (TICKER)
-========================= */
-#liveMatch {
-  background: #1e1e1e;
-  color: #eaeaea;
-  height: 260px;
-  overflow-y: auto;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-#liveMatch p {
-  margin: 4px 0;
-  padding: 6px 8px;
-  background: #2a2a2a;
-  border-radius: 6px;
-  font-size: 13px;
-}
-
-/* =========================
-   📰 NEWS / SPIELBERICHT
-========================= */
-#newsBox {
-  min-height: 120px;
-  max-height: 300px;
-  overflow-y: auto;
-  line-height: 1.4;
-}
-
-/* =========================
-   📊 TABLE (FINAL FIX)
-========================= */
-/* =========================
-   📊 MODERN TABLE (UPGRADE)
-========================= */
-
-.modernTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  color: #eaeaea;
-}
-
-.modernTable thead {
-  background: rgba(255,255,255,0.05);
-  text-transform: uppercase;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-}
-
-.modernTable th {
-  padding: 10px 6px;
-  text-align: center;
-  opacity: 0.7;
-}
-
-.modernTable td {
-  padding: 10px 6px;
-  text-align: center;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  position: relative;
-}
-
-/* Team linksbündig */
-.modernTable td:nth-child(2) {
-  text-align: left;
-  padding-left: 12px;
-}
-
-/* Hover */
-.modernTable tbody tr:hover {
-  background: rgba(255,255,255,0.04);
-}
-
-/* =========================
-   🟢 PLATZ 1 (GRÜN)
-========================= */
-.modernTable tr.rank-1 {
-  background: rgba(76, 175, 80, 0.15);
-  font-weight: bold;
-}
-
-/* =========================
-   🔴 ABSTIEG (15 + 16)
-========================= */
-.modernTable tr.relegation {
-  background: rgba(244, 67, 54, 0.15);
-}
-
-/* =========================
-   🟩 PLAYER TEAM (LINKER BALKEN)
-========================= */
-.modernTable tr.playerTeam td:first-child::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 4px;
-  height: 100%;
-  background: #4caf50;
-  border-radius: 2px;
-}
-
-/* Punkte Highlight */
-.modernTable td:last-child {
-  font-weight: bold;
-  color: #4caf50;
-}
-
-/* Mobile */
-@media (max-width: 600px){
-  .modernTable {
-    font-size: 12px;
-  }
-
-  .modernTable th,
-  .modernTable td {
-    padding: 6px 4px;
-  }
-}
-/* =========================
-   BUTTONS
-========================= */
-button {
-  background: #2e7d32;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #388e3c;
-}
-
-/* =========================
-   MOBILE
-========================= */
-@media (max-width: 768px){
-
-  .layout {
-    flex-direction: column;
-    padding: 10px;
-  }
-
-  #liveMatch {
-    height: 200px;
-  }
-
-  #score {
-    font-size: 22px;
-  }
-}
-/* =========================
-   🔧 EXTRA FEATURES (SAFE ADD)
-========================= */
-
-/* Tabs */
-.menuTabs {
-  display: flex;
-  border-bottom: 1px solid #eee;
-}
-
-.tab {
-  flex: 1;
-  padding: 10px;
-  background: none;
-  border: none;
-  opacity: 0.6;
-}
-
-.tab.active {
-  opacity: 1;
-  border-bottom: 3px solid #2e7d32;
-}
-
-/* Tab Content */
-.tabContent {
-  display: none;
-  padding: 15px;
-}
-
-.tabContent.active {
-  display: block;
-}
-
-/* Setup Box */
-.setupBox {
-  background: #f9fbf9;
-  padding: 14px;
-  border-radius: 10px;
+.panel h2 {
   margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
 }
 
-.setupBox input,
-.setupBox select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.setupBox button {
-  width: 100%;
-  margin-top: 10px;
-}
-
-/* Leaderboard */
-#leaderboard {
-  background: #f1f8f4;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.lb-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px;
-  margin: 4px 0;
-  background: white;
-  border-radius: 6px;
-}
-
-.lb-1 { border-left: 4px solid gold; }
-.lb-2 { border-left: 4px solid silver; }
-.lb-3 { border-left: 4px solid #cd7f32; }
-
-/* Ads */
-#adBanner {
-  height: 70px;
-  overflow: hidden;
-  background: #1b5e20;
-  border-radius: 10px;
-}
-
-.adTrack {
-  display: flex;
-  gap: 40px;
-  animation: scrollAds 30s linear infinite;
-}
-
-.adItem img {
-  height: 40px;
-}
-
-@keyframes scrollAds {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-/* SCOREBOARD */
+/* =========================
+   ⚽ SCOREBOARD
+========================= */
 .scoreboard.big {
   display: flex;
   justify-content: space-between;
@@ -437,14 +168,21 @@ button:hover {
 }
 
 #score {
-  background: #1b5e20;
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
   color: white;
-  padding: 10px 20px;
+
+  padding: 12px 22px;
   border-radius: 12px;
-  font-size: 26px;
+
+  font-size: 28px;
+  font-weight: bold;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* MOMENTUM */
+/* =========================
+   📊 MOMENTUM BAR
+========================= */
 .momentum {
   height: 8px;
   background: #ccc;
@@ -455,30 +193,37 @@ button:hover {
 
 #momentumBar {
   height: 100%;
-  width: 50%;
+  width: 0%;
   background: linear-gradient(to right, #4caf50, #ff5252);
   transition: width 0.3s;
 }
 
-/* LIVE EVENTS FIX */
+/* =========================
+   📺 LIVE MATCH
+========================= */
 .live {
-  background: #1e1e1e;
-  color: #eee;
+  background: #111;
+  color: #eaeaea;
+
+  border-radius: 12px;
+  padding: 10px;
   max-height: 260px;
   overflow-y: auto;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 12px;
+
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
 }
 
 .live p {
-  padding: 6px;
-  border-radius: 6px;
-  margin: 4px 0;
   background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin: 4px 0;
+  font-size: 13px;
 }
 
-/* CONTROL DESK */
+/* =========================
+   🎮 CONTROL DESK
+========================= */
 .controlDesk {
   background: #263238;
   padding: 12px;
@@ -495,78 +240,119 @@ button:hover {
 .btn {
   flex: 1;
   padding: 10px;
-  border: none;
   border-radius: 8px;
   color: white;
-  cursor: pointer;
 }
 
 .btn.attack { background: #e53935; }
 .btn.calm { background: #43a047; }
 .btn.counter { background: #fb8c00; }
 
-/* SETTINGS */
-.settingsRow {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.settingsRow div {
-  flex: 1;
-}
-
-.settingsRow label {
-  font-size: 12px;
-  display: block;
-}
-
-/* INTENSITY */
-.intensity input {
+/* =========================
+   📊 MODERN TABLE
+========================= */
+.modernTable {
   width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
 }
 
-.intensity .labels {
-  display: flex;
-  justify-content: space-between;
+.modernTable thead tr {
+  background: rgba(0,0,0,0.04);
+}
+
+.modernTable th {
+  padding: 8px 6px;
+  text-align: center;
   font-size: 11px;
+  font-weight: 600;
+  color: #666;
 }
 
-/* SPEED */
-.speedControl {
-  display: flex;
-  gap: 6px;
-  margin-top: 10px;
+.modernTable td {
+  padding: 10px 6px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  position: relative;
 }
 
-.speed {
-  background: #37474f;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
+.modernTable td:nth-child(2) {
+  text-align: left;
+  padding-left: 10px;
+  font-weight: 500;
 }
 
-.speed.active {
+.modernTable tbody tr:hover {
+  background: rgba(0,0,0,0.04);
+  transform: scale(1.01);
+}
+
+/* 🟢 Platz 1 */
+.modernTable tr.rank-1 {
+  background: linear-gradient(90deg, rgba(76,175,80,0.15), transparent);
+  font-weight: 600;
+}
+
+/* 🔴 Abstieg */
+.modernTable tr.relegation {
+  background: linear-gradient(90deg, rgba(244,67,54,0.15), transparent);
+}
+
+/* 🟩 Dein Team */
+.modernTable tr.playerTeam td:first-child::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
   background: #4caf50;
+  border-radius: 2px;
 }
 
-/* PRIMARY BUTTON */
-.primaryAction {
-  margin-top: 12px;
-}
-
-#mainActionBtn {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
+/* Punkte */
+.modernTable td:last-child {
   font-weight: bold;
+  color: #2e7d32;
+}
+
+/* =========================
+   🔘 BUTTONS
+========================= */
+button {
   background: linear-gradient(135deg, #43a047, #2e7d32);
   color: white;
   border: none;
+
+  padding: 9px 14px;
   border-radius: 10px;
+
+  cursor: pointer;
+  font-weight: 500;
+
+  transition: all 0.2s ease;
 }
 
-#mainActionBtn.pause {
-  background: #c62828;
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* =========================
+   📱 MOBILE
+========================= */
+@media (max-width: 768px){
+
+  .layout {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .live {
+    height: 200px;
+  }
+
+  #score {
+    font-size: 22px;
+  }
 }
