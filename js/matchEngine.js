@@ -41,7 +41,7 @@ function simulateMatchday(){
 function startLiveMatch(matches){
 
   console.log("🚀 startLiveMatch");
-
+  game.match.halftimePlayed = false;
   game.match.minute = 0;
   game.match.isRunning = true;
   game.phase = "live";
@@ -85,14 +85,18 @@ function startInterval(){
     updateScoreUI();
     updateProgressBar();
 
-    if(game.match.minute === 45){
-      game.match.isRunning = false;
-      game.phase = "halftime";
+    if(game.match.minute === 45 && !game.match.halftimePlayed){
 
-      addLiveEvent("⏸ Halbzeit", 45);
-      updateMainButton?.();
-      return;
-    }
+  game.match.halftimePlayed = true;
+
+  game.match.isRunning = false;
+  game.phase = "halftime";
+
+  addLiveEvent("⏸ Halbzeit", 45);
+
+  updateMainButton?.();
+  return;
+}
 
     if(game.match.minute >= 90){
       endMatch();
