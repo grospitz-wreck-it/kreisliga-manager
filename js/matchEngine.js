@@ -104,26 +104,29 @@ function simulateMinute(){
 
   var chance = 0.08;
 
-  // 👉 ALLES ZU ZAHLEN ZWINGEN
-  chance += Number(window.tacticModifier || 0);
-  chance += Number(window.formationModifier || 0);
-  chance += Number(window.liveModifier || 0);
-  chance += Number(window.intensityModifier || 0);
+  chance += Number(tacticModifier || 0);
+  chance += Number(formationModifier || 0);
+  chance += Number(liveModifier || 0);
+  chance += Number(intensityModifier || 0);
 
-  // 👉 ABSICHERN
   if(isNaN(chance)) chance = 0.08;
 
+  // TOR
   if(Math.random() < chance){
 
     var isHome = Math.random() < 0.5;
     var scoringTeam = isHome ? match.home : match.away;
 
-    if(isHome) match.score.home++;
-    else match.score.away++;
+    if(isHome){
+      match.score.home = match.score.home + 1;
+    } else {
+      match.score.away = match.score.away + 1;
+    }
 
     addLiveEvent("⚽ Tor für " + scoringTeam + "!", m);
   }
 
+  // EVENTS
   if(Math.random() < 0.05){
 
     var texts = [
@@ -133,9 +136,9 @@ function simulateMinute(){
       "📢 Fans werden laut"
     ];
 
-    var txt = texts[Math.floor(Math.random() * texts.length)];
-    addLiveEvent(txt, m);
-  
+    var index = Math.floor(Math.random() * texts.length);
+    addLiveEvent(texts[index], m);
+  }
 }
 
 // andere Spiele
