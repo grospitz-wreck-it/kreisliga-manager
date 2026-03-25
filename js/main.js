@@ -21,6 +21,8 @@ window.onload = function(){
   if(typeof startAds === "function"){
     startAds();
   }
+ // 🔥 HIER GEHÖRT ES HIN
+  bindUI();
 
   console.log("✅ App vollständig geladen");
 };
