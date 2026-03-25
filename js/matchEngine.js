@@ -2,7 +2,7 @@
 // =========================
 // ⚽ MATCH ENGINE (CLEAN + DEBUG)
 // =========================
-
+console.log("✅ matchEngine geladen");
 let interval = null;
 
 // =========================
