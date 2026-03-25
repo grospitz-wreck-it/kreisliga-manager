@@ -3,10 +3,7 @@
 // =========================
 console.log("UI START");
 function updateTable(){
-  const pts = team._live?.points ?? team.points;
-  const gf  = team._live?.gf ?? team.goalsFor;
-  const ga  = team._live?.ga ?? team.goalsAgainst;
-  const diff = gf - ga;
+  
   const table = document.querySelector("#table tbody");
   if(!table) return;
 
@@ -53,7 +50,10 @@ function updateTable(){
     const row = document.createElement("tr");
 
     const isPlayer = team.name === game.team.selected;
-    const diff = team.goalsFor - team.goalsAgainst;
+    const pts = team._live?.points ?? team.points;
+    const gf  = team._live?.gf ?? team.goalsFor;
+    const ga  = team._live?.ga ?? team.goalsAgainst;
+    const diff = gf - ga;
 
     row.innerHTML = `
       <td>${index + 1}</td>
