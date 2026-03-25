@@ -97,31 +97,45 @@ startInterval();
 
 function simulateMinute(){
 
-var m = game.match.minute;
-var match = window.currentMatch;
+  var m = game.match.minute;
+  var match = window.currentMatch;
 
-if(!match) return;
+  if(!match) return;
 
-var chance = 0.08;
+  var chance = 0.08;
 
-chance += window.tacticModifier || 0;
-chance += window.formationModifier || 0;
-chance += window.liveModifier || 0;
-chance += window.intensityModifier || 0;
+  // 👉 ALLES ZU ZAHLEN ZWINGEN
+  chance += Number(window.tacticModifier || 0);
+  chance += Number(window.formationModifier || 0);
+  chance += Number(window.liveModifier || 0);
+  chance += Number(window.intensityModifier || 0);
 
-if(Math.random() < chance){
+  // 👉 ABSICHERN
+  if(isNaN(chance)) chance = 0.08;
 
-```
-var isHome = Math.random() < 0.5;
+  if(Math.random() < chance){
 
-if(isHome) match.score.home++;
-else match.score.away++;
+    var isHome = Math.random() < 0.5;
+    var scoringTeam = isHome ? match.home : match.away;
 
-var scoringTeam = isHome ? match.home : match.away;
+    if(isHome) match.score.home++;
+    else match.score.away++;
 
-addLiveEvent("Tor für " + scoringTeam, m);
-```
+    addLiveEvent("⚽ Tor für " + scoringTeam + "!", m);
+  }
 
+  if(Math.random() < 0.05){
+
+    var texts = [
+      "💥 Chance vergeben",
+      "🧤 Starke Parade",
+      "🟨 Gelbe Karte",
+      "📢 Fans werden laut"
+    ];
+
+    var txt = texts[Math.floor(Math.random() * texts.length)];
+    addLiveEvent(txt, m);
+  }
 }
 
 // andere Spiele
