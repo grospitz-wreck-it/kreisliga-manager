@@ -29,6 +29,7 @@ function simulateMatchday(){
   if(!matches){
     console.warn("❌ Kein Spieltag");
     return;
+    startConference(matches);
   }
 
   game.league.currentMatchday++;
