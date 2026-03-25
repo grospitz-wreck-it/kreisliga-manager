@@ -128,16 +128,9 @@ function bindUI(){
   function bindButton(el, handler){
     if(!el) return;
 
-    let triggered = false;
-
-    el.addEventListener("touchstart", () => {
-      triggered = true;
+    el.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
       handler();
-    }, { passive: true });
-
-    el.addEventListener("click", () => {
-      if (!triggered) handler();
-      triggered = false;
     });
   }
 
