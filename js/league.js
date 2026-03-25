@@ -17,78 +17,76 @@ function createTeam(name){
 // =========================
 // 🏟️ LIGA LADEN
 // =========================
-function loadLeague(name) {
+function loadLeague(name){
 
-  teams = [];
-  schedule = [];
-  currentMatchday = 0;
+  game.league.key = name;
+  game.league.teams = [];
+  game.league.schedule = [];
+  game.league.currentMatchday = 0;
 
+  let t = [];
+
+  // =========================
+  // 🏟️ HERFORD
+  // =========================
   if (name === "herford") {
-    teams = [
-      createTeam("Bünder SV"),
-      createTeam("SC Herford"),
-      createTeam("TuS Bruchmühlen"),
-      createTeam("SV Rödinghausen II"),
-      createTeam("FC Exter"),
-      createTeam("SV Enger-Westerenger"),
-      createTeam("TuRa Löhne"),
-      createTeam("FC Herford"),
-      createTeam("TSV Löhne"),
-      createTeam("SV Oetinghausen"),
-      createTeam("SC Vlotho"),
-      createTeam("SV Bischofshagen"),
-      createTeam("TuS Hunnebrock"),
-      createTeam("SV Hiddenhausen"),
-      createTeam("FC Schweicheln"),
-      createTeam("RW Kirchlengern II")
+    t = [
+      "Bünder SV","SC Herford","TuS Bruchmühlen","SV Rödinghausen II",
+      "FC Exter","SV Enger-Westerenger","TuRa Löhne","FC Herford",
+      "TSV Löhne","SV Oetinghausen","SC Vlotho","SV Bischofshagen",
+      "TuS Hunnebrock","SV Hiddenhausen","FC Schweicheln","RW Kirchlengern II"
     ];
   }
 
-  if (name === "luebbecke") {
-    teams = [
-      createTeam("Gehlenbeck"),
-      createTeam("TuSpo Rahden"),
-      createTeam("TG Espelkamp"),
-      createTeam("SuS Holzhausen"),
-      createTeam("FC Lübbecke II"),
-      createTeam("FC Oppenwehe"),
-      createTeam("TuS Stemwede"),
-      createTeam("Union Varl"),
-      createTeam("SSV Ströhen"),
-      createTeam("Fabbenstedt"),
-      createTeam("TuS Tengern II"),
-      createTeam("Tonnenheide"),
-      createTeam("Pr Espelkamp II"),
-      createTeam("TuS Levern"),
-      createTeam("Isenstedt"),
-      createTeam("TuRa Espelk.")
+  // =========================
+  // 🏟️ LÜBBECKE
+  // =========================
+  else if (name === "luebbecke") {
+    t = [
+      "Gehlenbeck","TuSpo Rahden","TG Espelkamp","SuS Holzhausen",
+      "FC Lübbecke II","FC Oppenwehe","TuS Stemwede","Union Varl",
+      "SSV Ströhen","Fabbenstedt","TuS Tengern II","Tonnenheide",
+      "Pr Espelkamp II","TuS Levern","Isenstedt","TuRa Espelk."
     ];
   }
 
-  if (name === "bielefeld") {
-    teams = [
-      createTeam("TuS Jöllenbeck"),
-      createTeam("SC Bielefeld"),
-      createTeam("BV Werther"),
-      createTeam("SG Oesterweg"),
-      createTeam("TuS 08 Senne I"),
-      createTeam("Schildesche"),
-      createTeam("SV Häger"),
-      createTeam("Oldentrup"),
-      createTeam("TuS Jöllen. II"),
-      createTeam("SC Peckeloh II"),
-      createTeam("Kosova Bi"),
-      createTeam("Ubbedissen"),
-      createTeam("TuS Ost Bie."),
-      createTeam("Amshausen"),
-      createTeam("TuS Quelle"),
-      createTeam("Gadderbaum")
+  // =========================
+  // 🏟️ BIELEFELD
+  // =========================
+  else if (name === "bielefeld") {
+    t = [
+      "TuS Jöllenbeck","SC Bielefeld","BV Werther","SG Oesterweg",
+      "TuS 08 Senne I","Schildesche","SV Häger","Oldentrup",
+      "TuS Jöllen. II","SC Peckeloh II","Kosova Bi","Ubbedissen",
+      "TuS Ost Bie.","Amshausen","TuS Quelle","Gadderbaum"
     ];
   }
 
-  console.log("Teams geladen:", teams.length);
+  // =========================
+  // ❌ FALLBACK
+  // =========================
+  if(t.length === 0){
+    console.error("❌ Unbekannte Liga:", name);
+    alert("Liga nicht gefunden!");
+    return;
+  }
 
-  generateSchedule(); // 🔥 automatisch erzeugen
+  // =========================
+  // 🧱 TEAMS ERSTELLEN
+  // =========================
+  game.league.teams = t.map(createTeam);
+
+  // =========================
+  // ⚽ SPIELPLAN
+  // =========================
+  generateSchedule();
+
+  // =========================
+  // 💾 SAVE
+  // =========================
+  saveGameState();
+
+  console.log("✅ Liga geladen:", name, game.league.teams.length, "Teams");
 }
 
 // =========================
