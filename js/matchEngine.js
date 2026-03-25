@@ -135,7 +135,7 @@ function simulateMinute(){
 
     var txt = texts[Math.floor(Math.random() * texts.length)];
     addLiveEvent(txt, m);
-  }
+  
 }
 
 // andere Spiele
