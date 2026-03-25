@@ -26,8 +26,11 @@ body {
   content: "";
   position: absolute;
   inset: 0;
+
   background: url("logos/manager_logo.png") center/contain no-repeat;
   opacity: 0.9;
+
+  pointer-events: none; /* 🔥 DAS FIXT DEN CLICK */
 }
 
 .headerOverlay {
