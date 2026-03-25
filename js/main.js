@@ -24,7 +24,13 @@ window.onload = function(){
 
   console.log("✅ App vollständig geladen");
 };
+function toggleSetup(){
 
+  const panel = document.getElementById("setupPanel");
+  if(!panel) return;
+
+  panel.classList.toggle("open");
+}
 // =========================
 // 👤 PLAYER
 // =========================
