@@ -2,7 +2,6 @@
 // ⚙️ GLOBALS
 // =========================
 var matchInterval = null;
-var matchSpeed = 1000;
 
 // =========================
 // ▶ SPIELTAG STARTEN
@@ -12,23 +11,21 @@ function simulateMatchday(){
   var md = game.league.schedule[game.league.currentMatchday];
 
   if(!md || md.length === 0){
-    console.error("❌ Kein Spieltag vorhanden");
+    console.error("❌ Kein Spieltag");
     return;
   }
 
-  console.log("📅 Spieltag", game.league.currentMatchday + 1);
-
-  startLiveMatch(md[0]); // nur dein Spiel (erstmal)
+  startLiveMatch(md[0]); // dein Spiel
 }
 
 // =========================
-// ⚽ LIVE MATCH START
+// ⚽ MATCH START
 // =========================
 function startLiveMatch(match){
 
-  if(!match){
-    console.error("❌ Kein Match übergeben");
-    return;
+  if(matchInterval){
+    clearInterval(matchInterval);
+    matchInterval = null;
   }
 
   window.currentMatch = {
@@ -41,7 +38,6 @@ function startLiveMatch(match){
   game.match.running = true;
 
   updateScoreUI();
-
   startInterval();
 }
 
@@ -60,18 +56,11 @@ function startInterval(){
 
     simulateMinute();
 
-  }, matchSpeed / (speedMultiplier || 1));
+  }, 1000 / (speedMultiplier || 1));
 }
 
 // =========================
-// 🔄 RESTART (für Speed)
-// =========================
-function restartInterval(){
-  startInterval();
-}
-
-// =========================
-// 🧠 MINUTE SIMULATION
+// 🧠 MINUTE SIM
 // =========================
 function simulateMinute(){
 
@@ -84,19 +73,16 @@ function simulateMinute(){
 
   // Halbzeit
   if(m === 45){
-    addLiveEvent("⏸ Halbzeitpause", m);
+    addLiveEvent("⏸ Halbzeit – intensive Partie!", m);
   }
 
-  // Spielende
+  // Ende
   if(m > 90){
     endMatch();
     return;
   }
 
-  // Zufällige Chance
-  var chance = 0.08;
-  chance += Number(tacticModifier || 0);
-  chance += Number(formationModifier || 0);
+  var chance = 0.12;
   chance += Number(liveModifier || 0);
   chance += Number(intensityModifier || 0);
 
@@ -110,38 +96,62 @@ function simulateMinute(){
 }
 
 // =========================
-// 🎭 EVENT GENERATOR
+// 🎭 EVENT ENGINE
 // =========================
 function generateEvent(team, isHome, minute){
 
   var match = window.currentMatch;
 
   var buildup = [
-    team + " baut ruhig auf",
-    team + " kombiniert sich nach vorne",
-    "Geduldiger Angriff von " + team
+    team + " baut ruhig von hinten auf",
+    team + " lässt den Ball laufen",
+    "Geduldiger Spielaufbau von " + team,
+    team + " verlagert das Spiel clever",
+    team + " sucht die Lücke im Mittelfeld"
   ];
 
-  var action = [
-    "starker Pass in die Spitze",
-    "Flanke kommt gefährlich rein",
+  var midfield = [
+    "starker Doppelpass",
+    "schneller Seitenwechsel",
+    "feines Dribbling",
+    "Ballgewinn im Mittelfeld",
+    "Pressing greift perfekt"
+  ];
+
+  var attack = [
+    "Steilpass in die Spitze",
+    "Flanke in den Strafraum",
     "Schuss aus der Distanz",
-    "Steilpass durch die Abwehr",
-    "Dribbling durch das Mittelfeld"
+    "Durchbruch über außen",
+    "gefährlicher Abschluss"
   ];
 
   var finish = [
-    "TOR!!!",
+    "TOR!!! ⚽",
     "knapp vorbei!",
-    "stark gehalten!",
+    "überragend gehalten!",
     "an den Pfosten!",
-    "über das Tor!"
+    "geblockt im letzten Moment!"
+  ];
+
+  var rare = [
+    "😳 Platzfehler sorgt für Chaos",
+    "🤕 Spieler bleibt kurz liegen",
+    "🗣 Diskussion mit dem Schiri",
+    "🎯 Traumaktion aus dem Nichts",
+    "😬 Riesenmissverständnis in der Abwehr"
   ];
 
   var text =
-    buildup[Math.floor(Math.random()*buildup.length)] + ", " +
-    action[Math.floor(Math.random()*action.length)] + " – " +
-    finish[Math.floor(Math.random()*finish.length)];
+    randomFrom(buildup) + ", " +
+    randomFrom(midfield) + ", " +
+    randomFrom(attack) + " – " +
+    randomFrom(finish);
+
+  // 5% kuriose Events
+  if(Math.random() < 0.05){
+    text = randomFrom(rare);
+  }
 
   addLiveEvent(text, minute);
 
@@ -159,7 +169,7 @@ function generateEvent(team, isHome, minute){
 }
 
 // =========================
-// 🧾 LIVE EVENT UI
+// 🧾 EVENT UI
 // =========================
 function addLiveEvent(text, minute){
 
@@ -202,7 +212,10 @@ function updateScoreUI(){
 // =========================
 function endMatch(){
 
-  clearInterval(matchInterval);
+  if(matchInterval){
+    clearInterval(matchInterval);
+    matchInterval = null;
+  }
 
   game.match.running = false;
 
@@ -210,15 +223,20 @@ function endMatch(){
 
   addLiveEvent("🏁 Abpfiff!", 90);
 
-  // Tabelle updaten
   updateTableData(match);
 
   if(typeof updateTable === "function"){
     updateTable();
   }
 
-  // nächster Spieltag
   game.league.currentMatchday++;
 
   console.log("✅ Spiel beendet");
+}
+
+// =========================
+// 🎲 HELPER
+// =========================
+function randomFrom(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
 }
