@@ -1,10 +1,26 @@
 // =========================
-// ⚽ MATCH ENGINE (LIVE TABLE VERSION)
+// ⚽ MATCH ENGINE (FULL FLOW VERSION)
 // =========================
 
 console.log("ENGINE START");
 
 let interval = null;
+
+// =========================
+// 🧠 SAISON START
+// =========================
+function startSeason(){
+
+  game.league.currentMatchday = 0;
+
+  // 🔥 Spielplan generieren (Hin + Rückrunde)
+  game.league.schedule = generateSchedule(game.league.teams);
+
+  addLiveEvent("📅 Saison gestartet", 0);
+
+  game.phase = "ready";
+  updateMainButton?.();
+}
 
 // =========================
 // 🧠 MATCHDAY
@@ -19,7 +35,10 @@ function simulateMatchday(){
   const i = game.league.currentMatchday || 0;
   const matches = game.league.schedule[i];
 
-  if(!matches) return;
+  if(!matches){
+    addLiveEvent("🏆 Saison beendet!", 0);
+    return;
+  }
 
   game.league.currentMatchday++;
 
@@ -43,18 +62,21 @@ function startConference(matches){
   game.match.halftimePlayed = false;
   game.phase = "live";
 
-  // Spiele initialisieren
   game.match.currentMatches = matches.map(m => ({
     ...m,
     score: { home: 0, away: 0 }
   }));
 
-  // dein Spiel
   window.currentMatch = game.match.currentMatches.find(m =>
     m.home === game.team.selected || m.away === game.team.selected
   );
 
-  // Anzeige
+  // 🔥 Anzeige Gegner
+  if(window.currentMatch){
+    const opponent = getOpponentName(window.currentMatch);
+    addLiveEvent(`🆚 ${game.team.selected} vs ${opponent}`, 0);
+  }
+
   updateTeamsUI?.();
   updateScoreUI?.();
   updateProgressBar?.();
@@ -102,7 +124,7 @@ function startConferenceInterval(){
 }
 
 // =========================
-// ⚽ MINUTE (KONFERENZ)
+// ⚽ MINUTE
 // =========================
 function simulateConferenceMinute(){
 
@@ -122,7 +144,7 @@ function simulateConferenceMinute(){
         match.score.away++;
       }
 
-      // 🔥 NUR dein Spiel bekommt Events
+      // nur dein Spiel
       if(match.home === game.team.selected || match.away === game.team.selected){
 
         if(isHome){
@@ -134,18 +156,16 @@ function simulateConferenceMinute(){
     }
   });
 
-  // 🔥 LIVE TABELLE
   applyLiveTable();
 }
 
 // =========================
-// 📊 LIVE TABLE BERECHNEN
+// 📊 LIVE TABLE
 // =========================
 function applyLiveTable(){
 
   const teams = game.league.teams;
 
-  // reset
   teams.forEach(t => {
     t._live = {
       points: t.points,
@@ -154,7 +174,6 @@ function applyLiveTable(){
     };
   });
 
-  // laufende spiele einrechnen
   game.match.currentMatches.forEach(match => {
 
     const home = teams.find(t => t.name === match.home);
@@ -178,8 +197,7 @@ function applyLiveTable(){
     }
   });
 
-  // 👉 UI triggern
-  updateTable?.(true); // true = live mode
+  updateTable?.(true);
 }
 
 // =========================
@@ -201,6 +219,15 @@ function endConference(){
   updateTable?.();
 
   addLiveEvent("🏁 Spiel beendet", 90);
+
+  // 🔥 nächster Gegner
+  const next = getNextMatch();
+
+  if(next){
+    addLiveEvent(`➡️ Nächster Gegner: ${getOpponentName(next)}`, 0);
+  } else {
+    addLiveEvent("🏆 Saison beendet!", 0);
+  }
 
   updateMainButton?.();
 }
@@ -266,8 +293,67 @@ function updateTableData(match){
 }
 
 // =========================
+// 📅 SPIELPLAN
+// =========================
+function generateSchedule(teams){
+
+  const rounds = [];
+  const list = [...teams];
+
+  if(list.length % 2 !== 0){
+    list.push({ name: "SPIELFREI" });
+  }
+
+  const n = list.length;
+
+  for(let r = 0; r < n-1; r++){
+
+    const matches = [];
+
+    for(let i = 0; i < n/2; i++){
+
+      const home = list[i];
+      const away = list[n-1-i];
+
+      if(home.name !== "SPIELFREI" && away.name !== "SPIELFREI"){
+        matches.push({ home: home.name, away: away.name });
+      }
+    }
+
+    rounds.push(matches);
+    list.splice(1, 0, list.pop());
+  }
+
+  const reverse = rounds.map(round =>
+    round.map(m => ({ home: m.away, away: m.home }))
+  );
+
+  return [...rounds, ...reverse];
+}
+
+// =========================
+// 🔎 HELPER
+// =========================
+function getNextMatch(){
+
+  const i = game.league.currentMatchday || 0;
+  const matches = game.league.schedule[i];
+
+  if(!matches) return null;
+
+  return matches.find(m =>
+    m.home === game.team.selected || m.away === game.team.selected
+  );
+}
+
+function getOpponentName(match){
+  return match.home === game.team.selected ? match.away : match.home;
+}
+
+// =========================
 // 🌍 EXPORTS
 // =========================
+window.startSeason = startSeason;
 window.simulateMatchday = simulateMatchday;
 window.resumeMatch = resumeMatch;
 window.restartInterval = restartInterval;
