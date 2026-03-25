@@ -139,9 +139,47 @@ function bindUI(){
   bindButton(document.getElementById("overlay"), closeSetup);
 }
 // =========================
+// 🎮 MATCH UI
+// =========================
+
+function updateScoreUI(){
+
+  const el = document.getElementById("score");
+  if(!el || !window.currentMatch) return;
+
+  el.innerText =
+    window.currentMatch.score.home + " : " +
+    window.currentMatch.score.away;
+}
+
+function updateTeamsUI(){
+
+  if(!window.currentMatch) return;
+
+  const l = document.getElementById("teamLeft");
+  const r = document.getElementById("teamRight");
+
+  if(l) l.innerText = window.currentMatch.home;
+  if(r) r.innerText = window.currentMatch.away;
+}
+
+function updateProgressBar(){
+
+  const bar = document.getElementById("momentumBar");
+  if(!bar) return;
+
+  const minute = game.match.minute || 0;
+  const percent = (minute / 90) * 100;
+
+  bar.style.width = percent + "%";
+}
+// =========================
 // 🌍 GLOBAL EXPORTS (FIX)
 // =========================
 window.updateTable = updateTable;
 window.populateTeamSelect = populateTeamSelect;
 window.updateHeader = updateHeader;
 window.bindUI = bindUI;
+window.updateScoreUI = updateScoreUI;
+window.updateTeamsUI = updateTeamsUI;
+window.updateProgressBar = updateProgressBar;
