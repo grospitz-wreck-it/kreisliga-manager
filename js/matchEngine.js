@@ -70,6 +70,85 @@ function startConference(matches){
 
   updateMainButton?.();
 }
+function startConferenceInterval(){
+
+  console.log("⏱️ Konferenz Interval");
+
+  if(interval) clearInterval(interval);
+
+  interval = setInterval(() => {
+
+    if(!game.match.isRunning) return;
+
+    game.match.minute++;
+
+    simulateConferenceMinute();
+
+    updateScoreUI?.();
+    updateProgressBar?.();
+
+    // Halbzeit
+    if(game.match.minute === 45 && !game.match.halftimePlayed){
+
+      game.match.halftimePlayed = true;
+      game.match.isRunning = false;
+      game.phase = "halftime";
+
+      addLiveEvent("⏸ Halbzeit in allen Spielen", 45);
+      updateMainButton?.();
+      return;
+    }
+
+    // Ende
+    if(game.match.minute >= 90){
+      endConference();
+    }
+
+  }, 1000 / (window.speedMultiplier || 1));
+}
+function simulateConferenceMinute(){
+
+  const minute = game.match.minute;
+
+  game.match.currentMatches.forEach(match => {
+
+    let chance = 0.08;
+
+    if(Math.random() < chance){
+
+      const isHome = Math.random() < 0.5;
+
+      if(isHome){
+        match.score.home++;
+        addLiveEvent(`⚽ ${match.home} trifft gegen ${match.away}`, minute);
+      } else {
+        match.score.away++;
+        addLiveEvent(`⚽ ${match.away} trifft gegen ${match.home}`, minute);
+      }
+    }
+  });
+}
+function endConference(){
+
+  console.log("🏁 Konferenz beendet");
+
+  clearInterval(interval);
+
+  game.match.isRunning = false;
+  game.phase = "ready";
+
+  const matches = game.match.currentMatches;
+
+  matches.forEach(match => {
+    updateTableData(match); // 🔥 ALLE Spiele zählen
+  });
+
+  updateTable?.();
+
+  addLiveEvent("🏁 Spieltag beendet", 90);
+
+  updateMainButton?.();
+}
 // =========================
 // 🎮 START
 // =========================
