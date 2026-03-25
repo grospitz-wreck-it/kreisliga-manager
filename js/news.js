@@ -44,8 +44,7 @@ function buildMatchText(match){
 
   const analysis = analyzeMatch(match);
 
-  let text = `${t1} ${s1}:${s2} ${t2} – `;
-
+  let text = `${t1} ${s1}:${s2} ${t2} - `;
   if(s1 > s2){
 
     if(analysis.dominant){
