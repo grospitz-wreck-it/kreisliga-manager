@@ -7,7 +7,9 @@ window.onload = function(){
 
   initPlayer();
   initLeagueUI();
+  if(typeof initFriendUI === "function"){
   initFriendUI();
+}
 
   updateHeader();
   updateMainButton();
