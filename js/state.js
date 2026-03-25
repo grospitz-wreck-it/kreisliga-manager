@@ -27,7 +27,23 @@ window.game = {
     intensity: 2
   }
 };
-
+var game = {
+  player: {
+    id: null,
+    name: "",
+    team: null
+  },
+  league: {
+    key: null,
+    teams: [],
+    schedule: [],
+    currentMatchday: 0
+  },
+  match: {
+    running: false,
+    minute: 0
+  }
+};
 // =========================
 // 💾 SAVE
 // =========================
