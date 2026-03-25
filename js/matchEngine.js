@@ -23,7 +23,8 @@ function simulateMatchday(){
 // ⚽ MATCH START
 // =========================
 function startLiveMatch(match){
-
+  game.match.minute = 0;
+updateProgressBar(); // sofort auf 0 setzen
   if(matchInterval){
     clearInterval(matchInterval);
     matchInterval = null;
@@ -87,14 +88,16 @@ function simulateMinute(){
 
   if(!match) return;
 
-  if(m === 45){
-    addLiveEvent("⏸ Halbzeit – intensive Partie!", m);
-  }
+ if(m === 45){
 
-  if(m > 90){
-    endMatch();
-    return;
-  }
+  addLiveEvent("⏸ Halbzeit – intensive Partie!", m);
+
+  game.match.running = false;
+  clearInterval(game.match.interval);
+
+  console.log("⏸ Halbzeitpause");
+  return;
+}
 
   var chance = 0.12;
   chance += Number(liveModifier || 0);
