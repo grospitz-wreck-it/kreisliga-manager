@@ -51,7 +51,8 @@ function canChangeName(){
 // =========================
 // 👤 INIT NAME
 // =========================
-async function initPlayerName(){
+function initPlayerName(){
+
   if(!playerName){
     let name = prompt("Wie heißt du Manager?");
     if(!isValidName(name)){
@@ -74,16 +75,23 @@ function updateNameUI(){
 }
 
 // =========================
-// 🆕 HEADER
+// 🆕 HEADER (FIXED)
 // =========================
 function updateHeader(){
 
   const league = localStorage.getItem("selectedLeague") || "Keine Liga";
   const team = localStorage.getItem("selectedTeam") || "";
 
-  document.getElementById("gameTitle")?.textContent = playerName || "Kreisliga Manager";
-  document.getElementById("leagueTitle")?.textContent =
-    team ? `${league} • ${team}` : league;
+  const titleEl = document.getElementById("gameTitle");
+  const subEl = document.getElementById("leagueTitle");
+
+  if(titleEl){
+    titleEl.textContent = playerName || "Kreisliga Manager";
+  }
+
+  if(subEl){
+    subEl.textContent = team ? `${league} • ${team}` : league;
+  }
 }
 
 // =========================
@@ -95,7 +103,9 @@ function startSeason(){
 
   currentMatchday = 0;
 
-  generateSchedule?.();
+  if(typeof generateSchedule === "function"){
+    generateSchedule();
+  }
 
   gameState.phase = "matchday_ready";
 
@@ -104,7 +114,7 @@ function startSeason(){
 }
 
 // =========================
-// ▶️ MATCH START (FIXED CLEAN)
+// ▶️ MATCH START (CLEAN)
 // =========================
 function startMatch(){
 
@@ -114,6 +124,7 @@ function startMatch(){
     simulateMatchday();
   } else {
     console.error("❌ simulateMatchday fehlt");
+    return;
   }
 
   gameState.phase = "live";
@@ -121,7 +132,7 @@ function startMatch(){
 }
 
 // =========================
-// ▶️ RESUME (ENGINE ONLY)
+// ▶️ RESUME (ENGINE HANDLES)
 // =========================
 function resumeMatch(){
 
@@ -153,11 +164,15 @@ function handleMainAction(){
       break;
 
     case "halftime":
-      window.resumeMatch?.(); // 👉 direkt Engine nutzen
+      if(typeof window.resumeMatch === "function"){
+        window.resumeMatch();
+      }
+      gameState.phase = "live";
       break;
 
     case "live":
-      isSimulating = false; // simple pause
+      // simple pause
+      window.isSimulating = false;
       gameState.phase = "halftime";
       break;
   }
@@ -194,6 +209,7 @@ function updateMainButton(){
 // 📅 MATCHDAY UI
 // =========================
 function updateMatchdayUI(){
+
   const el = document.getElementById("matchday");
   if(!el) return;
 
@@ -201,20 +217,22 @@ function updateMatchdayUI(){
     "Spieltag: " +
     (currentMatchday || 0) +
     " / " +
-    (schedule?.length || 30);
+    (schedule ? schedule.length : 30);
 }
 
 // =========================
 // 👥 FRIENDS
 // =========================
 let friendCode = localStorage.getItem("friendCode");
+
 if(!friendCode){
   friendCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   localStorage.setItem("friendCode", friendCode);
 }
 
 function initFriendUI(){
-  document.getElementById("friendCodeDisplay")?.innerText = friendCode;
+  const el = document.getElementById("friendCodeDisplay");
+  if(el) el.innerText = friendCode;
 }
 
 // =========================
@@ -224,10 +242,10 @@ window.onload = function(){
 
   console.log("🚀 App gestartet");
 
-  loadGameState?.();
-  updateTable?.();
-  startAds?.();
-  loadLeaderboard?.();
+  if(typeof loadGameState === "function") loadGameState();
+  if(typeof updateTable === "function") updateTable();
+  if(typeof startAds === "function") startAds();
+  if(typeof loadLeaderboard === "function") loadLeaderboard();
 
   initPlayerName();
   updateHeader();
@@ -236,7 +254,9 @@ window.onload = function(){
   updateMainButton();
 
   const select = document.getElementById("leagueSelect");
-  if(select){
+
+  if(select && typeof leagues !== "undefined"){
+
     select.innerHTML = "";
 
     Object.keys(leagues).forEach(l => {
