@@ -267,3 +267,114 @@ window.onload = function(){
     });
   }
 };
+// =========================
+// 🧱 UI FUNCTION SAFE BUNDLE
+// =========================
+
+// 📱 SETUP PANEL
+function toggleSetup(){
+  document.getElementById("setupPanel")?.classList.toggle("open");
+  document.getElementById("overlay")?.classList.toggle("active");
+}
+
+function closeSetup(){
+  document.getElementById("setupPanel")?.classList.remove("open");
+  document.getElementById("overlay")?.classList.remove("active");
+}
+
+// 📑 TABS
+function openTab(evt, tabId){
+
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tabContent").forEach(c => c.classList.remove("active"));
+
+  if(evt && evt.currentTarget){
+    evt.currentTarget.classList.add("active");
+  }
+
+  const tab = document.getElementById(tabId);
+  if(tab) tab.classList.add("active");
+}
+
+// 🏆 LEAGUE SELECT
+function selectLeague(){
+
+  const select = document.getElementById("leagueSelect");
+  if(!select) return;
+
+  const leagueKey = select.value;
+
+  localStorage.setItem("selectedLeague", leagueKey);
+
+  if(typeof loadLeague === "function"){
+    loadLeague(leagueKey);
+  }
+
+  updateHeader?.();
+}
+
+// ⚽ TEAM SELECT
+function selectTeam(teamName){
+
+  localStorage.setItem("selectedTeam", teamName);
+
+  window.selectedTeam = teamName;
+
+  updateHeader?.();
+
+  alert("Team gewählt: " + teamName);
+}
+
+// ✏️ NAME CHANGE (SAFE WRAPPER)
+async function changeName(){
+
+  const inputEl = document.getElementById("nameInput");
+  if(!inputEl) return;
+
+  const input = inputEl.value.trim();
+
+  if(typeof isValidName === "function" && !isValidName(input)){
+    alert("Ungültiger Name!");
+    return;
+  }
+
+  if(typeof canChangeName === "function" && !canChangeName()){
+    alert("Nur 1x pro Minute!");
+    return;
+  }
+
+  playerName = input;
+  localStorage.setItem("playerName", playerName);
+  localStorage.setItem("lastNameChange", Date.now());
+
+  updateHeader?.();
+}
+
+// 👥 FRIENDS
+function copyFriendCode(){
+  navigator.clipboard.writeText(friendCode || "");
+  alert("Code kopiert!");
+}
+
+function joinFriendCode(){
+
+  const input = document.getElementById("friendCodeInput")?.value.trim().toUpperCase();
+  if(!input) return;
+
+  localStorage.setItem("friendCode", input);
+  location.reload();
+}
+
+// ⚡ SPEED CONTROL
+function setSpeed(speed){
+
+  if(!speed || speed <= 0) return;
+
+  window.speedMultiplier = speed;
+
+  if(typeof window.restartInterval === "function"){
+    window.restartInterval();
+  }
+
+  console.log("⏩ Speed:", speed);
+}
