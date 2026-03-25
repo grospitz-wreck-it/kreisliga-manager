@@ -1,26 +1,26 @@
 // =========================
 // 🔥 MATCH ENGINE (FINAL STABLE)
 // =========================
-if(typeof saveScoreToLeaderboard !== "function"){
+// =========================
+// 🏆 LEADERBOARD FIX (GLOBAL SAFE)
+// =========================
+window.saveScoreToLeaderboard = window.saveScoreToLeaderboard || async function(player, team, score, matchday){
 
-  async function saveScoreToLeaderboard(player, team, score, matchday){
+  let data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
 
-    let data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+  data.push({
+    player,
+    team,
+    score,
+    matchday,
+    date: Date.now()
+  });
 
-    data.push({
-      player,
-      team,
-      score,
-      matchday,
-      date: Date.now()
-    });
+  localStorage.setItem("leaderboard", JSON.stringify(data));
 
-    localStorage.setItem("leaderboard", JSON.stringify(data));
+  console.log("📊 Score gespeichert");
+};
 
-    console.log("📊 Local Leaderboard gespeichert");
-  }
-
-}
 // ❗ KEIN let → globale Nutzung
 currentInterval = null;
 halftimePlayed = false;
