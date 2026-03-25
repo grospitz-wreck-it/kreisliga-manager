@@ -84,7 +84,7 @@ function loadLeague(name){
   // =========================
   // 💾 SAVE
   // =========================
-  saveGameState();
+  saveGameState?.();
 
   console.log("✅ Liga geladen:", name, game.league.teams.length, "Teams");
 }
@@ -94,16 +94,14 @@ function loadLeague(name){
 // =========================
 function generateSchedule(){
 
-  if(!teams || teams.length === 0){
+  if(!game.league.teams || game.league.teams.length === 0){
     console.error("Keine Teams für Spielplan");
     return;
   }
 
-  schedule = [];
+  let tempTeams = [...game.league.teams];
 
-  let tempTeams = [...teams];
-
-  // 👉 Dummy bei ungerade
+  // Dummy bei ungerade
   if(tempTeams.length % 2 !== 0){
     tempTeams.push({ name: "SPIELFREI" });
   }
@@ -126,13 +124,16 @@ function generateSchedule(){
       let away = tempTeams[tempTeams.length - 1 - i];
 
       if(home.name !== "SPIELFREI" && away.name !== "SPIELFREI"){
-        matchday.push([home, away]);
+        matchday.push({
+          home: home.name,
+          away: away.name
+        });
       }
     }
 
     firstLeg.push(matchday);
 
-    // Rotation (stabil)
+    // Rotation
     let fixed = tempTeams[0];
     let rest = tempTeams.slice(1);
 
@@ -144,23 +145,24 @@ function generateSchedule(){
   // =========================
   // 🔁 RÜCKRUNDE
   // =========================
-  let secondLeg = firstLeg.map(matchday =>
-    matchday.map(match => [match[1], match[0]])
+  let secondLeg = firstLeg.map(md =>
+    md.map(m => ({
+      home: m.away,
+      away: m.home
+    }))
   );
 
   // =========================
   // 🧩 KOMBINIEREN
   // =========================
-  schedule = [...firstLeg, ...secondLeg];
+  let fullSchedule = [...firstLeg, ...secondLeg];
 
-  // =========================
-  // 🔥 AUF 30 SPIELTAGE FIXEN
-  // =========================
-  while(schedule.length < 30){
-    schedule = schedule.concat(schedule);
+  // Auf 30 Spieltage begrenzen
+  while(fullSchedule.length < 30){
+    fullSchedule = fullSchedule.concat(fullSchedule);
   }
 
-  schedule = schedule.slice(0, 30);
+  game.league.schedule = fullSchedule.slice(0, 30);
 
-  console.log("Spielplan erstellt:", schedule.length, "Spieltage");
+  console.log("✅ Spielplan erstellt:", game.league.schedule.length);
 }
