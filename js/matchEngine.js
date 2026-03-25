@@ -1,100 +1,89 @@
 // =========================
-// MATCH ENGINE SAFE
+// ⚽ MATCH ENGINE
 // =========================
 
 var interval = null;
 
+// =========================
+// 🧠 SIMULATE MATCHDAY
+// =========================
 function simulateMatchday(){
 
-if(!game.team.selected){
-alert("Team wählen!");
-return;
+  if(!game.team.selected){
+    alert("Team wählen!");
+    return;
+  }
+
+  var matches = game.league.schedule[game.league.currentMatchday];
+
+  if(!matches){
+    console.warn("Keine Spiele mehr");
+    return;
+  }
+
+  game.league.currentMatchday++;
+
+  startLiveMatch(matches);
 }
 
-var matches = game.league.schedule[game.league.currentMatchday];
-
-if(!matches){
-console.warn("Keine Spiele mehr");
-return;
-}
-
-game.league.currentMatchday++;
-
-startLiveMatch(matches);
-}
-
+// =========================
+// 🎮 START LIVE MATCH
+// =========================
 function startLiveMatch(matches){
 
-game.match.minute = 0;
-game.match.isRunning = true;
+  game.match.minute = 0;
+  game.match.isRunning = true;
 
-window.currentMatchdayMatches = matches;
+  var myMatch = matches.find(function(m){
+    return m.home === game.team.selected || m.away === game.team.selected;
+  });
 
-matches.forEach(function(m){
-if(!m.score){
-m.score = { home: 0, away: 0 };
-}
-});
+  if(!myMatch){
+    console.error("Kein eigenes Spiel gefunden");
+    return;
+  }
 
-var myMatch = matches.find(function(m){
-return m.home === game.team.selected || m.away === game.team.selected;
-});
+  myMatch.score = { home: 0, away: 0 };
 
-if(!myMatch){
-console.error("Kein eigenes Spiel gefunden");
-return;
-}
+  window.currentMatch = myMatch;
 
-window.currentMatch = myMatch;
-
-startInterval();
+  startInterval();
 }
 
+// =========================
+// ⏱️ INTERVAL
+// =========================
 function startInterval(){
 
-clearInterval(interval);
+  if(interval){
+    clearInterval(interval);
+  }
 
-interval = setInterval(function(){
+  interval = window.setInterval(function(){
 
-```
-if(!game.match.isRunning) return;
+    if(!game.match.isRunning) return;
 
-game.match.minute++;
+    game.match.minute = game.match.minute + 1;
 
-simulateMinute();
+    simulateMinute();
 
-if(game.match.minute === 45){
-  game.match.isRunning = false;
-  game.phase = "halftime";
-  addLiveEvent("Halbzeit", 45);
-  updateMainButton();
-  return;
+    if(game.match.minute >= 90){
+      endMatch();
+    }
+
+  }, 1000 / (speedMultiplier || 1));
 }
 
-if(game.match.minute >= 90){
-  endMatch();
-}
-```
-
-}, 1000 / (window.speedMultiplier || 1));
-}
-
+// =========================
+// 🔁 RESTART INTERVAL
+// =========================
 function restartInterval(){
-startInterval();
+  startInterval();
 }
 
-function resumeMatch(){
-
-if(game.phase !== "halftime") return;
-
-game.match.isRunning = true;
-game.phase = "live";
-
-addLiveEvent("2. Halbzeit gestartet", game.match.minute);
-
-startInterval();
-}
-
+// =========================
+// ⏱️ MINUTE SIMULATION
+// =========================
 function simulateMinute(){
 
   var m = game.match.minute;
@@ -139,83 +128,77 @@ function simulateMinute(){
     var index = Math.floor(Math.random() * texts.length);
     addLiveEvent(texts[index], m);
   }
-
-
-// andere Spiele
-if(window.currentMatchdayMatches){
-
-```
-window.currentMatchdayMatches.forEach(function(otherMatch){
-
-  if(otherMatch === match) return;
-
-  if(Math.random() < 0.05){
-
-    if(Math.random() < 0.5) otherMatch.score.home++;
-    else otherMatch.score.away++;
-  }
-
-});
-```
-
 }
 
-if(Math.random() < 0.05){
-addLiveEvent("Chance oder Aktion im Spiel", m);
-}
-}
-
+// =========================
+// 🏁 MATCH ENDE
+// =========================
 function endMatch(){
 
-clearInterval(interval);
+  clearInterval(interval);
 
-game.match.isRunning = false;
-game.phase = "ready";
+  game.match.isRunning = false;
+  game.phase = "ready";
 
-var match = window.currentMatch;
-if(!match) return;
+  var match = window.currentMatch;
+  if(!match) return;
 
-addLiveEvent(
-"Endstand: " +
-match.home + " " + match.score.home +
-" - " +
-match.score.away + " " + match.away,
-90
-);
+  addLiveEvent(
+    "🏁 Endstand: " + match.home + " " +
+    match.score.home + " - " +
+    match.score.away + " " +
+    match.away,
+    90
+  );
 
-if(window.currentMatchdayMatches){
-window.currentMatchdayMatches.forEach(function(m){
-updateTableData(m);
-});
+  updateTableData(match);
+
+  if(typeof updateTable === "function") updateTable();
+  if(typeof updateMainButton === "function") updateMainButton();
+
+  if(typeof submitScore === "function"){
+    submitScore(match);
+  }
 }
 
-updateTable && updateTable();
-updateMainButton && updateMainButton();
-
-if(typeof submitScore === "function"){
-submitScore(match);
-}
-}
-
+// =========================
+// 📊 TABELLE UPDATEN
+// =========================
 function updateTableData(match){
 
-var home = game.league.teams.find(function(t){ return t.name === match.home; });
-var away = game.league.teams.find(function(t){ return t.name === match.away; });
+  var home = game.league.teams.find(function(t){
+    return t.name === match.home;
+  });
 
-if(!home || !away) return;
+  var away = game.league.teams.find(function(t){
+    return t.name === match.away;
+  });
 
-home.goalsFor = (home.goalsFor || 0) + match.score.home;
-home.goalsAgainst = (home.goalsAgainst || 0) + match.score.away;
+  if(!home || !away) return;
 
-away.goalsFor = (away.goalsFor || 0) + match.score.away;
-away.goalsAgainst = (away.goalsAgainst || 0) + match.score.home;
+  home.goalsFor += match.score.home;
+  home.goalsAgainst += match.score.away;
 
-if(match.score.home > match.score.away){
-home.points = (home.points || 0) + 3;
-} else if(match.score.home < match.score.away){
-away.points = (away.points || 0) + 3;
-} else {
-home.points = (home.points || 0) + 1;
-away.points = (away.points || 0) + 1;
-}
+  away.goalsFor += match.score.away;
+  away.goalsAgainst += match.score.home;
+
+  home.played++;
+  away.played++;
+
+  if(match.score.home > match.score.away){
+    home.points += 3;
+    home.wins++;
+    away.losses++;
+  }
+  else if(match.score.home < match.score.away){
+    away.points += 3;
+    away.wins++;
+    home.losses++;
+  }
+  else{
+    home.points += 1;
+    away.points += 1;
+    home.draws++;
+    away.draws++;
+  }
 }
