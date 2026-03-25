@@ -47,6 +47,11 @@ function startLiveMatch(matches){
 
   window.currentMatch = myMatch;
 
+  // UI reset
+  updateScoreUI();
+  updateTeamsUI();
+  updateProgressBar();
+
   startInterval();
 }
 
@@ -63,10 +68,25 @@ function startInterval(){
 
     if(!game.match.isRunning) return;
 
-    game.match.minute = game.match.minute + 1;
+    game.match.minute++;
 
     simulateMinute();
 
+    updateScoreUI();
+    updateProgressBar();
+
+    // 🟡 HALBZEIT
+    if(game.match.minute === 45){
+      game.match.isRunning = false;
+      game.phase = "halftime";
+
+      addLiveEvent("⏸ Halbzeit", 45);
+
+      if(typeof updateMainButton === "function") updateMainButton();
+      return;
+    }
+
+    // 🔴 ENDE
     if(game.match.minute >= 90){
       endMatch();
     }
@@ -79,6 +99,23 @@ function startInterval(){
 // =========================
 function restartInterval(){
   startInterval();
+}
+
+// =========================
+// ▶️ 2. HALBZEIT
+// =========================
+function resumeMatch(){
+
+  if(game.phase !== "halftime") return;
+
+  game.match.isRunning = true;
+  game.phase = "live";
+
+  addLiveEvent("▶️ 2. Halbzeit startet", 45);
+
+  startInterval();
+
+  if(typeof updateMainButton === "function") updateMainButton();
 }
 
 // =========================
@@ -100,22 +137,22 @@ function simulateMinute(){
 
   if(isNaN(chance)) chance = 0.08;
 
-  // TOR
+  // ⚽ TOR
   if(Math.random() < chance){
 
     var isHome = Math.random() < 0.5;
     var scoringTeam = isHome ? match.home : match.away;
 
     if(isHome){
-      match.score.home = match.score.home + 1;
+      match.score.home++;
     } else {
-      match.score.away = match.score.away + 1;
+      match.score.away++;
     }
 
     addLiveEvent("⚽ Tor für " + scoringTeam + "!", m);
   }
 
-  // EVENTS
+  // 📢 KLEINE EVENTS
   if(Math.random() < 0.05){
 
     var texts = [
@@ -144,7 +181,8 @@ function endMatch(){
   if(!match) return;
 
   addLiveEvent(
-    "🏁 Endstand: " + match.home + " " +
+    "🏁 Endstand: " +
+    match.home + " " +
     match.score.home + " - " +
     match.score.away + " " +
     match.away,
@@ -201,4 +239,38 @@ function updateTableData(match){
     home.draws++;
     away.draws++;
   }
+}
+
+// =========================
+// 🎯 UI HELPERS
+// =========================
+function updateScoreUI(){
+
+  var scoreEl = document.getElementById("score");
+
+  if(scoreEl && window.currentMatch){
+    scoreEl.innerText =
+      window.currentMatch.score.home + " : " +
+      window.currentMatch.score.away;
+  }
+}
+
+function updateTeamsUI(){
+
+  var left = document.getElementById("teamLeft");
+  var right = document.getElementById("teamRight");
+
+  if(!window.currentMatch) return;
+
+  if(left) left.innerText = window.currentMatch.home;
+  if(right) right.innerText = window.currentMatch.away;
+}
+
+function updateProgressBar(){
+
+  var bar = document.getElementById("momentumBar");
+  if(!bar) return;
+
+  var percent = (game.match.minute / 90) * 100;
+  bar.style.width = percent + "%";
 }
