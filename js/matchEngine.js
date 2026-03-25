@@ -39,7 +39,7 @@ function simulateMatchday(){
 // 🎮 START
 // =========================
 function startLiveMatch(matches){
-
+  clearLiveEvents();
   console.log("🚀 startLiveMatch");
   game.match.halftimePlayed = false;
   game.match.minute = 0;
