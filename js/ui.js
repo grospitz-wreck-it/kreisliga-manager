@@ -1,7 +1,7 @@
 // =========================
 // 📊 TABELLE
 // =========================
-
+console.log("UI START");
 function updateTable(){
 
   const table = document.querySelector("#table tbody");
