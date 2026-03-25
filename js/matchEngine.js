@@ -35,7 +35,41 @@ function simulateMatchday(){
   game.league.currentMatchday++;
   startLiveMatch(matches);
 }
+function startConference(matches){
 
+  console.log("📡 Konferenz startet", matches);
+
+  clearLiveEvents?.();
+
+  if(interval){
+    clearInterval(interval);
+    interval = null;
+  }
+
+  game.match.minute = 0;
+  game.match.isRunning = true;
+  game.match.halftimePlayed = false;
+  game.phase = "live";
+
+  // 🔥 ALLE Spiele initialisieren
+  game.match.currentMatches = matches.map(m => ({
+    ...m,
+    score: { home: 0, away: 0 }
+  }));
+
+  // 👉 dein Spiel für UI merken
+  window.currentMatch = game.match.currentMatches.find(m =>
+    m.home === game.team.selected || m.away === game.team.selected
+  );
+
+  updateTeamsUI?.();
+  updateScoreUI?.();
+  updateProgressBar?.();
+
+  startConferenceInterval();
+
+  updateMainButton?.();
+}
 // =========================
 // 🎮 START
 // =========================
