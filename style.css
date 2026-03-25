@@ -214,7 +214,7 @@ body {
   border-radius: 12px;
 
   /* Spielfeld Hintergrund */
-  background: url("/gfx/field.svg") center/cover no-repeat;
+  background: url("gfx/field.svg") center/cover no-repeat;
 
   /* dunkler Overlay für Lesbarkeit */
   box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.65);
