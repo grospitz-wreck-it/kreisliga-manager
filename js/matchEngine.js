@@ -7,26 +7,18 @@ var liveModifier = 0;
 var intensityModifier = 0;
 var speedMultiplier = 1;
 
+
 // =========================
 // 🎮 MATCHDAY START
 // =========================
 function simulateMatchday(){
 
-  if(!game.league || !game.league.schedule.length){
-    console.error("Keine Liga geladen");
-    return;
-  }
-
   var day = game.league.currentMatchday;
   var matches = game.league.schedule[day];
 
-  if(!matches || matches.length === 0){
-    console.error("Keine Spiele vorhanden");
-    return;
-  }
-
   var firstMatch = matches[0];
 
+  // 👉 ORIGINAL (funktionierend)
   window.currentMatch = {
     home: firstMatch[0].name,
     away: firstMatch[1].name,
@@ -35,6 +27,7 @@ function simulateMatchday(){
 
   startLiveMatch();
 }
+
 
 // =========================
 // ▶ MATCH START
@@ -47,15 +40,15 @@ function startLiveMatch(){
     interval: null
   };
 
-  // 🔥 FIX: Progress direkt auf 0
+  // ✅ FIX: Balken auf 0 setzen
   updateProgressBar();
 
   updateScoreUI();
-
   addLiveEvent("Anpfiff!", 0);
 
   startInterval();
 }
+
 
 // =========================
 // ⏱ INTERVAL
@@ -73,8 +66,9 @@ function startInterval(){
   }, 1000 / speedMultiplier);
 }
 
+
 // =========================
-// ▶ RESUME
+// ▶ RESUME (für Halbzeit)
 // =========================
 function resumeMatch(){
 
@@ -82,12 +76,11 @@ function resumeMatch(){
 
   game.match.running = true;
   startInterval();
-
-  console.log("▶ Match fortgesetzt");
 }
 
+
 // =========================
-// ⏱ MINUTE SIMULATION
+// ⏱ MINUTE
 // =========================
 function simulateMinute(){
 
@@ -98,7 +91,7 @@ function simulateMinute(){
 
   if(!match) return;
 
-  // 🛑 HALBZEIT
+  // 🛑 HALBZEIT (ECHT)
   if(m === 45){
 
     addLiveEvent("⏸ Halbzeit – intensive Partie!", m);
@@ -109,7 +102,7 @@ function simulateMinute(){
     return;
   }
 
-  // 🏁 SPIELENDE
+  // 🏁 ENDE
   if(m > 90){
     endMatch();
     return;
@@ -128,8 +121,9 @@ function simulateMinute(){
   }
 
   updateScoreUI();
-  updateProgressBar();
+  updateProgressBar(); // ✅ FIX
 }
+
 
 // =========================
 // 🎯 EVENTS
@@ -142,30 +136,29 @@ function generateEvent(team, isHome, minute){
 
     team + " baut ruhig auf",
     team + " kombiniert stark durchs Mittelfeld",
-    team + " kommt über außen",
-    "Starker Pass von " + team,
+    team + " verlagert das Spiel clever",
     team + " mit viel Ballbesitz",
-    team + " setzt den Gegner unter Druck",
-    "Fehlpass im Aufbau von " + team,
-    "Gute Chance für " + team,
-    "Schuss von " + team + "!",
-    "Knapp vorbei von " + team,
-    "Große Chance für " + team + "!",
-    "Latte! " + team,
-    "Pfosten! Unglaublich!",
+    "Starker Pass von " + team,
+    "Unsicherheit in der Abwehr",
+    "Fehlpass im Aufbau",
+    "Konterchance für " + team,
+    "Schneller Angriff von " + team,
+    "Gefährlicher Abschluss!",
+    "Große Chance!",
+    "Knapp vorbei!",
+    "Latte!",
+    "Pfosten!",
     "TOR für " + team + "!!!",
-    "Was für ein Fehler in der Abwehr!",
-    "Gelbe Karte für " + team,
-    "Foulspiel im Mittelfeld",
     "Der Keeper hält stark!",
     "Riesenchance vergeben!",
-    "Konter läuft für " + team,
-    "Schneller Angriff von " + team
+    "Foulspiel im Mittelfeld",
+    "Gelbe Karte",
+    "Starkes Pressing von " + team
   ];
 
   var text = randomFrom(events);
 
-  // ⚽ TOR LOGIK
+  // ⚽ TOR
   if(text.indexOf("TOR") !== -1){
 
     if(isHome){
@@ -179,6 +172,7 @@ function generateEvent(team, isHome, minute){
 
   addLiveEvent(text, minute);
 }
+
 
 // =========================
 // 🏁 MATCH ENDE
@@ -196,9 +190,8 @@ function endMatch(){
   if(typeof updateTable === "function"){
     updateTable();
   }
-
-  console.log("Spiel beendet");
 }
+
 
 // =========================
 // 📊 PROGRESS BAR
@@ -213,6 +206,7 @@ function updateProgressBar(){
 
   bar.style.width = percent + "%";
 }
+
 
 // =========================
 // 🔢 SCORE UI
@@ -233,6 +227,7 @@ function updateScoreUI(){
     score.innerText = match.score.home + " : " + match.score.away;
   }
 }
+
 
 // =========================
 // 🎲 HELPER
