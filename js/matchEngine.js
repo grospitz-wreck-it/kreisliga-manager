@@ -29,17 +29,23 @@ function simulateMatchday(){
   if(!matches){
     console.warn("❌ Kein Spieltag");
     return;
-    startConference(matches);
   }
 
   game.league.currentMatchday++;
-  startLiveMatch(matches);
+
+  // 🔥 KONFERENZ STARTEN (NICHT startLiveMatch!)
+  startConference(matches);
 }
 function startConference(matches){
 
   console.log("📡 Konferenz startet", matches);
 
   clearLiveEvents?.();
+
+  // 🔥 Begegnungen anzeigen
+  matches.forEach(m => {
+    addLiveEvent(`📢 ${m.home} vs ${m.away}`, 0);
+  });
 
   if(interval){
     clearInterval(interval);
@@ -51,13 +57,11 @@ function startConference(matches){
   game.match.halftimePlayed = false;
   game.phase = "live";
 
-  // 🔥 ALLE Spiele initialisieren
   game.match.currentMatches = matches.map(m => ({
     ...m,
     score: { home: 0, away: 0 }
   }));
 
-  // 👉 dein Spiel für UI merken
   window.currentMatch = game.match.currentMatches.find(m =>
     m.home === game.team.selected || m.away === game.team.selected
   );
@@ -94,7 +98,7 @@ function startConferenceInterval(){
       game.match.isRunning = false;
       game.phase = "halftime";
 
-      addLiveEvent("⏸ Halbzeit in allen Spielen", 45);
+      addLiveEvent("⏸ Halbzeit (alle Spiele)", 45);
       updateMainButton?.();
       return;
     }
@@ -106,31 +110,45 @@ function startConferenceInterval(){
 
   }, 1000 / (window.speedMultiplier || 1));
 }
-function simulateConferenceMinute(){
+function startConferenceInterval(){
 
-  const minute = game.match.minute;
+  console.log("⏱️ Konferenz Interval");
 
-  game.match.currentMatches.forEach(match => {
+  if(interval) clearInterval(interval);
 
-    let chance = 0.08;
+  interval = setInterval(() => {
 
-    if(Math.random() < chance){
+    if(!game.match.isRunning) return;
 
-      const isHome = Math.random() < 0.5;
+    game.match.minute++;
 
-      if(isHome){
-        match.score.home++;
-        addLiveEvent(`⚽ ${match.home} trifft gegen ${match.away}`, minute);
-      } else {
-        match.score.away++;
-        addLiveEvent(`⚽ ${match.away} trifft gegen ${match.home}`, minute);
-      }
+    simulateConferenceMinute();
+
+    updateScoreUI?.();
+    updateProgressBar?.();
+
+    // Halbzeit
+    if(game.match.minute === 45 && !game.match.halftimePlayed){
+
+      game.match.halftimePlayed = true;
+      game.match.isRunning = false;
+      game.phase = "halftime";
+
+      addLiveEvent("⏸ Halbzeit (alle Spiele)", 45);
+      updateMainButton?.();
+      return;
     }
-  });
+
+    // Ende
+    if(game.match.minute >= 90){
+      endConference();
+    }
+
+  }, 1000 / (window.speedMultiplier || 1));
 }
 function endConference(){
 
-  console.log("🏁 Konferenz beendet");
+  console.log("🏁 Konferenz Ende");
 
   clearInterval(interval);
 
@@ -140,7 +158,7 @@ function endConference(){
   const matches = game.match.currentMatches;
 
   matches.forEach(match => {
-    updateTableData(match); // 🔥 ALLE Spiele zählen
+    updateTableData(match);
   });
 
   updateTable?.();
@@ -176,7 +194,11 @@ function startLiveMatch(matches){
   updateScoreUI();
   updateProgressBar();
 
-  startInterval();
+  if(game.match.currentMatches && game.match.currentMatches.length > 0){
+  startConferenceInterval(); // 🔥 KONFERENZ
+} else {
+  startInterval(); // fallback
+}
   updateMainButton?.();
 }
 
