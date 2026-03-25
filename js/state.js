@@ -1,156 +1,55 @@
 // =========================
-// 🌍 GLOBAL STATE (SAFE)
+// 💾 GLOBAL GAME STATE
 // =========================
-
-if(!window.__GAME_STATE__){
-
-  window.__GAME_STATE__ = {
-
+window.game = {
+  player: {
+    id: localStorage.getItem("playerId") || crypto.randomUUID(),
+    name: localStorage.getItem("playerName") || null
+  },
+  league: {
+    key: localStorage.getItem("selectedLeague") || null,
     teams: [],
     schedule: [],
-    currentMatchday: 0,
-    selectedTeam: null,
-    teamLocked: false,
-
-    isSimulating: false,
-    currentInterval: null,
-    currentMinute: 0,
-    matchdayResults: [],
-    speedMultiplier: 1,
-
-    liveModifier: 0,
-    tacticModifier: 0,
-    formationModifier: 0,
-    substitutions: 5,
-
-    liveScore: { t1:null, t2:null, s1:0, s2:0 }
-  };
-
-}
-
-// =========================
-// 🔗 SHORTCUTS
-// =========================
-
-let teams = window.__GAME_STATE__.teams;
-let schedule = window.__GAME_STATE__.schedule;
-let currentMatchday = window.__GAME_STATE__.currentMatchday;
-let selectedTeam = window.__GAME_STATE__.selectedTeam;
-let teamLocked = window.__GAME_STATE__.teamLocked;
-
-let isSimulating = window.__GAME_STATE__.isSimulating;
-let currentInterval = window.__GAME_STATE__.currentInterval;
-let currentMinute = window.__GAME_STATE__.currentMinute;
-let matchdayResults = window.__GAME_STATE__.matchdayResults;
-let speedMultiplier = window.__GAME_STATE__.speedMultiplier;
-
-let liveModifier = window.__GAME_STATE__.liveModifier;
-let tacticModifier = window.__GAME_STATE__.tacticModifier;
-let formationModifier = window.__GAME_STATE__.formationModifier;
-let substitutions = window.__GAME_STATE__.substitutions;
-
-// 🔥 FIX: richtige Variable deklarieren
-let liveScore = window.__GAME_STATE__.liveScore;
-
-
-// =========================
-// 🏆 LIGEN
-// =========================
-
-const leagues = {
-  herford: "Kreisliga Herford",
-  luebbecke: "Kreisliga A Lübbecke",
-  bielefeld: "Kreisliga A Bielefeld"
+    currentMatchday: 0
+  },
+  team: {
+    selected: localStorage.getItem("selectedTeam") || null
+  },
+  match: {
+    isRunning: false,
+    minute: 0,
+    score: null
+  },
+  settings: {
+    speed: 1,
+    tactic: "Normal",
+    formation: "4-4-2",
+    intensity: 2
+  }
 };
 
-
 // =========================
-// 💾 SAVE GAME STATE
+// 💾 SAVE
 // =========================
-
 function saveGameState(){
-
-  const state = {
-    teams,
-    schedule,
-    currentMatchday,
-    selectedTeam,
-    matchdayResults,
-    liveScore,
-    currentMinute
-  };
-
-  localStorage.setItem("gameState", JSON.stringify(state));
-
-  console.log("💾 Game gespeichert");
+  localStorage.setItem("gameState", JSON.stringify(game));
 }
 
-
 // =========================
-// 📦 LOAD GAME STATE
+// 📥 LOAD
 // =========================
-
 function loadGameState(){
 
   const saved = localStorage.getItem("gameState");
-
-  if(!saved){
-    console.log("Kein Save gefunden");
-    return;
-  }
+  if(!saved) return;
 
   try{
-    const state = JSON.parse(saved);
+    const parsed = JSON.parse(saved);
 
-    teams = state.teams || teams;
-    schedule = state.schedule || schedule;
-    currentMatchday = state.currentMatchday || 0;
-    selectedTeam = state.selectedTeam || null;
-    matchdayResults = state.matchdayResults || [];
+    Object.assign(game, parsed);
 
-    // 🔥 FIX: sauberer fallback
-    liveScore = state.liveScore || { t1:null, t2:null, s1:0, s2:0 };
-
-    currentMinute = state.currentMinute || 0;
-
-    console.log("📦 Game geladen");
-
-  } catch(e){
-    console.error("Save kaputt:", e);
+    console.log("💾 Game geladen");
+  }catch(e){
+    console.error("Load Fehler", e);
   }
-}
-function resetGame(){
-
-  if(!confirm("Spiel wirklich zurücksetzen?")){
-    return;
-  }
-
-  // 💾 LocalStorage löschen
-  localStorage.removeItem("gameState");
-
-  // 🔥 GLOBAL STATE RESET
-  teams.length = 0;
-  schedule.length = 0;
-
-  currentMatchday = 0;
-  selectedTeam = null;
-  teamLocked = false;
-
-  isSimulating = false;
-  clearInterval(currentInterval);
-
-  currentMinute = 0;
-  matchdayResults = [];
-
-  liveScore = { t1:null, t2:null, s1:0, s2:0 };
-
-  tacticModifier = 0;
-  formationModifier = 0;
-  liveModifier = 0;
-  substitutions = 5;
-
-  console.log("🧨 Spiel komplett zurückgesetzt");
-
-  // 🔄 Seite neu laden (sauberster Zustand)
-  location.reload();
 }
