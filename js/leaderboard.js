@@ -28,19 +28,18 @@ return;
 // 🧠 BESTEN SCORE PRO SPIELER
 // =========================
 const bestPerPlayer = Object.values(
-data.reduce((acc, entry) => {
+  data.reduce((acc, entry) => {
 
-```
-  if(
-    !acc[entry.player_id] ||
-    acc[entry.player_id].score < entry.score
-  ){
-    acc[entry.player_id] = entry;
-  }
+    if(
+      !acc[entry.player_id] ||
+      acc[entry.player_id].score < entry.score
+    ){
+      acc[entry.player_id] = entry;
+    }
 
-  return acc;
+    return acc;
 
-}, {}));
+  }, {}));
 
 // =========================
 // 📈 SORTIEREN
