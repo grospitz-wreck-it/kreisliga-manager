@@ -353,26 +353,32 @@ button:hover {
 /* =========================
    📱 MOBILE FULL WIDTH FIX
 ========================= */
+/* =========================
+   📱 MOBILE LAYOUT FIX
+========================= */
 @media (max-width: 768px){
 
-  /* Layout ohne Rand */
   .layout {
+    display: flex;
+    flex-direction: column !important; /* 🔥 wichtig */
     padding: 0;
     gap: 10px;
   }
 
-  /* Panels full width */
-  .panel {
-    border-radius: 0;
-    margin: 0;
-  }
-
-  /* Side + Main komplett breit */
   .mainPanel,
   .sidePanel {
-    width: 100%;
-    max-width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
   }
+
+  .sidePanel {
+    order: 2; /* Tabelle unter Spiel */
+  }
+
+  .mainPanel {
+    order: 1;
+  }
+
 
   /* etwas Innenabstand behalten */
   .panel {
