@@ -200,13 +200,16 @@ function endMatch(){
   game.match.isRunning = false;
   game.phase = "ready";
 
-  const match = window.currentMatch;
+  var match = window.currentMatch;
   if(!match) return;
 
-  addLiveEvent(
-    `🏁 ${match.home} ${match.score.home} - ${match.score.away} ${match.away}`,
-    90
-  );
+  var text =
+    match.home + " " +
+    match.score.home + " - " +
+    match.score.away + " " +
+    match.away;
+
+  addLiveEvent("🏁 " + text, 90);
 
   updateTableData(match);
 
