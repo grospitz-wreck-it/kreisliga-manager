@@ -1,11 +1,12 @@
 // =========================
-// ⚽ MATCH ENGINE
+// ⚽ MATCH ENGINE NEXT LEVEL
 // =========================
 
 var interval = null;
+var momentum = 0; // -1 bis +1
 
 // =========================
-// 🧠 MATCHDAY STARTEN
+// 🧠 MATCHDAY
 // =========================
 function simulateMatchday(){
 
@@ -15,19 +16,14 @@ function simulateMatchday(){
   }
 
   var matches = game.league.schedule[game.league.currentMatchday];
-
-  if(!matches){
-    console.warn("Keine Spiele mehr");
-    return;
-  }
+  if(!matches) return;
 
   game.league.currentMatchday++;
-
   startLiveMatch(matches);
 }
 
 // =========================
-// 🎮 MATCH START
+// 🎮 START MATCH
 // =========================
 function startLiveMatch(matches){
 
@@ -35,34 +31,24 @@ function startLiveMatch(matches){
   game.match.isRunning = true;
   game.phase = "live";
 
+  momentum = 0;
+
   var myMatch = matches.find(function(m){
-    return m.home === game.team.selected || m.away === game.team.selected;
+    return m[0] === game.team.selected || m[1] === game.team.selected;
   });
 
-  if(!myMatch){
-    console.error("Kein eigenes Spiel gefunden");
-    return;
-  }
+  var matchObj = {
+    home: myMatch[0],
+    away: myMatch[1],
+    score: { home: 0, away: 0 },
+    red: { home: 0, away: 0 }
+  };
 
-  myMatch.score = { home: 0, away: 0 };
-  window.currentMatch = myMatch;
+  window.currentMatch = matchObj;
 
   updateTeamsUI();
   updateScoreUI();
   updateProgressBar();
-
-  startInterval();
-}
-// =========================
-// 🔁 INTERVAL NEUSTARTEN
-// =========================
-function restartInterval(){
-
-  if(!game.match || !game.match.isRunning) return;
-
-  if(interval){
-    clearInterval(interval);
-  }
 
   startInterval();
 }
@@ -72,9 +58,7 @@ function restartInterval(){
 // =========================
 function startInterval(){
 
-  if(interval){
-    clearInterval(interval);
-  }
+  if(interval) clearInterval(interval);
 
   interval = setInterval(function(){
 
@@ -87,18 +71,14 @@ function startInterval(){
     updateScoreUI();
     updateProgressBar();
 
-    // 🟡 HALBZEIT
     if(game.match.minute === 45){
       game.match.isRunning = false;
       game.phase = "halftime";
-
       addLiveEvent("⏸ Halbzeit", 45);
-
-      if(typeof updateMainButton === "function") updateMainButton();
+      updateMainButton();
       return;
     }
 
-    // 🔴 ENDE
     if(game.match.minute >= 90){
       endMatch();
     }
@@ -116,59 +96,187 @@ function resumeMatch(){
   game.match.isRunning = true;
   game.phase = "live";
 
-  addLiveEvent("▶️ 2. Halbzeit startet", 45);
+  addLiveEvent("▶️ 2. Halbzeit beginnt", 45);
 
   startInterval();
-
-  if(typeof updateMainButton === "function") updateMainButton();
+  updateMainButton();
 }
 
 // =========================
-// ⏱️ MINUTE
+// ⏱️ MINUTE SIMULATION
 // =========================
 function simulateMinute(){
 
   var m = game.match.minute;
   var match = window.currentMatch;
-
   if(!match) return;
 
-  var chance = 0.08;
+  updateMomentum(match);
+
+  var chance = 0.05;
+
+  chance += momentum * 0.05;
+  chance += (match.red.home > match.red.away ? -0.03 : 0);
+  chance += (match.red.away > match.red.home ? 0.03 : 0);
 
   chance += Number(tacticModifier || 0);
-  chance += Number(formationModifier || 0);
   chance += Number(liveModifier || 0);
-  chance += Number(intensityModifier || 0);
-
-  if(isNaN(chance)) chance = 0.08;
 
   // ⚽ TOR
   if(Math.random() < chance){
 
-    var isHome = Math.random() < 0.5;
+    var isHome = momentum >= 0;
 
     if(isHome){
       match.score.home++;
-      addLiveEvent("⚽ Tor für " + match.home + "!", m);
+      addLiveEvent(buildGoalText(match.home), m);
+      momentum += 0.2;
     } else {
       match.score.away++;
-      addLiveEvent("⚽ Tor für " + match.away + "!", m);
+      addLiveEvent(buildGoalText(match.away), m);
+      momentum -= 0.2;
     }
+
+    return;
   }
 
-  // 📢 RANDOM EVENTS
-  if(Math.random() < 0.05){
-
-    var events = [
-      "💥 Große Chance!",
-      "🧤 Starke Parade!",
-      "🟨 Gelbe Karte",
-      "📢 Fans eskalieren"
-    ];
-
-    var text = events[Math.floor(Math.random() * events.length)];
-    addLiveEvent(text, m);
+  // 🎲 EVENTS
+  if(Math.random() < 0.3){
+    triggerMatchEvent(match, m);
   }
+}
+
+// =========================
+// 🔥 MOMENTUM SYSTEM
+// =========================
+function updateMomentum(match){
+
+  momentum += (Math.random() - 0.5) * 0.1;
+
+  if(match.score.home > match.score.away){
+    momentum += 0.05;
+  } else if(match.score.away > match.score.home){
+    momentum -= 0.05;
+  }
+
+  momentum = Math.max(-1, Math.min(1, momentum));
+}
+
+// =========================
+// 🎲 EVENT SYSTEM
+// =========================
+function triggerMatchEvent(match, minute){
+
+  var team = momentum >= 0 ? match.home : match.away;
+  var opponent = team === match.home ? match.away : match.home;
+
+  var roll = Math.random();
+
+  if(roll < 0.6){
+    buildChanceEvent(team, opponent, minute);
+  }
+  else if(roll < 0.85){
+    buildBigChanceEvent(team, opponent, minute);
+  }
+  else if(roll < 0.95){
+    buildGameEvent(team, opponent, minute, match);
+  }
+  else{
+    buildFunnyEvent(minute);
+  }
+}
+
+// =========================
+// ⚽ EVENT BUILDERS
+// =========================
+function buildChanceEvent(team, opponent, minute){
+
+  var t1 = [
+    team + baut ruhig auf",
+    team + kombiniert stark",
+    "Geduldiger Angriff von " + team
+  ];
+
+  var t2 = [
+    "kommt in den Strafraum",
+    "findet die Lücke",
+    "zieht nach innen"
+  ];
+
+  var t3 = [
+    "aber der Abschluss ist schwach",
+    "doch der Keeper hält",
+    "knapp vorbei!"
+  ];
+
+  addLiveEvent(randomPick(t1) + ", " + randomPick(t2) + " – " + randomPick(t3), minute);
+}
+
+function buildBigChanceEvent(team, opponent, minute){
+
+  addLiveEvent(
+    "😱 Riesenchance für " + team + "! " +
+    randomPick([
+      "Unglaublich vergeben!",
+      "Was für eine Parade!",
+      "Das muss ein Tor sein!"
+    ]),
+    minute
+  );
+}
+
+function buildGameEvent(team, opponent, minute, match){
+
+  var events = [
+
+    function(){
+      addLiveEvent("🟨 Gelb für " + team, minute);
+    },
+
+    function(){
+      addLiveEvent("📐 Ecke für " + team, minute);
+    },
+
+    function(){
+      addLiveEvent("🟥 ROT! " + team + " jetzt in Unterzahl!", minute);
+      if(team === match.home) match.red.home++;
+      else match.red.away++;
+    }
+
+  ];
+
+  randomPick(events)();
+}
+
+function buildFunnyEvent(minute){
+
+  var texts = [
+    "😂 Spieler stolpert über den Ball",
+    "🐦 Vogel auf dem Platz",
+    "📢 Fan brüllt dazwischen"
+  ];
+
+  addLiveEvent(randomPick(texts), minute);
+}
+
+// =========================
+// ⚽ TOR TEXT
+// =========================
+function buildGoalText(team){
+
+  var a = [
+    "⚽ TOR für " + team + "!",
+    "🔥 TOOOOR! " + team,
+    "⚡ Treffer!"
+  ];
+
+  var b = [
+    "Unhaltbar!",
+    "Eiskalt!",
+    "Was für ein Ding!"
+  ];
+
+  return randomPick(a) + " – " + randomPick(b);
 }
 
 // =========================
@@ -181,37 +289,29 @@ function endMatch(){
   game.match.isRunning = false;
   game.phase = "ready";
 
-  var match = window.currentMatch;
-  if(!match) return;
+  var m = window.currentMatch;
 
   addLiveEvent(
     "🏁 Endstand: " +
-    match.home + " " +
-    match.score.home + " - " +
-    match.score.away + " " +
-    match.away,
+    m.home + " " + m.score.home +
+    " - " + m.score.away + " " + m.away,
     90
   );
 
-  updateTableData(match);
-
+  updateTableData(m);
   if(typeof updateTable === "function") updateTable();
 
-  addMatchReport(match);
+  addMatchReport(m);
+  updateMainButton();
 }
 
 // =========================
-// 📊 TABELLE UPDATEN
+// 📊 TABLE UPDATE
 // =========================
 function updateTableData(match){
 
-  var home = game.league.teams.find(function(t){
-    return t.name === match.home;
-  });
-
-  var away = game.league.teams.find(function(t){
-    return t.name === match.away;
-  });
+  var home = game.league.teams.find(t => t.name === match.home);
+  var away = game.league.teams.find(t => t.name === match.away);
 
   if(!home || !away) return;
 
@@ -226,28 +326,20 @@ function updateTableData(match){
 
   if(match.score.home > match.score.away){
     home.points += 3;
-    home.wins++;
-    away.losses++;
   }
   else if(match.score.home < match.score.away){
     away.points += 3;
-    away.wins++;
-    home.losses++;
   }
   else{
-    home.points += 1;
-    away.points += 1;
-    home.draws++;
-    away.draws++;
+    home.points++;
+    away.points++;
   }
 }
 
 // =========================
-// 📰 SPIELBERICHT
+// 📰 REPORT
 // =========================
 function addMatchReport(match){
-
-  if(!match) return;
 
   var text =
     match.home + " " +
@@ -255,21 +347,7 @@ function addMatchReport(match){
     match.score.away + " " +
     match.away;
 
-  if(match.score.home > match.score.away){
-    text += " → Heimsieg!";
-  } else if(match.score.home < match.score.away){
-    text += " → Auswärtssieg!";
-  } else {
-    text += " → Remis.";
-  }
-
-  var box = document.getElementById("newsBox");
-  if(!box) return;
-
-  var p = document.createElement("p");
-  p.innerText = "📰 " + text;
-
-  box.prepend(p);
+  addNews("📰 " + text);
 }
 
 // =========================
@@ -278,22 +356,17 @@ function addMatchReport(match){
 function updateScoreUI(){
 
   var el = document.getElementById("score");
-  if(!el || !window.currentMatch) return;
-
-  el.innerText =
-    window.currentMatch.score.home + " : " +
-    window.currentMatch.score.away;
+  if(el && currentMatch){
+    el.innerText = currentMatch.score.home + " : " + currentMatch.score.away;
+  }
 }
 
 function updateTeamsUI(){
 
-  if(!window.currentMatch) return;
+  if(!currentMatch) return;
 
-  var l = document.getElementById("teamLeft");
-  var r = document.getElementById("teamRight");
-
-  if(l) l.innerText = window.currentMatch.home;
-  if(r) r.innerText = window.currentMatch.away;
+  document.getElementById("teamLeft").innerText = currentMatch.home;
+  document.getElementById("teamRight").innerText = currentMatch.away;
 }
 
 function updateProgressBar(){
@@ -301,6 +374,12 @@ function updateProgressBar(){
   var bar = document.getElementById("momentumBar");
   if(!bar) return;
 
-  var percent = (game.match.minute / 90) * 100;
-  bar.style.width = percent + "%";
+  bar.style.width = (game.match.minute / 90 * 100) + "%";
+}
+
+// =========================
+// 🧠 HELPERS
+// =========================
+function randomPick(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
 }
