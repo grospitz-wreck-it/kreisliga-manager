@@ -1,103 +1,50 @@
 // =========================
-// 📊 TABELLE (FINAL CLEAN)
+// 📊 TABELLE
 // =========================
-function updateTable(isLive = false, liveT1 = null, liveT2 = null) {
 
-  const tbody = document.querySelector("#table tbody");
-  if(!tbody) return;
+function updateTable(){
 
-  tbody.innerHTML = "";
+  const table = document.getElementById("leagueTable");
+  if(!table) return;
 
-  // 👉 KEIN originales Array zerstören!
-  let tableData = teams.map(t => ({ ...t }));
+  table.innerHTML = "";
 
-  // =========================
-  // 🔥 LIVE OVERRIDE
-  // =========================
-  if(isLive && liveT1 && liveT2){
-    tableData = tableData.map(t => {
-      if(t.name === liveT1.name) return liveT1;
-      if(t.name === liveT2.name) return liveT2;
-      return t;
-    });
+  if(!game.league.teams || game.league.teams.length === 0){
+    console.warn("Keine Teams für Tabelle");
+    return;
   }
 
-  // =========================
-  // 🔥 SORTIERUNG
-  // =========================
-tableData.sort((a, b) => {
+  // Sortierung
+  const sorted = [...game.league.teams].sort((a,b)=>{
+    if(b.points !== a.points) return b.points - a.points;
+    return (b.goalDiff || 0) - (a.goalDiff || 0);
+  });
 
-  // 1️⃣ Punkte
-  if(b.points !== a.points){
-    return b.points - a.points;
-  }
-
-  // 2️⃣ Tordifferenz
-  let diffA = (a.goalsFor || 0) - (a.goalsAgainst || 0);
-  let diffB = (b.goalsFor || 0) - (b.goalsAgainst || 0);
-
-  if(diffB !== diffA){
-    return diffB - diffA;
-  }
-
-  // 3️⃣ erzielte Tore
-  if((b.goalsFor || 0) !== (a.goalsFor || 0)){
-    return (b.goalsFor || 0) - (a.goalsFor || 0);
-  }
-
-  // 4️⃣ stabil halten (kein Springen)
-  return a.name.localeCompare(b.name);
-});
-
-  // =========================
-  // 🧱 RENDER
-  // =========================
-  tableData.forEach((t, index) => {
-
-    let goalDiff = (t.goalsFor || 0) - (t.goalsAgainst || 0);
-
-    let rowClass = "";
-
-    // 👉 Tabellenplatz
-    if(index === 0){
-      rowClass += " first";
-    }
-    else if(index >= tableData.length - 2){
-      rowClass += " relegation";
-    }
-
-    // 👉 eigenes Team
-    if(t.name === selectedTeam){
-      rowClass += " userTeamRow";
-    }
-
-    // 👉 Live Match Teams
-    if(isLive && (t.name === liveT1?.name || t.name === liveT2?.name)){
-      rowClass += " live";
-    }
+  sorted.forEach((team, index)=>{
 
     const row = document.createElement("tr");
-    row.className = rowClass.trim();
+
+    const isPlayer = team.name === game.team.selected;
 
     row.innerHTML = `
-      <td>${t.name}</td>
-      <td>${t.played || 0}</td>
-      <td>${t.wins || 0}</td>
-      <td>${t.draws || 0}</td>
-      <td>${t.losses || 0}</td>
-      <td>${t.goalsFor || 0}:${t.goalsAgainst || 0}</td>
-      <td>${goalDiff}</td>
-      <td><strong>${t.points || 0}</strong></td>
+      <td>${index + 1}</td>
+      <td ${isPlayer ? 'style="font-weight:bold;color:#4caf50"' : ''}>
+        ${team.name}
+      </td>
+      <td>${team.points || 0}</td>
+      <td>${team.goalsFor || 0}</td>
+      <td>${team.goalsAgainst || 0}</td>
+      <td>${(team.goalsFor || 0) - (team.goalsAgainst || 0)}</td>
     `;
 
-    tbody.appendChild(row);
+    table.appendChild(row);
   });
 }
 
+// =========================
+// 📋 TEAM DROPDOWN
+// =========================
 
-// =========================
-// 👥 TEAM SELECT
-// =========================
 function populateTeamSelect(){
 
   const select = document.getElementById("teamSelect");
@@ -105,72 +52,42 @@ function populateTeamSelect(){
 
   select.innerHTML = "";
 
-  if(!teams || teams.length === 0) return;
+  if(!game.league.teams) return;
 
-  teams.forEach(t => {
-    let o = document.createElement("option");
-    o.value = t.name;
-    o.textContent = t.name;
-    select.appendChild(o);
+  game.league.teams.forEach(team => {
+
+    const opt = document.createElement("option");
+    opt.value = team.name;
+    opt.textContent = team.name;
+
+    select.appendChild(opt);
   });
 
-  select.selectedIndex = 0;
-}
-
-
-// =========================
-// 📢 LIVE EVENTS (FIX)
-// =========================
-function addEvent(text){
-
-  const box = document.getElementById("liveMatch");
-  if(!box) return;
-
-  const p = document.createElement("p");
-  p.textContent = text;
-
-  box.prepend(p);
-}
-
-
-// =========================
-// 🧾 SCOREBOARD
-// =========================
-function updateScoreboard(t1, t2, s1, s2){
-
-  if(!t1 || !t2) return;
-
-  const score = document.getElementById("score");
-  const left = document.getElementById("teamLeft");
-  const right = document.getElementById("teamRight");
-
-  if(score) score.innerText = `${s1} : ${s2}`;
-  if(left) left.innerText = t1.name;
-  if(right) right.innerText = t2.name;
-
-  if(!left || !right) return;
-
-  left.classList.remove("leading","losing");
-  right.classList.remove("leading","losing");
-
-  if(s1 > s2){
-    left.classList.add("leading");
-    right.classList.add("losing");
-  }
-  else if(s2 > s1){
-    right.classList.add("leading");
-    left.classList.add("losing");
+  // bereits gewähltes Team setzen
+  if(game.team.selected){
+    select.value = game.team.selected;
   }
 }
 
-
 // =========================
-// ⏱️ TIMELINE
+// 🧾 HEADER UPDATE (Fallback)
 // =========================
-function updateTimeline(minute){
 
-  const bar = document.getElementById("timelineBar");
-  if(!bar) return;
+function updateHeader(){
 
-  bar.style.width = (minute / 90) * 100 + "%";
+  const title = document.getElementById("gameTitle");
+  const sub = document.getElementById("leagueTitle");
+
+  if(title){
+    title.innerText = game.player?.name || "Manager";
+  }
+
+  if(sub){
+    const league = game.league?.key || "Keine Liga";
+    const team = game.team?.selected || "";
+
+    sub.innerText = team 
+      ? `${league} • ${team}`
+      : league;
+  }
 }
