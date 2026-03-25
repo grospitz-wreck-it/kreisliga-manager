@@ -40,10 +40,7 @@ data.reduce((acc, entry) => {
 
   return acc;
 
-}, {})
-```
-
-);
+}, {}));
 
 // =========================
 // 📈 SORTIEREN
