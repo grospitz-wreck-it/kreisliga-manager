@@ -1,6 +1,6 @@
 async function loadLeaderboard(){
 
-const box = document.getElementById("leaderboard");
+var box = document.getElementById("leaderboard");
 
 if(!box){
 console.error("leaderboard nicht gefunden");
@@ -9,12 +9,12 @@ return;
 
 box.innerHTML = "Lade Daten...";
 
-const res = await supabaseClient
+var res = await supabaseClient
 .from("leaderboard")
 .select("*");
 
-const data = res.data;
-const error = res.error;
+var data = res.data;
+var error = res.error;
 
 if(error){
 console.error("Leaderboard Fehler:", error);
@@ -29,18 +29,21 @@ return;
 
 // Beste Scores pro Spieler
 var bestPerPlayer = Object.values(
-  data.reduce(function(acc, entry){
+data.reduce(function(acc, entry){
 
-    if(
-      !acc[entry.player_id] ||
-      acc[entry.player_id].score < entry.score
-    ){
-      acc[entry.player_id] = entry;
-    }
+```
+  if(
+    !acc[entry.player_id] ||
+    acc[entry.player_id].score < entry.score
+  ){
+    acc[entry.player_id] = entry;
+  }
 
-    return acc;
+  return acc;
 
-  }, {})
+}, {})
+```
+
 );
 
 // Sortieren
@@ -48,7 +51,7 @@ bestPerPlayer.sort(function(a, b){
 return b.score - a.score;
 });
 
-const top10 = bestPerPlayer.slice(0, 10);
+var top10 = bestPerPlayer.slice(0, 10);
 
 box.innerHTML = "";
 
@@ -57,6 +60,7 @@ top10.forEach(function(entry, i){
 ```
 var div = document.createElement("div");
 
+// Highlight eigener Spieler
 if(entry.player_id === game.player.id){
   div.style.background = "gold";
   div.style.color = "black";
@@ -67,13 +71,15 @@ if(entry.player_id === game.player.id){
 
 div.style.marginBottom = "6px";
 
-div.innerHTML =
-  "<strong>#" + (i+1) + "</strong> " +
-  "<span style='color:" + (entry.color || "#fff") + "'>" +
-  (entry.name || "Unbekannt") +
-  "</span>" +
-  "<br><small>(" + entry.team + ")</small> - " +
-  "<strong>" + entry.score + "</strong> Punkte";
+var html = "";
+html += "<strong>#" + (i+1) + "</strong> ";
+html += "<span style='color:" + (entry.color || "#fff") + "'>";
+html += entry.name ? entry.name : "Unbekannt";
+html += "</span>";
+html += "<br><small>(" + entry.team + ")</small> - ";
+html += "<strong>" + entry.score + "</strong> Punkte";
+
+div.innerHTML = html;
 
 box.appendChild(div);
 ```
