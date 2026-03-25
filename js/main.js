@@ -1,7 +1,6 @@
 // =========================
 // 👤 PLAYER SYSTEM
 // =========================
-
 let playerId = localStorage.getItem("playerId");
 if(!playerId){
   playerId = crypto.randomUUID();
@@ -10,15 +9,13 @@ if(!playerId){
 
 let playerName = localStorage.getItem("playerName");
 let lastNameChange = localStorage.getItem("lastNameChange");
-
 let playerTitle = localStorage.getItem("playerTitle") || "Freizeitkicker";
 
 // =========================
-// 🎮 GAME STATE
+// 🎮 GAME STATE (GLOBAL FIX)
 // =========================
-let gameState = window.gameState || {
-  phase: "idle"
-};
+window.gameState = window.gameState || { phase: "idle" };
+let gameState = window.gameState;
 
 // =========================
 // 🆕 LEAGUE
@@ -26,7 +23,7 @@ let gameState = window.gameState || {
 let currentLeague = localStorage.getItem("selectedLeague") || null;
 
 // =========================
-// 🛑 NAME FILTER
+// 🔍 VALIDATION
 // =========================
 const bannedWords = [
   "nazi","hitler","ss","reich",
@@ -35,9 +32,6 @@ const bannedWords = [
   "polizei","fbi","cia"
 ];
 
-// =========================
-// 🔍 VALIDATION
-// =========================
 function isValidName(name){
   if(!name || name.length < 3) return false;
   if(name.length > 20) return false;
@@ -58,7 +52,6 @@ function canChangeName(){
 // 👤 INIT NAME
 // =========================
 async function initPlayerName(){
-
   if(!playerName){
     let name = prompt("Wie heißt du Manager?");
     if(!isValidName(name)){
@@ -73,83 +66,11 @@ async function initPlayerName(){
 }
 
 // =========================
-// 📱 PANEL
-// =========================
-function toggleSetup(){
-  document.getElementById("setupPanel")?.classList.toggle("open");
-  document.getElementById("overlay")?.classList.toggle("active");
-}
-
-function closeSetup(){
-  document.getElementById("setupPanel")?.classList.remove("open");
-  document.getElementById("overlay")?.classList.remove("active");
-}
-
-// =========================
-// 📑 TABS
-// =========================
-function openTab(evt, tabId){
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".tabContent").forEach(c => c.classList.remove("active"));
-
-  evt.currentTarget.classList.add("active");
-  document.getElementById(tabId).classList.add("active");
-}
-
-// =========================
 // 🎨 UI
 // =========================
 function updateNameUI(){
   const input = document.getElementById("nameInput");
   if(input) input.value = playerName;
-}
-
-// =========================
-// ✏️ NAME
-// =========================
-async function changeName(){
-
-  const input = document.getElementById("nameInput").value.trim();
-
-  if(!isValidName(input)) return alert("Ungültiger Name!");
-  if(!canChangeName()) return alert("Nur 1x pro Minute!");
-
-  const { data } = await supabaseClient
-    .from("leaderboard")
-    .select("name")
-    .eq("name", input);
-
-  if(data?.length > 0){
-    return alert("Name bereits vergeben!");
-  }
-
-  playerName = input;
-  lastNameChange = Date.now();
-
-  localStorage.setItem("playerName", playerName);
-  localStorage.setItem("lastNameChange", lastNameChange);
-
-  updateHeader();
-  loadLeaderboard?.();
-}
-
-// =========================
-// 🏅 TITEL
-// =========================
-function getPlayerTitle(score){
-  if(score >= 50) return "Schwalbengott";
-  if(score >= 30) return "Kampfschwein";
-  if(score >= 15) return "Platzwart";
-  return "Freizeitkicker";
-}
-
-// =========================
-// 👥 FRIENDS
-// =========================
-let friendCode = localStorage.getItem("friendCode");
-if(!friendCode){
-  friendCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-  localStorage.setItem("friendCode", friendCode);
 }
 
 // =========================
@@ -160,11 +81,9 @@ function updateHeader(){
   const league = localStorage.getItem("selectedLeague") || "Keine Liga";
   const team = localStorage.getItem("selectedTeam") || "";
 
-  const titleEl = document.getElementById("gameTitle");
-  const subEl = document.getElementById("leagueTitle");
-
-  if(titleEl) titleEl.textContent = playerName || "Kreisliga Manager";
-  if(subEl) subEl.textContent = team ? `${league} • ${team}` : league;
+  document.getElementById("gameTitle")?.textContent = playerName || "Kreisliga Manager";
+  document.getElementById("leagueTitle")?.textContent =
+    team ? `${league} • ${team}` : league;
 }
 
 // =========================
@@ -185,44 +104,31 @@ function startSeason(){
 }
 
 // =========================
-// ▶️ MATCH START (FIXED!!!)
+// ▶️ MATCH START (FIXED CLEAN)
 // =========================
 function startMatch(){
 
   console.log("⚽ Spiel startet");
 
-  // 🔥 WICHTIG: Reset gegen Blocker
-  isSimulating = false;
-
-  // 🔥 garantiert richtiger Start
   if(typeof simulateMatchday === "function"){
     simulateMatchday();
+  } else {
+    console.error("❌ simulateMatchday fehlt");
   }
-
-  // 👉 FALLBACK: falls Engine verkackt
-  setTimeout(()=>{
-    if(!isSimulating && typeof startMatchLoop === "function"){
-      console.warn("⚠️ Loop war nicht aktiv → starte manuell");
-      isSimulating = true;
-      startMatchLoop();
-    }
-  }, 300);
 
   gameState.phase = "live";
   updateMainButton();
 }
 
 // =========================
-// ▶️ RESUME
+// ▶️ RESUME (ENGINE ONLY)
 // =========================
 function resumeMatch(){
 
-  console.log("▶️ Spiel läuft weiter");
+  console.log("▶️ Resume");
 
-  isSimulating = true;
-
-  if(typeof startMatchLoop === "function"){
-    startMatchLoop();
+  if(typeof window.resumeMatch === "function"){
+    window.resumeMatch();
   }
 
   gameState.phase = "live";
@@ -247,11 +153,12 @@ function handleMainAction(){
       break;
 
     case "halftime":
-      resumeMatch();
+      window.resumeMatch?.(); // 👉 direkt Engine nutzen
       break;
 
     case "live":
-      pauseMatch?.();
+      isSimulating = false; // simple pause
+      gameState.phase = "halftime";
       break;
   }
 
@@ -290,38 +197,24 @@ function updateMatchdayUI(){
   const el = document.getElementById("matchday");
   if(!el) return;
 
-  el.innerText = "Spieltag: " + (currentMatchday || 0) + " / " + (schedule?.length || 30);
+  el.innerText =
+    "Spieltag: " +
+    (currentMatchday || 0) +
+    " / " +
+    (schedule?.length || 30);
 }
 
 // =========================
-// 📊 MOMENTUM
+// 👥 FRIENDS
 // =========================
-function updateMomentum(value){
-  const bar = document.getElementById("momentumBar");
-  if(bar){
-    bar.style.width = value + "%";
-  }
+let friendCode = localStorage.getItem("friendCode");
+if(!friendCode){
+  friendCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+  localStorage.setItem("friendCode", friendCode);
 }
 
-// =========================
-// 👥 FRIEND UI
-// =========================
 function initFriendUI(){
-  const el = document.getElementById("friendCodeDisplay");
-  if(el) el.innerText = friendCode;
-}
-
-function copyFriendCode(){
-  navigator.clipboard.writeText(friendCode);
-  alert("Code kopiert!");
-}
-
-function joinFriendCode(){
-  const input = document.getElementById("friendCodeInput").value.trim().toUpperCase();
-  if(!input) return;
-
-  localStorage.setItem("friendCode", input);
-  location.reload();
+  document.getElementById("friendCodeDisplay")?.innerText = friendCode;
 }
 
 // =========================
