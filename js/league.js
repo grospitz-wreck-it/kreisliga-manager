@@ -1,4 +1,13 @@
 // =========================
+// 📦 LIGEN LISTE (für UI)
+// =========================
+var leagues = {
+  herford: "Kreisliga Herford",
+  luebbecke: "Kreisliga Lübbecke",
+  bielefeld: "Kreisliga Bielefeld"
+};
+
+// =========================
 // 🏗️ TEAM ERSTELLEN
 // =========================
 function createTeam(name){
