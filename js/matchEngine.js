@@ -5,7 +5,7 @@
 var interval = null;
 
 // =========================
-// 🧠 SIMULATE MATCHDAY
+// 🧠 MATCHDAY STARTEN
 // =========================
 function simulateMatchday(){
 
@@ -27,12 +27,13 @@ function simulateMatchday(){
 }
 
 // =========================
-// 🎮 START LIVE MATCH
+// 🎮 MATCH START
 // =========================
 function startLiveMatch(matches){
 
   game.match.minute = 0;
   game.match.isRunning = true;
+  game.phase = "live";
 
   var myMatch = matches.find(function(m){
     return m.home === game.team.selected || m.away === game.team.selected;
@@ -44,12 +45,10 @@ function startLiveMatch(matches){
   }
 
   myMatch.score = { home: 0, away: 0 };
-
   window.currentMatch = myMatch;
 
-  // UI reset
-  updateScoreUI();
   updateTeamsUI();
+  updateScoreUI();
   updateProgressBar();
 
   startInterval();
@@ -64,7 +63,7 @@ function startInterval(){
     clearInterval(interval);
   }
 
-  interval = window.setInterval(function(){
+  interval = setInterval(function(){
 
     if(!game.match.isRunning) return;
 
@@ -95,13 +94,6 @@ function startInterval(){
 }
 
 // =========================
-// 🔁 RESTART INTERVAL
-// =========================
-function restartInterval(){
-  startInterval();
-}
-
-// =========================
 // ▶️ 2. HALBZEIT
 // =========================
 function resumeMatch(){
@@ -119,7 +111,7 @@ function resumeMatch(){
 }
 
 // =========================
-// ⏱️ MINUTE SIMULATION
+// ⏱️ MINUTE
 // =========================
 function simulateMinute(){
 
@@ -141,29 +133,28 @@ function simulateMinute(){
   if(Math.random() < chance){
 
     var isHome = Math.random() < 0.5;
-    var scoringTeam = isHome ? match.home : match.away;
 
     if(isHome){
       match.score.home++;
+      addLiveEvent("⚽ Tor für " + match.home + "!", m);
     } else {
       match.score.away++;
+      addLiveEvent("⚽ Tor für " + match.away + "!", m);
     }
-
-    addLiveEvent("⚽ Tor für " + scoringTeam + "!", m);
   }
 
-  // 📢 KLEINE EVENTS
+  // 📢 RANDOM EVENTS
   if(Math.random() < 0.05){
 
-    var texts = [
-      "💥 Chance vergeben",
-      "🧤 Starke Parade",
+    var events = [
+      "💥 Große Chance!",
+      "🧤 Starke Parade!",
       "🟨 Gelbe Karte",
-      "📢 Fans werden laut"
+      "📢 Fans eskalieren"
     ];
 
-    var index = Math.floor(Math.random() * texts.length);
-    addLiveEvent(texts[index], m);
+    var text = events[Math.floor(Math.random() * events.length)];
+    addLiveEvent(text, m);
   }
 }
 
@@ -192,11 +183,8 @@ function endMatch(){
   updateTableData(match);
 
   if(typeof updateTable === "function") updateTable();
-  if(typeof updateMainButton === "function") updateMainButton();
 
-  if(typeof submitScore === "function"){
-    submitScore(match);
-  }
+  addMatchReport(match);
 }
 
 // =========================
@@ -242,28 +230,57 @@ function updateTableData(match){
 }
 
 // =========================
-// 🎯 UI HELPERS
+// 📰 SPIELBERICHT
+// =========================
+function addMatchReport(match){
+
+  if(!match) return;
+
+  var text =
+    match.home + " " +
+    match.score.home + " - " +
+    match.score.away + " " +
+    match.away;
+
+  if(match.score.home > match.score.away){
+    text += " → Heimsieg!";
+  } else if(match.score.home < match.score.away){
+    text += " → Auswärtssieg!";
+  } else {
+    text += " → Remis.";
+  }
+
+  var box = document.getElementById("newsBox");
+  if(!box) return;
+
+  var p = document.createElement("p");
+  p.innerText = "📰 " + text;
+
+  box.prepend(p);
+}
+
+// =========================
+// 🎯 UI
 // =========================
 function updateScoreUI(){
 
-  var scoreEl = document.getElementById("score");
+  var el = document.getElementById("score");
+  if(!el || !window.currentMatch) return;
 
-  if(scoreEl && window.currentMatch){
-    scoreEl.innerText =
-      window.currentMatch.score.home + " : " +
-      window.currentMatch.score.away;
-  }
+  el.innerText =
+    window.currentMatch.score.home + " : " +
+    window.currentMatch.score.away;
 }
 
 function updateTeamsUI(){
 
-  var left = document.getElementById("teamLeft");
-  var right = document.getElementById("teamRight");
-
   if(!window.currentMatch) return;
 
-  if(left) left.innerText = window.currentMatch.home;
-  if(right) right.innerText = window.currentMatch.away;
+  var l = document.getElementById("teamLeft");
+  var r = document.getElementById("teamRight");
+
+  if(l) l.innerText = window.currentMatch.home;
+  if(r) r.innerText = window.currentMatch.away;
 }
 
 function updateProgressBar(){
