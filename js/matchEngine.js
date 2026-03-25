@@ -1,7 +1,26 @@
 // =========================
 // 🔥 MATCH ENGINE (FINAL STABLE)
 // =========================
+if(typeof saveScoreToLeaderboard !== "function"){
 
+  async function saveScoreToLeaderboard(player, team, score, matchday){
+
+    let data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+
+    data.push({
+      player,
+      team,
+      score,
+      matchday,
+      date: Date.now()
+    });
+
+    localStorage.setItem("leaderboard", JSON.stringify(data));
+
+    console.log("📊 Local Leaderboard gespeichert");
+  }
+
+}
 // ❗ KEIN let → globale Nutzung
 currentInterval = null;
 halftimePlayed = false;
