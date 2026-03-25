@@ -28,22 +28,19 @@ return;
 }
 
 // Beste Scores pro Spieler
-const bestPerPlayer = Object.values(
-data.reduce(function(acc, entry){
+var bestPerPlayer = Object.values(
+  data.reduce(function(acc, entry){
 
-```
-  if(
-    !acc[entry.player_id] ||
-    acc[entry.player_id].score < entry.score
-  ){
-    acc[entry.player_id] = entry;
-  }
+    if(
+      !acc[entry.player_id] ||
+      acc[entry.player_id].score < entry.score
+    ){
+      acc[entry.player_id] = entry;
+    }
 
-  return acc;
+    return acc;
 
-}, {})
-```
-
+  }, {})
 );
 
 // Sortieren
