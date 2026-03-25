@@ -69,7 +69,12 @@ function startInterval(){
 
   }, 100);
 }
+function restartInterval(){
 
+  if(!game.match.running) return;
+
+  startInterval();
+}
 // =========================
 // 🧠 MINUTE SIM
 // =========================
