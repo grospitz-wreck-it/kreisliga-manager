@@ -197,10 +197,6 @@ body {
   background: linear-gradient(to right, #4caf50, #ff5252);
   transition: width 0.3s;
 }
-
-/* =========================
-   📺 LIVE MATCH
-========================= */
 /* =========================
    📺 LIVE MATCH (FIXED)
 ========================= */
@@ -368,4 +364,44 @@ button:hover {
   #score {
     font-size: 22px;
   }
+}
+/* =========================
+   📢 ADS (FINAL FIX)
+========================= */
+
+/* Container */
+#adBanner {
+  height: 70px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #111;
+
+  display: flex;
+  align-items: center;
+}
+
+/* Track */
+.adTrack {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+
+  height: 100%;
+  animation: scrollAds 30s linear infinite;
+}
+
+/* Einzelnes Ad */
+.adItem {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Bilder */
+.adItem img {
+  height: 50px; /* 🔥 KEY FIX */
+  width: auto;
+  object-fit: contain;
+
+  display: block;
 }
