@@ -126,16 +126,26 @@ function restartInterval(){
 // =========================
 function resumeMatch(){
 
-  console.log("▶️ resume");
+  console.log("▶️ resumeMatch", game.phase);
 
-  if(game.phase !== "halftime") return;
+  if(!game.match){
+    console.warn("kein match");
+    return;
+  }
+
+  // 🔥 alten Interval IMMER killen
+  if(interval){
+    clearInterval(interval);
+    interval = null;
+  }
 
   game.match.isRunning = true;
   game.phase = "live";
 
-  addLiveEvent("▶️ 2. Halbzeit", 45);
+  addLiveEvent("▶️ 2. Halbzeit startet", 45);
 
   startInterval();
+
   updateMainButton?.();
 }
 
