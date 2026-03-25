@@ -15,19 +15,19 @@ function selectLeague(){
 
   loadLeague(league);
 
-  if(!teams || teams.length === 0){
+  if(!game.league.teams || game.league.teams.length === 0){
     console.error("Keine Teams geladen:", league);
     alert("Fehler beim Laden der Liga");
     return;
   }
 
   generateSchedule();
-  populateTeamSelect();
-  updateTable();
+  populateTeamSelect?.();
+  updateTable?.();
 
   updateHeader();
 
-  gameState.phase = "idle";
+  game.phase = "idle";
   updateMainButton();
 
   console.log("Liga geladen:", league);
@@ -46,16 +46,15 @@ function selectTeam(){
     return;
   }
 
-  selectedTeam = team;
-  teamLocked = true;
+  game.team.selected = team;
 
   localStorage.setItem("selectedTeam", team);
 
-  document.getElementById("setupPanel").classList.remove("open");
+  document.getElementById("setupPanel")?.classList.remove("open");
 
   updateHeader();
 
-  gameState.phase = "idle";
+  game.phase = "idle";
   updateMainButton();
 }
 
@@ -63,7 +62,7 @@ function selectTeam(){
 // 🔥 EVENT SYSTEM
 // =========================
 
-function addLiveEvent(text, minute = currentMinute){
+function addLiveEvent(text, minute = game.match.minute || 0){
 
   const box = document.getElementById("liveMatch");
   if(!box) return;
@@ -73,7 +72,6 @@ function addLiveEvent(text, minute = currentMinute){
 
   box.prepend(p);
 
-  // Limit für Performance
   if(box.children.length > 50){
     box.removeChild(box.lastChild);
   }
@@ -87,15 +85,17 @@ function addEvent(text, minute){
 // 🎯 TAKTIK
 // =========================
 
-tacticModifier = 0;
+window.tacticModifier = 0;
 
 function setTactic(){
 
   const val = document.getElementById("tacticSelect").value;
 
-  if(val === "Offensiv") tacticModifier = 0.02;
-  else if(val === "Defensiv") tacticModifier = -0.015;
-  else tacticModifier = 0;
+  if(val === "Offensiv") window.tacticModifier = 0.02;
+  else if(val === "Defensiv") window.tacticModifier = -0.015;
+  else window.tacticModifier = 0;
+
+  game.settings.tactic = val;
 
   addLiveEvent("📋 Taktik geändert: " + val);
 }
@@ -104,16 +104,18 @@ function setTactic(){
 // 📐 FORMATION
 // =========================
 
-formationModifier = 0;
+window.formationModifier = 0;
 
 function setFormation(){
 
   const val = document.getElementById("formationSelect").value;
 
-  if(val === "4-3-3") formationModifier = 0.01;
-  else if(val === "3-5-2") formationModifier = 0.005;
-  else if(val === "5-3-2") formationModifier = -0.015;
-  else formationModifier = 0;
+  if(val === "4-3-3") window.formationModifier = 0.01;
+  else if(val === "3-5-2") window.formationModifier = 0.005;
+  else if(val === "5-3-2") window.formationModifier = -0.015;
+  else window.formationModifier = 0;
+
+  game.settings.formation = val;
 
   addLiveEvent("📐 Formation: " + val);
 }
@@ -122,32 +124,31 @@ function setFormation(){
 // ⚡ LIVE MODES
 // =========================
 
-liveModifier = 0;
+window.liveModifier = 0;
 
 function setLiveMode(mode){
 
-  liveModifier = 0;
+  window.liveModifier = 0;
 
-  // Buttons resetten
   document.querySelectorAll(".quickActions .btn")
     .forEach(b => b.classList.remove("active"));
 
   const btns = document.querySelectorAll(".quickActions .btn");
 
   if(mode === "attack"){
-    liveModifier = 0.01;
+    window.liveModifier = 0.01;
     btns[0]?.classList.add("active");
     addLiveEvent("🔥 Mehr Druck nach vorne");
   }
 
   else if(mode === "calm"){
-    liveModifier = -0.01;
+    window.liveModifier = -0.01;
     btns[1]?.classList.add("active");
     addLiveEvent("🧊 Team wird defensiver");
   }
 
   else if(mode === "counter"){
-    liveModifier = 0.005;
+    window.liveModifier = 0.005;
     btns[2]?.classList.add("active");
     addLiveEvent("⚡ Umschaltspiel aktiviert");
   }
@@ -157,14 +158,16 @@ function setLiveMode(mode){
 // 🔁 WECHSEL
 // =========================
 
+window.substitutions = 5;
+
 function makeSub(){
 
-  if(!isSimulating){
+  if(!game.match.isRunning){
     alert("Spiel läuft nicht");
     return;
   }
 
-  if(substitutions <= 0){
+  if(window.substitutions <= 0){
     alert("Keine Wechsel mehr");
     return;
   }
@@ -177,20 +180,22 @@ function makeSub(){
 
   addLiveEvent(events[Math.floor(Math.random()*events.length)]);
 
-  substitutions--;
+  window.substitutions--;
 }
 
 // =========================
 // 🎚️ INTENSITÄT
 // =========================
 
-intensityModifier = 0;
+window.intensityModifier = 0;
 
 function setIntensity(val){
 
-  if(val == 1) intensityModifier = -0.01;
-  if(val == 2) intensityModifier = 0;
-  if(val == 3) intensityModifier = 0.02;
+  if(val == 1) window.intensityModifier = -0.01;
+  if(val == 2) window.intensityModifier = 0;
+  if(val == 3) window.intensityModifier = 0.02;
+
+  game.settings.intensity = val;
 
   addLiveEvent("⚙️ Intensität angepasst");
 }
@@ -201,12 +206,15 @@ function setIntensity(val){
 
 function setSpeed(e, multi){
 
-  speedMultiplier = multi;
+  game.settings.speed = multi;
+  window.speedMultiplier = multi;
 
-  document.querySelectorAll(".speed").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".speed")
+    .forEach(b => b.classList.remove("active"));
+
   e.target.classList.add("active");
 
-  if(isSimulating){
+  if(game.match.isRunning && typeof restartInterval === "function"){
     restartInterval();
   }
 }
@@ -217,9 +225,9 @@ function setSpeed(e, multi){
 
 function pauseMatch(){
 
-  isSimulating = false;
+  game.match.isRunning = false;
 
-  gameState.phase = "matchday_ready";
+  game.phase = "halftime";
   updateMainButton();
 
   addLiveEvent("⏸ Spiel pausiert");
