@@ -255,3 +255,23 @@ function endMatch(){
 function randomFrom(arr){
   return arr[Math.floor(Math.random() * arr.length)];
 }
+function resumeMatch(){
+
+  if(game.match.running) return;
+
+  game.match.running = true;
+  startInterval();
+
+  console.log("▶ Match fortgesetzt");
+}
+function pauseMatch(){
+
+  game.match.running = false;
+
+  if(matchInterval){
+    clearInterval(matchInterval);
+    matchInterval = null;
+  }
+
+  console.log("⏸ Match pausiert");
+}
