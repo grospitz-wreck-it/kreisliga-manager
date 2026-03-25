@@ -20,7 +20,7 @@ body {
   z-index: 1000;
   height: 120px;
 
-  background: url("logos/logo.png") center/cover no-repeat;
+  background: url("logos/manager_logo.png") center/cover no-repeat;
   display: flex;
   align-items: flex-end;
 }
