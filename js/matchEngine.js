@@ -1,5 +1,5 @@
 // =========================
-// ⚽ MATCH ENGINE (CLEAN FINAL)
+// ⚽ MATCH ENGINE (LIVE TABLE VERSION)
 // =========================
 
 console.log("ENGINE START");
@@ -11,29 +11,19 @@ let interval = null;
 // =========================
 function simulateMatchday(){
 
-  console.log("👉 simulateMatchday");
-
   if(!game.team.selected){
     alert("Team wählen!");
-    return;
-  }
-
-  if(!game.league.schedule || !game.league.schedule.length){
-    console.error("❌ Kein Spielplan");
     return;
   }
 
   const i = game.league.currentMatchday || 0;
   const matches = game.league.schedule[i];
 
-  if(!matches){
-    console.warn("❌ Kein Spieltag");
-    return;
-  }
+  if(!matches) return;
 
   game.league.currentMatchday++;
 
-  startConference(matches); // 🔥 IMMER KONFERENZ
+  startConference(matches);
 }
 
 // =========================
@@ -41,20 +31,7 @@ function simulateMatchday(){
 // =========================
 function startConference(matches){
 
-  console.log("📡 Konferenz startet", matches);
-
   clearLiveEvents?.();
-
-  // Begegnungen anzeigen
-  matches.forEach(m => {
-
-    if(m.home === game.team.selected || m.away === game.team.selected){
-      addLiveEvent(`🔥 DEIN SPIEL: ${m.home} vs ${m.away}`, 0);
-    } else {
-      addLiveEvent(`📢 ${m.home} vs ${m.away}`, 0);
-    }
-
-  });
 
   if(interval){
     clearInterval(interval);
@@ -66,15 +43,18 @@ function startConference(matches){
   game.match.halftimePlayed = false;
   game.phase = "live";
 
+  // Spiele initialisieren
   game.match.currentMatches = matches.map(m => ({
     ...m,
     score: { home: 0, away: 0 }
   }));
 
+  // dein Spiel
   window.currentMatch = game.match.currentMatches.find(m =>
     m.home === game.team.selected || m.away === game.team.selected
   );
 
+  // Anzeige
   updateTeamsUI?.();
   updateScoreUI?.();
   updateProgressBar?.();
@@ -84,11 +64,9 @@ function startConference(matches){
 }
 
 // =========================
-// ⏱️ KONFERENZ INTERVAL
+// ⏱️ INTERVAL
 // =========================
 function startConferenceInterval(){
-
-  console.log("⏱️ Konferenz Interval");
 
   if(interval) clearInterval(interval);
 
@@ -110,7 +88,7 @@ function startConferenceInterval(){
       game.match.isRunning = false;
       game.phase = "halftime";
 
-      addLiveEvent("⏸ Halbzeit (alle Spiele)", 45);
+      addLiveEvent("⏸ Halbzeit", 45);
       updateMainButton?.();
       return;
     }
@@ -124,7 +102,7 @@ function startConferenceInterval(){
 }
 
 // =========================
-// ⚽ MINUTE (ALLE SPIELE)
+// ⚽ MINUTE (KONFERENZ)
 // =========================
 function simulateConferenceMinute(){
 
@@ -136,23 +114,78 @@ function simulateConferenceMinute(){
 
     if(Math.random() < chance){
 
-      if(Math.random() < 0.5){
+      const isHome = Math.random() < 0.5;
+
+      if(isHome){
         match.score.home++;
-        addLiveEvent(`⚽ ${match.home} (${match.score.home})`, minute);
       } else {
         match.score.away++;
-        addLiveEvent(`⚽ ${match.away} (${match.score.away})`, minute);
+      }
+
+      // 🔥 NUR dein Spiel bekommt Events
+      if(match.home === game.team.selected || match.away === game.team.selected){
+
+        if(isHome){
+          addLiveEvent(`⚽ ${match.home}`, minute);
+        } else {
+          addLiveEvent(`⚽ ${match.away}`, minute);
+        }
       }
     }
   });
+
+  // 🔥 LIVE TABELLE
+  applyLiveTable();
 }
 
 // =========================
-// 🏁 KONFERENZ ENDE
+// 📊 LIVE TABLE BERECHNEN
+// =========================
+function applyLiveTable(){
+
+  const teams = game.league.teams;
+
+  // reset
+  teams.forEach(t => {
+    t._live = {
+      points: t.points,
+      gf: t.goalsFor,
+      ga: t.goalsAgainst
+    };
+  });
+
+  // laufende spiele einrechnen
+  game.match.currentMatches.forEach(match => {
+
+    const home = teams.find(t => t.name === match.home);
+    const away = teams.find(t => t.name === match.away);
+
+    if(!home || !away) return;
+
+    home._live.gf += match.score.home;
+    home._live.ga += match.score.away;
+
+    away._live.gf += match.score.away;
+    away._live.ga += match.score.home;
+
+    if(match.score.home > match.score.away){
+      home._live.points += 3;
+    } else if(match.score.home < match.score.away){
+      away._live.points += 3;
+    } else {
+      home._live.points += 1;
+      away._live.points += 1;
+    }
+  });
+
+  // 👉 UI triggern
+  updateTable?.(true); // true = live mode
+}
+
+// =========================
+// 🏁 ENDE
 // =========================
 function endConference(){
-
-  console.log("🏁 Konferenz Ende");
 
   clearInterval(interval);
 
@@ -167,19 +200,15 @@ function endConference(){
 
   updateTable?.();
 
-  addLiveEvent("🏁 Spieltag beendet", 90);
+  addLiveEvent("🏁 Spiel beendet", 90);
 
   updateMainButton?.();
 }
 
 // =========================
-// ▶️ RESUME (FIXED!)
+// ▶️ RESUME
 // =========================
 function resumeMatch(){
-
-  console.log("▶️ resumeMatch");
-
-  if(!game.match) return;
 
   if(interval){
     clearInterval(interval);
@@ -189,40 +218,26 @@ function resumeMatch(){
   game.match.isRunning = true;
   game.phase = "live";
 
-  addLiveEvent("▶️ 2. Halbzeit startet", 45);
+  addLiveEvent("▶️ 2. Halbzeit", 45);
 
-  // 🔥 IMMER KONFERENZ
   startConferenceInterval();
-
   updateMainButton?.();
 }
 
 // =========================
-// 🔁 SPEED FIX (WICHTIG)
+// 🔁 SPEED
 // =========================
 function restartInterval(){
 
-  console.log("🔁 restartInterval");
+  if(!game.match?.isRunning) return;
 
-  if(!game.match || !game.match.isRunning){
-    console.warn("⏸ kein laufendes Spiel");
-    return;
-  }
+  if(interval) clearInterval(interval);
 
-  if(interval){
-    clearInterval(interval);
-  }
-
-  // 🔥 erkennt automatisch Modus
-  if(game.match.currentMatches && game.match.currentMatches.length > 0){
-    startConferenceInterval();
-  } else {
-    startInterval();
-  }
+  startConferenceInterval();
 }
 
 // =========================
-// 📊 TABLE UPDATE
+// 📊 TABLE FINAL
 // =========================
 function updateTableData(match){
 
