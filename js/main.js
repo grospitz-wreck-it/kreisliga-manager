@@ -7,16 +7,20 @@ window.onload = function(){
 
   initPlayer();
   initLeagueUI();
+
   if(typeof initFriendUI === "function"){
-  initFriendUI();
-}
+    initFriendUI();
+  }
 
   updateHeader();
   updateMainButton();
 
   updateTable?.();
   loadLeaderboard?.();
-  startAds?.();
+
+  if(typeof startAds === "function"){
+    startAds();
+  }
 
   console.log("✅ App vollständig geladen");
 };
@@ -24,7 +28,7 @@ window.onload = function(){
 // =========================
 // 👤 PLAYER
 // =========================
-function initPlayerName(){
+function initPlayer(){
 
   if(!game.player.name){
 
