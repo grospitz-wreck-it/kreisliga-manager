@@ -350,19 +350,48 @@ button:hover {
 /* =========================
    📱 MOBILE
 ========================= */
+/* =========================
+   📱 MOBILE FULL WIDTH FIX
+========================= */
 @media (max-width: 768px){
 
+  /* Layout ohne Rand */
   .layout {
-    flex-direction: column;
-    padding: 10px;
+    padding: 0;
+    gap: 10px;
   }
 
-  .live {
-    height: 200px;
+  /* Panels full width */
+  .panel {
+    border-radius: 0;
+    margin: 0;
   }
 
-  #score {
-    font-size: 22px;
+  /* Side + Main komplett breit */
+  .mainPanel,
+  .sidePanel {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* etwas Innenabstand behalten */
+  .panel {
+    padding: 12px;
+  }
+
+  /* Header kompakter */
+  .header {
+    height: 90px;
+  }
+
+  /* Tabelle sauber scrollbar */
+  .tableWrapper {
+    overflow-x: auto;
+  }
+
+  /* Ads nicht übertrieben */
+  #adBanner {
+    border-radius: 0;
   }
 }
 /* =========================
