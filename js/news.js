@@ -166,4 +166,3 @@ function addMatchReport(match){
 // =========================
 window.generateMatchdayReport = generateMatchdayReport;
 window.addMatchReport = addMatchReport;
-```
