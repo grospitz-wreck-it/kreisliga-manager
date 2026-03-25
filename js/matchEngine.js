@@ -108,8 +108,22 @@ function simulateMinute(){
     generateEvent(team, isHome, m);
   }
 
-  // 👉 sorgt dafür, dass Anzeige immer sauber aktualisiert
+  // ✅ Anzeige updaten
   updateScoreUI();
+  updateProgressBar(); // 🔥 HIER rein
+}
+
+function updateProgressBar(){
+
+  var bar = document.getElementById("momentumBar");
+  if(!bar) return;
+
+  var minute = game.match.minute || 0;
+
+  // 0–90 Minuten → 0–100%
+  var percent = (minute / 90) * 100;
+
+  bar.style.width = percent + "%";
 }
 
 // =========================
