@@ -9,7 +9,31 @@ window.onload = function(){
 
   initPlayer();
   initLeagueUI();
+window.onload = function(){
 
+  loadGameState();
+
+  initPlayer();
+  initLeagueUI();
+
+  bindUI();
+
+  if(typeof initFriendUI === "function"){
+    initFriendUI();
+  }
+
+  updateHeader();
+  updateMainButton();
+
+  updateTable?.();
+  loadLeaderboard?.();
+
+  if(typeof startAds === "function"){
+    startAds();
+  }
+
+  console.log("✅ App vollständig geladen");
+};
   if(typeof initFriendUI === "function"){
     initFriendUI();
   }
