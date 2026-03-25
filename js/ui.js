@@ -138,3 +138,10 @@ function bindUI(){
   bindButton(document.getElementById("menuBtn"), toggleSetup);
   bindButton(document.getElementById("overlay"), closeSetup);
 }
+// =========================
+// 🌍 GLOBAL EXPORTS (FIX)
+// =========================
+window.updateTable = updateTable;
+window.populateTeamSelect = populateTeamSelect;
+window.updateHeader = updateHeader;
+window.bindUI = bindUI;
