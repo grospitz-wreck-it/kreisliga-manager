@@ -3,18 +3,21 @@ async function loadLeaderboard(){
 const box = document.getElementById("leaderboard");
 
 if(!box){
-console.error("❌ leaderboard nicht gefunden");
+console.error("leaderboard nicht gefunden");
 return;
 }
 
 box.innerHTML = "Lade Daten...";
 
-const { data, error } = await supabaseClient
+const res = await supabaseClient
 .from("leaderboard")
 .select("*");
 
+const data = res.data;
+const error = res.error;
+
 if(error){
-console.error("❌ Leaderboard Fehler:", error);
+console.error("Leaderboard Fehler:", error);
 box.innerHTML = "Fehler: " + error.message;
 return;
 }
@@ -24,41 +27,39 @@ box.innerHTML = "Noch keine Einträge";
 return;
 }
 
-// =========================
-// 🧠 BESTEN SCORE PRO SPIELER
-// =========================
+// Beste Scores pro Spieler
 const bestPerPlayer = Object.values(
-  data.reduce((acc, entry) => {
+data.reduce(function(acc, entry){
 
-    if(
-      !acc[entry.player_id] ||
-      acc[entry.player_id].score < entry.score
-    ){
-      acc[entry.player_id] = entry;
-    }
+```
+  if(
+    !acc[entry.player_id] ||
+    acc[entry.player_id].score < entry.score
+  ){
+    acc[entry.player_id] = entry;
+  }
 
-    return acc;
+  return acc;
 
-  }, {}));
+}, {})
+```
 
-// =========================
-// 📈 SORTIEREN
-// =========================
-bestPerPlayer.sort((a, b) => b.score - a.score);
+);
 
-// =========================
-// 🏆 TOP 10
-// =========================
+// Sortieren
+bestPerPlayer.sort(function(a, b){
+return b.score - a.score;
+});
+
 const top10 = bestPerPlayer.slice(0, 10);
 
 box.innerHTML = "";
 
-top10.forEach((entry, i) => {
+top10.forEach(function(entry, i){
 
 ```
-let div = document.createElement("div");
+var div = document.createElement("div");
 
-// 🥇 Eigener Spieler hervorheben
 if(entry.player_id === game.player.id){
   div.style.background = "gold";
   div.style.color = "black";
@@ -69,38 +70,28 @@ if(entry.player_id === game.player.id){
 
 div.style.marginBottom = "6px";
 
-div.innerHTML = `
-  <strong>#${i+1}</strong> 
-  <span style="color:${entry.color || '#fff'}">
-    ${entry.name || "Unbekannt"}
-  </span>
-  <small> [${typeof getPlayerTitle === "function" ? getPlayerTitle(entry.score) : "Freizeitkicker"}]</small>
-  <br>
-  <small>(${entry.team})</small>
-  - <strong>${entry.score}</strong> Punkte
-`;
+div.innerHTML =
+  "<strong>#" + (i+1) + "</strong> " +
+  "<span style='color:" + (entry.color || "#fff") + "'>" +
+  (entry.name || "Unbekannt") +
+  "</span>" +
+  "<br><small>(" + entry.team + ")</small> - " +
+  "<strong>" + entry.score + "</strong> Punkte";
 
 box.appendChild(div);
 ```
 
 });
 
-// =========================
-// 🏆 EIGENER RANG
-// =========================
-const myRank = bestPerPlayer.findIndex(e => e.player_id === game.player.id);
+var myRank = bestPerPlayer.findIndex(function(e){
+return e.player_id === game.player.id;
+});
 
 if(myRank !== -1){
-
-```
-const rankDiv = document.createElement("div");
-
-rankDiv.innerHTML = `👉 Dein Rang: #${myRank + 1}`;
+var rankDiv = document.createElement("div");
+rankDiv.innerHTML = "Dein Rang: #" + (myRank + 1);
 rankDiv.style.marginTop = "10px";
 rankDiv.style.fontWeight = "bold";
-
 box.appendChild(rankDiv);
-```
-
 }
 }
