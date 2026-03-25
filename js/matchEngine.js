@@ -56,7 +56,7 @@ function startLiveMatch(matches){
   }
 
   myMatch.score = { home: 0, away: 0 };
-  window.currentMatch = myMatch;
+  game.match.currentMatches = []
 
   updateTeamsUI();
   updateScoreUI();
