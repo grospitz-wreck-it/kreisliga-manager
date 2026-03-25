@@ -1,6 +1,8 @@
 // =========================
 // 🚀 INIT
 // =========================
+console.log("MAIN START");
+console.log("simulateMatchday:", typeof simulateMatchday);
 window.onload = function(){
 
   loadGameState();
