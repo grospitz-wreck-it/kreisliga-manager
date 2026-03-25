@@ -18,50 +18,45 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
-  height: 120px;
 
-  background: url("logos/manager_logo.png") center/cover no-repeat;
-  display: flex;
-  align-items: flex-end;
+  height: 90px; /* Mobile-first kleiner */
+
+  background: #000;
+  overflow: hidden;
 }
 
+/* echtes Logo-Layer */
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: url("logos/manager_logo.png") center/contain no-repeat;
+  opacity: 0.9;
+}
+
+/* Overlay bleibt */
 .headerOverlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
 }
 
-.headerContent {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  padding: 12px 16px;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.gameTitle {
-  color: #fff;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.subTitle {
-  color: #ddd;
-  font-size: 13px;
-}
-
 /* =========================
    🍔 MENU BUTTON
 ========================= */
 #menuBtn {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 20px;
+
   background: rgba(0,0,0,0.5);
-  border: none;
-  color: white;
-  padding: 10px;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 /* =========================
@@ -111,25 +106,27 @@ body {
 ========================= */
 .layout {
   display: flex;
-  gap: 20px;
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  align-items: flex-start;
-}
-
-.mainPanel {
-  flex: 2;
-  min-width: 0;
-}
-
-.sidePanel {
-  flex: 1;
-  min-width: 280px;
-
-  display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
+  padding: 10px;
+}
+
+/* Desktop erst später */
+@media (min-width: 769px){
+  .layout {
+    flex-direction: row;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .mainPanel {
+    flex: 2;
+  }
+
+  .sidePanel {
+    flex: 1;
+  }
 }
 
 /* =========================
@@ -212,10 +209,27 @@ body {
   /* Spielfeld Hintergrund */
   background: url("gfx/field.svg") center/cover no-repeat;
 
-  /* dunkler Overlay für Lesbarkeit */
-  box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.65);
+ .live {
+  position: relative;
+  height: 220px;
+  overflow-y: auto;
 
-  color: #fff;
+  border-radius: 12px;
+
+  background: url("gfx/field.svg") center/cover no-repeat;
+}
+
+.live::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+}
+
+.live p {
+  position: relative;
+  z-index: 2;
+}
 }
 
 /* Events */
@@ -354,27 +368,15 @@ button:hover {
 ========================= */
 @media (max-width: 768px){
 
-  .layout {
-    display: flex;
-    flex-direction: column !important; /* 🔥 wichtig */
-    padding: 0;
-    gap: 10px;
+  .panel {
+    border-radius: 0;
+    padding: 12px;
   }
 
-  .mainPanel,
-  .sidePanel {
-    width: 100% !important;
-    max-width: 100% !important;
+  body {
+    overflow-x: hidden;
   }
-
-  .sidePanel {
-    order: 2; /* Tabelle unter Spiel */
-  }
-
-  .mainPanel {
-    order: 1;
-  }
-
+}
 
   /* etwas Innenabstand behalten */
   .panel {
@@ -400,32 +402,16 @@ button:hover {
 ========================= */
 @media (max-width: 768px){
 
-  /* ❌ Hover-Effekte deaktivieren */
+  /* nur problematische Elemente */
   .modernTable tbody tr:hover {
     transform: none;
-    background: rgba(0,0,0,0.02);
   }
 
-  /* ❌ Animationen killen (Ads etc.) */
   .adTrack {
     animation: none;
   }
 
-  /* ❌ Kein Subpixel-Gezitter */
-  * {
-    transform: none !important;
-  }
-
-  /* ✅ Stabilere Darstellung */
-  .panel {
-    will-change: auto;
-  }
-
-  /* ✅ Live-Feed ruhiger */
-  .live {
-    -webkit-overflow-scrolling: touch;
-  }
-   
+  /* KEIN global reset mehr */
 }
 /* =========================
    📢 ADS (FINAL FIX)
@@ -458,7 +444,9 @@ button:hover {
   display: flex;
   align-items: center;
 }
-
+#adBanner {
+  height: 60px;
+}
 /* Bilder */
 .adItem img {
   height: 50px; /* 🔥 KEY FIX */
