@@ -53,6 +53,17 @@ function startLiveMatch(matches){
 
   startInterval();
 }
+// =========================
+// 🔁 INTERVAL NEUSTARTEN
+// =========================
+function restartInterval(){
+
+  if(interval){
+    clearInterval(interval);
+  }
+
+  startInterval();
+}
 
 // =========================
 // ⏱️ INTERVAL
