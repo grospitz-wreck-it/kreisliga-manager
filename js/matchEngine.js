@@ -149,7 +149,7 @@ const scoringTeam = isHome ? match.home : match.away;
 if(isHome) match.score.home++;
 else match.score.away++;
 
-addLiveEvent(`⚽ Tor für ${scoringTeam}!`, m);
+addLiveEvent(`Endstand: ${match.home} ${match.score.home} - ${match.score.away} ${match.away}`, 90);
 ```
 
 }
