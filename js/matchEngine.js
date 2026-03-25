@@ -2,6 +2,7 @@
 // ⚙️ GLOBALS
 // =========================
 var matchInterval = null;
+var lastTick = 0;
 
 // =========================
 // ▶ SPIELTAG STARTEN
@@ -15,7 +16,7 @@ function simulateMatchday(){
     return;
   }
 
-  startLiveMatch(md[0]); // dein Spiel
+  startLiveMatch(md[0]);
 }
 
 // =========================
@@ -42,7 +43,7 @@ function startLiveMatch(match){
 }
 
 // =========================
-// ⏱ INTERVAL
+// ⏱ INTERVAL (🔥 FIXED)
 // =========================
 function startInterval(){
 
@@ -50,13 +51,23 @@ function startInterval(){
     clearInterval(matchInterval);
   }
 
+  lastTick = Date.now();
+
   matchInterval = setInterval(function(){
 
     if(!game.match.running) return;
 
-    simulateMinute();
+    var now = Date.now();
+    var delta = now - lastTick;
 
-  }, 1000 / (speedMultiplier || 1));
+    var step = 1000 / (speedMultiplier || 1);
+
+    if(delta >= step){
+      lastTick = now;
+      simulateMinute();
+    }
+
+  }, 100);
 }
 
 // =========================
@@ -71,12 +82,10 @@ function simulateMinute(){
 
   if(!match) return;
 
-  // Halbzeit
   if(m === 45){
     addLiveEvent("⏸ Halbzeit – intensive Partie!", m);
   }
 
-  // Ende
   if(m > 90){
     endMatch();
     return;
@@ -93,6 +102,9 @@ function simulateMinute(){
 
     generateEvent(team, isHome, m);
   }
+
+  // 👉 sorgt dafür, dass Anzeige immer sauber aktualisiert
+  updateScoreUI();
 }
 
 // =========================
@@ -148,14 +160,12 @@ function generateEvent(team, isHome, minute){
     randomFrom(attack) + " – " +
     randomFrom(finish);
 
-  // 5% kuriose Events
   if(Math.random() < 0.05){
     text = randomFrom(rare);
   }
 
   addLiveEvent(text, minute);
 
-  // TOR?
   if(text.indexOf("TOR") !== -1){
 
     if(isHome){
