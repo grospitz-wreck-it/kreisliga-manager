@@ -59,7 +59,7 @@ async function loadLeaderboard(){
     let div = document.createElement("div");
 
     // 🥇 Eigener Spieler hervorheben
-    if(entry.player_id === playerId){
+    if(entry.playerId === game.player.id){
       div.style.background = "gold";
       div.style.color = "black";
       div.style.fontWeight = "bold";
