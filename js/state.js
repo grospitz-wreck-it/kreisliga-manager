@@ -1,6 +1,7 @@
 // =========================
 // 💾 GLOBAL GAME STATE
 // =========================
+console.log("STATE START");
 window.game = {
   player: {
     id: localStorage.getItem("playerId") || crypto.randomUUID(),
