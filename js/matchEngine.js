@@ -58,6 +58,8 @@ function startLiveMatch(matches){
 // =========================
 function restartInterval(){
 
+  if(!game.match || !game.match.isRunning) return;
+
   if(interval){
     clearInterval(interval);
   }
