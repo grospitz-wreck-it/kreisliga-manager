@@ -297,40 +297,22 @@ function updateTableData(match){
 // =========================
 function generateSchedule(teams){
 
-  const rounds = [];
-  const list = [...teams];
+  console.log("📅 generateSchedule INPUT:", teams);
 
-  if(list.length % 2 !== 0){
-    list.push({ name: "SPIELFREI" });
+  if(!teams){
+    console.error("❌ teams ist undefined!");
+    return [];
   }
 
-  const n = list.length;
-
-  for(let r = 0; r < n-1; r++){
-
-    const matches = [];
-
-    for(let i = 0; i < n/2; i++){
-
-      const home = list[i];
-      const away = list[n-1-i];
-
-      if(home.name !== "SPIELFREI" && away.name !== "SPIELFREI"){
-        matches.push({ home: home.name, away: away.name });
-      }
-    }
-
-    rounds.push(matches);
-    list.splice(1, 0, list.pop());
+  if(!Array.isArray(teams)){
+    console.warn("⚠️ teams war kein Array → konvertiere");
+    teams = Object.values(teams);
   }
 
-  const reverse = rounds.map(round =>
-    round.map(m => ({ home: m.away, away: m.home }))
-  );
-
-  return [...rounds, ...reverse];
-}
-
+  if(!teams.length){
+    console.error("❌ teams leer!");
+    return [];
+  }
 // =========================
 // 🔎 HELPER
 // =========================
