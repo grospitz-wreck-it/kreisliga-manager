@@ -30,7 +30,7 @@ function loadLeague(name){
 
   game.league.key = name;
   game.league.teams = [];
-  game.league.schedule = [];
+  game.league.schedule = generateMatchSchedule(game.league.teams);
   game.league.currentMatchday = 0;
 
   let t = [];
