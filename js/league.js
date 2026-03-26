@@ -85,10 +85,13 @@ function loadLeague(name){
   // =========================
   game.league.teams = t.map(createTeam);
 
+  // 🔥 DEBUG (kannst du später rausnehmen)
+  console.log("TEAMS NACH CREATE:", game.league.teams);
+
   // =========================
   // ⚽ SPIELPLAN
   // =========================
-  generateSchedule();
+  generateSchedule(); // nutzt game.league.teams (jetzt sicher!)
 
   // =========================
   // 💾 SAVE
@@ -103,12 +106,20 @@ function loadLeague(name){
 // =========================
 function generateSchedule(){
 
-  if(!game.league.teams || game.league.teams.length === 0){
-    console.error("Keine Teams für Spielplan");
+  const teams = game.league.teams;
+
+  // 🔥 HARD FIX (entscheidend)
+  if(!teams || !Array.isArray(teams)){
+    console.error("❌ teams nicht korrekt:", teams);
     return;
   }
 
-  let tempTeams = [...game.league.teams];
+  if(teams.length === 0){
+    console.error("❌ Keine Teams für Spielplan");
+    return;
+  }
+
+  let tempTeams = [...teams];
 
   // Dummy bei ungerade
   if(tempTeams.length % 2 !== 0){
@@ -132,7 +143,7 @@ function generateSchedule(){
       let home = tempTeams[i];
       let away = tempTeams[tempTeams.length - 1 - i];
 
-      if(home.name !== "SPIELFREI" && away.name !== "SPIELFREI"){
+      if(home && away && home.name !== "SPIELFREI" && away.name !== "SPIELFREI"){
         matchday.push({
           home: home.name,
           away: away.name
@@ -166,11 +177,7 @@ function generateSchedule(){
   // =========================
   let fullSchedule = [...firstLeg, ...secondLeg];
 
-  // Auf 30 Spieltage begrenzen
-  while(fullSchedule.length < 30){
-    fullSchedule = fullSchedule.concat(fullSchedule);
-  }
-
+  // genau 30 Spieltage
   game.league.schedule = fullSchedule.slice(0, 30);
 
   console.log("✅ Spielplan erstellt:", game.league.schedule.length);
