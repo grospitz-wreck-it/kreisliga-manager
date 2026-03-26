@@ -93,8 +93,8 @@ function startConferenceInterval(){
 
   interval = setInterval(() => {
 
-    if(!game.match.isRunning) return;
-
+  if(!game.match.isRunning || game.phase !== "live") return;
+    
     game.match.minute++;
 
     simulateConferenceMinute();
