@@ -231,17 +231,33 @@ function endConference(){
 // =========================
 function resumeMatch(){
 
+  console.log("▶️ resumeMatch");
+
+  if(!game.match){
+    console.warn("kein match");
+    return;
+  }
+
+  // 🔥 IMMER alten Interval killen
   if(interval){
     clearInterval(interval);
     interval = null;
   }
 
+  // 🔥 wichtig
   game.match.isRunning = true;
   game.phase = "live";
 
-  addLiveEvent("▶️ 2. Halbzeit", 45);
+  // ❗ Sicherheit: falls Minute genau 45 ist → weiterlaufen lassen
+  if(game.match.minute < 45){
+    game.match.minute = 45;
+  }
 
+  addLiveEvent("▶️ 2. Halbzeit startet", 45);
+
+  // 🔥 NEU starten
   startConferenceInterval();
+
   updateMainButton?.();
 }
 
