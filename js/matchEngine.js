@@ -13,8 +13,8 @@ function startSeason(){
 
   game.league.currentMatchday = 0;
 
-  // 🔥 Spielplan generieren (Hin + Rückrunde)
-  game.league.schedule = generateSchedule(game.league.teams);
+  // 🔥 NEUER NAME!
+  game.league.schedule = generateMatchSchedule(game.league.teams);
 
   addLiveEvent("📅 Saison gestartet", 0);
 
@@ -71,7 +71,6 @@ function startConference(matches){
     m.home === game.team.selected || m.away === game.team.selected
   );
 
-  // 🔥 Anzeige Gegner
   if(window.currentMatch){
     const opponent = getOpponentName(window.currentMatch);
     addLiveEvent(`🆚 ${game.team.selected} vs ${opponent}`, 0);
@@ -103,9 +102,7 @@ function startConferenceInterval(){
     updateScoreUI?.();
     updateProgressBar?.();
 
-    // Halbzeit
     if(game.match.minute === 45 && !game.match.halftimePlayed){
-
       game.match.halftimePlayed = true;
       game.match.isRunning = false;
       game.phase = "halftime";
@@ -115,7 +112,6 @@ function startConferenceInterval(){
       return;
     }
 
-    // Ende
     if(game.match.minute >= 90){
       endConference();
     }
@@ -144,7 +140,6 @@ function simulateConferenceMinute(){
         match.score.away++;
       }
 
-      // nur dein Spiel
       if(match.home === game.team.selected || match.away === game.team.selected){
 
         if(isHome){
@@ -220,7 +215,6 @@ function endConference(){
 
   addLiveEvent("🏁 Spiel beendet", 90);
 
-  // 🔥 nächster Gegner
   const next = getNextMatch();
 
   if(next){
@@ -293,26 +287,49 @@ function updateTableData(match){
 }
 
 // =========================
-// 📅 SPIELPLAN
+// 📅 SPIELPLAN (NEUER NAME)
 // =========================
-function generateSchedule(teams){
+function generateMatchSchedule(teams){
 
-  console.log("📅 generateSchedule INPUT:", teams);
-
-  if(!teams){
-    console.error("❌ teams ist undefined!");
+  if(!teams || !Array.isArray(teams)){
+    console.error("❌ Ungültige Teams:", teams);
     return [];
   }
 
-  if(!Array.isArray(teams)){
-    console.warn("⚠️ teams war kein Array → konvertiere");
-    teams = Object.values(teams);
+  let list = [...teams];
+
+  if(list.length % 2 !== 0){
+    list.push({ name: "SPIELFREI" });
   }
 
-  if(!teams.length){
-    console.error("❌ teams leer!");
-    return [];
+  const rounds = [];
+  const n = list.length;
+
+  for(let r = 0; r < n - 1; r++){
+
+    const matches = [];
+
+    for(let i = 0; i < n / 2; i++){
+
+      const home = list[i];
+      const away = list[n - 1 - i];
+
+      if(home.name !== "SPIELFREI" && away.name !== "SPIELFREI"){
+        matches.push({ home: home.name, away: away.name });
+      }
+    }
+
+    rounds.push(matches);
+    list.splice(1, 0, list.pop());
   }
+
+  const reverse = rounds.map(round =>
+    round.map(m => ({ home: m.away, away: m.home }))
+  );
+
+  return [...rounds, ...reverse];
+}
+
 // =========================
 // 🔎 HELPER
 // =========================
@@ -341,4 +358,3 @@ window.resumeMatch = resumeMatch;
 window.restartInterval = restartInterval;
 
 console.log("ENGINE END");
-  }
