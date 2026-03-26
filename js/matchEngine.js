@@ -223,29 +223,19 @@ function resumeMatch(){
 
   console.log("▶️ resumeMatch");
 
-  if(!game.match){
-    console.warn("kein match");
-    return;
-  }
+  if(!game.match) return;
 
-  // 🔥 IMMER alten Interval killen
+  // Sicherheit (sollte eig. schon null sein)
   if(interval){
     clearInterval(interval);
     interval = null;
   }
 
-  // 🔥 wichtig
   game.match.isRunning = true;
   game.phase = "live";
 
-  // ❗ Sicherheit: falls Minute genau 45 ist → weiterlaufen lassen
-  if(game.match.minute < 45){
-    game.match.minute = 45;
-  }
+  addLiveEvent("▶️ 2. Halbzeit startet", game.match.minute);
 
-  addLiveEvent("▶️ 2. Halbzeit startet", 45);
-
-  // 🔥 NEU starten
   startConferenceInterval();
 
   updateMainButton?.();
