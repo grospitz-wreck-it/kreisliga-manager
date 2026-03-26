@@ -87,21 +87,41 @@ function startConference(matches){
 // =========================
 // ⏱️ INTERVAL
 // =========================
-if(game.match.minute === 45 && !game.match.halftimePlayed){
+// =========================
+// ⏱️ INTERVAL
+// =========================
+function startConferenceInterval(){
 
-  game.match.halftimePlayed = true;
-  game.match.isRunning = false;
-  game.phase = "halftime";
+  if(interval) clearInterval(interval);
 
-  // 🔥 GANZ WICHTIG
-  clearInterval(interval);
-  interval = null;
+  interval = setInterval(() => {
 
-  addLiveEvent("⏸ Halbzeit", 45);
-  updateMainButton?.();
-  return;
-}
+    // 🔥 FIX 3 (wichtig!)
+    if(!game.match || !game.match.isRunning) return;
 
+    game.match.minute++;
+
+    simulateConferenceMinute();
+
+    updateScoreUI?.();
+    updateProgressBar?.();
+
+    // 🧠 HALBZEIT
+    if(game.match.minute === 45 && !game.match.halftimePlayed){
+
+      game.match.halftimePlayed = true;
+      game.match.isRunning = false;
+      game.phase = "halftime";
+
+      clearInterval(interval);
+      interval = null;
+
+      addLiveEvent("⏸ Halbzeit", 45);
+      updateMainButton?.();
+      return;
+    }
+
+    // 🏁 ENDE
     if(game.match.minute >= 90){
       endConference();
     }
