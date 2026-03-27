@@ -1,5 +1,5 @@
 // =========================
-// ⚽ MATCH ENGINE (FINAL STABLE)
+// ⚽ MATCH ENGINE (FINAL CLEAN STABLE)
 // =========================
 
 console.log("ENGINE START");
@@ -7,7 +7,6 @@ console.log("ENGINE START");
 let interval = null;
 let lastTick = Date.now();
 
-// Default Speed
 window.speedMultiplier = 1;
 
 // =========================
@@ -85,7 +84,7 @@ function startConference(matches){
 }
 
 // =========================
-// ⏱️ GAME LOOP (STABIL)
+// ⏱️ GAME LOOP (FIXED)
 // =========================
 function startConferenceInterval(){
 
@@ -129,7 +128,7 @@ function startConferenceInterval(){
       endConference();
     }
 
-  }, 50); // fester Loop
+  }, 50);
 }
 
 // =========================
@@ -137,11 +136,16 @@ function startConferenceInterval(){
 // =========================
 function resumeMatch(){
 
+  console.log("▶️ resumeMatch", game.match?.minute);
+
   if(!game.match) return;
   if(game.match.minute < 45) return;
 
   game.match.isRunning = true;
   game.phase = "live";
+
+  // 🔥 WICHTIG: verhindert "1 Minute pro Klick"
+  lastTick = Date.now();
 
   addLiveEvent("▶️ 2. Halbzeit startet", game.match.minute);
 
@@ -160,7 +164,6 @@ function setSpeed(multiplier){
   console.log("⚡ Speed:", multiplier);
 }
 
-// 👉 echte Zeitsteuerung
 function getIntervalSpeed(){
 
   switch(window.speedMultiplier){
@@ -172,7 +175,7 @@ function getIntervalSpeed(){
 }
 
 // =========================
-// ⚽ MINUTE SIMULATION
+// ⚽ MINUTE
 // =========================
 function simulateConferenceMinute(){
 
