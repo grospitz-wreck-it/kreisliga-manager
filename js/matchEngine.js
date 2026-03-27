@@ -1,10 +1,11 @@
 // =========================
-// ⚽ MATCH ENGINE (FINAL BALANCED)
+// ⚽ MATCH ENGINE (FINAL STABLE)
 // =========================
 
 console.log("ENGINE START");
 
 let interval = null;
+let lastTick = Date.now();
 
 // Default Speed
 window.speedMultiplier = 1;
@@ -84,49 +85,51 @@ function startConference(matches){
 }
 
 // =========================
-// ⏱️ INTERVAL
+// ⏱️ GAME LOOP (STABIL)
 // =========================
 function startConferenceInterval(){
 
   if(interval) return;
 
-  interval = setInterval(tick, getIntervalSpeed());
-}
+  lastTick = Date.now();
 
-function tick(){
+  interval = setInterval(() => {
 
-  if(!game.match) return;
-  if(!game.match.isRunning) return;
+    if(!game.match) return;
+    if(!game.match.isRunning) return;
 
-  game.match.minute++;
+    const now = Date.now();
+    const delta = now - lastTick;
 
-  simulateConferenceMinute();
+    if(delta < getIntervalSpeed()) return;
 
-  updateScoreUI?.();
-  updateProgressBar?.();
+    lastTick = now;
 
-  // Halbzeit
-  if(game.match.minute === 45 && !game.match.halftimePlayed){
+    game.match.minute++;
 
-    game.match.halftimePlayed = true;
-    game.match.isRunning = false;
-    game.phase = "halftime";
+    simulateConferenceMinute();
 
-    addLiveEvent("⏸ Halbzeit", 45);
-    updateMainButton?.();
-    return;
-  }
+    updateScoreUI?.();
+    updateProgressBar?.();
 
-  // Ende
-  if(game.match.minute >= 90){
-    endConference();
-  }
-}
+    // Halbzeit
+    if(game.match.minute === 45 && !game.match.halftimePlayed){
 
-// 👉 angenehmeres Tempo
-function getIntervalSpeed(){
-  const base = 1200; // 🔥 langsamer als vorher (war 1000)
-  return base / (window.speedMultiplier || 1);
+      game.match.halftimePlayed = true;
+      game.match.isRunning = false;
+      game.phase = "halftime";
+
+      addLiveEvent("⏸ Halbzeit", 45);
+      updateMainButton?.();
+      return;
+    }
+
+    // Ende
+    if(game.match.minute >= 90){
+      endConference();
+    }
+
+  }, 50); // fester Loop
 }
 
 // =========================
@@ -146,37 +149,30 @@ function resumeMatch(){
 }
 
 // =========================
-// 🚀 SPEED (1x / 3x / 5x)
+// 🚀 SPEED
 // =========================
 function setSpeed(multiplier){
 
-  if(![1,3,5].includes(multiplier)){
-    console.warn("Nur 1x, 3x oder 5x erlaubt");
-    return;
-  }
+  if(![1,3,5].includes(multiplier)) return;
 
   window.speedMultiplier = multiplier;
 
   console.log("⚡ Speed:", multiplier);
+}
 
-  restartInterval();
+// 👉 echte Zeitsteuerung
+function getIntervalSpeed(){
+
+  switch(window.speedMultiplier){
+    case 5: return 200;
+    case 3: return 400;
+    case 1:
+    default: return 800;
+  }
 }
 
 // =========================
-// 🔁 INTERVAL RESET
-// =========================
-function restartInterval(){
-
-  if(!interval) return;
-
-  clearInterval(interval);
-  interval = null;
-
-  interval = setInterval(tick, getIntervalSpeed());
-}
-
-// =========================
-// ⚽ MINUTE
+// ⚽ MINUTE SIMULATION
 // =========================
 function simulateConferenceMinute(){
 
@@ -265,7 +261,6 @@ function endConference(){
 
   addLiveEvent("🏁 Spiel beendet", 90);
 
-  // 🔥 FIX: Upcoming IMMER anzeigen
   const next = getNextMatch();
 
   if(next){
