@@ -1,10 +1,13 @@
 // =========================
-// ⚽ MATCH ENGINE (FINAL + SPEED FIX)
+// ⚽ MATCH ENGINE (FINAL BALANCED)
 // =========================
 
 console.log("ENGINE START");
 
 let interval = null;
+
+// Default Speed
+window.speedMultiplier = 1;
 
 // =========================
 // 🧠 SAISON START
@@ -69,8 +72,7 @@ function startConference(matches){
   );
 
   if(window.currentMatch){
-    const opponent = getOpponentName(window.currentMatch);
-    addLiveEvent(`🆚 ${game.team.selected} vs ${opponent}`, 0);
+    addLiveEvent(`🆚 ${game.team.selected} vs ${getOpponentName(window.currentMatch)}`, 0);
   }
 
   updateTeamsUI?.();
@@ -82,20 +84,18 @@ function startConference(matches){
 }
 
 // =========================
-// ⏱️ INTERVAL (STABIL + SPEED)
+// ⏱️ INTERVAL
 // =========================
 function startConferenceInterval(){
 
-  if(interval) return; // nie doppelt
+  if(interval) return;
 
   interval = setInterval(tick, getIntervalSpeed());
 }
 
-// 👉 zentrale Tick-Funktion
 function tick(){
 
   if(!game.match) return;
-
   if(!game.match.isRunning) return;
 
   game.match.minute++;
@@ -123,17 +123,16 @@ function tick(){
   }
 }
 
-// 👉 Speed berechnen
+// 👉 angenehmeres Tempo
 function getIntervalSpeed(){
-  return 1000 / (window.speedMultiplier || 1);
+  const base = 1200; // 🔥 langsamer als vorher (war 1000)
+  return base / (window.speedMultiplier || 1);
 }
 
 // =========================
 // ▶️ RESUME
 // =========================
 function resumeMatch(){
-
-  console.log("▶️ resumeMatch", game.match?.minute);
 
   if(!game.match) return;
   if(game.match.minute < 45) return;
@@ -147,9 +146,14 @@ function resumeMatch(){
 }
 
 // =========================
-// 🚀 SPEED SETZEN
+// 🚀 SPEED (1x / 3x / 5x)
 // =========================
 function setSpeed(multiplier){
+
+  if(![1,3,5].includes(multiplier)){
+    console.warn("Nur 1x, 3x oder 5x erlaubt");
+    return;
+  }
 
   window.speedMultiplier = multiplier;
 
@@ -159,11 +163,11 @@ function setSpeed(multiplier){
 }
 
 // =========================
-// 🔁 INTERVAL NEUSTART
+// 🔁 INTERVAL RESET
 // =========================
 function restartInterval(){
 
-  if(!interval) return; // nichts zu tun
+  if(!interval) return;
 
   clearInterval(interval);
   interval = null;
@@ -261,6 +265,7 @@ function endConference(){
 
   addLiveEvent("🏁 Spiel beendet", 90);
 
+  // 🔥 FIX: Upcoming IMMER anzeigen
   const next = getNextMatch();
 
   if(next){
@@ -368,6 +373,5 @@ window.startSeason = startSeason;
 window.simulateMatchday = simulateMatchday;
 window.resumeMatch = resumeMatch;
 window.setSpeed = setSpeed;
-window.restartInterval = restartInterval;
 
 console.log("ENGINE END");
