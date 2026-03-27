@@ -22,17 +22,17 @@
       <div class="subTitle" id="leagueTitle">Keine Liga gewählt</div>
     </div>
 
-    <button id="menuBtn">☰</button>
+    <button id="menuBtn" onclick="toggleSetup()">☰</button>
   </div>
 </div>
 
 <!-- SETUP PANEL -->
 <div id="setupPanel">
-  <button class="closeBtn">✖</button>
+  <button class="closeBtn" onclick="closeSetup()">✖</button>
 
   <div class="menuTabs">
-    <button class="tab active" data-tab="profil">👤</button>
-    <button class="tab" data-tab="freunde">👥</button>
+    <button class="tab active" onclick="openTab(event,'profil')">👤</button>
+    <button class="tab" onclick="openTab(event,'freunde')">👥</button>
   </div>
 
   <div class="tabContent active" id="profil">
@@ -40,24 +40,24 @@
     <div class="setupBox">
       <h3>👤 Profil</h3>
       <input id="nameInput" placeholder="Manager Name">
-      <button id="saveNameBtn">Speichern</button>
+      <button onclick="changeName()">Speichern</button>
     </div>
 
     <div class="setupBox">
       <h3>🏆 Liga</h3>
       <select id="leagueSelect"></select>
-      <button id="startLeagueBtn">Liga starten</button>
+      <button onclick="selectLeague()">Liga starten</button>
     </div>
 
     <div class="setupBox">
       <h3>⚽ Team</h3>
       <select id="teamSelect"></select>
-      <button id="selectTeamBtn">Team übernehmen</button>
+      <button onclick="selectTeam()">Team übernehmen</button>
       <p id="selectedTeamText">-</p>
     </div>
 
     <div class="setupBox">
-      <button class="danger" id="resetBtn">🧨 Neues Spiel starten</button>
+      <button class="danger" onclick="resetGame()">🧨 Neues Spiel starten</button>
     </div>
 
   </div>
@@ -71,10 +71,10 @@
         <strong id="friendCodeDisplay">---</strong>
       </div>
 
-      <button id="copyCodeBtn">📋 Kopieren</button>
+      <button onclick="copyFriendCode()">📋 Kopieren</button>
 
       <input id="friendCodeInput" placeholder="Freundescode">
-      <button id="joinCodeBtn">Beitreten</button>
+      <button onclick="joinFriendCode()">Beitreten</button>
     </div>
   </div>
 </div>
@@ -95,22 +95,23 @@
       <div id="momentumBar"></div>
     </div>
 
+    <!-- LIVE EVENTS -->
     <div id="liveMatch" class="live"></div>
 
     <!-- 🎮 CONTROL -->
     <div class="controlDesk">
 
       <div class="quickActions">
-        <button class="btn attack" data-mode="attack">🔥 Druck</button>
-        <button class="btn calm" data-mode="calm">❄️ Ruhig</button>
-        <button class="btn counter" data-mode="counter">⚡ Konter</button>
+        <button onclick="setLiveMode('attack')" class="btn attack">🔥 Druck</button>
+        <button onclick="setLiveMode('calm')" class="btn calm">❄️ Ruhig</button>
+        <button onclick="setLiveMode('counter')" class="btn counter">⚡ Konter</button>
       </div>
 
       <div class="settingsRow">
 
         <div>
           <label>Taktik</label>
-          <select id="tacticSelect">
+          <select id="tacticSelect" onchange="setTactic()">
             <option>Normal</option>
             <option>Offensiv</option>
             <option>Defensiv</option>
@@ -119,7 +120,7 @@
 
         <div>
           <label>Formation</label>
-          <select id="formationSelect">
+          <select id="formationSelect" onchange="setFormation()">
             <option>4-4-2</option>
             <option>4-3-3</option>
             <option>3-5-2</option>
@@ -129,14 +130,14 @@
 
         <div>
           <label>Wechsel</label>
-          <button id="subBtn">🔄</button>
+          <button onclick="makeSub()">🔄</button>
         </div>
 
       </div>
 
       <div class="intensity">
         <label>Intensität</label>
-        <input type="range" min="1" max="3" value="2" id="intensitySlider">
+        <input type="range" min="1" max="3" value="2" id="intensitySlider" onchange="setIntensity(this.value)">
         <div class="labels">
           <span>Defensiv</span>
           <span>Balanced</span>
@@ -147,14 +148,16 @@
       <!-- SPEED -->
       <div class="speedControl">
         <span>⏱</span>
-        <button data-speed="1">1x</button>
-        <button data-speed="3">3x</button>
-        <button data-speed="5">5x</button>
+        <button onclick="setSpeed(1)">1x</button>
+        <button onclick="setSpeed(3)">3x</button>
+        <button onclick="setSpeed(5)">5x</button>
       </div>
 
-      <!-- ⭐ MAIN BUTTON -->
+      <!-- ⭐ MAIN BUTTON (FIXED) -->
       <div class="primaryAction">
-        <button id="mainButton">▶ Saison starten</button>
+        <button id="mainButton">
+          ▶ Saison starten
+        </button>
       </div>
 
     </div>
@@ -200,9 +203,9 @@
       <h2>🏆 Top 10 Manager</h2>
 
       <div>
-        <button data-lb="global">🌍</button>
-        <button data-lb="league">🏟️</button>
-        <button data-lb="friends">👥</button>
+        <button onclick="setLeaderboardMode('global')">🌍</button>
+        <button onclick="setLeaderboardMode('league')">🏟️</button>
+        <button onclick="setLeaderboardMode('friends')">👥</button>
       </div>
 
       <div id="leaderboard">Lade...</div>
