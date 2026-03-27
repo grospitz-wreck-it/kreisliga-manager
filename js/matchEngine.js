@@ -1,5 +1,5 @@
 // =========================
-// ⚽ MATCH ENGINE (STABLE VERSION)
+// ⚽ MATCH ENGINE (FINAL STABLE)
 // =========================
 
 console.log("ENGINE START");
@@ -25,7 +25,6 @@ function startSeason(){
 // =========================
 function simulateMatchday(){
 
-  // 🔥 verhindert falsche Klicks
   if(game.phase === "live" || game.phase === "halftime") return;
 
   if(!game.team.selected){
@@ -88,7 +87,7 @@ function startConference(matches){
 }
 
 // =========================
-// ⏱️ INTERVAL
+// ⏱️ INTERVAL (FINAL FIX)
 // =========================
 function startConferenceInterval(){
 
@@ -99,9 +98,20 @@ function startConferenceInterval(){
 
   interval = setInterval(() => {
 
-    if(!game.match || !game.match.isRunning) return;
+    if(!game.match) return;
+
+    if(!game.match.isRunning){
+      return;
+    }
+
+    if(!game.match.currentMatches || game.match.currentMatches.length === 0){
+      console.warn("⛔ keine Matches aktiv");
+      return;
+    }
 
     game.match.minute++;
+
+    console.log("⏱️ Minute läuft:", game.match.minute);
 
     simulateConferenceMinute();
 
@@ -242,7 +252,7 @@ function endConference(){
 }
 
 // =========================
-// ▶️ RESUME
+// ▶️ RESUME (FINAL FIX)
 // =========================
 function resumeMatch(){
 
@@ -250,13 +260,12 @@ function resumeMatch(){
 
   if(!game.match) return;
 
-  // 🔥 erlaubt auch Klick genau beim Umschalten
+  // 👉 erlaubt robustes Resume
   if(game.match.minute < 45){
     console.warn("⛔ zu früh für 2. Halbzeit");
     return;
   }
 
-  // 🔥 verhindert mehrfaches Starten
   if(game.match.isRunning) return;
 
   if(interval){
@@ -273,6 +282,7 @@ function resumeMatch(){
 
   updateMainButton?.();
 }
+
 // =========================
 // 🔁 SPEED
 // =========================
