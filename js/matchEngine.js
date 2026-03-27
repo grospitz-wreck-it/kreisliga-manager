@@ -246,12 +246,18 @@ function endConference(){
 // =========================
 function resumeMatch(){
 
-  console.log("▶️ resumeMatch");
-
-  // 🔥 verhindert mehrfach klicken
-  if(game.phase !== "halftime") return;
+  console.log("▶️ resumeMatch", game.phase, game.match?.minute);
 
   if(!game.match) return;
+
+  // 🔥 erlaubt auch Klick genau beim Umschalten
+  if(game.match.minute < 45){
+    console.warn("⛔ zu früh für 2. Halbzeit");
+    return;
+  }
+
+  // 🔥 verhindert mehrfaches Starten
+  if(game.match.isRunning) return;
 
   if(interval){
     clearInterval(interval);
@@ -267,7 +273,6 @@ function resumeMatch(){
 
   updateMainButton?.();
 }
-
 // =========================
 // 🔁 SPEED
 // =========================
