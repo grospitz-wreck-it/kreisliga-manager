@@ -343,3 +343,7 @@ button {
     animation: none;
   }
 }
+button {
+  touch-action: manipulation;
+  cursor: pointer;
+}
