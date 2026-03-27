@@ -1,5 +1,5 @@
 // =========================
-// ⚽ MATCH ENGINE (FULL FLOW VERSION)
+// ⚽ MATCH ENGINE (STABLE VERSION)
 // =========================
 
 console.log("ENGINE START");
@@ -12,8 +12,6 @@ let interval = null;
 function startSeason(){
 
   game.league.currentMatchday = 0;
-
-  // 🔥 NEUER NAME!
   game.league.schedule = generateMatchSchedule(game.league.teams);
 
   addLiveEvent("📅 Saison gestartet", 0);
@@ -26,6 +24,9 @@ function startSeason(){
 // 🧠 MATCHDAY
 // =========================
 function simulateMatchday(){
+
+  // 🔥 verhindert falsche Klicks
+  if(game.phase === "live" || game.phase === "halftime") return;
 
   if(!game.team.selected){
     alert("Team wählen!");
@@ -57,15 +58,17 @@ function startConference(matches){
     interval = null;
   }
 
-  game.match.minute = 0;
-  game.match.isRunning = true;
-  game.match.halftimePlayed = false;
-  game.phase = "live";
+  game.match = {
+    minute: 0,
+    isRunning: true,
+    halftimePlayed: false,
+    currentMatches: matches.map(m => ({
+      ...m,
+      score: { home: 0, away: 0 }
+    }))
+  };
 
-  game.match.currentMatches = matches.map(m => ({
-    ...m,
-    score: { home: 0, away: 0 }
-  }));
+  game.phase = "live";
 
   window.currentMatch = game.match.currentMatches.find(m =>
     m.home === game.team.selected || m.away === game.team.selected
@@ -87,16 +90,15 @@ function startConference(matches){
 // =========================
 // ⏱️ INTERVAL
 // =========================
-// =========================
-// ⏱️ INTERVAL
-// =========================
 function startConferenceInterval(){
 
-  if(interval) clearInterval(interval);
+  if(interval){
+    clearInterval(interval);
+    interval = null;
+  }
 
   interval = setInterval(() => {
 
-    // 🔥 FIX 3 (wichtig!)
     if(!game.match || !game.match.isRunning) return;
 
     game.match.minute++;
@@ -210,7 +212,10 @@ function applyLiveTable(){
 // =========================
 function endConference(){
 
-  clearInterval(interval);
+  if(interval){
+    clearInterval(interval);
+    interval = null;
+  }
 
   game.match.isRunning = false;
   game.phase = "ready";
@@ -243,9 +248,11 @@ function resumeMatch(){
 
   console.log("▶️ resumeMatch");
 
+  // 🔥 verhindert mehrfach klicken
+  if(game.phase !== "halftime") return;
+
   if(!game.match) return;
 
-  // Sicherheit (sollte eig. schon null sein)
   if(interval){
     clearInterval(interval);
     interval = null;
@@ -268,7 +275,10 @@ function restartInterval(){
 
   if(!game.match?.isRunning) return;
 
-  if(interval) clearInterval(interval);
+  if(interval){
+    clearInterval(interval);
+    interval = null;
+  }
 
   startConferenceInterval();
 }
@@ -303,7 +313,7 @@ function updateTableData(match){
 }
 
 // =========================
-// 📅 SPIELPLAN (NEUER NAME)
+// 📅 SPIELPLAN
 // =========================
 function generateMatchSchedule(teams){
 
