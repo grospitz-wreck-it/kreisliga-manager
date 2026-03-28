@@ -1,17 +1,15 @@
 let interval = null;
 
-function handleMainAction(){
+// 🔥 Match State GLOBAL
+let matchState = {
+  minute: 0,
+  half: 1,
+  running: false
+};
 
-  console.log("PHASE:", game.phase);
-
-  if(game.phase === "setup"){
-    startMatch();
-  }
-  else if(game.phase === "live"){
-    endMatch();
-  }
-}
-
+// =========================
+// ▶️ START MATCH
+// =========================
 function startMatch(){
 
   const teams = game.league.teams;
@@ -28,20 +26,89 @@ function startMatch(){
 
   game.phase = "live";
 
-  updateMatchUI("Spiel gestartet");
+  matchState.minute = 0;
+  matchState.half = 1;
+  matchState.running = true;
 
-  interval = setTimeout(() => {
-    endMatch();
-  }, 3000);
+  runMatchLoop();
 }
 
+// =========================
+// 🔄 MATCH LOOP
+// =========================
+function runMatchLoop(){
+
+  clearInterval(interval);
+
+  interval = setInterval(() => {
+
+    if(!matchState.running) return;
+
+    matchState.minute++;
+
+    // 🟡 Halbzeit
+    if(matchState.minute === 45){
+      matchState.half = 2;
+      updateMatchUI("Halbzeit (45')");
+      updateProgressBar();
+      return;
+    }
+
+    // 🔴 Spielende
+    if(matchState.minute >= 90){
+      endMatch();
+      return;
+    }
+
+    updateMatchUI(
+      `Minute ${matchState.minute}' (HZ ${matchState.half})`
+    );
+
+    updateProgressBar();
+
+  }, 500); // Geschwindigkeit (0.5s pro Minute)
+}
+
+// =========================
+// ⏹ MATCH ENDE
+// =========================
 function endMatch(){
 
-  clearTimeout(interval);
+  clearInterval(interval);
 
+  matchState.running = false;
   game.phase = "setup";
 
-  updateMatchUI("Spiel beendet");
+  updateMatchUI("Spiel beendet (90')");
+  updateProgressBar();
 }
 
+// =========================
+// 📊 PROGRESS BAR
+// =========================
+function updateProgressBar(){
+
+  const percent = (matchState.minute / 90) * 100;
+
+  const bar = document.getElementById("progressFill");
+
+  if(bar){
+    bar.style.width = percent + "%";
+  }
+}
+
+// =========================
+// 🎮 BUTTON LOGIK
+// =========================
+function handleMainAction(){
+
+  if(game.phase === "setup"){
+    startMatch();
+  } else {
+    endMatch();
+  }
+}
+
+// 🌍 EXPORTS
 window.handleMainAction = handleMainAction;
+window.matchState = matchState;
