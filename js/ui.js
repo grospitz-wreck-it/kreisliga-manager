@@ -1,24 +1,12 @@
-
-
-// =========================
-// 📊 TABELLE
-// =========================
 console.log("UI START");
-function updateTable(){
-  
-  const table = document.querySelector("#table tbody");
-  if(!table) return;
 
-  table.innerHTML = "";
-
-  const teams = game.league.teams;
-
-  if(!teams || teams.length === 0){
-    return;
-  }
+// =========================
+// 🏆 LIGA SELECT INIT
+// =========================
 function initLeagueSelect(){
 
   const select = document.getElementById("leagueSelect");
+  if(!select) return;
 
   select.innerHTML = "";
 
@@ -31,58 +19,55 @@ function initLeagueSelect(){
     select.appendChild(opt);
   });
 }
-  // =========================
-  // 📊 SORTIERUNG (ECHT)
-  // =========================
+
+// =========================
+// 📊 TABELLE
+// =========================
+function updateTable(){
+
+  const table = document.querySelector("#table tbody");
+  if(!table) return;
+
+  table.innerHTML = "";
+
+  const teams = game.league.teams;
+  if(!teams || teams.length === 0) return;
+
   const sorted = [...teams].sort((a,b)=>{
 
-    // 1. Punkte
-    if(b.points !== a.points){
-      return b.points - a.points;
+    if(b.stats.points !== a.stats.points){
+      return b.stats.points - a.stats.points;
     }
 
-    // 2. Tordifferenz
-    const diffA = a.goalsFor - a.goalsAgainst;
-    const diffB = b.goalsFor - b.goalsAgainst;
+    const diffA = a.stats.goalsFor - a.stats.goalsAgainst;
+    const diffB = b.stats.goalsFor - b.stats.goalsAgainst;
 
     if(diffB !== diffA){
       return diffB - diffA;
     }
 
-    // 3. Tore
-    if(b.goalsFor !== a.goalsFor){
-      return b.goalsFor - a.goalsFor;
-    }
-
-    // 4. (Pseudo) direkter Vergleich fallback
-    return a.name.localeCompare(b.name);
+    return b.stats.goalsFor - a.stats.goalsFor;
   });
 
-  // =========================
-  // 🧱 RENDER
-  // =========================
   sorted.forEach((team, index)=>{
+
+    const s = team.stats;
 
     const row = document.createElement("tr");
 
-    const isPlayer = team.name === game.team.selected;
-    const pts = team._live?.points ?? team.points;
-    const gf  = team._live?.gf ?? team.goalsFor;
-    const ga  = team._live?.ga ?? team.goalsAgainst;
-    const diff = gf - ga;
+    const isPlayer = team.name === game.team.name;
 
     row.innerHTML = `
       <td>${index + 1}</td>
       <td ${isPlayer ? 'style="font-weight:bold;color:#4caf50"' : ''}>
         ${team.name}
       </td>
-      <td>${team.played || 0}</td>
-      <td>${team.wins || 0}</td>
-      <td>${team.draws || 0}</td>
-      <td>${team.losses || 0}</td>
-      <td>${team.goalsFor || 0}:${team.goalsAgainst || 0}</td>
-      <td>${diff}</td>
-      <td><strong>${team.points || 0}</strong></td>
+      <td>${s.played}</td>
+      <td>${s.wins}</td>
+      <td>${s.draws}</td>
+      <td>${s.losses}</td>
+      <td>${s.goalsFor}:${s.goalsAgainst}</td>
+      <td>${s.points}</td>
     `;
 
     table.appendChild(row);
@@ -90,9 +75,8 @@ function initLeagueSelect(){
 }
 
 // =========================
-// 📋 TEAM DROPDOWN
+// 📋 TEAM SELECT
 // =========================
-
 function populateTeamSelect(){
 
   const select = document.getElementById("teamSelect");
@@ -100,27 +84,19 @@ function populateTeamSelect(){
 
   select.innerHTML = "";
 
-  if(!game.league.teams) return;
-
   game.league.teams.forEach(team => {
 
     const opt = document.createElement("option");
-    opt.value = team.name;
+    opt.value = team.id;
     opt.textContent = team.name;
 
     select.appendChild(opt);
   });
-
-  // bereits gewähltes Team setzen
-  if(game.team.selected){
-    select.value = game.team.selected;
-  }
 }
 
 // =========================
-// 🧾 HEADER UPDATE (Fallback)
+// 🧾 HEADER
 // =========================
-
 function updateHeader(){
 
   const title = document.getElementById("gameTitle");
@@ -131,36 +107,18 @@ function updateHeader(){
   }
 
   if(sub){
-    const league = game.league?.key || "Keine Liga";
-    const team = game.team?.selected || "";
+    const league = game.league?.name || "Keine Liga";
+    const team = game.team?.name || "";
 
     sub.innerText = team 
       ? `${league} • ${team}`
       : league;
   }
 }
-// =========================
-// 🎮 UI EVENT SYSTEM (MOBILE FIX)
-// =========================
-function bindUI(){
 
-  function bindButton(el, handler){
-    if(!el) return;
-
-    el.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      handler();
-    });
-  }
-
-  bindButton(document.getElementById("mainActionBtn"), handleMainAction);
-  bindButton(document.getElementById("menuBtn"), toggleSetup);
-  bindButton(document.getElementById("overlay"), closeSetup);
-}
 // =========================
 // 🎮 MATCH UI
 // =========================
-
 function updateScoreUI(){
 
   const el = document.getElementById("score");
@@ -175,11 +133,8 @@ function updateTeamsUI(){
 
   if(!window.currentMatch) return;
 
-  const l = document.getElementById("teamLeft");
-  const r = document.getElementById("teamRight");
-
-  if(l) l.innerText = window.currentMatch.home;
-  if(r) r.innerText = window.currentMatch.away;
+  document.getElementById("teamLeft").innerText = currentMatch.home;
+  document.getElementById("teamRight").innerText = currentMatch.away;
 }
 
 function updateProgressBar(){
@@ -187,13 +142,12 @@ function updateProgressBar(){
   const bar = document.getElementById("momentumBar");
   if(!bar) return;
 
-  const minute = game.match.minute || 0;
-  const percent = (minute / 90) * 100;
-
+  const percent = (game.match.minute / 90) * 100;
   bar.style.width = percent + "%";
 }
+
 // =========================
-// 📢 LIVE EVENTS UI
+// 📢 EVENTS
 // =========================
 function addLiveEvent(text, minute){
 
@@ -207,12 +161,13 @@ function addLiveEvent(text, minute){
 }
 
 function clearLiveEvents(){
-
   const box = document.getElementById("liveMatch");
-  if(!box) return;
-
-  box.innerHTML = "";
+  if(box) box.innerHTML = "";
 }
+
+// =========================
+// 📅 SPIELPLAN
+// =========================
 function renderSchedule(){
 
   const container = document.getElementById("scheduleContainer");
@@ -221,7 +176,7 @@ function renderSchedule(){
   const schedule = game.league.schedule;
 
   if(!schedule || schedule.length === 0){
-    container.innerHTML = "<p>Kein Spielplan vorhanden</p>";
+    container.innerHTML = "<p>Kein Spielplan</p>";
     return;
   }
 
@@ -229,24 +184,13 @@ function renderSchedule(){
 
   schedule.forEach((round, index) => {
 
-    const isCurrent = index === game.league.currentMatchday;
-
-    html += `
-      <div class="matchday ${isCurrent ? "current" : ""}">
-        <h4>Spieltag ${index + 1}</h4>
-    `;
+    html += `<div class="matchday"><h4>Spieltag ${index+1}</h4>`;
 
     round.forEach(match => {
 
-      const isUser =
-        match.home === game.team.selected ||
-        match.away === game.team.selected;
-
       html += `
-        <div class="match ${isUser ? "highlight" : ""}">
-          <span>${match.home}</span>
-          <span>vs</span>
-          <span>${match.away}</span>
+        <div class="match">
+          ${match.home} vs ${match.away}
         </div>
       `;
     });
@@ -256,69 +200,72 @@ function renderSchedule(){
 
   container.innerHTML = html;
 }
+
+// =========================
+// 🎮 BINDINGS (EINMAL!)
+// =========================
 function bindUI(){
 
   console.log("🔗 bindUI aktiv");
 
-  // ===== SETUP =====
+  // MAIN BUTTON
+  document.getElementById("mainButton")
+    ?.addEventListener("click", handleMainAction);
+
+  // MENU
   document.getElementById("menuBtn")
     ?.addEventListener("click", toggleSetup);
 
-  document.querySelector(".closeBtn")
+  document.getElementById("overlay")
     ?.addEventListener("click", closeSetup);
 
-  document.getElementById("selectLeagueBtn")
-    ?.addEventListener("click", selectLeague);
+  // SELECTS
+  document.getElementById("leagueSelect")
+    ?.addEventListener("change", selectLeague);
 
-  document.getElementById("selectTeamBtn")
-    ?.addEventListener("click", selectTeam);
+  document.getElementById("teamSelect")
+    ?.addEventListener("change", selectTeam);
 
-  document.getElementById("resetBtn")
+  // RESET
+  document.getElementById("resetGameBtn")
     ?.addEventListener("click", resetGame);
 
-  // ===== TABS =====
+  // SPEED
+  document.querySelectorAll(".speedControl button")
+    .forEach(btn => {
+      btn.addEventListener("click", () => {
+        setSpeed(Number(btn.dataset.speed));
+      });
+    });
+
+  // TABS
   document.querySelectorAll(".tableTabs .tab").forEach(tab => {
 
     tab.addEventListener("click", () => {
 
-      // Buttons
       document.querySelectorAll(".tableTabs .tab")
         .forEach(t => t.classList.remove("active"));
 
       tab.classList.add("active");
 
-      // Inhalte
       document.querySelectorAll(".tabContent")
         .forEach(c => c.classList.remove("active"));
 
-      const target = document.getElementById(tab.dataset.tab);
-      target?.classList.add("active");
+      document.getElementById(tab.dataset.tab)
+        ?.classList.add("active");
 
-      // 🔥 Spielplan rendern beim Öffnen
       if(tab.dataset.tab === "scheduleTab"){
         renderSchedule();
       }
     });
 
   });
-
-  // ===== SPEED =====
-  document.querySelectorAll(".speedControl button")
-    .forEach(btn => {
-      btn.addEventListener("click", () => {
-        setSpeed(Number(btn.innerText.replace("x","")));
-      });
-    });
-
 }
+
 // =========================
-// 🌍 EXPORT
+// 🌍 EXPORTS
 // =========================
-window.addLiveEvent = addLiveEvent;
-window.clearLiveEvents = clearLiveEvents;
-// =========================
-// 🌍 GLOBAL EXPORTS (FIX)
-// =========================
+window.initLeagueSelect = initLeagueSelect;
 window.updateTable = updateTable;
 window.populateTeamSelect = populateTeamSelect;
 window.updateHeader = updateHeader;
@@ -326,3 +273,5 @@ window.bindUI = bindUI;
 window.updateScoreUI = updateScoreUI;
 window.updateTeamsUI = updateTeamsUI;
 window.updateProgressBar = updateProgressBar;
+window.addLiveEvent = addLiveEvent;
+window.clearLiveEvents = clearLiveEvents;
