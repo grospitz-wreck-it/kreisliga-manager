@@ -2,7 +2,29 @@
 // 🧠 UI MODULE
 // =========================
 console.log("UI START");
+// =========================
+// 🧾 HEADER
+// =========================
+function updateHeader(){
 
+  const title = document.getElementById("gameTitle");
+  const sub = document.getElementById("leagueTitle");
+
+  if(title){
+    title.innerText = game.player?.name || "Manager";
+  }
+
+  if(sub){
+    const leagueName =
+      window.LEAGUES?.[game.league.key]?.name || "Keine Liga";
+
+    const team = game.team?.selected || "";
+
+    sub.innerText = team
+      ? `${leagueName} • ${team}`
+      : leagueName;
+  }
+}
 // =========================
 // 🏆 LIGA SELECT
 // =========================
