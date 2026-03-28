@@ -1,9 +1,9 @@
 window.onload = () => {
 
   loadGame();
-
+  
   initUI();
-
+  initLeagueSelect();
   bindUI();
 
   console.log("✅ READY");
