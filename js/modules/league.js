@@ -7,32 +7,9 @@ const LEAGUES = {
       "FC Herford","TuS Hunnebrock","SC Vlotho","TuS Bardüttingdorf",
       "SV Löhne-Obernbeck","TuS Dünne","SV Bischofshagen","FC Schweicheln"
     ]
-  },
-  luebbecke: {
-    name: "Kreisliga A Lübbecke",
-    teams: [
-      "TuS Tengern II","FC Lübbecke","SV Börninghausen","TuS Gehlenbeck",
-      "FC Preußen Espelkamp II","SV Hüllhorst","TuS Dielingen",
-      "SV Schnathorst","FC Oppenwehe","TuS Nettelstedt",
-      "SV Rahden","TuS Stemwede","SV Hüllhorst II",
-      "FC Bad Oeynhausen II","SV Holzhausen","TuS Levern"
-    ]
-  },
-  bielefeld: {
-    name: "Kreisliga A Bielefeld",
-    teams: [
-      "TuS Dornberg II","VfR Wellensiek","SC Hicret Bielefeld",
-      "TuS Brake","VfB Fichte Bielefeld","SC Bielefeld",
-      "TuS Quelle II","SV Gadderbaum","FC Hilal Spor",
-      "TuS Einigkeit","SV Ubbedissen","SC Stieghorst",
-      "VfL Oldentrup","TuS Ost","SV Heepen","FC Türk Sport"
-    ]
   }
 };
 
-// =========================
-// 🏆 Liga wählen
-// =========================
 function selectLeague(key){
 
   const data = LEAGUES[key];
@@ -41,23 +18,25 @@ function selectLeague(key){
 
   game.league.teams = data.teams.map(name => ({
     name,
-    strength: Math.floor(Math.random() * 30) + 60
+    strength: Math.floor(Math.random() * 30) + 60,
+    points: 0,
+    goalsFor: 0,
+    goalsAgainst: 0,
+    wins: 0,
+    draws: 0,
+    losses: 0,
+    played: 0
   }));
 
   game.league.currentRound = 0;
 
-  createTable();
   generateSchedule();
-  populateTeamSelect();
 
-  console.log("✅ Liga geladen:", data.name);
+  createTable();
+  populateTeamSelect();
+  renderSchedule();
 }
 
-window.selectLeague = selectLeague;
-
-// =========================
-// 👕 TEAM wählen (FIX!)
-// =========================
 function selectTeam(teamName){
 
   const team = game.league.teams.find(t => t.name === teamName);
@@ -67,12 +46,10 @@ function selectTeam(teamName){
     return;
   }
 
-  // 🔥 DAS FEHLT BEI DIR
-  game.team.selected = team.name;
+  game.team.selected = team; // 🔥 OBJEKT
 
-  console.log("✅ Team gesetzt:", game.team.selected);
+  console.log("✅ Team gesetzt:", team.name);
 }
 
-window.selectTeam = selectTeam;
-
+window.selectLeague = selectLeague;
 window.selectTeam = selectTeam;
