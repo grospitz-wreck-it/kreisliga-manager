@@ -4,7 +4,11 @@ let interval = null;
 let matchState = {
   minute: 0,
   half: 1,
-  running: false
+  running: false,
+  score: {
+    home: 0,
+    away: 0
+  }
 };
 
 // =========================
@@ -29,6 +33,10 @@ function startMatch(){
   matchState.minute = 0;
   matchState.half = 1;
   matchState.running = true;
+  matchState.score.home = 0;
+  matchState.score.away = 0;
+
+  clearLiveFeed();
 
   runMatchLoop();
 }
@@ -46,11 +54,14 @@ function runMatchLoop(){
 
     matchState.minute++;
 
+    // ⚽ TOR CHANCE
+    maybeGoal();
+
     // 🟡 Halbzeit
     if(matchState.minute === 45){
       matchState.half = 2;
-      updateMatchUI("Halbzeit (45')");
-      updateProgressBar();
+      addLiveEvent("⏸ Halbzeitpause");
+      updateAllUI("Halbzeit (45')");
       return;
     }
 
@@ -60,13 +71,33 @@ function runMatchLoop(){
       return;
     }
 
-    updateMatchUI(
-      `Minute ${matchState.minute}' (HZ ${matchState.half})`
+    updateAllUI(
+      `Minute ${matchState.minute}'`
     );
 
-    updateProgressBar();
+  }, 500);
+}
 
-  }, 500); // Geschwindigkeit (0.5s pro Minute)
+// =========================
+// ⚽ TORE
+// =========================
+function maybeGoal(){
+
+  // ca. 6–10 Tore pro Spiel maximal
+  const chance = Math.random();
+
+  if(chance < 0.08){ // 8% pro Minute
+
+    const isHome = Math.random() < 0.5;
+
+    if(isHome){
+      matchState.score.home++;
+      addLiveEvent(`⚽ TOR für ${game.match.current.home}!`);
+    } else {
+      matchState.score.away++;
+      addLiveEvent(`⚽ TOR für ${game.match.current.away}!`);
+    }
+  }
 }
 
 // =========================
@@ -79,8 +110,32 @@ function endMatch(){
   matchState.running = false;
   game.phase = "setup";
 
-  updateMatchUI("Spiel beendet (90')");
+  addLiveEvent("🏁 Abpfiff!");
+
+  updateAllUI("Spiel beendet");
+}
+
+// =========================
+// 📊 UI UPDATE KOMPLETT
+// =========================
+function updateAllUI(text){
+
+  updateMatchUI(text);
+  updateScoreUI();
   updateProgressBar();
+}
+
+// =========================
+// 📊 SCORE
+// =========================
+function updateScoreUI(){
+
+  const el = document.getElementById("score");
+
+  if(!el) return;
+
+  el.innerText =
+    `${matchState.score.home} : ${matchState.score.away}`;
 }
 
 // =========================
@@ -98,7 +153,29 @@ function updateProgressBar(){
 }
 
 // =========================
-// 🎮 BUTTON LOGIK
+// 📰 LIVE TICKER
+// =========================
+function addLiveEvent(text){
+
+  const box = document.getElementById("liveFeed");
+  if(!box) return;
+
+  const p = document.createElement("p");
+  p.innerText = `${matchState.minute}' - ${text}`;
+
+  box.prepend(p);
+}
+
+function clearLiveFeed(){
+
+  const box = document.getElementById("liveFeed");
+  if(box){
+    box.innerHTML = "";
+  }
+}
+
+// =========================
+// 🎮 BUTTON
 // =========================
 function handleMainAction(){
 
