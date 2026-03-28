@@ -5,7 +5,10 @@ window.game = {
 
   league: {
     key: null,
-    teams: []
+    teams: [],
+    schedule: [],
+    currentRound: 0,
+    table: []
   },
 
   team: {
@@ -16,8 +19,4 @@ window.game = {
     current: null
   },
 
-  phase: "setup"
-};
-game.season = {
-  year: 1
-};
+  season: { // 🔥 HIER rein!
