@@ -45,7 +45,10 @@ async function loadGame(){
     if(data.matchState){
       Object.assign(matchState, data.matchState);
     }
-
+    if(!game.league.schedule && game.league.teams?.length){
+  console.warn("⚠️ Kein Spielplan im Save → neu generieren");
+  generateSchedule();
+}
     console.log("✅ Spiel geladen");
 
     return true;
