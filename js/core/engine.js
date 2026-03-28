@@ -271,23 +271,40 @@ function endMatch(){
 
   const match = game.match.current;
 
+  if(!match){
+    console.warn("❌ Kein aktuelles Match");
+    return;
+  }
+
+  // ❗ doppelte Verarbeitung verhindern
+  if(match.result){
+    console.warn("⚠️ Match wurde bereits ausgewertet");
+    return;
+  }
+
+  // ✅ Ergebnis setzen
   match.result = {
     home: matchState.score.home,
     away: matchState.score.away
   };
 
-  // ✅ dein Spiel in Tabelle
+  // ✅ Tabelle aktualisieren
   applyMatchResult(match);
 
-  // ✅ SOFORT anzeigen
+  // ✅ UI sofort updaten
   renderTable();
+  renderSchedule();
 
-  // ❗ erst DANACH Runde erhöhen
+  // ✅ Runde erst danach erhöhen
   game.league.currentRound++;
+
+  // ✅ Match sauber beenden
+  game.match.current = null;
+  matchState.running = false;
 
   game.phase = "idle";
 
-  renderSchedule();
+  console.log("✅ Spiel beendet:", match.home.name, match.result.home, ":", match.result.away, match.away.name);
 }
 
 // =========================
