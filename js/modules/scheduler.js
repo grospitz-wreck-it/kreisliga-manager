@@ -10,12 +10,15 @@ function generateSchedule(){
     return;
   }
 
-  let teams = [...originalTeams]; // nur Array kopieren
+  // 👉 WICHTIG: echte Referenzen behalten
+  let teams = [...originalTeams];
 
   const rounds = [];
+  const n = teams.length;
 
-  // Bei ungerader Anzahl Dummy
-  if(teams.length % 2 !== 0){
+  // ❗ Bei dir sollten es 16 sein → sonst Fehler anzeigen
+  if(n % 2 !== 0){
+    console.warn("⚠️ Ungerade Anzahl – BYE wird hinzugefügt");
     teams.push({ name: "BYE" });
   }
 
@@ -23,7 +26,7 @@ function generateSchedule(){
   const half = teams.length / 2;
 
   // =========================
-  // 🔁 HINRUNDE
+  // 🔁 HINRUNDE (Circle Method - stabil)
   // =========================
   for(let roundIndex = 0; roundIndex < totalRounds; roundIndex++){
 
@@ -34,22 +37,32 @@ function generateSchedule(){
       const home = teams[i];
       const away = teams[teams.length - 1 - i];
 
-      if(home && away && home.name !== "BYE" && away.name !== "BYE"){
+      // 👉 BYE ignorieren
+      if(home.name !== "BYE" && away.name !== "BYE"){
         round.push({
-          home: home,   // ✅ REFERENZ
-          away: away,   // ✅ REFERENZ
-          result: null
+          home,
+          away,
+          result: null,
+          _processed: false
         });
       }
     }
 
+    // 🔥 DEBUG (kannst du drin lassen)
+    if(round.length !== 8 && teams.length === 16){
+      console.error("❌ Falsche Anzahl Spiele:", round.length);
+    }
+
     rounds.push(round);
 
-    // ✅ KORREKTE ROTATION (Circle Method)
+    // =========================
+    // 🔁 ROTATION (FIXED + ROTATE REST)
+    // =========================
     const fixed = teams[0];
     const rest = teams.slice(1);
 
-    rest.unshift(rest.pop());
+    const last = rest.pop();
+    rest.unshift(last);
 
     teams = [fixed, ...rest];
   }
@@ -59,9 +72,10 @@ function generateSchedule(){
   // =========================
   const returnRounds = rounds.map(round =>
     round.map(match => ({
-      home: match.away, // gleiche Referenzen
+      home: match.away,
       away: match.home,
-      result: null
+      result: null,
+      _processed: false
     }))
   );
 
@@ -73,6 +87,43 @@ function generateSchedule(){
   game.league.currentMatchIndex = 0;
 
   console.log("📅 Spielplan erstellt:", game.league.schedule.length, "Spieltage");
+
+  // ✅ EXTRA VALIDIERUNG
+  validateSchedule();
+}
+
+// =========================
+// 🧪 VALIDIERUNG (NEU!)
+// =========================
+function validateSchedule(){
+
+  const firstRound = game.league.schedule[0];
+
+  if(!firstRound){
+    console.error("❌ Kein Spieltag vorhanden");
+    return;
+  }
+
+  const teams = [];
+
+  firstRound.forEach(m => {
+    teams.push(m.home.name);
+    teams.push(m.away.name);
+  });
+
+  console.log("🔍 Teams im Spieltag:", teams.length);
+
+  const unique = new Set(teams);
+
+  console.log("🔍 Unique Teams:", unique.size);
+
+  if(teams.length !== unique.size){
+    console.error("❌ DUPLIKATE IM SPIELTAG!");
+  }
+
+  if(teams.length !== game.league.teams.length){
+    console.error("❌ NICHT ALLE TEAMS IM SPIELTAG!");
+  }
 }
 
 // =========================
@@ -102,14 +153,7 @@ function nextMatch(){
     return null;
   }
 
-  const match = round[matchIndex];
-
-  if(!match){
-    console.warn("❌ Kein Spiel gefunden");
-    return null;
-  }
-
-  return match;
+  return round[matchIndex] || null;
 }
 
 // =========================
@@ -124,7 +168,6 @@ function advanceSchedule(){
 
   matchIndex++;
 
-  // Wenn Spieltag fertig → nächster Spieltag
   if(matchIndex >= round.length){
     matchIndex = 0;
     roundIndex++;
