@@ -15,9 +15,48 @@ function handleMainAction(){
   }
 }
 
+// =========================
+// 🏁 START MATCH
+// =========================
+function startMatch(){
+
+  const round = game.league.schedule?.[game.league.currentRound];
+  const myTeam = game.team.selected;
+
+  if(!round || !myTeam){
+    console.warn("❌ Kein Spieltag oder Team");
+    return;
+  }
+
+  // 👉 Spieltag simulieren (setzt auch dein Match)
+  simulateMatchday();
+
+  const match = game.match.current;
+
+  if(!match){
+    console.error("❌ Kein Spiel für dein Team gefunden");
+    return;
+  }
+
+  game.phase = "live";
+
+  matchState.minute = 0;
+  matchState.running = true;
+  matchState.score.home = 0;
+  matchState.score.away = 0;
+  matchState.events = [];
+  matchState.cards.home = 0;
+  matchState.cards.away = 0;
+
+  renderCurrentMatch();
+  updateUI();
+  renderLiveFeed();
+
+  runMatchLoop();
+}
 
 // =========================
-// 🏁 START
+// 🧾 SPIELTAG SIMULATION
 // =========================
 function simulateMatchday(){
 
@@ -37,6 +76,8 @@ function simulateMatchday(){
       return;
     }
 
+    if(match._processed) return;
+
     const home = Math.floor(Math.random()*3);
     const away = Math.floor(Math.random()*3);
 
@@ -44,12 +85,13 @@ function simulateMatchday(){
     applyMatchResult(match);
   });
 
-  // 👉 WICHTIG: Spieler-Spiel setzen
   if(playerMatch){
     game.match.current = playerMatch;
   } else {
     console.warn("⚠️ Kein Spiel für Spieler gefunden!");
   }
+
+  renderTable();
 }
 
 // =========================
@@ -80,7 +122,7 @@ function runMatchLoop(){
 }
 
 // =========================
-// 🎲 EVENT STEUERUNG
+// 🎲 EVENTS
 // =========================
 function simulateLiveEvent(){
 
@@ -92,7 +134,6 @@ function simulateLiveEvent(){
 
   const rand = Math.random();
 
-  // 🎯 CHANCEN (taktik beeinflusst!)
   if(rand < 0.12 + homeWeight){
     createChance(match, true);
   }
@@ -108,14 +149,12 @@ function simulateLiveEvent(){
 }
 
 // =========================
-// 🧠 TAKTIK SYSTEM
+// 🧠 TAKTIK
 // =========================
 function getAttackWeight(team){
-
   if(team.tactic === "offensive") return 0.08;
   if(team.tactic === "defensive") return -0.05;
-
-  return 0; // balanced
+  return 0;
 }
 
 // =========================
@@ -126,9 +165,8 @@ function createChance(match, isHome){
   const team = isHome ? match.home : match.away;
   const opponent = isHome ? match.away : match.home;
 
-  const strengthDiff = team.strength - opponent.strength;
-
-  const chance = Math.random() + strengthDiff * 0.01;
+  const diff = team.strength - opponent.strength;
+  const chance = Math.random() + diff * 0.01;
 
   if(chance > 0.9){
     goal(team, isHome);
@@ -156,7 +194,7 @@ function goal(team, isHome){
 }
 
 // =========================
-// 💥 FOUL + ELFMETER
+// 💥 FOUL
 // =========================
 function createFoul(match){
 
@@ -165,20 +203,18 @@ function createFoul(match){
 
   addEvent(`💥 Foul von ${team.name}`);
 
-  // 🔥 ELFMETER CHANCE
   if(Math.random() > 0.8){
     createPenalty(match, !isHome);
     return;
   }
 
-  // Karten
-  const cardRoll = Math.random();
+  const card = Math.random();
 
-  if(cardRoll > 0.9){
+  if(card > 0.9){
     addEvent(`🟥 ROT für ${team.name}`);
     team.strength -= 10;
   }
-  else if(cardRoll > 0.65){
+  else if(card > 0.65){
     addEvent(`🟨 Gelb für ${team.name}`);
   }
 }
@@ -192,9 +228,7 @@ function createPenalty(match, isHome){
 
   addEvent(`⚠️ ELFMETER für ${team.name}!`);
 
-  const scored = Math.random() < 0.75;
-
-  if(scored){
+  if(Math.random() < 0.75){
     goal(team, isHome);
     addEvent(`🎯 Elfmeter verwandelt!`);
   } else {
@@ -206,9 +240,7 @@ function createPenalty(match, isHome){
 // 🚫 ABSEITS
 // =========================
 function createOffside(match){
-
   const team = Math.random() > 0.5 ? match.home : match.away;
-
   addEvent(`🚫 Abseits von ${team.name}`);
 }
 
@@ -217,45 +249,11 @@ function createOffside(match){
 // =========================
 function addEvent(text){
 
-  matchState.events.unshift(
-    `${matchState.minute}' - ${text}`
-  );
+  matchState.events.unshift(`${matchState.minute}' - ${text}`);
 
   if(matchState.events.length > 25){
     matchState.events.pop();
   }
-}
-
-// =========================
-// 🧾 SPIELTAG
-// =========================
-function simulateMatchday(){
-
-  const round = game.league.schedule?.[game.league.currentRound];
-
-  if(!round) return;
-
-  round.forEach(match => {
-
-    // ❗ WICHTIG: nur simulieren wenn noch KEIN Ergebnis existiert
-    if(match.result) return;
-
-    if(
-      match.home.name === game.team.selected?.name ||
-      match.away.name === game.team.selected?.name
-    ){
-      return; // dein Spiel wird später gemacht
-    }
-
-    const home = Math.floor(Math.random()*3);
-    const away = Math.floor(Math.random()*3);
-
-    match.result = { home, away };
-
-    applyMatchResult(match);
-  });
-
-  renderTable();
 }
 
 // =========================
@@ -270,42 +268,36 @@ function endMatch(){
     return;
   }
 
-  if(match.result && match._processed){
-  console.warn("⚠️ Match bereits verarbeitet");
-  return;
-}
+  if(match._processed){
+    console.warn("⚠️ Match bereits verarbeitet");
+    return;
+  }
 
-  // ✅ Ergebnis setzen
   match.result = {
     home: matchState.score.home,
     away: matchState.score.away
   };
 
-  // ✅ Tabelle aktualisieren
   applyMatchResult(match);
 
-  // ✅ UI sofort updaten
   renderTable();
   renderSchedule();
 
-  // ✅ Runde erst danach erhöhen
   game.league.currentRound++;
 
-  // ✅ Match sauber beenden
   game.match.current = null;
   matchState.running = false;
 
   game.phase = "idle";
 
-  console.log("✅ Spiel beendet:", match.home.name, match.result.home, ":", match.result.away, match.away.name);
+  console.log("✅ Spiel beendet");
 }
 
 // =========================
-// 🏁 Aktualisierung Ergebnisse
+// 📊 TABELLE
 // =========================
 function applyMatchResult(match){
 
-  // 🔥 DOPPELTE VERARBEITUNG VERHINDERN
   if(match._processed) return;
 
   const home = match.home;
@@ -314,18 +306,15 @@ function applyMatchResult(match){
   const h = match.result.home;
   const a = match.result.away;
 
-  // Spiele
   home.played++;
   away.played++;
 
-  // Tore
   home.goalsFor += h;
   home.goalsAgainst += a;
 
   away.goalsFor += a;
   away.goalsAgainst += h;
 
-  // Ergebnis
   if(h > a){
     home.wins++;
     away.losses++;
@@ -343,9 +332,9 @@ function applyMatchResult(match){
     away.points += 1;
   }
 
-  // 🔥 GANZ WICHTIG
   match._processed = true;
 }
+
 // =========================
 // 🌍 GLOBAL
 // =========================
