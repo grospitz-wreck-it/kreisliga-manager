@@ -98,7 +98,10 @@ function runMatchLoop(){
 
     matchState.minute++;
 
-    updateUI();
+    // 🔥 SAFE CALL
+    if(typeof updateUI === "function"){
+      updateUI();
+    }
 
     if(matchState.minute > 90){
       clearInterval(interval);
@@ -107,7 +110,6 @@ function runMatchLoop(){
 
   }, 300);
 }
-
 function endMatch(){
 
   const match = game.match.current;
