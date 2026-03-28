@@ -1,6 +1,6 @@
 let interval = null;
 
-// 🔥 Match State GLOBAL
+// 🔥 Match State
 let matchState = {
   minute: 0,
   half: 1,
@@ -54,10 +54,8 @@ function runMatchLoop(){
 
     matchState.minute++;
 
-    // ⚽ TOR CHANCE
     maybeGoal();
 
-    // 🟡 Halbzeit
     if(matchState.minute === 45){
       matchState.half = 2;
       addLiveEvent("⏸ Halbzeitpause");
@@ -65,7 +63,6 @@ function runMatchLoop(){
       return;
     }
 
-    // 🔴 Spielende
     if(matchState.minute >= 90){
       endMatch();
       return;
@@ -79,29 +76,41 @@ function runMatchLoop(){
 }
 
 // =========================
-// ⚽ TORE
+// ⚽ REALISTISCHE TORE
 // =========================
 function maybeGoal(){
 
-  // ca. 6–10 Tore pro Spiel maximal
-  const chance = Math.random();
+  const home = game.match.current.home;
+  const away = game.match.current.away;
 
-  if(chance < 0.08){ // 8% pro Minute
+  // 🔥 Basis Chance
+  let baseChance = 0.05;
 
-    const isHome = Math.random() < 0.5;
+  // 🔥 Stärke Einfluss
+  let diff = home.strength - away.strength;
 
-    if(isHome){
-      matchState.score.home++;
-      addLiveEvent(`⚽ TOR für ${game.match.current.home}!`);
-    } else {
-      matchState.score.away++;
-      addLiveEvent(`⚽ TOR für ${game.match.current.away}!`);
-    }
+  // Heimbonus
+  let homeChance = baseChance + (diff * 0.001) + 0.02;
+  let awayChance = baseChance - (diff * 0.001);
+
+  // Clamp
+  homeChance = Math.max(0.01, Math.min(0.15, homeChance));
+  awayChance = Math.max(0.01, Math.min(0.15, awayChance));
+
+  const roll = Math.random();
+
+  if(roll < homeChance){
+    matchState.score.home++;
+    addLiveEvent(`⚽ TOR für ${home.name}!`);
+  }
+  else if(roll < homeChance + awayChance){
+    matchState.score.away++;
+    addLiveEvent(`⚽ TOR für ${away.name}!`);
   }
 }
 
 // =========================
-// ⏹ MATCH ENDE
+// ⏹ ENDE
 // =========================
 function endMatch(){
 
@@ -116,35 +125,26 @@ function endMatch(){
 }
 
 // =========================
-// 📊 UI UPDATE KOMPLETT
+// 📊 UI UPDATE
 // =========================
 function updateAllUI(text){
-
   updateMatchUI(text);
   updateScoreUI();
   updateProgressBar();
 }
 
-// =========================
-// 📊 SCORE
-// =========================
 function updateScoreUI(){
 
   const el = document.getElementById("score");
-
   if(!el) return;
 
   el.innerText =
     `${matchState.score.home} : ${matchState.score.away}`;
 }
 
-// =========================
-// 📊 PROGRESS BAR
-// =========================
 function updateProgressBar(){
 
   const percent = (matchState.minute / 90) * 100;
-
   const bar = document.getElementById("progressFill");
 
   if(bar){
@@ -153,7 +153,7 @@ function updateProgressBar(){
 }
 
 // =========================
-// 📰 LIVE TICKER
+// 📰 LIVE
 // =========================
 function addLiveEvent(text){
 
@@ -167,11 +167,8 @@ function addLiveEvent(text){
 }
 
 function clearLiveFeed(){
-
   const box = document.getElementById("liveFeed");
-  if(box){
-    box.innerHTML = "";
-  }
+  if(box) box.innerHTML = "";
 }
 
 // =========================
