@@ -1,3 +1,6 @@
+// =========================
+// 📦 LIGEN DATEN
+// =========================
 const LEAGUES = {
   herford: {
     name: "Kreisliga A Herford",
@@ -16,6 +19,7 @@ const LEAGUES = {
 function initLeagueSelect(){
 
   const select = document.getElementById("leagueSelect");
+  if(!select) return;
 
   select.innerHTML = `<option value="">Liga wählen</option>`;
 
@@ -33,8 +37,11 @@ function initLeagueSelect(){
 function populateTeamSelect(){
 
   const select = document.getElementById("teamSelect");
+  if(!select) return;
 
   select.innerHTML = `<option value="">Team wählen</option>`;
+
+  if(!game.league.teams) return;
 
   game.league.teams.forEach(team => {
     const opt = document.createElement("option");
@@ -51,11 +58,28 @@ function selectLeague(key){
 
   const data = LEAGUES[key];
 
-  game.league.key = key;
+  if(!data){
+    console.error("❌ Liga nicht gefunden:", key);
+    return;
+  }
 
+  // Reset
+  game.league.key = key;
+  game.league.currentRound = 0;
+  game.team.selected = null;
+  game.match.current = null;
+
+  // =========================
+  // 🧱 TEAMS ERSTELLEN
+  // =========================
   game.league.teams = data.teams.map(name => ({
     name,
     strength: Math.floor(Math.random() * 30) + 60,
+
+    // 🔥 TAKTIK
+    tactic: "balanced",
+
+    // 📊 STATS
     points: 0,
     goalsFor: 0,
     goalsAgainst: 0,
@@ -65,19 +89,37 @@ function selectLeague(key){
     played: 0
   }));
 
-  game.league.currentRound = 0;
+  console.log("✅ Teams erstellt:", game.league.teams);
 
+  // =========================
+  // ⚽ SPIELPLAN
+  // =========================
   generateSchedule();
 
-  createTable();
+  if(!game.league.schedule || game.league.schedule.length === 0){
+    console.error("❌ Spielplan fehlgeschlagen!");
+    return;
+  }
+
+  console.log("📅 Spielplan ready:", game.league.schedule.length);
+
+  // =========================
+  // 📊 UI UPDATES
+  // =========================
+  createTable?.();
   populateTeamSelect();
-  renderSchedule();
+  renderSchedule?.();
 }
 
 // =========================
 // 👤 TEAM WÄHLEN
 // =========================
 function selectTeam(teamName){
+
+  if(!game.league.teams){
+    console.error("❌ Keine Teams geladen");
+    return;
+  }
 
   const team = game.league.teams.find(t => t.name === teamName);
 
@@ -88,11 +130,14 @@ function selectTeam(teamName){
 
   game.team.selected = team;
 
-  console.log("✅ Team gesetzt:", team.name);
+  console.log("✅ Team gewählt:", team.name);
+
+  // Optional direkt anzeigen
+  renderCurrentMatch?.();
 }
 
 // =========================
-// 🌍 GLOBAL
+// 🌍 GLOBAL EXPORTS
 // =========================
 window.initLeagueSelect = initLeagueSelect;
 window.populateTeamSelect = populateTeamSelect;
