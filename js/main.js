@@ -1,23 +1,61 @@
-window.onload = async () => {
+// =========================
+// 🌍 GLOBAL GAME STATE
+// =========================
+const game = {
+  phase: "setup",
 
-  // UI initialisieren
-  initLeagueSelect();
-  bindUI();
+  league: {
+    key: null,
+    teams: [],
+    schedule: [],
+    currentRound: 0
+  },
 
-  // 🔥 ERSTE LIGA AUTOMATISCH LADEN
-  const firstLeague = Object.keys(LEAGUES)[0];
+  team: {
+    selected: null
+  },
 
-  if(firstLeague){
-    document.getElementById("leagueSelect").value = firstLeague;
-    selectLeague(firstLeague);
-  }
-
-  // Save laden
-  const loaded = await loadGame();
-
-  if(loaded){
-    updateMatchUI("Spielstand geladen");
-  } else {
-    updateMatchUI("Bereit");
+  match: {
+    current: null
   }
 };
+
+window.game = game;
+
+// =========================
+// 🚀 INIT
+// =========================
+function init(){
+
+  console.log("🚀 Spiel wird gestartet...");
+
+  // Dropdowns initialisieren
+  initLeagueSelect();
+
+  // UI Events binden
+  bindUI();
+
+  // Optional: Save laden
+  if(typeof loadGame === "function"){
+    const loaded = loadGame();
+
+    if(loaded){
+      console.log("💾 Save geladen");
+
+      // UI nachladen
+      if(game.league.teams.length > 0){
+        populateTeamSelect();
+        renderSchedule();
+      }
+    }
+  }
+
+  game.phase = "setup";
+
+  console.log("✅ Init fertig");
+}
+
+// =========================
+// ▶️ START
+// =========================
+window.onload = init;
