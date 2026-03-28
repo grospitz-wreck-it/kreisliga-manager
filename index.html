@@ -2,38 +2,95 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kreisliga Manager</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui;
+      background: #f2f2f2;
+    }
+
+    .container {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #2e7d32;
+      color: white;
+      font-weight: bold;
+    }
+
+    #score {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    #match {
+      text-align: center;
+      font-size: 16px;
+    }
+
+    #progressBar {
+      height: 10px;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #progressFill {
+      height: 100%;
+      width: 0%;
+      background: green;
+    }
+
+    #liveFeed {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      max-height: 250px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    #liveFeed p {
+      margin: 6px 0;
+    }
+  </style>
 </head>
 <body>
 
-  <h2>Manager</h2>
+  <div class="container">
 
-  <div>
     <input id="nameInput" placeholder="Dein Name">
-  </div>
 
-  <div>
     <select id="leagueSelect"></select>
-  </div>
-
-  <div>
     <select id="teamSelect"></select>
-  </div>
 
-  <button id="mainButton">Start</button>
+    <button id="mainButton">Spiel starten</button>
 
-  <h3 id="match"></h3>
+    <div id="score">0 : 0</div>
+    <div id="match"></div>
 
-  <!-- 🔥 SCORE -->
-  <h1 id="score">0 : 0</h1>
+    <div id="progressBar">
+      <div id="progressFill"></div>
+    </div>
 
-  <!-- 🔥 PROGRESS -->
-  <div style="height:12px;background:#ccc;margin-top:10px;border-radius:6px;overflow:hidden;">
-    <div id="progressFill" style="height:100%;width:0%;background:green;"></div>
-  </div>
+    <div id="liveFeed"></div>
 
-  <!-- 🔥 LIVE TICKER -->
-  <div id="liveFeed" style="margin-top:15px;max-height:200px;overflow:auto;border:1px solid #ccc;padding:10px;">
   </div>
 
   <script src="js/core/state.js"></script>
