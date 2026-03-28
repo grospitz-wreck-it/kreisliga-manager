@@ -26,6 +26,18 @@ function bindUI(){
   document.getElementById("selectTeamBtn")
     ?.addEventListener("click", selectTeam);
 }
+const leagueSelect = document.getElementById("leagueSelect");
 
+leagueSelect?.addEventListener("change", (e) => {
+  const key = e.target.value;
+
+  console.log("🏆 Liga gewählt:", key);
+
+  if(typeof window.selectLeague === "function"){
+    window.selectLeague(key);
+  } else {
+    console.error("❌ selectLeague fehlt");
+  }
+});
 // 🌍 EXPORT
 window.bindUI = bindUI;
