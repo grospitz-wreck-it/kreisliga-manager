@@ -5,10 +5,24 @@ const LEAGUES = {
   herford: {
     name: "Kreisliga A Herford",
     teams: [
-      "VfL Holsen II","TSV Löhne","SV Oetinghausen","FC Exter",
-"FC Herford","TuRa Löhne","TuS Hunnebrock","TuS Bardüttingdorf-Wallenbrück",
-"TuS Dünne","SV Bischofshagen-Wittel","FC Schweicheln","SG FA Herringhausen/Eickum II",
-"Bünder SV"
+      "VfL Holsen II",
+      "TSV Löhne",
+      "SV Oetinghausen",
+      "FC Exter",
+      "FC Herford",
+      "TuRa Löhne",
+      "TuS Hunnebrock",
+      "TuS Bardüttingdorf-Wallenbrück",
+      "TuS Dünne",
+      "SV Bischofshagen-Wittel",
+      "FC Schweicheln",
+      "SG FA Herringhausen/Eickum II",
+      "Bünder SV",
+
+      // 🔥 FEHLENDE TEAMS ERGÄNZT
+      "SC Enger",
+      "RW Kirchlengern II",
+      "SpVg Hiddenhausen"
     ]
   }
 };
@@ -76,10 +90,8 @@ function selectLeague(key){
     name,
     strength: Math.floor(Math.random() * 30) + 60,
 
-    // 🔥 TAKTIK
     tactic: "balanced",
 
-    // 📊 STATS
     points: 0,
     goalsFor: 0,
     goalsAgainst: 0,
@@ -89,7 +101,12 @@ function selectLeague(key){
     played: 0
   }));
 
-  console.log("✅ Teams erstellt:", game.league.teams);
+  // 🔥 SAFETY CHECK
+  if(game.league.teams.length !== 16){
+    console.error("❌ FALSCHE TEAMANZAHL:", game.league.teams.length);
+  } else {
+    console.log("✅ Teams erstellt:", game.league.teams.length);
+  }
 
   // =========================
   // ⚽ SPIELPLAN
@@ -132,7 +149,6 @@ function selectTeam(teamName){
 
   console.log("✅ Team gewählt:", team.name);
 
-  // Optional direkt anzeigen
   renderCurrentMatch?.();
 }
 
