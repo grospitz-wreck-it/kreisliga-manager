@@ -1,105 +1,35 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
   <meta charset="UTF-8">
   <title>Kreisliga Manager</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<!-- HEADER -->
+  <h2 id="header">Manager</h2>
 
-<div class="header">
   <div>
-    <div id="gameTitle">Manager</div>
-    <div id="leagueTitle">Keine Liga</div>
-  </div>
-</div>
-
-<!-- SETUP -->
-
-<div class="panel">
-
-  <h3>👤 Name</h3>
-  <input id="nameInput">
-
-  <h3>🏆 Liga</h3>
-  <select id="leagueSelect">
-    
-  </select>
-
-  <h3>⚽ Team</h3>
-  <select id="teamSelect"></select>
-
-</div>
-
-<!-- MATCH -->
-
-<div class="panel">
-
-  <div class="scoreboard">
-    <div id="teamLeft">-</div>
-    <div id="score">0 : 0</div>
-    <div id="teamRight">-</div>
+    <input id="nameInput" placeholder="Dein Name">
   </div>
 
-  <div id="liveMatch"></div>
-
-  <div class="speedControl">
-    <button>1x</button>
-    <button>3x</button>
-    <button>5x</button>
+  <div>
+    <select id="leagueSelect"></select>
   </div>
 
-<button id="mainButton">▶ Start</button>
-
-</div>
-
-<!-- TABLE + SCHEDULE -->
-
-<div class="panel">
-
-  <div class="tableTabs">
-    <button class="tab active" data-tab="tableTab">Tabelle</button>
-    <button class="tab" data-tab="scheduleTab">Spielplan</button>
+  <div>
+    <select id="teamSelect"></select>
   </div>
 
-  <div id="tableTab" class="tabContent active">
-    <table id="table">
-      <tbody></tbody>
-    </table>
-  </div>
+  <button id="mainButton">Start</button>
 
-  <div id="scheduleTab" class="tabContent">
-    <div id="scheduleContainer"></div>
-  </div>
+  <h3 id="match"></h3>
 
-</div>
-
-<!-- SCRIPTS -->
-
-<script src="js/services/storage.js"></script>
-
-<script src="js/core/state.js"></script>
-
-<script src="js/modules/player.js"></script>
-
-<script src="js/modules/league.js"></script>
-
-<script src="js/modules/table.js"></script>
-
-<script src="js/core/scheduler.js"></script>
-
-<script src="js/core/engine.js"></script>
-
-<script src="js/ui/ui.js"></script>
-
-<script src="js/ui/bindings.js"></script>
-
-<script src="js/main.js"></script>
+  <script src="js/core/state.js"></script>
+  <script src="js/modules/league.js"></script>
+  <script src="js/core/engine.js"></script>
+  <script src="js/ui/ui.js"></script>
+  <script src="js/ui/bindings.js"></script>
+  <script src="js/main.js"></script>
 
 </body>
 </html>
