@@ -47,7 +47,7 @@ function startMatch(){
   matchState.cards.away = 0;
 
   clearLiveFeed();
-
+  nextMatch();
   runMatchLoop();
 }
 
