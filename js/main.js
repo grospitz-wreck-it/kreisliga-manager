@@ -2,17 +2,22 @@ console.log("MAIN START");
 
 window.onload = function(){
 
+  console.log("INIT START");
+
   loadGame?.();
 
   initPlayer?.();
+
+  // 🔥 GANZ WICHTIG: zuerst Ligen rein
   initLeagueSelect?.();
 
+  // 🔥 DANN UI binden
   bindUI();
 
   updateHeader?.();
   updateTable?.();
 
-  console.log("✅ App geladen");
+  console.log("INIT DONE");
 };
 
 // =========================
