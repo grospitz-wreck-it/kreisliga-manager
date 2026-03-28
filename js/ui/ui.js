@@ -49,7 +49,18 @@ function renderCurrentMatch(){
     <b>${match.home.name}</b> vs <b>${match.away.name}</b>
   `;
 }
+function renderLiveFeed(){
 
+  const el = document.getElementById("liveFeed");
+
+  if(!el) return;
+
+  el.innerHTML = matchState.events
+    .map(e => `<p>${e}</p>`)
+    .join("");
+}
+
+window.renderLiveFeed = renderLiveFeed;
 // =========================
 // 📅 SPIELPLAN
 // =========================
