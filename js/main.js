@@ -7,10 +7,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
   console.log("🚀 DOM READY");
 
+  // 1️⃣ Basis
   initPlayer?.();
   initLeagueSelect?.();
 
-  // 🔥 JETZT ERST VALUE LESEN
+  // 2️⃣ UI EVENTS ZUERST!
+  bindUI?.();
+
+  // 3️⃣ Default Liga laden
   const leagueSelect = document.getElementById("leagueSelect");
 
   console.log("👉 SELECT VALUE:", leagueSelect?.value);
@@ -21,7 +25,11 @@ window.addEventListener("DOMContentLoaded", () => {
     console.warn("❌ Keine Default Liga gesetzt");
   }
 
-  bindUI?.();
+  // 4️⃣ UI rendern
+  populateTeamSelect?.();
+  updateTable?.();
+  updateHeader?.();
+
 });
 // =========================
 // 🎮 MAIN FLOW
