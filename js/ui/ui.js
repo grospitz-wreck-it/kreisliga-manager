@@ -30,22 +30,20 @@ function updateHeader(){
 // =========================
 function initLeagueSelect(){
 
-  console.log("🔥 initLeagueSelect CALLED");
-
   const select = document.getElementById("leagueSelect");
-  if(!select || typeof LEAGUES === "undefined") return;
+  if(!select) return;
 
   select.innerHTML = "";
 
   Object.entries(LEAGUES).forEach(([key, val]) => {
 
     const opt = document.createElement("option");
-    opt.value = key;
-    opt.textContent = val.name;
+
+    opt.value = key;            // 🔥 WICHTIG
+    opt.textContent = val.name; // nur Anzeige
 
     select.appendChild(opt);
   });
-
 }
 
 // =========================
@@ -306,3 +304,4 @@ window.updateProgressBar = updateProgressBar;
 window.addLiveEvent = addLiveEvent;
 window.clearLiveEvents = clearLiveEvents;
 window.renderSchedule = renderSchedule;
+
