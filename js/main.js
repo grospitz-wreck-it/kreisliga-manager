@@ -40,3 +40,34 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 });
+// =========================
+// 🎮 MAIN FLOW
+// =========================
+function handleMainAction(){
+
+  console.log("🎮 Main Button:", game.phase);
+
+  switch(game.phase){
+
+    case "idle":
+      startSeason();
+      break;
+
+    case "ready":
+      startMatch();
+      break;
+
+    case "halftime":
+      resumeMatch();
+      break;
+
+    case "live":
+      pauseMatch();
+      break;
+  }
+}
+
+// =========================
+// 🌍 EXPORT (WICHTIG!)
+// =========================
+window.handleMainAction = handleMainAction;
