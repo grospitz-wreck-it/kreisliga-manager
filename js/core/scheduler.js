@@ -1,26 +1,63 @@
 function generateSchedule(){
 
-  const teams = game.league.teams;
+  const originalTeams = game.league.teams;
+
+  // 🔥 WICHTIG: Kopie erstellen
+  let teams = [...originalTeams];
+
   const rounds = [];
 
-  for(let i=0;i<teams.length-1;i++){
+  // Bei ungerader Zahl Dummy-Team
+  if(teams.length % 2 !== 0){
+    teams.push({ name: "BYE" });
+  }
+
+  const totalRounds = teams.length - 1;
+  const half = teams.length / 2;
+
+  // =========================
+  // 🔁 HINRUNDE
+  // =========================
+  for(let i = 0; i < totalRounds; i++){
 
     const round = [];
 
-    for(let j=0;j<teams.length/2;j++){
+    for(let j = 0; j < half; j++){
 
-      round.push({
-        home: teams[j],
-        away: teams[teams.length-1-j],
-        result: null
-      });
+      const home = teams[j];
+      const away = teams[teams.length - 1 - j];
+
+      if(home.name !== "BYE" && away.name !== "BYE"){
+        round.push({
+          home,
+          away,
+          result: null
+        });
+      }
     }
 
-    teams.splice(1,0,teams.pop());
+    // 🔄 Rotation (ohne erstes Team)
+    teams.splice(1, 0, teams.pop());
+
     rounds.push(round);
   }
 
-  game.league.schedule = rounds;
+  // =========================
+  // 🔁 RÜCKRUNDE
+  // =========================
+  const returnRounds = rounds.map(round =>
+    round.map(match => ({
+      home: match.away,
+      away: match.home,
+      result: null
+    }))
+  );
+
+  game.league.schedule = [...rounds, ...returnRounds];
+
+  game.league.currentRound = 0;
+
+  console.log("📅 Spielplan erstellt:", game.league.schedule.length, "Spieltage");
 }
 
 window.generateSchedule = generateSchedule;
