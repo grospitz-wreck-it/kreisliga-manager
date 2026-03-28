@@ -10,23 +10,28 @@ function generateSchedule(){
     return;
   }
 
-  // 👉 WICHTIG: echte Referenzen behalten
+  // 👉 Referenzen behalten
   let teams = [...originalTeams];
 
   const rounds = [];
-  const n = teams.length;
 
-  // ❗ Bei dir sollten es 16 sein → sonst Fehler anzeigen
-  if(n % 2 !== 0){
-    console.warn("⚠️ Ungerade Anzahl – BYE wird hinzugefügt");
+  const originalCount = teams.length;
+  const isOdd = teams.length % 2 !== 0;
+
+  // 👉 BYE bei ungerader Anzahl
+  if(isOdd){
+    console.warn("⚠️ Ungerade Liga → BYE hinzugefügt");
     teams.push({ name: "BYE" });
   }
 
   const totalRounds = teams.length - 1;
   const half = teams.length / 2;
 
+  console.log(`📊 Teams: ${originalCount}`);
+  console.log(`📅 Erwartete Spieltage: ${(originalCount - 1) * 2}`);
+
   // =========================
-  // 🔁 HINRUNDE (Circle Method - stabil)
+  // 🔁 HINRUNDE
   // =========================
   for(let roundIndex = 0; roundIndex < totalRounds; roundIndex++){
 
@@ -37,7 +42,6 @@ function generateSchedule(){
       const home = teams[i];
       const away = teams[teams.length - 1 - i];
 
-      // 👉 BYE ignorieren
       if(home.name !== "BYE" && away.name !== "BYE"){
         round.push({
           home,
@@ -48,21 +52,15 @@ function generateSchedule(){
       }
     }
 
-    // 🔥 DEBUG (kannst du drin lassen)
-    if(round.length !== 8 && teams.length === 16){
-      console.error("❌ Falsche Anzahl Spiele:", round.length);
-    }
-
     rounds.push(round);
 
     // =========================
-    // 🔁 ROTATION (FIXED + ROTATE REST)
+    // 🔁 ROTATION (Circle Method)
     // =========================
     const fixed = teams[0];
     const rest = teams.slice(1);
 
-    const last = rest.pop();
-    rest.unshift(last);
+    rest.unshift(rest.pop());
 
     teams = [fixed, ...rest];
   }
@@ -80,49 +78,68 @@ function generateSchedule(){
   );
 
   // =========================
-  // 🧩 KOMBINIEREN
+  // 🧩 FINAL
   // =========================
   game.league.schedule = [...rounds, ...returnRounds];
   game.league.currentRound = 0;
   game.league.currentMatchIndex = 0;
 
-  console.log("📅 Spielplan erstellt:", game.league.schedule.length, "Spieltage");
+  console.log("✅ Spielplan erstellt:", game.league.schedule.length, "Spieltage");
 
-  // ✅ EXTRA VALIDIERUNG
-  validateSchedule();
+  // =========================
+  // 🧪 VALIDIERUNG
+  // =========================
+  validateSchedule(originalCount);
 }
 
 // =========================
-// 🧪 VALIDIERUNG (NEU!)
+// 🧪 VALIDIERUNG (VERBESSERT)
 // =========================
-function validateSchedule(){
+function validateSchedule(expectedTeamCount){
 
-  const firstRound = game.league.schedule[0];
+  const schedule = game.league.schedule;
+
+  if(!schedule || schedule.length === 0){
+    console.error("❌ Kein Spielplan vorhanden");
+    return;
+  }
+
+  const firstRound = schedule[0];
 
   if(!firstRound){
-    console.error("❌ Kein Spieltag vorhanden");
+    console.error("❌ Kein erster Spieltag");
     return;
   }
 
   const teams = [];
 
-  firstRound.forEach(m => {
-    teams.push(m.home.name);
-    teams.push(m.away.name);
+  firstRound.forEach(match => {
+    teams.push(match.home.name);
+    teams.push(match.away.name);
   });
-
-  console.log("🔍 Teams im Spieltag:", teams.length);
 
   const unique = new Set(teams);
 
+  console.log("🔍 Teams im Spieltag:", teams.length);
   console.log("🔍 Unique Teams:", unique.size);
 
+  // ❌ Doppelte Teams
   if(teams.length !== unique.size){
     console.error("❌ DUPLIKATE IM SPIELTAG!");
   }
 
-  if(teams.length !== game.league.teams.length){
-    console.error("❌ NICHT ALLE TEAMS IM SPIELTAG!");
+  // ❌ Fehlende Teams
+  if(unique.size !== expectedTeamCount){
+    console.error("❌ NICHT ALLE TEAMS EINGETEILT!");
+  }
+
+  // ✅ Spiele pro Spieltag
+  const expectedMatches = Math.floor(expectedTeamCount / 2);
+
+  if(firstRound.length !== expectedMatches){
+    console.error("❌ Falsche Anzahl Spiele pro Spieltag:", firstRound.length);
+  } else {
+    console.log("✅ Spiele pro Spieltag korrekt:", expectedMatches);
   }
 }
 
@@ -164,10 +181,15 @@ function advanceSchedule(){
   let roundIndex = game.league.currentRound;
   let matchIndex = game.league.currentMatchIndex || 0;
 
-  const round = game.league.schedule[roundIndex];
+  const schedule = game.league.schedule;
+
+  if(!schedule || !schedule[roundIndex]) return;
+
+  const round = schedule[roundIndex];
 
   matchIndex++;
 
+  // 👉 nächster Spieltag
   if(matchIndex >= round.length){
     matchIndex = 0;
     roundIndex++;
