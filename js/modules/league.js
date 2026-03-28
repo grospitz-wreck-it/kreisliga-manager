@@ -59,22 +59,40 @@ function loadLeague(key){
 // =========================
 // 🏆 SELECT LEAGUE
 // =========================
-function selectLeague(){
+function selectLeague(key){
 
-  const select = document.getElementById("leagueSelect");
-  if(!select) return;
+  console.log("🏆 selectLeague:", key);
 
-  const key = select.value;
-
-  console.log("SELECTED:", key);
-
-  if(!LEAGUES[key]){
-    console.error("❌ Ungültige Liga");
+  const league = LEAGUES[key];
+  if(!league){
+    console.error("❌ Liga nicht gefunden");
     return;
   }
 
-  loadLeague(key);
+  game.league.key = key;
+
+  // Teams klonen (wichtig!)
+  game.league.teams = league.teams.map(name => ({
+    name,
+    played: 0,
+    wins: 0,
+    draws: 0,
+    losses: 0,
+    goalsFor: 0,
+    goalsAgainst: 0,
+    points: 0
+  }));
+
+  console.log("👥 Teams geladen:", game.league.teams);
+
+  // 🔥 UI UPDATE
+  populateTeamSelect?.();
+  updateTable?.();
+  updateHeader?.();
 }
+
+// 🌍 EXPORT
+window.selectLeague = selectLeague;
 
 // =========================
 // ⚽ SELECT TEAM (🔥 HIER FEHLT ES BEI DIR)
