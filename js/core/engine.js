@@ -263,9 +263,6 @@ function simulateMatchday(){
     // ✅ Ergebnis setzen
     match.result = { home, away };
 
-    // ❌ ALT
-    // updateTable(match.home, match.away, home, away);
-
     // ✅ NEU
     applyMatchResult(match);
   });
