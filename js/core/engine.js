@@ -258,6 +258,7 @@ function updateAllUI(text){
   updateMatchUI(text);
   updateScoreUI();
   updateProgressBar();
+  saveGame();
 }
 
 function updateScoreUI(){
