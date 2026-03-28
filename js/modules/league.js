@@ -47,3 +47,10 @@ function selectLeague(key){
 
 window.LEAGUES = LEAGUES;
 window.selectLeague = selectLeague;
+
+// 🔥 DAS HAT GEFEHLT
+function selectTeam(name){
+  game.team.selected = name;
+}
+
+window.selectTeam = selectTeam;
