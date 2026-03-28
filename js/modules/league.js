@@ -1,3 +1,6 @@
+// =========================
+// 📦 LIGEN DATEN
+// =========================
 const LEAGUES = {
   herford: {
     name: "Kreisliga A Herford",
@@ -30,21 +33,71 @@ const LEAGUES = {
   }
 };
 
+// =========================
+// 👤 TEAM AUSWÄHLEN (FIX für bindings.js)
+// =========================
+function selectTeam(name){
+  game.team.selected = name;
+  console.log("👤 Team gewählt:", name);
+}
+
+window.selectTeam = selectTeam;
+
+// =========================
+// 🏗️ TEAM ERSTELLEN
+// =========================
+function createTeam(name, id){
+  return {
+    id: id,
+    name: name,
+    strength: Math.floor(Math.random() * 30) + 60
+  };
+}
+
+// =========================
+// 🏟️ LIGA AUSWÄHLEN
+// =========================
 function selectLeague(key){
 
   const data = LEAGUES[key];
 
+  if(!data){
+    console.error("❌ Liga nicht gefunden:", key);
+    return;
+  }
+
   game.league.key = key;
 
-  game.league.teams = data.teams.map(name => ({
-    name,
-    strength: Math.floor(Math.random() * 30) + 60
-  }));
+  // 🔥 Teams erstellen (mit ID!)
+  game.league.teams = data.teams.map((name, i) => createTeam(name, i));
 
+  console.log("🏟️ Teams geladen:", game.league.teams);
+
+  // =========================
+  // 📊 Tabelle erstellen
+  // =========================
   createTable();
 
-  generateSchedule(); // 🔥 wichtig
+  // =========================
+  // ⚽ Spielplan erstellen
+  // =========================
+  generateSchedule();
 
+  // =========================
+  // 🎮 Team-Auswahl UI
+  // =========================
   populateTeamSelect();
+
+  // =========================
+  // 💾 Speichern
+  // =========================
+  saveGame?.();
+
+  console.log("✅ Liga geladen:", data.name);
 }
 
+// =========================
+// 🌍 EXPORT
+// =========================
+window.selectLeague = selectLeague;
+window.LEAGUES = LEAGUES;
