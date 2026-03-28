@@ -303,8 +303,10 @@ function endMatch(){
 // =========================
 // 🏁 Aktualisierung Ergebnisse
 // =========================
-
 function applyMatchResult(match){
+
+  // 🔥 DOPPELTE VERARBEITUNG VERHINDERN
+  if(match._processed) return;
 
   const home = match.home;
   const away = match.away;
@@ -340,6 +342,9 @@ function applyMatchResult(match){
     home.points += 1;
     away.points += 1;
   }
+
+  // 🔥 GANZ WICHTIG
+  match._processed = true;
 }
 // =========================
 // 🌍 GLOBAL
