@@ -38,20 +38,14 @@ function selectLeague(key){
 
   game.league.teams = data.teams.map(name => ({
     name,
-    strength: Math.floor(Math.random() * 30) + 60 // 60–90
+    strength: Math.floor(Math.random() * 30) + 60
   }));
 
   createTable();
-  generateSchedule();
+
+  generateSchedule(); // 🔥 wichtig
+
   populateTeamSelect();
-}
-
-window.LEAGUES = LEAGUES;
-window.selectLeague = selectLeague;
-
-// 🔥 DAS HAT GEFEHLT
-function selectTeam(name){
-  game.team.selected = name;
 }
 
 window.selectTeam = selectTeam;
