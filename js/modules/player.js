@@ -1,31 +1,61 @@
-function createPlayer(name, position){
+console.log("PLAYER MODULE");
 
-  return {
-    id: crypto.randomUUID(),
-    name,
-    position, // GK, DEF, MID, ATT
-    rating: rand(50, 80),
-    form: rand(40, 100),
-    stamina: 100,
-    yellow: 0,
-    red: false
-  };
+// =========================
+// 👤 INIT PLAYER
+// =========================
+function initPlayer(){
+
+  if(!game.player){
+    game.player = {};
+  }
+
+  // Name laden oder neu setzen
+  if(!game.player.name){
+
+    let saved = localStorage.getItem("playerName");
+
+    if(saved){
+      game.player.name = saved;
+    } else {
+
+      let name = prompt("Manager Name?");
+      if(!name){
+        name = "Manager_" + Math.floor(Math.random()*1000);
+      }
+
+      game.player.name = name;
+      localStorage.setItem("playerName", name);
+    }
+  }
+
+  // Input setzen
+  const input = document.getElementById("nameInput");
+  if(input){
+    input.value = game.player.name;
+  }
+
+  console.log("👤 Player:", game.player.name);
 }
 
-function generateTeamPlayers(){
+// =========================
+// ✏️ NAME ÄNDERN
+// =========================
+function changeName(){
 
-  return [
-    createPlayer("Max Müller", "GK"),
-    createPlayer("Schmidt", "DEF"),
-    createPlayer("Kaya", "DEF"),
-    createPlayer("Ali", "MID"),
-    createPlayer("Jonas", "MID"),
-    createPlayer("Ben", "ATT")
-  ];
+  const input = document.getElementById("nameInput");
+  if(!input) return;
+
+  const name = input.value.trim();
+  if(!name) return;
+
+  game.player.name = name;
+  localStorage.setItem("playerName", name);
+
+  updateHeader?.();
 }
 
-function rand(min, max){
-  return Math.floor(Math.random()*(max-min)+min);
-}
-
-window.generateTeamPlayers = generateTeamPlayers;
+// =========================
+// 🌍 EXPORT
+// =========================
+window.initPlayer = initPlayer;
+window.changeName = changeName;
