@@ -22,8 +22,9 @@ function handleMainAction(){
 function simulateMatchday(){
 
   const round = game.league.schedule?.[game.league.currentRound];
-
   if(!round) return;
+
+  let playerMatch = null;
 
   round.forEach(match => {
 
@@ -31,22 +32,24 @@ function simulateMatchday(){
       match.home.name === game.team.selected?.name ||
       match.away.name === game.team.selected?.name;
 
-    // ❗ Spieler-Spiel wird IMMER übersprungen
-    if(isPlayerMatch) return;
-
-    // ❗ nur simulieren wenn noch kein Ergebnis existiert
-    if(match.result === null){
-
-      const home = Math.floor(Math.random()*3);
-      const away = Math.floor(Math.random()*3);
-
-      match.result = { home, away };
-
-      applyMatchResult(match);
+    if(isPlayerMatch){
+      playerMatch = match;
+      return;
     }
+
+    const home = Math.floor(Math.random()*3);
+    const away = Math.floor(Math.random()*3);
+
+    match.result = { home, away };
+    applyMatchResult(match);
   });
 
-  renderTable();
+  // 👉 WICHTIG: Spieler-Spiel setzen
+  if(playerMatch){
+    game.match.current = playerMatch;
+  } else {
+    console.warn("⚠️ Kein Spiel für Spieler gefunden!");
+  }
 }
 
 // =========================
