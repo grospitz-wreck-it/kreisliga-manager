@@ -2,13 +2,20 @@
 // 🚀 INIT
 // =========================
 console.log("MAIN START");
-
+console.log("simulateMatchday:", typeof simulateMatchday);
 window.onload = function(){
 
   loadGameState();
 
   initPlayer();
   initLeagueUI();
+window.onload = function(){
+
+  loadGameState();
+
+  initPlayer();
+  initLeagueUI();
+
   bindUI();
 
   if(typeof initFriendUI === "function"){
@@ -27,10 +34,24 @@ window.onload = function(){
 
   console.log("✅ App vollständig geladen");
 };
+  if(typeof initFriendUI === "function"){
+    initFriendUI();
+  }
 
-// =========================
-// 🔲 SETUP PANEL
-// =========================
+  updateHeader();
+  updateMainButton();
+
+  updateTable?.();
+  loadLeaderboard?.();
+
+  if(typeof startAds === "function"){
+    startAds();
+  }
+ // 🔥 HIER GEHÖRT ES HIN
+  bindUI();
+
+  console.log("✅ App vollständig geladen");
+};
 function toggleSetup(){
   const panel = document.getElementById("setupPanel");
   const overlay = document.getElementById("overlay");
@@ -52,7 +73,6 @@ function closeSetup(){
   panel.classList.remove("open");
   overlay.classList.remove("active");
 }
-
 // =========================
 // 👤 PLAYER
 // =========================
@@ -116,7 +136,7 @@ function updateHeader(){
 }
 
 // =========================
-// ▶️ MAIN ACTION FLOW
+// ▶️ FLOW
 // =========================
 function handleMainAction(){
 
@@ -127,7 +147,7 @@ function handleMainAction(){
       break;
 
     case "ready":
-      simulateMatchday();
+      startMatch();
       break;
 
     case "halftime":
@@ -135,11 +155,8 @@ function handleMainAction(){
       break;
 
     case "live":
-      // Pause
-      if(game.match){
-        game.match.isRunning = false;
-        game.phase = "halftime";
-      }
+      game.match.isRunning = false;
+      game.phase = "halftime";
       break;
   }
 
@@ -147,15 +164,59 @@ function handleMainAction(){
 }
 
 // =========================
-// 🔘 BUTTON TEXT
+// 🏁 SAISON
+// =========================
+function startSeason(){
+
+  if(!game.league.teams.length){
+    alert("Liga wählen!");
+    return;
+  }
+
+  game.league.currentMatchday = 0;
+  generateSchedule();
+
+  game.phase = "ready";
+}
+
+// =========================
+// ⚽ MATCH
+// =========================
+function startMatch(){
+
+  if(!game.team.selected){
+    alert("Bitte zuerst ein Team wählen!");
+    return;
+  }
+
+  if(!game.league.schedule || game.league.schedule.length === 0){
+    alert("Keine Liga gestartet!");
+    return;
+  }
+
+  if(game.match.isRunning){
+    console.warn("Spiel läuft bereits");
+    return;
+  }
+
+  simulateMatchday();
+
+  game.match.isRunning = true;
+  game.phase = "live";
+
+  updateMainButton();
+}
+
+// =========================
+// 🔘 BUTTON
 // =========================
 function updateMainButton(){
 
   const btn = document.getElementById("mainActionBtn");
   if(!btn) return;
 
-  if(game.phase === "idle")      btn.innerText = "▶ Liga starten";
-  else if(game.phase === "ready")    btn.innerText = "▶ Spieltag";
+  if(game.phase === "idle") btn.innerText = "▶ Saison starten";
+  else if(game.phase === "ready") btn.innerText = "▶ Spieltag";
   else if(game.phase === "halftime") btn.innerText = "▶ 2. Halbzeit";
-  else if(game.phase === "live")     btn.innerText = "⏸ Pause";
+  else if(game.phase === "live") btn.innerText = "⏸ Pause";
 }
