@@ -36,17 +36,23 @@ function findPlayerMatch(){
 // =========================
 function startMatch(){
 
-  // 👉 ERST dein Spiel holen
-  let match = findPlayerMatch();
+  const round = game.league.schedule?.[game.league.currentRound];
+  const myTeam = game.team.selected;
 
-  // 👉 Fallback (falls irgendwas schief ist)
+  if(!round || !myTeam) return;
+
+  // ✅ EXAKT dein Spiel holen
+  const match = round.find(m =>
+    m.home.name === myTeam.name ||
+    m.away.name === myTeam.name
+  );
+
   if(!match){
-    match = game.league.schedule?.[game.league.currentRound]?.[0];
+    console.error("❌ Kein Spiel für dein Team gefunden!");
+    return;
   }
 
-  if(!match) return;
-
-  // 👉 DANN KI Spiele simulieren
+  // 👉 KI Spiele simulieren (ohne dein Spiel)
   simulateMatchday();
 
   game.match.current = match;
