@@ -3,42 +3,25 @@
 // =========================
 console.log("MAIN FILE LOADED");
 
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
 
   console.log("🚀 DOM READY");
 
-  try {
+  initPlayer?.();
+  initLeagueSelect?.();
 
-    // 🔹 Player
-    if(typeof initPlayer === "function"){
-      initPlayer();
-    }
+  // 🔥 JETZT ERST VALUE LESEN
+  const leagueSelect = document.getElementById("leagueSelect");
 
-    // 🔹 Liga Dropdown
-    if(typeof initLeagueSelect === "function"){
-      initLeagueSelect();
-    }
+  console.log("👉 SELECT VALUE:", leagueSelect?.value);
 
-    // 🔹 UI Events
-    if(typeof bindUI === "function"){
-      bindUI();
-    }
-
-    // 🔹 UI Updates
-    if(typeof updateHeader === "function"){
-      updateHeader();
-    }
-
-    if(typeof updateTable === "function"){
-      updateTable();
-    }
-
-    console.log("✅ INIT COMPLETE");
-
-  } catch(err){
-    console.error("❌ INIT ERROR:", err);
+  if(leagueSelect && leagueSelect.value){
+    selectLeague(leagueSelect.value);
+  } else {
+    console.warn("❌ Keine Default Liga gesetzt");
   }
 
+  bindUI?.();
 });
 // =========================
 // 🎮 MAIN FLOW
