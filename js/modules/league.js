@@ -42,6 +42,7 @@ function selectLeague(key){
   }));
 
   createTable();
+  generateSchedule();
   populateTeamSelect();
 }
 
