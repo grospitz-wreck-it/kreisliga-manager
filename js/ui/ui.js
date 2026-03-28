@@ -12,33 +12,37 @@ function updateUI(){
     return;
   }
 
-  const match = game.match.current;
+  const match = game.match?.current;
+
+  // 🛡️ SAFE ACCESS
+  const seasonYear = game.season?.year ?? 1;
+  const matchday = (game.league?.currentRound ?? 0) + 1;
 
   // =========================
   // ❌ KEIN MATCH
   // =========================
   if(!match){
     scoreEl.textContent = "0 : 0";
-    matchEl.textContent = "Kein Spiel aktiv";
+    matchEl.textContent = `Saison ${seasonYear} | Kein Spiel aktiv`;
     progress.style.width = "0%";
     return;
   }
 
   // =========================
-  // ⚽ SCORE (dein Code)
+  // ⚽ SCORE
   // =========================
   scoreEl.textContent =
     matchState.score.home + " : " + matchState.score.away;
 
   // =========================
-  // 📅 ERWEITERT (NEU)
+  // 📅 MATCH INFO
   // =========================
   matchEl.textContent =
-    `Saison ${game.season.year} | Spieltag ${game.league.currentRound + 1}\n` +
+    `Saison ${seasonYear} | Spieltag ${matchday} | ` +
     `${match.home.name} vs ${match.away.name} | ${matchState.minute}'`;
 
   // =========================
-  // 📊 FORTSCHRITT (dein Code)
+  // 📊 PROGRESS
   // =========================
   const percent = Math.min((matchState.minute / 90) * 100, 100);
   progress.style.width = percent + "%";
