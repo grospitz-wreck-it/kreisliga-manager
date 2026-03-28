@@ -91,6 +91,7 @@ function runMatchLoop(){
 
     updateUI();
     renderLiveFeed();
+    renderLiveTable();
 
     if(matchState.minute > 90){
       clearInterval(interval);
