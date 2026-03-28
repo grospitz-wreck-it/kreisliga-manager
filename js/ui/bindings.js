@@ -36,4 +36,22 @@ document.getElementById("tacticSelect").addEventListener("change", (e) => {
     game.team.selected.tactic = e.target.value;
   }
 });
+// =========================
+// 🎮 TAKTIK ÄNDERN
+// =========================
+const tacticSelect = document.getElementById("tacticSelect");
+
+if(tacticSelect){
+  tacticSelect.addEventListener("change", (e) => {
+
+    if(!game.team.selected){
+      console.warn("❌ Kein Team ausgewählt");
+      return;
+    }
+
+    game.team.selected.tactic = e.target.value;
+
+    console.log("🧠 Neue Taktik:", game.team.selected.tactic);
+  });
+}
 window.bindUI = bindUI;
