@@ -31,5 +31,9 @@ function bindUI(){
     handleMainAction();
   });
 }
-
+document.getElementById("tacticSelect").addEventListener("change", (e) => {
+  if(game.team.selected){
+    game.team.selected.tactic = e.target.value;
+  }
+});
 window.bindUI = bindUI;
