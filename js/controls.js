@@ -121,19 +121,18 @@ addLiveEvent("Formation geändert");
 
 function setSpeed(e, multi){
 
-  if(![1,3,5].includes(multi)) return;
+speedMultiplier = multi;
 
-  window.speedMultiplier = multi;
+document.querySelectorAll(".speed").forEach(function(b){
+b.classList.remove("active");
+});
 
-  document.querySelectorAll(".speed").forEach(function(b){
-    b.classList.remove("active");
-  });
+e.target.classList.add("active");
 
-  if(e && e.target) e.target.classList.add("active");
-
-  console.log("⚡ Speed:", multi);
+if(game.match.isRunning){
+restartInterval();
 }
-
+}
 
 // =========================
 // PAUSE
