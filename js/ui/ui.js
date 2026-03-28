@@ -84,7 +84,9 @@ function updateMatchUI(text){
     el.innerText = text;
   }
 }
-
+window.updateUI = updateUI;
+window.renderSchedule = renderSchedule;
+window.renderCurrentMatch = renderCurrentMatch;
 window.initLeagueSelect = initLeagueSelect;
 window.populateTeamSelect = populateTeamSelect;
 window.updateMatchUI = updateMatchUI;
