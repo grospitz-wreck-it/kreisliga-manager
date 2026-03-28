@@ -147,7 +147,11 @@ function selectTeam(teamName){
     console.error("❌ Team nicht gefunden:", teamName);
     return;
   }
+  const select = document.getElementById("tacticSelect");
 
+if(select){
+  select.value = team.tactic;
+}
   game.team.selected = team;
 
   console.log("✅ Team gewählt:", team.name);
