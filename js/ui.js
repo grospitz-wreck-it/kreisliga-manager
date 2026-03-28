@@ -1,3 +1,5 @@
+
+
 // =========================
 // 📊 TABELLE
 // =========================
@@ -14,7 +16,21 @@ function updateTable(){
   if(!teams || teams.length === 0){
     return;
   }
+function initLeagueSelect(){
 
+  const select = document.getElementById("leagueSelect");
+
+  select.innerHTML = "";
+
+  Object.entries(LEAGUES).forEach(([key, val]) => {
+
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = val.name;
+
+    select.appendChild(opt);
+  });
+}
   // =========================
   // 📊 SORTIERUNG (ECHT)
   // =========================
