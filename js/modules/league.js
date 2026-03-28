@@ -33,7 +33,18 @@ function selectLeague(key){
 function selectTeam(name){
   game.team.selected = name;
 }
+function populateTeamSelect(){
 
+  const select = document.getElementById("teamSelect");
+  select.innerHTML = "";
+
+  game.league.teams.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.name;
+    opt.textContent = `${t.name} (Stärke ${t.strength})`;
+    select.appendChild(opt);
+  });
+}
 window.LEAGUES = LEAGUES;
 window.selectLeague = selectLeague;
 window.selectTeam = selectTeam;
