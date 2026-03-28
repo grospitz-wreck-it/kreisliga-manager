@@ -9,7 +9,25 @@ function initLeagueSelect(){
     select.appendChild(opt);
   });
 }
+function renderCurrentMatch(){
 
+  const el = document.getElementById("currentMatch");
+
+  if(!el) return;
+
+  const match = game.match.current;
+
+  if(!match){
+    el.innerHTML = "Kein Spiel aktiv";
+    return;
+  }
+
+  el.innerHTML = `
+    <h3>${match.home.name} vs ${match.away.name}</h3>
+  `;
+}
+
+window.renderCurrentMatch = renderCurrentMatch;
 function populateTeamSelect(){
 
   const select = document.getElementById("teamSelect");
