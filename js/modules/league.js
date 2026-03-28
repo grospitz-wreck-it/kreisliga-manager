@@ -67,10 +67,10 @@ function selectTeam(teamName){
     return;
   }
 
-  // 🔥 NUR NAME SPEICHERN
+  // 🔥 DAS FEHLT BEI DIR
   game.team.selected = team.name;
 
-  console.log("✅ Team gewählt:", team.name);
+  console.log("✅ Team gesetzt:", game.team.selected);
 }
 
 window.selectTeam = selectTeam;
