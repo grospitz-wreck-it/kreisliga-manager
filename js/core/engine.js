@@ -71,23 +71,27 @@ function simulateMatchday(){
       match.home.name === game.team.selected?.name ||
       match.away.name === game.team.selected?.name;
 
+    // 👉 DEIN SPIEL: NUR MERKEN
     if(isPlayerMatch){
       playerMatch = match;
       return;
     }
 
+    // 👉 NUR simulieren wenn NOCH NICHT verarbeitet
     if(match._processed) return;
 
     const home = Math.floor(Math.random()*3);
     const away = Math.floor(Math.random()*3);
 
     match.result = { home, away };
+
     applyMatchResult(match);
   });
 
-  if(playerMatch){
-    game.match.current = playerMatch;
-  } else {
+  // 👉 GANZ AM ENDE setzen
+  game.match.current = playerMatch || null;
+
+  if(!playerMatch){
     console.warn("⚠️ Kein Spiel für Spieler gefunden!");
   }
 
