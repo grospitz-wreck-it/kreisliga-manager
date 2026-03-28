@@ -347,3 +347,47 @@ button {
   touch-action: manipulation;
   cursor: pointer;
 }
+.tableTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tableTabs .tab {
+  flex: 1;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.tableTabs .active {
+  background: #222;
+  color: #fff;
+}
+
+.tabContent {
+  display: none;
+}
+
+.tabContent.active {
+  display: block;
+}
+
+.matchday {
+  margin-bottom: 15px;
+}
+
+.matchday.current {
+  border-left: 4px solid orange;
+  padding-left: 8px;
+}
+
+.match {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.match.highlight {
+  font-weight: bold;
+  color: orange;
+}
