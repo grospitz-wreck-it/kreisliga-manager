@@ -1,5 +1,5 @@
 // =========================
-// ⚽ MATCH ENGINE
+// ⚽ MATCH ENGINE (FINAL CLEAN STABLE)
 // =========================
 
 console.log("ENGINE START");
@@ -13,11 +13,6 @@ window.speedMultiplier = 1;
 // 🧠 SAISON START
 // =========================
 function startSeason(){
-
-  if(!game.league.teams || game.league.teams.length === 0){
-    alert("Liga wählen!");
-    return;
-  }
 
   game.league.currentMatchday = 0;
   game.league.schedule = generateMatchSchedule(game.league.teams);
@@ -41,12 +36,10 @@ function simulateMatchday(){
   }
 
   const i = game.league.currentMatchday || 0;
-  const matches = game.league.schedule?.[i];
+  const matches = game.league.schedule[i];
 
   if(!matches){
     addLiveEvent("🏆 Saison beendet!", 0);
-    game.phase = "idle";
-    updateMainButton?.();
     return;
   }
 
@@ -61,9 +54,6 @@ function simulateMatchday(){
 function startConference(matches){
 
   clearLiveEvents?.();
-
-  // Interval sauber stoppen vor neuem Spiel
-  stopInterval();
 
   game.match = {
     minute: 0,
@@ -94,12 +84,11 @@ function startConference(matches){
 }
 
 // =========================
-// ⏱️ GAME LOOP
+// ⏱️ GAME LOOP (FIXED)
 // =========================
 function startConferenceInterval(){
 
-  // Niemals doppelt starten
-  if(interval !== null) return;
+  if(interval) return;
 
   lastTick = Date.now();
 
@@ -143,17 +132,7 @@ function startConferenceInterval(){
 }
 
 // =========================
-// 🛑 INTERVAL STOPPEN
-// =========================
-function stopInterval(){
-  if(interval !== null){
-    clearInterval(interval);
-    interval = null;
-  }
-}
-
-// =========================
-// ▶️ RESUME 2. HALBZEIT
+// ▶️ RESUME
 // =========================
 function resumeMatch(){
 
@@ -161,11 +140,11 @@ function resumeMatch(){
 
   if(!game.match) return;
   if(game.match.minute < 45) return;
-  if(game.match.isRunning) return;
 
   game.match.isRunning = true;
   game.phase = "live";
 
+  // 🔥 WICHTIG: verhindert "1 Minute pro Klick"
   lastTick = Date.now();
 
   addLiveEvent("▶️ 2. Halbzeit startet", game.match.minute);
@@ -196,7 +175,7 @@ function getIntervalSpeed(){
 }
 
 // =========================
-// ⚽ MINUTE SIMULIEREN
+// ⚽ MINUTE
 // =========================
 function simulateConferenceMinute(){
 
@@ -265,11 +244,9 @@ function applyLiveTable(){
 }
 
 // =========================
-// 🏁 KONFERENZ ENDE
+// 🏁 ENDE
 // =========================
 function endConference(){
-
-  stopInterval(); // 🔥 Interval sauber beenden
 
   game.match.isRunning = false;
   game.phase = "ready";
@@ -293,14 +270,13 @@ function endConference(){
     addLiveEvent(`➡️ Nächster Gegner: ${getOpponentName(next)}`, 0);
   } else {
     addLiveEvent("🏆 Saison beendet!", 0);
-    game.phase = "idle";
   }
 
   updateMainButton?.();
 }
 
 // =========================
-// 📊 TABLE FINAL UPDATE
+// 📊 TABLE FINAL
 // =========================
 function updateTableData(match){
 
@@ -329,7 +305,7 @@ function updateTableData(match){
 }
 
 // =========================
-// 📅 SPIELPLAN GENERATOR
+// 📅 SPIELPLAN
 // =========================
 function generateMatchSchedule(teams){
 
@@ -375,7 +351,7 @@ function generateMatchSchedule(teams){
 function getNextMatch(){
 
   const i = game.league.currentMatchday || 0;
-  const matches = game.league.schedule?.[i];
+  const matches = game.league.schedule[i];
 
   if(!matches) return null;
 
@@ -395,6 +371,5 @@ window.startSeason = startSeason;
 window.simulateMatchday = simulateMatchday;
 window.resumeMatch = resumeMatch;
 window.setSpeed = setSpeed;
-window.stopInterval = stopInterval;
 
 console.log("ENGINE END");
