@@ -61,3 +61,28 @@ function generateSchedule(){
 }
 
 window.generateSchedule = generateSchedule;
+// =========================
+// 👉 NÄCHSTES SPIEL
+// =========================
+function nextMatch(){
+
+  const schedule = game.league.schedule;
+  const roundIndex = game.league.currentRound;
+
+  if(!schedule || !schedule.length){
+    console.warn("Kein Spielplan vorhanden");
+    return null;
+  }
+
+  if(roundIndex >= schedule.length){
+    console.warn("Saison beendet");
+    return null;
+  }
+
+  const round = schedule[roundIndex];
+
+  // 👉 aktuell erstes Spiel des Spieltags
+  return round[0];
+}
+
+window.nextMatch = nextMatch;
