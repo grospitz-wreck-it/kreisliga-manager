@@ -1,11 +1,17 @@
 const LEAGUES = {
   a: {
     name: "Liga A",
-    teams: ["Team 1", "Team 2"]
+    teams: [
+      { name: "Team 1", strength: 70 },
+      { name: "Team 2", strength: 60 }
+    ]
   },
   b: {
     name: "Liga B",
-    teams: ["Team 3", "Team 4"]
+    teams: [
+      { name: "Team 3", strength: 80 },
+      { name: "Team 4", strength: 50 }
+    ]
   }
 };
 
@@ -14,7 +20,12 @@ function selectLeague(key){
   const data = LEAGUES[key];
 
   game.league.key = key;
-  game.league.teams = data.teams;
+
+  // 🔥 WICHTIG: Kopie erstellen (kein Reference Bug)
+  game.league.teams = data.teams.map(t => ({
+    name: t.name,
+    strength: t.strength
+  }));
 
   populateTeamSelect();
 }
