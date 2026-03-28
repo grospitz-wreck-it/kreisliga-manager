@@ -1,17 +1,55 @@
+// =========================
+// 🧠 UI MODULE
+// =========================
 console.log("UI START");
 
 // =========================
-// 🏆 LIGA SELECT INIT
+// 🏆 LIGA SELECT
 // =========================
 function initLeagueSelect(){
+
   console.log("🔥 initLeagueSelect CALLED");
 
   const select = document.getElementById("leagueSelect");
-  console.log("SELECT:", select);
+  if(!select || typeof LEAGUES === "undefined") return;
 
+  select.innerHTML = "";
+
+  Object.entries(LEAGUES).forEach(([key, val]) => {
+
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = val.name;
+
+    select.appendChild(opt);
+  });
+
+}
+
+// =========================
+// 📋 TEAM DROPDOWN
+// =========================
+function populateTeamSelect(){
+
+  const select = document.getElementById("teamSelect");
   if(!select) return;
 
-  select.innerHTML = "TEST"; // 👈 TEST
+  select.innerHTML = "";
+
+  if(!game.league.teams) return;
+
+  game.league.teams.forEach(team => {
+
+    const opt = document.createElement("option");
+    opt.value = team.name;
+    opt.textContent = team.name;
+
+    select.appendChild(opt);
+  });
+
+  if(game.team.selected){
+    select.value = game.team.selected;
+  }
 }
 
 // =========================
@@ -29,39 +67,39 @@ function updateTable(){
 
   const sorted = [...teams].sort((a,b)=>{
 
-    if(b.stats.points !== a.stats.points){
-      return b.stats.points - a.stats.points;
-    }
+    if(b.points !== a.points) return b.points - a.points;
 
-    const diffA = a.stats.goalsFor - a.stats.goalsAgainst;
-    const diffB = b.stats.goalsFor - b.stats.goalsAgainst;
+    const diffA = a.goalsFor - a.goalsAgainst;
+    const diffB = b.goalsFor - b.goalsAgainst;
 
-    if(diffB !== diffA){
-      return diffB - diffA;
-    }
+    if(diffB !== diffA) return diffB - diffA;
 
-    return b.stats.goalsFor - a.stats.goalsFor;
+    if(b.goalsFor !== a.goalsFor) return b.goalsFor - a.goalsFor;
+
+    return a.name.localeCompare(b.name);
   });
 
   sorted.forEach((team, index)=>{
 
-    const s = team.stats;
-
     const row = document.createElement("tr");
 
-    const isPlayer = team.name === game.team.name;
+    const isPlayer = team.name === game.team.selected;
+
+    const gf = team.goalsFor || 0;
+    const ga = team.goalsAgainst || 0;
 
     row.innerHTML = `
       <td>${index + 1}</td>
-      <td ${isPlayer ? 'style="font-weight:bold;color:#4caf50"' : ''}>
+      <td ${isPlayer ? 'style="color:#4caf50;font-weight:bold"' : ''}>
         ${team.name}
       </td>
-      <td>${s.played}</td>
-      <td>${s.wins}</td>
-      <td>${s.draws}</td>
-      <td>${s.losses}</td>
-      <td>${s.goalsFor}:${s.goalsAgainst}</td>
-      <td>${s.points}</td>
+      <td>${team.played || 0}</td>
+      <td>${team.wins || 0}</td>
+      <td>${team.draws || 0}</td>
+      <td>${team.losses || 0}</td>
+      <td>${gf}:${ga}</td>
+      <td>${gf - ga}</td>
+      <td><strong>${team.points || 0}</strong></td>
     `;
 
     table.appendChild(row);
@@ -69,45 +107,50 @@ function updateTable(){
 }
 
 // =========================
-// 📋 TEAM SELECT
+// 📅 SPIELPLAN
 // =========================
-function populateTeamSelect(){
+function renderSchedule(){
 
-  const select = document.getElementById("teamSelect");
-  if(!select) return;
+  const container = document.getElementById("scheduleContainer");
+  if(!container) return;
 
-  select.innerHTML = "";
+  const schedule = game.league.schedule;
 
-  game.league.teams.forEach(team => {
+  if(!schedule || schedule.length === 0){
+    container.innerHTML = "<p>Kein Spielplan vorhanden</p>";
+    return;
+  }
 
-    const opt = document.createElement("option");
-    opt.value = team.id;
-    opt.textContent = team.name;
+  let html = "";
 
-    select.appendChild(opt);
+  schedule.forEach((round, index) => {
+
+    const isCurrent = index === game.league.currentMatchday;
+
+    html += `
+      <div class="matchday ${isCurrent ? "current" : ""}">
+        <h4>Spieltag ${index + 1}</h4>
+    `;
+
+    round.forEach(match => {
+
+      const isUser =
+        match.home === game.team.selected ||
+        match.away === game.team.selected;
+
+      html += `
+        <div class="match ${isUser ? "highlight" : ""}">
+          <span>${match.home}</span>
+          <span>vs</span>
+          <span>${match.away}</span>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
   });
-}
 
-// =========================
-// 🧾 HEADER
-// =========================
-function updateHeader(){
-
-  const title = document.getElementById("gameTitle");
-  const sub = document.getElementById("leagueTitle");
-
-  if(title){
-    title.innerText = game.player?.name || "Manager";
-  }
-
-  if(sub){
-    const league = game.league?.name || "Keine Liga";
-    const team = game.team?.name || "";
-
-    sub.innerText = team 
-      ? `${league} • ${team}`
-      : league;
-  }
+  container.innerHTML = html;
 }
 
 // =========================
@@ -127,8 +170,8 @@ function updateTeamsUI(){
 
   if(!window.currentMatch) return;
 
-  document.getElementById("teamLeft").innerText = currentMatch.home;
-  document.getElementById("teamRight").innerText = currentMatch.away;
+  document.getElementById("teamLeft").innerText = window.currentMatch.home;
+  document.getElementById("teamRight").innerText = window.currentMatch.away;
 }
 
 function updateProgressBar(){
@@ -136,8 +179,8 @@ function updateProgressBar(){
   const bar = document.getElementById("momentumBar");
   if(!bar) return;
 
-  const percent = (game.match.minute / 90) * 100;
-  bar.style.width = percent + "%";
+  const minute = game.match.minute || 0;
+  bar.style.width = (minute / 90 * 100) + "%";
 }
 
 // =========================
@@ -160,75 +203,44 @@ function clearLiveEvents(){
 }
 
 // =========================
-// 📅 SPIELPLAN
-// =========================
-function renderSchedule(){
-
-  const container = document.getElementById("scheduleContainer");
-  if(!container) return;
-
-  const schedule = game.league.schedule;
-
-  if(!schedule || schedule.length === 0){
-    container.innerHTML = "<p>Kein Spielplan</p>";
-    return;
-  }
-
-  let html = "";
-
-  schedule.forEach((round, index) => {
-
-    html += `<div class="matchday"><h4>Spieltag ${index+1}</h4>`;
-
-    round.forEach(match => {
-
-      html += `
-        <div class="match">
-          ${match.home} vs ${match.away}
-        </div>
-      `;
-    });
-
-    html += `</div>`;
-  });
-
-  container.innerHTML = html;
-}
-
-// =========================
-// 🎮 BINDINGS (EINMAL!)
+// 🎮 UI BINDINGS (FIXED)
 // =========================
 function bindUI(){
 
   console.log("🔗 bindUI aktiv");
 
-  // MAIN BUTTON
-  document.getElementById("mainButton")
-    ?.addEventListener("click", handleMainAction);
+  function bind(el, fn){
+    if(!el) return;
 
-  // MENU
-  document.getElementById("menuBtn")
-    ?.addEventListener("click", toggleSetup);
+    el.addEventListener("pointerdown", e => {
+      e.preventDefault();
+      fn();
+    });
+  }
 
-  document.getElementById("overlay")
-    ?.addEventListener("click", closeSetup);
+  bind(document.getElementById("mainActionBtn"),
+    () => window.handleMainAction?.());
 
-  // SELECTS
-  document.getElementById("leagueSelect")
-    ?.addEventListener("change", selectLeague);
+  bind(document.getElementById("menuBtn"),
+    () => window.toggleSetup?.());
 
-  document.getElementById("teamSelect")
-    ?.addEventListener("change", selectTeam);
+  bind(document.getElementById("overlay"),
+    () => window.closeSetup?.());
 
-  // RESET
-  document.getElementById("resetGameBtn")
-    ?.addEventListener("click", resetGame);
+  bind(document.getElementById("selectLeagueBtn"),
+    () => window.selectLeague?.());
+
+  bind(document.getElementById("selectTeamBtn"),
+    () => window.selectTeam?.());
+
+  bind(document.getElementById("resetBtn"),
+    () => window.resetGame?.());
 
   // SPEED
   document.querySelectorAll(".speedControl button")
     .forEach(btn => {
       btn.addEventListener("click", () => {
-        setSpeed(Number(btn.dataset.speed));
+        window.setSpeed?.(Number(btn.innerText.replace("x","")));
       });
     });
 
@@ -251,17 +263,19 @@ function bindUI(){
       if(tab.dataset.tab === "scheduleTab"){
         renderSchedule();
       }
+
     });
 
   });
+
 }
 
 // =========================
 // 🌍 EXPORTS
 // =========================
 window.initLeagueSelect = initLeagueSelect;
-window.updateTable = updateTable;
 window.populateTeamSelect = populateTeamSelect;
+window.updateTable = updateTable;
 window.updateHeader = updateHeader;
 window.bindUI = bindUI;
 window.updateScoreUI = updateScoreUI;
@@ -269,3 +283,4 @@ window.updateTeamsUI = updateTeamsUI;
 window.updateProgressBar = updateProgressBar;
 window.addLiveEvent = addLiveEvent;
 window.clearLiveEvents = clearLiveEvents;
+window.renderSchedule = renderSchedule;
