@@ -14,7 +14,7 @@ const matchState = {
 window.matchState = matchState;
 
 // =========================
-// ▶️ HAUPTAKTION BUTTON
+// ▶️ BUTTON LOGIK
 // =========================
 function handleMainAction(){
 
@@ -28,91 +28,120 @@ function handleMainAction(){
 window.handleMainAction = handleMainAction;
 
 // =========================
-// ⚽ KOMPLETTEN SPIELTAG SIMULIEREN
+// 🔍 SPIEL FINDEN (ROBUST)
+// =========================
+function findPlayerMatch(){
+
+  const round = game.league.schedule?.[game.league.currentRound];
+  const myName = game.team.selected?.name;
+
+  if(!round || !myName){
+    console.error("❌ Kein Spieltag oder Team fehlt");
+    return null;
+  }
+
+  for(let match of round){
+
+    // 🔥 unterstützt BEIDES (string oder objekt)
+    const homeName = typeof match.home === "string" ? match.home : match.home.name;
+    const awayName = typeof match.away === "string" ? match.away : match.away.name;
+
+    if(homeName === myName || awayName === myName){
+      console.log("✅ Spiel gefunden:", homeName, "vs", awayName);
+
+      // 🔥 sicherstellen: wir haben OBJEKTE
+      const homeObj = typeof match.home === "string"
+        ? game.league.teams.find(t => t.name === match.home)
+        : match.home;
+
+      const awayObj = typeof match.away === "string"
+        ? game.league.teams.find(t => t.name === match.away)
+        : match.away;
+
+      match.home = homeObj;
+      match.away = awayObj;
+
+      return match;
+    }
+  }
+
+  console.error("❌ Dein Team ist NICHT im Spieltag!");
+  return null;
+}
+
+// =========================
+// ⚽ SPIELTAG SIMULIEREN
 // =========================
 function simulateMatchday(){
 
-  const schedule = game.league.schedule;
-  const roundIndex = game.league.currentRound;
+  const round = game.league.schedule?.[game.league.currentRound];
 
-  if(!schedule || !schedule[roundIndex]){
-    console.error("❌ Kein Spielplan vorhanden oder falscher Spieltag");
+  if(!round){
+    console.error("❌ Kein Spieltag vorhanden");
     return;
   }
 
-  const matches = schedule[roundIndex];
+  round.forEach(match => {
 
-  console.log("👉 Dein Team:", game.team.selected);
-  console.log("👉 Spiele:", matches);
-
-  game.match.current = null; // 🔥 reset wichtig!
-
-  matches.forEach(match => {
-
-    // 🔥 WICHTIG: Namen vergleichen
-    const homeName = match.home.name;
-    const awayName = match.away.name;
-    const myName = game.team.selected?.name;
-
-    console.log("Check:", homeName, "vs", myName, "|", awayName, "vs", myName);
+    const homeName = typeof match.home === "string" ? match.home : match.home.name;
+    const awayName = typeof match.away === "string" ? match.away : match.away.name;
 
     const isPlayerMatch =
-      homeName === myName ||
-      awayName === myName;
+      homeName === game.team.selected?.name ||
+      awayName === game.team.selected?.name;
 
     if(isPlayerMatch){
-      console.log("✅ DEIN SPIEL GEFUNDEN");
-      game.match.current = match;
       return;
     }
 
-    // 👉 andere Spiele simulieren
-    const result = simulateMatch(match.home, match.away);
+    const homeObj = typeof match.home === "string"
+      ? game.league.teams.find(t => t.name === match.home)
+      : match.home;
+
+    const awayObj = typeof match.away === "string"
+      ? game.league.teams.find(t => t.name === match.away)
+      : match.away;
+
+    const result = simulateMatch(homeObj, awayObj);
 
     match.result = result;
 
-    updateTable(match.home, match.away, result.home, result.away);
+    updateTable(homeObj, awayObj, result.home, result.away);
   });
 
-  if(!game.match.current){
-    console.error("❌ KEIN SPIEL FÜR DICH GEFUNDEN!");
-  }
+  console.log("📊 Spieltag simuliert");
 }
 
 // =========================
-// 🤖 MATCH SIMULATION
+// 🤖 SIMULATION
 // =========================
 function simulateMatch(home, away){
 
-  const strengthDiff = home.strength - away.strength;
+  const diff = home.strength - away.strength;
 
-  const baseGoalsHome = Math.random() * 2 + (strengthDiff * 0.02);
-  const baseGoalsAway = Math.random() * 2 - (strengthDiff * 0.02);
+  const gHome = Math.max(0, Math.round(Math.random()*2 + diff*0.02));
+  const gAway = Math.max(0, Math.round(Math.random()*2 - diff*0.02));
 
-  const goalsHome = Math.max(0, Math.round(baseGoalsHome));
-  const goalsAway = Math.max(0, Math.round(baseGoalsAway));
-
-  return {
-    home: goalsHome,
-    away: goalsAway
-  };
+  return { home: gHome, away: gAway };
 }
 
 // =========================
-// 🚀 MATCH STARTEN
+// 🚀 START MATCH (FIXED)
 // =========================
 function startMatch(){
 
+  console.log("=== START MATCH ===");
+
   simulateMatchday();
 
-  const match = game.match.current;
+  const match = findPlayerMatch();
 
   if(!match){
-    alert("❌ Dein Spiel wurde nicht gefunden!");
-    console.error("Problem: Team nicht im Spieltag");
+    alert("❌ Spiel konnte nicht gefunden werden!");
     return;
   }
 
+  game.match.current = match;
   game.phase = "live";
 
   matchState.minute = 0;
@@ -122,7 +151,7 @@ function startMatch(){
   matchState.score.home = 0;
   matchState.score.away = 0;
 
-  console.log("🚀 Starte Spiel:", match.home.name, "vs", match.away.name);
+  console.log("🚀 Starte:", match.home.name, "vs", match.away.name);
 
   clearLiveFeed?.();
 
@@ -145,13 +174,11 @@ function runMatchLoop(){
 
     matchState.minute++;
 
-    // Halbzeit
     if(matchState.minute === 46){
       matchState.half = 2;
       addLiveEvent?.("⏸️ Halbzeit");
     }
 
-    // Spielende
     if(matchState.minute > 90){
       matchState.running = false;
       clearInterval(interval);
@@ -166,34 +193,31 @@ function runMatchLoop(){
 }
 
 // =========================
-// 🎯 LIVE EVENTS
+// 🎯 EVENTS
 // =========================
 function simulateLiveEvent(){
 
   const rand = Math.random();
-
   const home = game.match.current.home;
   const away = game.match.current.away;
 
   if(rand < 0.08){
-
     if(Math.random() < 0.5){
       matchState.score.home++;
-      addLiveEvent?.(`⚽ ${home.name} trifft!`);
+      addLiveEvent?.(`⚽ ${home.name}`);
     } else {
       matchState.score.away++;
-      addLiveEvent?.(`⚽ ${away.name} trifft!`);
+      addLiveEvent?.(`⚽ ${away.name}`);
     }
-
-  } else if(rand < 0.25){
-    addLiveEvent?.("🔥 Gute Chance!");
-  } else if(rand < 0.40){
-    addLiveEvent?.("🟨 Foul im Mittelfeld");
+  } else if(rand < 0.3){
+    addLiveEvent?.("🔥 Chance");
+  } else if(rand < 0.5){
+    addLiveEvent?.("🟨 Foul");
   }
 }
 
 // =========================
-// 🛑 MATCH ENDE
+// 🛑 ENDE
 // =========================
 function endMatch(){
 
