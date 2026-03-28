@@ -141,3 +141,4 @@ function startSeason(){
 window.selectLeague = selectLeague;
 window.selectTeam = selectTeam;
 window.startSeason = startSeason;
+window.LEAGUES = LEAGUES;
