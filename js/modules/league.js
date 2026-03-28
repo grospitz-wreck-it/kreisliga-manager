@@ -1,16 +1,31 @@
 const LEAGUES = {
-  a: {
-    name: "Liga A",
+  herford: {
+    name: "Kreisliga A Herford",
     teams: [
-      { name: "Team 1", strength: 70 },
-      { name: "Team 2", strength: 60 }
+      "SC Herford","FC Exter","TuS Bruchmühlen","SV Enger-Westerenger",
+      "SV Rödinghausen II","TuS Jöllenbeck II","VfL Holsen","SV Oetinghausen",
+      "FC Herford","TuS Hunnebrock","SC Vlotho","TuS Bardüttingdorf",
+      "SV Löhne-Obernbeck","TuS Dünne","SV Bischofshagen","FC Schweicheln"
     ]
   },
-  b: {
-    name: "Liga B",
+  luebbecke: {
+    name: "Kreisliga A Lübbecke",
     teams: [
-      { name: "Team 3", strength: 80 },
-      { name: "Team 4", strength: 50 }
+      "TuS Tengern II","FC Lübbecke","SV Börninghausen","TuS Gehlenbeck",
+      "FC Preußen Espelkamp II","SV Hüllhorst","TuS Dielingen",
+      "SV Schnathorst","FC Oppenwehe","TuS Nettelstedt",
+      "SV Rahden","TuS Stemwede","SV Hüllhorst II",
+      "FC Bad Oeynhausen II","SV Holzhausen","TuS Levern"
+    ]
+  },
+  bielefeld: {
+    name: "Kreisliga A Bielefeld",
+    teams: [
+      "TuS Dornberg II","VfR Wellensiek","SC Hicret Bielefeld",
+      "TuS Brake","VfB Fichte Bielefeld","SC Bielefeld",
+      "TuS Quelle II","SV Gadderbaum","FC Hilal Spor",
+      "TuS Einigkeit","SV Ubbedissen","SC Stieghorst",
+      "VfL Oldentrup","TuS Ost","SV Heepen","FC Türk Sport"
     ]
   }
 };
@@ -21,30 +36,14 @@ function selectLeague(key){
 
   game.league.key = key;
 
-  // 🔥 WICHTIG: Kopie erstellen (kein Reference Bug)
-  game.league.teams = data.teams.map(t => ({
-    name: t.name,
-    strength: t.strength
+  game.league.teams = data.teams.map(name => ({
+    name,
+    strength: Math.floor(Math.random() * 30) + 60 // 60–90
   }));
 
+  createTable();
   populateTeamSelect();
 }
 
-function selectTeam(name){
-  game.team.selected = name;
-}
-function populateTeamSelect(){
-
-  const select = document.getElementById("teamSelect");
-  select.innerHTML = "";
-
-  game.league.teams.forEach(t => {
-    const opt = document.createElement("option");
-    opt.value = t.name;
-    opt.textContent = `${t.name} (Stärke ${t.strength})`;
-    select.appendChild(opt);
-  });
-}
 window.LEAGUES = LEAGUES;
 window.selectLeague = selectLeague;
-window.selectTeam = selectTeam;
