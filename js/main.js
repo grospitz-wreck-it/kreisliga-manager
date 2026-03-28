@@ -1,21 +1,29 @@
-window.onload = () => {
+console.log("MAIN START");
 
-  loadGame();
-  
-  initUI();
-  initLeagueSelect();
+window.onload = function(){
+
+  loadGame?.();
+
+  initPlayer?.();
+  initLeagueSelect?.();
+
   bindUI();
 
-  console.log("✅ READY");
+  updateHeader?.();
+  updateTable?.();
+
+  console.log("✅ App geladen");
 };
 
+// =========================
+// ▶️ FLOW
+// =========================
 function handleMainAction(){
 
   switch(game.phase){
 
-    case "setup":
-      generateSchedule();
-      game.phase = "ready";
+    case "idle":
+      startSeason();
       break;
 
     case "ready":
@@ -24,6 +32,10 @@ function handleMainAction(){
 
     case "halftime":
       resumeMatch();
+      break;
+
+    case "live":
+      pauseMatch();
       break;
   }
 }
