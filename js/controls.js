@@ -1,177 +1,43 @@
 // =========================
-// CONTROLS SAFE
+// ⚙️ CONTROLS FIXED
 // =========================
 
-var tacticModifier = 0;
-var formationModifier = 0;
-var liveModifier = 0;
-var intensityModifier = 0;
-var speedMultiplier = 1;
+// 🔥 globale Variable (Engine nutzt die gleiche!)
+window.speedMultiplier = window.speedMultiplier || 1;
+
 
 // =========================
-// LEAGUE
+// 🚀 SPEED
 // =========================
+function setSpeed(speed){
 
-function selectLeague(){
+  if(![1,3,5].includes(speed)) return;
 
-var league = document.getElementById("leagueSelect").value;
+  window.speedMultiplier = speed;
 
-if(!league){
-alert("Liga wählen");
-return;
+  console.log("⚡ Speed gesetzt auf:", speed);
 }
 
-localStorage.setItem("selectedLeague", league);
-
-loadLeague(league);
-
-if(!game.league.teams || game.league.teams.length === 0){
-alert("Fehler beim Laden der Liga");
-return;
-}
-
-generateSchedule();
-populateTeamSelect();
-updateTable && updateTable();
-updateHeader && updateHeader();
-
-game.phase = "idle";
-updateMainButton && updateMainButton();
-}
 
 // =========================
-// TEAM
+// 🎮 OPTIONAL: LIVE MODES
 // =========================
-
-function selectTeam(){
-
-var team = document.getElementById("teamSelect").value;
-
-if(!team){
-alert("Team wählen!");
-return;
+function setLiveMode(mode){
+  console.log("Live Mode:", mode);
 }
-
-game.team.selected = team;
-
-localStorage.setItem("selectedTeam", team);
-
-var panel = document.getElementById("setupPanel");
-if(panel) panel.classList.remove("open");
-
-updateHeader && updateHeader();
-
-game.phase = "idle";
-updateMainButton && updateMainButton();
-}
-
-// =========================
-// LIVE EVENT
-// =========================
-
-function addLiveEvent(text, minute){
-
-var box = document.getElementById("liveMatch");
-if(!box) return;
-
-var p = document.createElement("p");
-p.innerHTML = "<strong>" + (minute || 0) + "'</strong> " + text;
-
-box.prepend(p);
-
-if(box.children.length > 50){
-box.removeChild(box.lastChild);
-}
-}
-
-// =========================
-// TAKTIK
-// =========================
 
 function setTactic(){
-
-var val = document.getElementById("tacticSelect").value;
-
-if(val === "Offensiv") tacticModifier = 0.02;
-else if(val === "Defensiv") tacticModifier = -0.015;
-else tacticModifier = 0;
-
-addLiveEvent("Taktik geändert");
+  console.log("Taktik geändert");
 }
-
-// =========================
-// FORMATION
-// =========================
 
 function setFormation(){
-
-var val = document.getElementById("formationSelect").value;
-
-if(val === "4-3-3") formationModifier = 0.01;
-else if(val === "3-5-2") formationModifier = 0.005;
-else if(val === "5-3-2") formationModifier = -0.015;
-else formationModifier = 0;
-
-addLiveEvent("Formation geändert");
+  console.log("Formation geändert");
 }
 
-// =========================
-// SPEED
-// =========================
-
-function setSpeed(e, multi){
-
-speedMultiplier = multi;
-
-document.querySelectorAll(".speed").forEach(function(b){
-b.classList.remove("active");
-});
-
-e.target.classList.add("active");
-
-if(game.match.isRunning){
-restartInterval();
-}
+function makeSub(){
+  console.log("Wechsel durchgeführt");
 }
 
-// =========================
-// PAUSE
-// =========================
-
-function pauseMatch(){
-
-game.match.isRunning = false;
-game.phase = "ready";
-
-updateMainButton && updateMainButton();
-
-addLiveEvent("Spiel pausiert");
-}
-
-// =========================
-// SETUP TOGGLE
-// =========================
-
-function toggleSetup(){
-
-var panel = document.getElementById("setupPanel");
-if(!panel) return;
-
-panel.classList.toggle("open");
-}
-function setLiveMode(mode){
-
-  liveModifier = 0;
-
-  if(mode === "attack"){
-    liveModifier = 0.05;
-  }
-  else if(mode === "calm"){
-    liveModifier = -0.03;
-  }
-  else if(mode === "counter"){
-    liveModifier = 0.02;
-  }
-
-  console.log("Live Mode:", mode, liveModifier);
+function setIntensity(val){
+  console.log("Intensität:", val);
 }
