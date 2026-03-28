@@ -124,20 +124,15 @@ function selectLeague(){
 
   const key = select.value;
 
+  console.log("SELECTED KEY:", key);
+  console.log("LEAGUE EXISTS:", LEAGUES[key]);
+
+  if(!LEAGUES[key]){
+    console.error("❌ Ungültiger League Key:", key);
+    return;
+  }
+
   loadLeague(key);
-}
-
-function selectTeam(){
-
-  const select = document.getElementById("teamSelect");
-  if(!select) return;
-
-  game.team.selected = select.value;
-
-  console.log("✅ Team gewählt:", game.team.selected);
-
-  window.updateHeader?.();
-  window.updateTable?.();
 }
 
 // =========================
