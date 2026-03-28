@@ -46,18 +46,18 @@
     <div class="setupBox">
       <h3>🏆 Liga</h3>
       <select id="leagueSelect"></select>
-      <button onclick="selectLeague()">Liga starten</button>
+      <button id="selectLeagueBtn" onclick="selectLeague()">Liga starten</button>
     </div>
 
     <div class="setupBox">
       <h3>⚽ Team</h3>
       <select id="teamSelect"></select>
-      <button onclick="selectTeam()">Team übernehmen</button>
+      <button id="selectTeamBtn" onclick="selectTeam()">Team übernehmen</button>
       <p id="selectedTeamText">-</p>
     </div>
 
     <div class="setupBox">
-      <button class="danger" onclick="resetGame()">🧨 Neues Spiel starten</button>
+      <button id="resetBtn" class="danger" onclick="resetGame()">🧨 Neues Spiel starten</button>
     </div>
 
   </div>
@@ -71,10 +71,10 @@
         <strong id="friendCodeDisplay">---</strong>
       </div>
 
-      <button onclick="copyFriendCode()">📋 Kopieren</button>
+      <button id="copyCodeBtn" onclick="copyFriendCode()">📋 Kopieren</button>
 
       <input id="friendCodeInput" placeholder="Freundescode">
-      <button onclick="joinFriendCode()">Beitreten</button>
+      <button id="joinCodeBtn" onclick="joinFriendCode()">Beitreten</button>
     </div>
   </div>
 </div>
@@ -153,9 +153,9 @@
         <button onclick="setSpeed(5)">5x</button>
       </div>
 
-      <!-- ⭐ MAIN BUTTON (FIXED) -->
+      <!-- ⭐ MAIN BUTTON -->
       <div class="primaryAction">
-        <button id="mainButton">
+        <button id="mainActionBtn">
           ▶ Saison starten
         </button>
       </div>
@@ -173,39 +173,39 @@
   <!-- 📊 SIDE -->
   <div class="sidePanel">
 
-<div class="panel">
+    <div class="panel">
 
-  <!-- TABS -->
-  <div class="tableTabs">
-    <button class="tab active" data-tab="tableTab">📊 Tabelle</button>
-    <button class="tab" data-tab="scheduleTab">📅 Spielplan</button>
-  </div>
+      <!-- TABS -->
+      <div class="tableTabs">
+        <button class="tab active" data-tab="tableTab">📊 Tabelle</button>
+        <button class="tab" data-tab="scheduleTab">📅 Spielplan</button>
+      </div>
 
-  <!-- TABELLE -->
-  <div id="tableTab" class="tabContent active">
-    <table id="table" class="modernTable">
-      <thead>
-        <tr>
-          <th>Team</th>
-          <th>Sp</th>
-          <th>S</th>
-          <th>U</th>
-          <th>N</th>
-          <th>Tore</th>
-          <th>Diff</th>
-          <th>Punkte</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+      <!-- TABELLE -->
+      <div id="tableTab" class="tabContent active">
+        <table id="table" class="modernTable">
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Sp</th>
+              <th>S</th>
+              <th>U</th>
+              <th>N</th>
+              <th>Tore</th>
+              <th>Diff</th>
+              <th>Punkte</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
 
-  <!-- SPIELPLAN -->
-  <div id="scheduleTab" class="tabContent">
-    <div id="scheduleContainer"></div>
-  </div>
+      <!-- SPIELPLAN -->
+      <div id="scheduleTab" class="tabContent">
+        <div id="scheduleContainer"></div>
+      </div>
 
-</div>
+    </div>
 
     <div class="panel">
       <h2>📢 Bandenwerbung</h2>
