@@ -8,18 +8,22 @@ var leagues = {
 };
 
 // =========================
+// 👤 TEAM AUSWÄHLEN
+// =========================
+function selectTeam(name){
+  game.team.selected = name;
+}
+
+window.selectTeam = selectTeam;
+
+// =========================
 // 🏗️ TEAM ERSTELLEN
 // =========================
-function createTeam(name){
+function createTeam(name, id){
   return {
+    id: id,
     name: name,
-    points: 0,
-    goalsFor: 0,
-    goalsAgainst: 0,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    played: 0
+    strength: Math.floor(Math.random() * 30) + 60
   };
 }
 
@@ -30,8 +34,8 @@ function loadLeague(name){
 
   game.league.key = name;
   game.league.teams = [];
-  game.league.schedule = generateMatchSchedule(game.league.teams);
-  game.league.currentMatchday = 0;
+  game.league.schedule = [];
+  game.league.currentRound = 0;
 
   let t = [];
 
@@ -83,102 +87,88 @@ function loadLeague(name){
   // =========================
   // 🧱 TEAMS ERSTELLEN
   // =========================
-  game.league.teams = t.map(createTeam);
+  game.league.teams = t.map((name, i) => createTeam(name, i));
 
-  // 🔥 DEBUG (kannst du später rausnehmen)
-  console.log("TEAMS NACH CREATE:", game.league.teams);
+  console.log("TEAMS:", game.league.teams);
+
+  // =========================
+  // 📊 TABELLE
+  // =========================
+  createTable();
 
   // =========================
   // ⚽ SPIELPLAN
   // =========================
-  generateSchedule(); // nutzt game.league.teams (jetzt sicher!)
+  generateSchedule();
 
   // =========================
   // 💾 SAVE
   // =========================
-  saveGameState?.();
+  saveGame?.();
 
-  console.log("✅ Liga geladen:", name, game.league.teams.length, "Teams");
+  console.log("✅ Liga geladen:", name);
 }
 
 // =========================
-// ⚽ SPIELPLAN (30 SPIELTAGE)
+// ⚽ SPIELPLAN
 // =========================
 function generateSchedule(){
 
-  const teams = game.league.teams;
+  let teams = [...game.league.teams];
 
-  // 🔥 HARD FIX (entscheidend)
-  if(!teams || !Array.isArray(teams)){
-    console.error("❌ teams nicht korrekt:", teams);
-    return;
+  if(teams.length % 2 !== 0){
+    teams.push({ name: "SPIELFREI" });
   }
 
-  if(teams.length === 0){
-    console.error("❌ Keine Teams für Spielplan");
-    return;
-  }
+  const rounds = teams.length - 1;
+  const half = teams.length / 2;
 
-  let tempTeams = [...teams];
-
-  // Dummy bei ungerade
-  if(tempTeams.length % 2 !== 0){
-    tempTeams.push({ name: "SPIELFREI" });
-  }
-
-  const rounds = tempTeams.length - 1;
-  const half = tempTeams.length / 2;
-
-  let firstLeg = [];
+  let schedule = [];
 
   // =========================
   // 🔁 HINRUNDE
   // =========================
-  for(let round = 0; round < rounds; round++){
+  for(let i = 0; i < rounds; i++){
 
     let matchday = [];
 
-    for(let i = 0; i < half; i++){
+    for(let j = 0; j < half; j++){
 
-      let home = tempTeams[i];
-      let away = tempTeams[tempTeams.length - 1 - i];
+      const home = teams[j];
+      const away = teams[teams.length - 1 - j];
 
-      if(home && away && home.name !== "SPIELFREI" && away.name !== "SPIELFREI"){
+      if(home.name !== "SPIELFREI" && away.name !== "SPIELFREI"){
         matchday.push({
-          home: home.name,
-          away: away.name
+          home: home,
+          away: away,
+          result: null
         });
       }
     }
 
-    firstLeg.push(matchday);
-
-    // Rotation
-    let fixed = tempTeams[0];
-    let rest = tempTeams.slice(1);
-
-    rest.unshift(rest.pop());
-
-    tempTeams = [fixed, ...rest];
+    teams.splice(1, 0, teams.pop());
+    schedule.push(matchday);
   }
 
   // =========================
   // 🔁 RÜCKRUNDE
   // =========================
-  let secondLeg = firstLeg.map(md =>
-    md.map(m => ({
-      home: m.away,
-      away: m.home
+  const returnRounds = schedule.map(round =>
+    round.map(match => ({
+      home: match.away,
+      away: match.home,
+      result: null
     }))
   );
 
-  // =========================
-  // 🧩 KOMBINIEREN
-  // =========================
-  let fullSchedule = [...firstLeg, ...secondLeg];
+  game.league.schedule = [...schedule, ...returnRounds];
+  game.league.currentRound = 0;
 
-  // genau 30 Spieltage
-  game.league.schedule = fullSchedule.slice(0, 30);
-
-  console.log("✅ Spielplan erstellt:", game.league.schedule.length);
+  console.log("📅 Spielplan erstellt:", game.league.schedule.length);
 }
+
+// =========================
+// 🌍 EXPORT
+// =========================
+window.loadLeague = loadLeague;
+window.generateSchedule = generateSchedule;
