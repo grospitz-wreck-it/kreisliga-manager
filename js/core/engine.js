@@ -291,6 +291,47 @@ function endMatch(){
 }
 
 // =========================
+// 🏁 Aktualisierung Ergebnisse
+// =========================
+
+function applyMatchResult(match){
+
+  const home = match.home;
+  const away = match.away;
+
+  const h = match.result.home;
+  const a = match.result.away;
+
+  // Spiele
+  home.played++;
+  away.played++;
+
+  // Tore
+  home.goalsFor += h;
+  home.goalsAgainst += a;
+
+  away.goalsFor += a;
+  away.goalsAgainst += h;
+
+  // Ergebnis
+  if(h > a){
+    home.wins++;
+    away.losses++;
+    home.points += 3;
+  }
+  else if(a > h){
+    away.wins++;
+    home.losses++;
+    away.points += 3;
+  }
+  else{
+    home.draws++;
+    away.draws++;
+    home.points += 1;
+    away.points += 1;
+  }
+}
+// =========================
 // 🌍 GLOBAL
 // =========================
 window.handleMainAction = handleMainAction;
