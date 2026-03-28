@@ -349,5 +349,5 @@ function applyMatchResult(match){
 // =========================
 // 🌍 GLOBAL
 // =========================
-window.handleMainAction = handleMainAction;
 window.startMatch = startMatch;
+window.handleMainAction = handleMainAction;
