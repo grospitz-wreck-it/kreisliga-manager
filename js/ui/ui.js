@@ -4,20 +4,14 @@ console.log("UI START");
 // 🏆 LIGA SELECT INIT
 // =========================
 function initLeagueSelect(){
+  console.log("🔥 initLeagueSelect CALLED");
 
   const select = document.getElementById("leagueSelect");
+  console.log("SELECT:", select);
+
   if(!select) return;
 
-  select.innerHTML = "";
-
-  Object.entries(LEAGUES).forEach(([key, val]) => {
-
-    const opt = document.createElement("option");
-    opt.value = key;
-    opt.textContent = val.name;
-
-    select.appendChild(opt);
-  });
+  select.innerHTML = "TEST"; // 👈 TEST
 }
 
 // =========================
