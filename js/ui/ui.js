@@ -9,6 +9,38 @@ function initLeagueSelect(){
     select.appendChild(opt);
   });
 }
+function renderSchedule(){
+
+  const el = document.getElementById("schedule");
+
+  if(!el) return;
+
+  const round = game.league.schedule?.[game.league.currentRound];
+
+  if(!round){
+    el.innerHTML = "Kein Spielplan";
+    return;
+  }
+
+  let html = "<h3>Spieltag " + (game.league.currentRound + 1) + "</h3>";
+
+  round.forEach(match => {
+
+    const result = match.result
+      ? `${match.result.home}:${match.result.away}`
+      : "-:-";
+
+    html += `
+      <div>
+        ${match.home.name} vs ${match.away.name} (${result})
+      </div>
+    `;
+  });
+
+  el.innerHTML = html;
+}
+
+window.renderSchedule = renderSchedule;
 function renderCurrentMatch(){
 
   const el = document.getElementById("currentMatch");
