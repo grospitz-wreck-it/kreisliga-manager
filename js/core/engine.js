@@ -249,6 +249,7 @@ function simulateMatchday(){
 
   round.forEach(match => {
 
+    // 👉 eigenes Spiel NICHT simulieren
     if(
       match.home.name === game.team.selected?.name ||
       match.away.name === game.team.selected?.name
@@ -259,10 +260,18 @@ function simulateMatchday(){
     const home = Math.floor(Math.random()*3);
     const away = Math.floor(Math.random()*3);
 
+    // ✅ Ergebnis setzen
     match.result = { home, away };
 
-    updateTable(match.home, match.away, home, away);
+    // ❌ ALT
+    // updateTable(match.home, match.away, home, away);
+
+    // ✅ NEU
+    applyMatchResult(match);
   });
+
+  // 👉 Tabelle danach einmal neu rendern
+  renderTable();
 }
 
 // =========================
