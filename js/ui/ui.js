@@ -14,18 +14,33 @@ function updateUI(){
 
   const match = game.match.current;
 
-  if(!match) return;
+  // =========================
+  // ❌ KEIN MATCH
+  // =========================
+  if(!match){
+    scoreEl.textContent = "0 : 0";
+    matchEl.textContent = "Kein Spiel aktiv";
+    progress.style.width = "0%";
+    return;
+  }
 
-  // ⚽ Score
+  // =========================
+  // ⚽ SCORE (dein Code)
+  // =========================
   scoreEl.textContent =
     matchState.score.home + " : " + matchState.score.away;
 
-  // ⏱️ Zeit + Teams
+  // =========================
+  // 📅 ERWEITERT (NEU)
+  // =========================
   matchEl.textContent =
+    `Saison ${game.season.year} | Spieltag ${game.league.currentRound + 1}\n` +
     `${match.home.name} vs ${match.away.name} | ${matchState.minute}'`;
 
-  // 📊 Fortschritt
-  const percent = (matchState.minute / 90) * 100;
+  // =========================
+  // 📊 FORTSCHRITT (dein Code)
+  // =========================
+  const percent = Math.min((matchState.minute / 90) * 100, 100);
   progress.style.width = percent + "%";
 }
 
