@@ -112,21 +112,21 @@ function updateForm(team, result){
 // =========================
 function sortTable(){
 
-  game.league.table.sort((a, b) => {
+  game.league.teams.sort((a, b) => {
 
-    if(b.points !== a.points){
-      return b.points - a.points;
-    }
+    // Punkte
+    if(b.points !== a.points) return b.points - a.points;
 
-    if(b.goalDiff !== a.goalDiff){
-      return b.goalDiff - a.goalDiff;
-    }
+    // Tordifferenz
+    const diffA = a.goalsFor - a.goalsAgainst;
+    const diffB = b.goalsFor - b.goalsAgainst;
+    if(diffB !== diffA) return diffB - diffA;
 
-    if(b.goalsFor !== a.goalsFor){
-      return b.goalsFor - a.goalsFor;
-    }
+    // Tore
+    if(b.goalsFor !== a.goalsFor) return b.goalsFor - a.goalsFor;
 
-    return 0;
+    // Name
+    return a.name.localeCompare(b.name);
   });
 }
 
