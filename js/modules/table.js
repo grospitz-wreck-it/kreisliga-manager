@@ -1,30 +1,79 @@
-function updateTable(){
+function createTable(){
 
-  const teams = game.league.teams;
+  game.table = game.league.teams.map(t => ({
+    name: t.name,
+    pts: 0,
+    gd: 0,
+    scored: 0,
+    conceded: 0,
+    played: 0
+  }));
+}
 
-  teams.sort((a,b)=> b.stats.points - a.stats.points);
+// =========================
+// 📊 UPDATE TABLE
+// =========================
+function updateTable(home, away, goalsHome, goalsAway){
 
-  const tbody = document.querySelector("#table tbody");
-  if(!tbody) return;
+  const h = game.table.find(t => t.name === home.name);
+  const a = game.table.find(t => t.name === away.name);
 
-  tbody.innerHTML = "";
+  h.played++;
+  a.played++;
 
-  teams.forEach(t=>{
+  h.scored += goalsHome;
+  h.conceded += goalsAway;
 
-    const tr = document.createElement("tr");
+  a.scored += goalsAway;
+  a.conceded += goalsHome;
 
-    tr.innerHTML = `
-      <td>${t.name}</td>
-      <td>${t.stats.played}</td>
-      <td>${t.stats.wins}</td>
-      <td>${t.stats.draws}</td>
-      <td>${t.stats.losses}</td>
-      <td>${t.stats.goalsFor}:${t.stats.goalsAgainst}</td>
-      <td>${t.stats.points}</td>
-    `;
+  h.gd = h.scored - h.conceded;
+  a.gd = a.scored - a.conceded;
 
-    tbody.appendChild(tr);
+  if(goalsHome > goalsAway){
+    h.pts += 3;
+  } else if(goalsAway > goalsHome){
+    a.pts += 3;
+  } else {
+    h.pts += 1;
+    a.pts += 1;
+  }
+
+  sortTable();
+}
+
+function sortTable(){
+  game.table.sort((a,b) =>
+    b.pts - a.pts || b.gd - a.gd
+  );
+}
+
+// =========================
+// 🖥 RENDER
+// =========================
+function renderTable(){
+
+  const el = document.getElementById("table");
+  if(!el) return;
+
+  el.innerHTML = "";
+
+  game.table.forEach((t,i) => {
+
+    const div = document.createElement("div");
+
+    let marker = "";
+
+    if(i === 0) marker = "⬆️";
+    if(i >= 14) marker = "⬇️";
+
+    div.innerText =
+      `${i+1}. ${t.name} ${t.pts}P (${t.gd}) ${marker}`;
+
+    el.appendChild(div);
   });
 }
 
+window.createTable = createTable;
 window.updateTable = updateTable;
+window.renderTable = renderTable;
