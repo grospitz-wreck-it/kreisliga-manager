@@ -278,18 +278,20 @@ function endMatch(){
 
   const match = game.match.current;
 
-  // ✅ Ergebnis setzen (bleibt wie bei dir)
   match.result = {
     home: matchState.score.home,
     away: matchState.score.away
   };
 
+  // ✅ dein Spiel in Tabelle
   applyMatchResult(match);
 
-  // 👉 Tabelle neu rendern
+  // ✅ SOFORT anzeigen
   renderTable();
 
+  // ❗ erst DANACH Runde erhöhen
   game.league.currentRound++;
+
   game.phase = "idle";
 
   renderSchedule();
