@@ -1,22 +1,75 @@
+// =========================
+// 🌍 GLOBAL GAME STATE
+// =========================
 window.game = {
+
+  // =========================
+  // 👤 SPIELER
+  // =========================
   player: {
     name: ""
   },
 
+  // =========================
+  // 🏆 LIGA
+  // =========================
   league: {
+    key: null,
+
+    teams: [],       // Team-Objekte
+    schedule: [],    // Spielplan
+    currentRound: 0, // aktueller Spieltag
+
+    table: []        // Tabelle (separat von teams!)
+  },
+
+  // =========================
+  // 👕 DEIN TEAM
+  // =========================
+  team: {
+    selected: null
+  },
+
+  // =========================
+  // ⚽ MATCH
+  // =========================
+  match: {
+    current: null
+  },
+
+  // =========================
+  // 🏁 SPIELPHASE
+  // =========================
+  phase: "setup", // setup | idle | live
+
+  // =========================
+  // 📅 SAISON
+  // =========================
+  season: {
+    year: 1
+  }
+};
+
+// =========================
+// 🧪 DEBUG HELPER (optional)
+// =========================
+window.resetGame = function(){
+
+  localStorage.clear();
+
+  game.player.name = "";
+  game.league = {
     key: null,
     teams: [],
     schedule: [],
     currentRound: 0,
     table: []
-  },
+  };
 
-  team: {
-    selected: null
-  },
+  game.team.selected = null;
+  game.match.current = null;
+  game.phase = "setup";
+  game.season.year = 1;
 
-  match: {
-    current: null
-  },
-
-  season: { // 🔥 HIER rein!
+  console.log("🧹 Game komplett zurückgesetzt");
+};
