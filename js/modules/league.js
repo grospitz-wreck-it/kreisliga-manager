@@ -1,110 +1,97 @@
+// =========================
+// 🏆 LEAGUE MODULE
+// =========================
 console.log("LEAGUE MODULE");
 
 // =========================
-// 🏆 LIGEN DATEN (SKALIERBAR)
+// 📚 LIGEN DATEN (MASTER)
 // =========================
 const LEAGUES = {
 
-  kreisliga: {
-    name: "Kreisliga",
+  herford: {
+    name: "Kreisliga Herford",
     teams: [
-      "FC Herford",
-      "SV Löhne",
-      "VfL Bünde",
+      "SC Herford",
+      "SV Enger-Westerenger",
       "TuS Bruchmühlen",
-      "SC Enger",
-      "RW Kirchlengern",
-      "SpVg Hiddenhausen",
-      "TSV Oetinghausen",
       "FC Exter",
+      "VfL Holsen",
       "SV Rödinghausen II",
-      "TuRa Löhne",
-      "SC Vlotho",
-      "FC Bad Oeynhausen",
-      "SV Eidinghausen",
+      "TuS Hunnebrock",
+      "FC Löhne-Gohfeld",
+      "SV Oetinghausen",
+      "TuS Bardüttingdorf",
+      "FC Schweicheln",
+      "SV Bünde",
+      "TuS Dünne",
+      "RW Kirchlengern II",
+      "SC Hiddenhausen",
+      "SV Eidinghausen"
+    ]
+  },
+
+  luebbecke: {
+    name: "Kreisliga Lübbecke",
+    teams: [
+      "TuS Nettelstedt",
+      "FC Preußisch Oldendorf",
+      "SV Börninghausen",
+      "TuS Dielingen",
+      "VfL Frotheim",
+      "TuS Gehlenbeck",
+      "SV Hüllhorst",
+      "FC Lübbecke",
+      "TuS Tengern II",
+      "SV Oberbauerschaft",
+      "FC Oppenwehe",
+      "TuS Stemwede",
+      "SV Schnathorst",
+      "FC Blasheim",
+      "TuS Alswede",
+      "SV Rahden"
+    ]
+  },
+
+  bielefeld: {
+    name: "Kreisliga Bielefeld",
+    teams: [
+      "VfB Fichte Bielefeld",
+      "TuS Brake",
+      "SV Brackwede",
+      "TSV Altenhagen",
+      "TuS Dornberg",
+      "VfL Ummeln",
+      "SV Gadderbaum",
       "TuS Jöllenbeck",
-      "BW Hollage"
+      "SC Babenhausen",
+      "FC Türk Sport",
+      "SV Ubbedissen",
+      "TuS Hillegossen",
+      "SC Hoberge-Uerentrup",
+      "SV Quelle",
+      "TuS Ost",
+      "FC Heepen"
     ]
   }
 
 };
 
 // =========================
-// 🏆 LIGA AUSWÄHLEN
+// 🧠 LIGA LADEN
 // =========================
-function selectLeague(){
+function loadLeague(key){
 
-  const select = document.getElementById("leagueSelect");
-  const key = select.value;
+  console.log("📥 loadLeague:", key);
 
-  if(!LEAGUES[key]) return;
+  const league = LEAGUES[key];
+  if(!league){
+    console.error("❌ Liga nicht gefunden");
+    return;
+  }
 
-  game.league.key = key;
-  game.league.name = LEAGUES[key].name;
-
-  // 👉 Teams generieren
-  game.league.teams = LEAGUES[key].teams.map((name, i) => ({
-    id: i,
+  // Teams als Objekte erzeugen
+  game.league.teams = league.teams.map(name => ({
     name,
-    players: generateTeamPlayers(),
-    stats: initStats()
-  }));
-
-  // 👉 Team Dropdown füllen
-  populateTeamSelect();
-
-  saveGame();
-  updateHeader();
-
-  console.log("✅ Liga geladen:", game.league.name);
-}
-
-// =========================
-// ⚽ TEAM DROPDOWN
-// =========================
-function populateTeamSelect(){
-
-  const select = document.getElementById("teamSelect");
-  if(!select) return;
-
-  select.innerHTML = "";
-
-  game.league.teams.forEach(team => {
-    const opt = document.createElement("option");
-    opt.value = team.id;
-    opt.textContent = team.name;
-    select.appendChild(opt);
-  });
-}
-
-// =========================
-// ⚽ TEAM AUSWÄHLEN
-// =========================
-function selectTeam(){
-
-  const select = document.getElementById("teamSelect");
-  const id = parseInt(select.value);
-
-  const team = game.league.teams.find(t => t.id === id);
-  if(!team) return;
-
-  game.team.id = team.id;
-  game.team.name = team.name;
-  game.team.players = team.players;
-
-  document.getElementById("selectedTeamText").innerText = team.name;
-
-  saveGame();
-  updateHeader();
-
-  console.log("✅ Team gewählt:", team.name);
-}
-
-// =========================
-// 📊 STATS INIT
-// =========================
-function initStats(){
-  return {
     played: 0,
     wins: 0,
     draws: 0,
@@ -112,33 +99,51 @@ function initStats(){
     goalsFor: 0,
     goalsAgainst: 0,
     points: 0
-  };
+  }));
+
+  game.league.key = key;
+  game.league.currentMatchday = 0;
+  game.league.schedule = [];
+
+  console.log("✅ Teams geladen:", game.league.teams);
+
+  // UI Updates
+  window.populateTeamSelect?.();
+  window.updateTable?.();
+  window.updateHeader?.();
+
 }
 
 // =========================
-// 📅 SAISON START
+// 🎮 USER ACTIONS
 // =========================
-function startSeason(){
+function selectLeague(){
 
-  if(!game.league.teams.length){
-    alert("Bitte Liga wählen!");
-    return;
-  }
+  const select = document.getElementById("leagueSelect");
+  if(!select) return;
 
-  generateSchedule();
+  const key = select.value;
 
-  game.league.currentMatchday = 0;
-  game.phase = "ready";
+  loadLeague(key);
+}
 
-  saveGame();
+function selectTeam(){
 
-  console.log("🚀 Saison gestartet");
+  const select = document.getElementById("teamSelect");
+  if(!select) return;
+
+  game.team.selected = select.value;
+
+  console.log("✅ Team gewählt:", game.team.selected);
+
+  window.updateHeader?.();
+  window.updateTable?.();
 }
 
 // =========================
 // 🌍 EXPORTS
 // =========================
+window.LEAGUES = LEAGUES;
+window.loadLeague = loadLeague;
 window.selectLeague = selectLeague;
 window.selectTeam = selectTeam;
-window.startSeason = startSeason;
-window.LEAGUES = LEAGUES;
