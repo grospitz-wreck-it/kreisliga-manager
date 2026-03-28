@@ -5,6 +5,8 @@ console.log("UI START");
 // =========================
 function initLeagueSelect(){
 
+  console.log("🔥 initLeagueSelect CALLED");
+
   const select = document.getElementById("leagueSelect");
   if(!select) return;
 
@@ -18,7 +20,15 @@ function initLeagueSelect(){
 
     select.appendChild(opt);
   });
+
+  // ✅ DEFAULT VISUELL setzen
+  const firstKey = Object.keys(LEAGUES)[0];
+  if(firstKey){
+    select.value = firstKey;
+  }
 }
+
+window.initLeagueSelect = initLeagueSelect;
 
 // =========================
 // 📋 TEAM DROPDOWN
