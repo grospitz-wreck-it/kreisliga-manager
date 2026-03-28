@@ -36,15 +36,18 @@ function findPlayerMatch(){
 // =========================
 function startMatch(){
 
-  simulateMatchday();
-
+  // 👉 ERST dein Spiel holen
   let match = findPlayerMatch();
 
+  // 👉 Fallback (falls irgendwas schief ist)
   if(!match){
     match = game.league.schedule?.[game.league.currentRound]?.[0];
   }
 
   if(!match) return;
+
+  // 👉 DANN KI Spiele simulieren
+  simulateMatchday();
 
   game.match.current = match;
   game.phase = "live";
