@@ -26,7 +26,6 @@ function populateTeamSelect(){
 function updateMatchUI(text){
 
   const el = document.getElementById("match");
-
   const m = game.match.current;
 
   if(m){
