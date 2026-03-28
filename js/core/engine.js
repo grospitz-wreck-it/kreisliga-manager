@@ -35,26 +35,38 @@ function simulateMatchday(){
   const schedule = game.league.schedule;
   const roundIndex = game.league.currentRound;
 
-  if(!schedule || roundIndex >= schedule.length){
-    console.warn("Keine Spiele mehr");
+  if(!schedule || !schedule[roundIndex]){
+    console.error("❌ Kein Spielplan vorhanden oder falscher Spieltag");
     return;
   }
 
   const matches = schedule[roundIndex];
 
+  console.log("👉 Dein Team:", game.team.selected);
+  console.log("👉 Spiele:", matches);
+
+  game.match.current = null; // 🔥 reset wichtig!
+
   matches.forEach(match => {
 
-    const isPlayerMatch =
-      match.home.name === game.team.selected?.name ||
-      match.away.name === game.team.selected?.name;
+    // 🔥 WICHTIG: Namen vergleichen
+    const homeName = match.home.name;
+    const awayName = match.away.name;
+    const myName = game.team.selected?.name;
 
-    // 👉 DEIN SPIEL merken
+    console.log("Check:", homeName, "vs", myName, "|", awayName, "vs", myName);
+
+    const isPlayerMatch =
+      homeName === myName ||
+      awayName === myName;
+
     if(isPlayerMatch){
+      console.log("✅ DEIN SPIEL GEFUNDEN");
       game.match.current = match;
       return;
     }
 
-    // 👉 ANDERE SPIELE simulieren
+    // 👉 andere Spiele simulieren
     const result = simulateMatch(match.home, match.away);
 
     match.result = result;
@@ -62,7 +74,9 @@ function simulateMatchday(){
     updateTable(match.home, match.away, result.home, result.away);
   });
 
-  console.log("📊 Spieltag simuliert:", roundIndex + 1);
+  if(!game.match.current){
+    console.error("❌ KEIN SPIEL FÜR DICH GEFUNDEN!");
+  }
 }
 
 // =========================
