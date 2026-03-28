@@ -154,7 +154,16 @@ const chance = base + tacticBonus + (Math.random() * 0.3);
     addEvent(`🎯 Chance für ${team.name}`);
   }
 }
+function getTacticBonus(team){
 
+  switch(team.tactic){
+    case "offensive": return 0.08;
+    case "defensive": return -0.05;
+    case "pressing": return 0.05;
+    case "counter": return 0.03;
+    default: return 0;
+  }
+}
 // =========================
 // ⚽ TOR
 // =========================
