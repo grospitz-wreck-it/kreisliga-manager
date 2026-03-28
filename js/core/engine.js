@@ -272,17 +272,16 @@ function endMatch(){
 
   const match = game.match.current;
 
+  // ✅ Ergebnis setzen (bleibt wie bei dir)
   match.result = {
     home: matchState.score.home,
     away: matchState.score.away
   };
 
-  updateTable(
-    match.home,
-    match.away,
-    matchState.score.home,
-    matchState.score.away
-  );
+  applyMatchResult(match);
+
+  // 👉 Tabelle neu rendern
+  renderTable();
 
   game.league.currentRound++;
   game.phase = "idle";
