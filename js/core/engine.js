@@ -19,43 +19,34 @@ function handleMainAction(){
 // =========================
 // 🏁 START
 // =========================
-function startMatch(){
+function simulateMatchday(){
 
   const round = game.league.schedule?.[game.league.currentRound];
-  const myTeam = game.team.selected;
 
-  if(!round || !myTeam) return;
+  if(!round) return;
 
-  // ✅ EXAKT dein Spiel holen
-  const match = round.find(m =>
-    m.home.name === myTeam.name ||
-    m.away.name === myTeam.name
-  );
+  round.forEach(match => {
 
-  if(!match){
-    console.error("❌ Kein Spiel für dein Team gefunden!");
-    return;
-  }
+    const isPlayerMatch =
+      match.home.name === game.team.selected?.name ||
+      match.away.name === game.team.selected?.name;
 
-  // 👉 KI Spiele simulieren (ohne dein Spiel)
-  simulateMatchday();
+    // ❗ Spieler-Spiel wird IMMER übersprungen
+    if(isPlayerMatch) return;
 
-  game.match.current = match;
-  game.phase = "live";
+    // ❗ nur simulieren wenn noch kein Ergebnis existiert
+    if(match.result === null){
 
-  matchState.minute = 0;
-  matchState.running = true;
-  matchState.score.home = 0;
-  matchState.score.away = 0;
-  matchState.events = [];
-  matchState.cards.home = 0;
-  matchState.cards.away = 0;
+      const home = Math.floor(Math.random()*3);
+      const away = Math.floor(Math.random()*3);
 
-  renderCurrentMatch();
-  updateUI();
-  renderLiveFeed();
+      match.result = { home, away };
 
-  runMatchLoop();
+      applyMatchResult(match);
+    }
+  });
+
+  renderTable();
 }
 
 // =========================
