@@ -308,6 +308,19 @@ function endMatch(){
   game.phase = "setup";
 
   addLiveEvent("🏁 Abpfiff!");
+
+  const home = game.match.current.home;
+  const away = game.match.current.away;
+
+  updateTable(
+    home,
+    away,
+    matchState.score.home,
+    matchState.score.away
+  );
+
+  renderTable();
+
   updateAllUI("Spiel beendet");
 }
 
