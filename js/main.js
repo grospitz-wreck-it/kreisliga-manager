@@ -66,7 +66,48 @@ function handleMainAction(){
       break;
   }
 }
+function startSeason(){
+  console.log("🏁 Saison startet");
 
+  if(!game.league.teams.length){
+    alert("Liga wählen!");
+    return;
+  }
+
+  generateSchedule?.();
+
+  game.phase = "ready";
+}
+
+function startMatch(){
+  console.log("⚽ Spiel startet");
+
+  simulateMatchday?.();
+
+  game.phase = "live";
+}
+
+function resumeMatch(){
+  console.log("▶️ 2. Halbzeit");
+
+  resumeMatchEngine?.();
+
+  game.phase = "live";
+}
+
+function pauseMatch(){
+  console.log("⏸ Pause");
+
+  pauseMatchEngine?.();
+
+  game.phase = "halftime";
+}
+
+// EXPORTS
+window.startSeason = startSeason;
+window.startMatch = startMatch;
+window.resumeMatch = resumeMatch;
+window.pauseMatch = pauseMatch;
 // =========================
 // 🌍 EXPORT (WICHTIG!)
 // =========================
