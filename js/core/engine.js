@@ -15,21 +15,6 @@ function handleMainAction(){
   }
 }
 
-// =========================
-// 🔍 MATCH FINDEN
-// =========================
-function findPlayerMatch(){
-
-  const round = game.league.schedule?.[game.league.currentRound];
-  const myTeam = game.team.selected;
-
-  if(!round || !myTeam) return null;
-
-  return round.find(m =>
-    m.home.name === myTeam.name ||
-    m.away.name === myTeam.name
-  );
-}
 
 // =========================
 // 🏁 START
