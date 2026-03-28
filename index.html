@@ -6,7 +6,7 @@
 </head>
 <body>
 
-  <h2 id="header">Manager</h2>
+  <h2>Manager</h2>
 
   <div>
     <input id="nameInput" placeholder="Dein Name">
@@ -24,9 +24,16 @@
 
   <h3 id="match"></h3>
 
-  <!-- 🔥 NEU: Fortschrittsbalken -->
+  <!-- 🔥 SCORE -->
+  <h1 id="score">0 : 0</h1>
+
+  <!-- 🔥 PROGRESS -->
   <div style="height:12px;background:#ccc;margin-top:10px;border-radius:6px;overflow:hidden;">
     <div id="progressFill" style="height:100%;width:0%;background:green;"></div>
+  </div>
+
+  <!-- 🔥 LIVE TICKER -->
+  <div id="liveFeed" style="margin-top:15px;max-height:200px;overflow:auto;border:1px solid #ccc;padding:10px;">
   </div>
 
   <script src="js/core/state.js"></script>
