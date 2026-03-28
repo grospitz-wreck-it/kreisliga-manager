@@ -143,6 +143,8 @@ function startMatch(){
   matchState.score.away = 0;
 
   console.log("🚀 STARTET JETZT:", match.home.name, "vs", match.away.name);
+  renderCurrentMatch();
+updateUI();
 
   runMatchLoop();
 }
