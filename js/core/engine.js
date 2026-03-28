@@ -78,7 +78,7 @@ function simulateMatchday(){
     ){
       return;
     }
-
+    renderSchedule();
     const result = simulateMatch(match.home, match.away);
 
     match.result = result;
@@ -210,5 +210,5 @@ function endMatch(){
   game.league.currentRound++;
   game.phase = "idle";
 }
-
+renderSchedule();
 window.endMatch = endMatch;
