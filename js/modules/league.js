@@ -67,9 +67,12 @@ function selectTeam(teamName){
     return;
   }
 
-  game.team.selected = team;
+  // 🔥 NUR NAME SPEICHERN
+  game.team.selected = team.name;
 
   console.log("✅ Team gewählt:", team.name);
 }
+
+window.selectTeam = selectTeam;
 
 window.selectTeam = selectTeam;
