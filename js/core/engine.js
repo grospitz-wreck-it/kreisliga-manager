@@ -22,12 +22,7 @@ let matchState = {
 // =========================
 function startMatch(){
 
-  // 🔥 SAFETY: Spielplan immer sicherstellen
-  if(!game.league.schedule || !game.league.schedule.length){
-    console.warn("⚠️ Kein Spielplan → wird neu erstellt");
-    generateSchedule();
-  }
-
+  // 🔥 IMMER aus Spielplan holen
   const match = nextMatch();
 
   if(!match){
