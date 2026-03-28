@@ -201,6 +201,72 @@ function renderTable(){
   container.innerHTML = html;
 }
 
+function renderTable(){
+
+  const el = document.getElementById("table");
+  if(!el) return;
+
+  sortTable();
+
+  let html = `
+    <table style="width:100%; background:white; border-radius:10px;">
+      <tr style="background:#2e7d32; color:white;">
+        <th>#</th>
+        <th>Team</th>
+        <th>Sp</th>
+        <th>S</th>
+        <th>U</th>
+        <th>N</th>
+        <th>T</th>
+        <th>Diff</th>
+        <th>P</th>
+      </tr>
+  `;
+
+  const teams = game.league.teams;
+  const total = teams.length;
+
+  teams.forEach((t, i) => {
+
+    const diff = t.goalsFor - t.goalsAgainst;
+
+    let rowStyle = "";
+
+    // 🟢 Aufsteiger (Top 2)
+    if(i < 2){
+      rowStyle = "background:#c8e6c9;";
+    }
+
+    // 🔴 Absteiger (letzte 2)
+    if(i >= total - 2){
+      rowStyle = "background:#ffcdd2;";
+    }
+
+    // ⭐ Dein Team hervorheben
+    if(game.team.selected && t.name === game.team.selected.name){
+      rowStyle = "background:#bbdefb;";
+    }
+
+    html += `
+      <tr style="${rowStyle}">
+        <td>${i + 1}</td>
+        <td>${t.name}</td>
+        <td>${t.played}</td>
+        <td>${t.wins}</td>
+        <td>${t.draws}</td>
+        <td>${t.losses}</td>
+        <td>${t.goalsFor}:${t.goalsAgainst}</td>
+        <td>${diff}</td>
+        <td><b>${t.points}</b></td>
+      </tr>
+    `;
+  });
+
+  html += "</table>";
+
+  el.innerHTML = html;
+}
+
 // =========================
 // 🌍 EXPORT
 // =========================
