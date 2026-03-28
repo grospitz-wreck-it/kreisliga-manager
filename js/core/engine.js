@@ -61,7 +61,7 @@ function simulateMatchday(){
 }
 
 function startMatch(){
-
+  console.log("UI vorhanden?", typeof updateUI);
   simulateMatchday();
 
   let match = findPlayerMatch();
