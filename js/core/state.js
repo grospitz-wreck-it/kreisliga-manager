@@ -18,3 +18,6 @@ window.game = {
 
   phase: "setup"
 };
+game.season = {
+  year: 1
+};
