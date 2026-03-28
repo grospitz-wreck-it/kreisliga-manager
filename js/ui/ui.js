@@ -1,46 +1,16 @@
-function initLeagueSelect(){
+function updateUI(){
 
-  const select = document.getElementById("leagueSelect");
+  const scoreEl = document.getElementById("score");
+  const timeEl = document.getElementById("time");
 
-  Object.entries(LEAGUES).forEach(([key, val]) => {
-    const opt = document.createElement("option");
-    opt.value = key;
-    opt.textContent = val.name;
-    select.appendChild(opt);
-  });
-}
-function renderSchedule(){
+  if(!scoreEl || !timeEl) return;
 
-  const el = document.getElementById("schedule");
+  scoreEl.textContent =
+    matchState.score.home + " : " + matchState.score.away;
 
-  if(!el) return;
-
-  const round = game.league.schedule?.[game.league.currentRound];
-
-  if(!round){
-    el.innerHTML = "Kein Spielplan";
-    return;
-  }
-
-  let html = "<h3>Spieltag " + (game.league.currentRound + 1) + "</h3>";
-
-  round.forEach(match => {
-
-    const result = match.result
-      ? `${match.result.home}:${match.result.away}`
-      : "-:-";
-
-    html += `
-      <div>
-        ${match.home.name} vs ${match.away.name} (${result})
-      </div>
-    `;
-  });
-
-  el.innerHTML = html;
+  timeEl.textContent = matchState.minute + "'";
 }
 
-window.renderSchedule = renderSchedule;
 function renderCurrentMatch(){
 
   const el = document.getElementById("currentMatch");
@@ -59,34 +29,38 @@ function renderCurrentMatch(){
   `;
 }
 
-window.renderCurrentMatch = renderCurrentMatch;
-function populateTeamSelect(){
+function renderSchedule(){
 
-  const select = document.getElementById("teamSelect");
-  select.innerHTML = "";
+  const el = document.getElementById("schedule");
 
-  game.league.teams.forEach(t => {
-    const opt = document.createElement("option");
-    opt.value = t.name;
-    opt.textContent = `${t.name} (Stärke ${t.strength})`;
-    select.appendChild(opt);
-  });
-}
+  if(!el) return;
 
-function updateMatchUI(text){
+  const round = game.league.schedule?.[game.league.currentRound];
 
-  const el = document.getElementById("match");
-  const m = game.match.current;
-
-  if(m){
-    el.innerText = `${m.home.name} vs ${m.away.name} - ${text}`;
-  } else {
-    el.innerText = text;
+  if(!round){
+    el.innerHTML = "Kein Spielplan";
+    return;
   }
+
+  let html = `<h3>Spieltag ${game.league.currentRound + 1}</h3>`;
+
+  round.forEach(match => {
+
+    const result = match.result
+      ? `${match.result.home}:${match.result.away}`
+      : "-:-";
+
+    html += `
+      <div>
+        ${match.home.name} vs ${match.away.name} (${result})
+      </div>
+    `;
+  });
+
+  el.innerHTML = html;
 }
+
+// 🔥 GLOBAL
 window.updateUI = updateUI;
 window.renderSchedule = renderSchedule;
 window.renderCurrentMatch = renderCurrentMatch;
-window.initLeagueSelect = initLeagueSelect;
-window.populateTeamSelect = populateTeamSelect;
-window.updateMatchUI = updateMatchUI;
