@@ -3,27 +3,26 @@
 // =========================
 console.log("MAIN START");
 
-window.addEventListener("load", () => {
+window.onload = function(){
 
-  loadGameState();
+  loadGameState?.();
 
-  initPlayer();
-  initLeagueUI();
+  initPlayer?.();
+  initLeagueUI?.();
+
   bindUI();
 
-  if(typeof initFriendUI === "function"){
-    initFriendUI();
-  }
+  initFriendUI?.();
 
-  updateHeader();
-  updateMainButton();
-
+  updateHeader?.();
+  updateMainButton?.();
   updateTable?.();
   loadLeaderboard?.();
 
-  if(typeof startAds === "function"){
-    startAds();
-  }
+  startAds?.();
+
+  console.log("✅ App vollständig geladen");
+};
 
   // 🔥 MAIN BUTTON FIX (Mobile + Desktop)
   const btn = document.getElementById("mainButton");
