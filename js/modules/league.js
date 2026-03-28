@@ -18,8 +18,6 @@ const LEAGUES = {
       "FC Schweicheln",
       "SG FA Herringhausen/Eickum II",
       "Bünder SV",
-
-      // 🔥 FEHLENDE TEAMS ERGÄNZT
       "SC Enger",
       "RW Kirchlengern II",
       "SpVg Hiddenhausen"
@@ -90,8 +88,13 @@ function selectLeague(key){
     name,
     strength: Math.floor(Math.random() * 30) + 60,
 
+    // 🔥 TAKTIK SYSTEM
     tactic: "balanced",
 
+    // 🔥 FORM (für spätere Features)
+    form: [],
+
+    // 📊 STATS
     points: 0,
     goalsFor: 0,
     goalsAgainst: 0,
@@ -149,6 +152,18 @@ function selectTeam(teamName){
 
   console.log("✅ Team gewählt:", team.name);
 
+  // =========================
+  // 🔄 TAKTIK DROPDOWN SYNC
+  // =========================
+  const tacticSelect = document.getElementById("tacticSelect");
+
+  if(tacticSelect){
+    tacticSelect.value = team.tactic;
+  }
+
+  // =========================
+  // 📊 UI UPDATE
+  // =========================
   renderCurrentMatch?.();
 }
 
