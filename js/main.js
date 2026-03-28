@@ -2,20 +2,13 @@
 // 🚀 INIT
 // =========================
 console.log("MAIN START");
-console.log("simulateMatchday:", typeof simulateMatchday);
-window.onload = function(){
+
+window.addEventListener("load", () => {
 
   loadGameState();
 
   initPlayer();
   initLeagueUI();
-window.onload = function(){
-
-  loadGameState();
-
-  initPlayer();
-  initLeagueUI();
-
   bindUI();
 
   if(typeof initFriendUI === "function"){
@@ -32,47 +25,28 @@ window.onload = function(){
     startAds();
   }
 
+  // 🔥 MAIN BUTTON FIX (Mobile + Desktop)
+  const btn = document.getElementById("mainButton");
+
+  if(btn){
+    let lastTap = 0;
+
+    function safeClick(){
+      const now = Date.now();
+      if(now - lastTap < 300) return;
+      lastTap = now;
+
+      handleMainAction();
+    }
+
+    btn.addEventListener("click", safeClick);
+    btn.addEventListener("touchstart", safeClick);
+  }
+
   console.log("✅ App vollständig geladen");
-};
-  if(typeof initFriendUI === "function"){
-    initFriendUI();
-  }
+});
 
-  updateHeader();
-  updateMainButton();
 
-  updateTable?.();
-  loadLeaderboard?.();
-
-  if(typeof startAds === "function"){
-    startAds();
-  }
- // 🔥 HIER GEHÖRT ES HIN
-  bindUI();
-
-  console.log("✅ App vollständig geladen");
-};
-function toggleSetup(){
-  const panel = document.getElementById("setupPanel");
-  const overlay = document.getElementById("overlay");
-
-  const isOpen = panel.classList.contains("open");
-
-  if(isOpen){
-    closeSetup();
-  } else {
-    panel.classList.add("open");
-    overlay.classList.add("active");
-  }
-}
-
-function closeSetup(){
-  const panel = document.getElementById("setupPanel");
-  const overlay = document.getElementById("overlay");
-
-  panel.classList.remove("open");
-  overlay.classList.remove("active");
-}
 // =========================
 // 👤 PLAYER
 // =========================
@@ -94,6 +68,7 @@ function initPlayer(){
     input.value = game.player.name;
   }
 }
+
 
 // =========================
 // 🏟️ LEAGUE UI
@@ -118,6 +93,7 @@ function initLeagueUI(){
   }
 }
 
+
 // =========================
 // 🧾 HEADER
 // =========================
@@ -135,88 +111,84 @@ function updateHeader(){
   }
 }
 
+
 // =========================
-// ▶️ FLOW
+// ▶️ FLOW (ENGINE GESTEUERT)
 // =========================
 function handleMainAction(){
+
+  console.log("🟡 Phase:", game.phase);
 
   switch(game.phase){
 
     case "idle":
-      startSeason();
+      startSeason(); // 🔥 kommt aus ENGINE
       break;
 
     case "ready":
-      startMatch();
+      simulateMatchday();
       break;
 
     case "halftime":
       resumeMatch();
-      break;
+      return;
 
     case "live":
-      game.match.isRunning = false;
-      game.phase = "halftime";
-      break;
+      console.log("⛔ Spiel läuft bereits");
+      return;
   }
 
   updateMainButton();
 }
 
-// =========================
-// 🏁 SAISON
-// =========================
-function startSeason(){
-
-  if(!game.league.teams.length){
-    alert("Liga wählen!");
-    return;
-  }
-
-  game.league.currentMatchday = 0;
-  generateSchedule();
-
-  game.phase = "ready";
-}
 
 // =========================
-// ⚽ MATCH
-// =========================
-function startMatch(){
-
-  if(!game.team.selected){
-    alert("Bitte zuerst ein Team wählen!");
-    return;
-  }
-
-  if(!game.league.schedule || game.league.schedule.length === 0){
-    alert("Keine Liga gestartet!");
-    return;
-  }
-
-  if(game.match.isRunning){
-    console.warn("Spiel läuft bereits");
-    return;
-  }
-
-  simulateMatchday();
-
-  game.match.isRunning = true;
-  game.phase = "live";
-
-  updateMainButton();
-}
-
-// =========================
-// 🔘 BUTTON
+// 🔘 BUTTON UI
 // =========================
 function updateMainButton(){
 
-  const btn = document.getElementById("mainActionBtn");
+  const btn = document.getElementById("mainButton");
   if(!btn) return;
 
-  if(game.phase === "idle") btn.innerText = "▶ Saison starten";
-  else if(game.phase === "ready") btn.innerText = "▶ Spieltag";
-  else if(game.phase === "halftime") btn.innerText = "▶ 2. Halbzeit";
-  else if(game.phase === "live") btn.innerText = "⏸ Pause";
+  btn.disabled = false;
+
+  switch(game.phase){
+
+    case "idle":
+      btn.innerText = "▶ Saison starten";
+      break;
+
+    case "ready":
+      btn.innerText = "▶ Nächstes Spiel";
+      break;
+
+    case "halftime":
+      btn.innerText = "▶ 2. Halbzeit";
+      break;
+
+    case "live":
+      btn.innerText = "⏳ Spiel läuft...";
+      btn.disabled = true;
+      break;
+  }
+}
+
+
+// =========================
+// ⚙️ SETUP PANEL
+// =========================
+function toggleSetup(){
+  const panel = document.getElementById("setupPanel");
+  const overlay = document.getElementById("overlay");
+
+  panel.classList.add("open");
+  overlay.classList.add("active");
+}
+
+function closeSetup(){
+  const panel = document.getElementById("setupPanel");
+  const overlay = document.getElementById("overlay");
+
+  panel.classList.remove("open");
+  overlay.classList.remove("active");
 }
