@@ -107,7 +107,7 @@ function selectLeague(key){
   console.log("👥 Teams geladen:", game.league.teams);
 
   // ❌ KEIN UI HIER MEHR
-}
+
 }
 
 // 🌍 EXPORT
