@@ -48,4 +48,3 @@ function selectLeague(key){
   populateTeamSelect();
 }
 
-window.selectTeam = selectTeam;
