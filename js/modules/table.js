@@ -7,81 +7,104 @@ function createTable(){
 
   game.league.table = game.league.teams.map(team => ({
     name: team.name,
-    points: 0,
-    goalsFor: 0,
-    goalsAgainst: 0,
-    goalDiff: 0,
+
+    played: 0,
     wins: 0,
     draws: 0,
     losses: 0,
-    played: 0
+
+    goalsFor: 0,
+    goalsAgainst: 0,
+    goalDiff: 0,
+
+    points: 0,
+
+    // 🔥 FORM (letzte 5 Spiele)
+    form: []
   }));
 
-  console.log("📊 Tabelle erstellt:", game.league.table);
+  console.log("📊 Tabelle erstellt");
 
   renderTable();
 }
 
 // =========================
-// 🔄 UPDATE NACH SPIEL
+// 🔄 UPDATE
 // =========================
 function updateTable(homeTeam, awayTeam, homeGoals, awayGoals){
 
   const table = game.league.table;
 
-  if(!table){
-    console.error("❌ Tabelle nicht vorhanden");
-    return;
-  }
-
   const home = table.find(t => t.name === homeTeam.name);
   const away = table.find(t => t.name === awayTeam.name);
 
   if(!home || !away){
-    console.error("❌ Team nicht in Tabelle gefunden", homeTeam, awayTeam);
+    console.error("❌ Team nicht gefunden", homeTeam, awayTeam);
     return;
   }
 
-  // =========================
-  // 📊 BASIS
-  // =========================
+  // Spiele
   home.played++;
   away.played++;
 
+  // Tore
   home.goalsFor += homeGoals;
   home.goalsAgainst += awayGoals;
 
   away.goalsFor += awayGoals;
   away.goalsAgainst += homeGoals;
 
-  // =========================
-  // 🏆 ERGEBNIS
-  // =========================
+  // Ergebnis
   if(homeGoals > awayGoals){
+
     home.points += 3;
     home.wins++;
     away.losses++;
+
+    updateForm(home, "W");
+    updateForm(away, "L");
+
   }
   else if(homeGoals < awayGoals){
+
     away.points += 3;
     away.wins++;
     home.losses++;
+
+    updateForm(away, "W");
+    updateForm(home, "L");
+
   }
   else{
+
     home.points += 1;
     away.points += 1;
+
     home.draws++;
     away.draws++;
+
+    updateForm(home, "D");
+    updateForm(away, "D");
   }
 
-  // =========================
-  // ➕ TORDIFFERENZ
-  // =========================
+  // Tordifferenz
   home.goalDiff = home.goalsFor - home.goalsAgainst;
   away.goalDiff = away.goalsFor - away.goalsAgainst;
 
   sortTable();
   renderTable();
+}
+
+// =========================
+// 🔥 FORM SYSTEM
+// =========================
+function updateForm(team, result){
+
+  team.form.unshift(result);
+
+  if(team.form.length > 5){
+    team.form.pop();
+  }
 }
 
 // =========================
@@ -91,23 +114,34 @@ function sortTable(){
 
   game.league.table.sort((a, b) => {
 
-    // Punkte
     if(b.points !== a.points){
       return b.points - a.points;
     }
 
-    // Tordifferenz
     if(b.goalDiff !== a.goalDiff){
       return b.goalDiff - a.goalDiff;
     }
 
-    // Tore
     if(b.goalsFor !== a.goalsFor){
       return b.goalsFor - a.goalsFor;
     }
 
     return 0;
   });
+}
+
+// =========================
+// 🎨 FORM ANZEIGE
+// =========================
+function renderForm(form){
+
+  return form.map(r => {
+
+    if(r === "W") return "🟢";
+    if(r === "D") return "🟡";
+    if(r === "L") return "🔴";
+
+  }).join("");
 }
 
 // =========================
@@ -122,13 +156,18 @@ function renderTable(){
   if(!table) return;
 
   let html = `
-    <table style="width:100%; font-size:14px; background:white; border-radius:10px; overflow:hidden;">
+    <table style="width:100%; font-size:13px; background:white;">
       <tr style="background:#2e7d32; color:white;">
         <th>#</th>
         <th>Team</th>
-        <th>P</th>
+        <th>Sp</th>
+        <th>S</th>
+        <th>U</th>
+        <th>N</th>
         <th>T</th>
-        <th>TD</th>
+        <th>Diff</th>
+        <th>P</th>
+        <th>Form</th>
       </tr>
   `;
 
@@ -145,9 +184,14 @@ function renderTable(){
         <td style="text-align:left; padding-left:6px;">
           ${team.name}
         </td>
-        <td>${team.points}</td>
+        <td>${team.played}</td>
+        <td>${team.wins}</td>
+        <td>${team.draws}</td>
+        <td>${team.losses}</td>
         <td>${team.goalsFor}:${team.goalsAgainst}</td>
         <td>${team.goalDiff}</td>
+        <td><b>${team.points}</b></td>
+        <td>${renderForm(team.form)}</td>
       </tr>
     `;
   });
@@ -158,7 +202,7 @@ function renderTable(){
 }
 
 // =========================
-// 🌍 GLOBAL
+// 🌍 EXPORT
 // =========================
 window.createTable = createTable;
 window.updateTable = updateTable;
