@@ -3,258 +3,125 @@
 // =========================
 function createTable(){
 
-  if(!game.league.teams) return;
-
-  game.league.table = game.league.teams.map(team => ({
-    name: team.name,
-
-    played: 0,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-
-    goalsFor: 0,
-    goalsAgainst: 0,
-    goalDiff: 0,
-
-    points: 0,
-
-    // 🔥 FORM (letzte 5 Spiele)
-    form: []
-  }));
-
-  console.log("📊 Tabelle erstellt");
+  game.league.teams.forEach(team => {
+    team.points = 0;
+    team.goalsFor = 0;
+    team.goalsAgainst = 0;
+    team.wins = 0;
+    team.draws = 0;
+    team.losses = 0;
+    team.played = 0;
+  });
 
   renderTable();
 }
 
 // =========================
-// 🔄 UPDATE
+// 📊 TABELLE UPDATEN
 // =========================
-function updateTable(homeTeam, awayTeam, homeGoals, awayGoals){
+function updateTable(match){
 
-  const table = game.league.table;
-
-  const home = table.find(t => t.name === homeTeam.name);
-  const away = table.find(t => t.name === awayTeam.name);
-
-  if(!home || !away){
-    console.error("❌ Team nicht gefunden", homeTeam, awayTeam);
+  if(!match || !match.result){
+    console.warn("❌ Kein Match/Result für Tabelle");
     return;
   }
+
+  const home = game.league.teams.find(t => t.name === match.home.name);
+  const away = game.league.teams.find(t => t.name === match.away.name);
+
+  if(!home || !away){
+    console.error("❌ Team nicht gefunden", match.home, match.away);
+    return;
+  }
+
+  const hg = match.result.home;
+  const ag = match.result.away;
 
   // Spiele
   home.played++;
   away.played++;
 
   // Tore
-  home.goalsFor += homeGoals;
-  home.goalsAgainst += awayGoals;
+  home.goalsFor += hg;
+  home.goalsAgainst += ag;
 
-  away.goalsFor += awayGoals;
-  away.goalsAgainst += homeGoals;
+  away.goalsFor += ag;
+  away.goalsAgainst += hg;
 
-  // Ergebnis
-  if(homeGoals > awayGoals){
-
-    home.points += 3;
+  // Punkte
+  if(hg > ag){
     home.wins++;
+    home.points += 3;
     away.losses++;
-
-    updateForm(home, "W");
-    updateForm(away, "L");
-
   }
-  else if(homeGoals < awayGoals){
-
-    away.points += 3;
+  else if(ag > hg){
     away.wins++;
+    away.points += 3;
     home.losses++;
-
-    updateForm(away, "W");
-    updateForm(home, "L");
-
   }
   else{
-
-    home.points += 1;
-    away.points += 1;
-
     home.draws++;
     away.draws++;
-
-    updateForm(home, "D");
-    updateForm(away, "D");
+    home.points += 1;
+    away.points += 1;
   }
 
-  // Tordifferenz
-  home.goalDiff = home.goalsFor - home.goalsAgainst;
-  away.goalDiff = away.goalsFor - away.goalsAgainst;
-
-  sortTable();
   renderTable();
 }
 
 // =========================
-// 🔥 FORM SYSTEM
+// 📊 TABELLE RENDERN
 // =========================
-function updateForm(team, result){
-
-  team.form.unshift(result);
-
-  if(team.form.length > 5){
-    team.form.pop();
-  }
-}
-
-// =========================
-// 🔃 SORTIERUNG
-// =========================
-function sortTable(){
-
-  game.league.teams.sort((a, b) => {
-
-    // Punkte
-    if(b.points !== a.points) return b.points - a.points;
-
-    // Tordifferenz
-    const diffA = a.goalsFor - a.goalsAgainst;
-    const diffB = b.goalsFor - b.goalsAgainst;
-    if(diffB !== diffA) return diffB - diffA;
-
-    // Tore
-    if(b.goalsFor !== a.goalsFor) return b.goalsFor - a.goalsFor;
-
-    // Name
-    return a.name.localeCompare(b.name);
-  });
-}
-
-// =========================
-// 🎨 FORM ANZEIGE
-// =========================
-function renderForm(form){
-
-  return form.map(r => {
-
-    if(r === "W") return "🟢";
-    if(r === "D") return "🟡";
-    if(r === "L") return "🔴";
-
-  }).join("");
-}
-
-// =========================
-// 🖥️ RENDER
-// =========================
-function renderTable(){
-
-  const container = document.getElementById("table");
-  if(!container) return;
-
-  const table = game.league.table;
-  if(!table) return;
-
-  let html = `
-    <table style="width:100%; font-size:13px; background:white;">
-      <tr style="background:#2e7d32; color:white;">
-        <th>#</th>
-        <th>Team</th>
-        <th>Sp</th>
-        <th>S</th>
-        <th>U</th>
-        <th>N</th>
-        <th>T</th>
-        <th>Diff</th>
-        <th>P</th>
-        <th>Form</th>
-      </tr>
-  `;
-
-  table.forEach((team, i) => {
-
-    const isPlayer = game.team.selected?.name === team.name;
-
-    html += `
-      <tr style="
-        text-align:center;
-        background:${isPlayer ? '#c8e6c9' : 'white'};
-      ">
-        <td>${i+1}</td>
-        <td style="text-align:left; padding-left:6px;">
-          ${team.name}
-        </td>
-        <td>${team.played}</td>
-        <td>${team.wins}</td>
-        <td>${team.draws}</td>
-        <td>${team.losses}</td>
-        <td>${team.goalsFor}:${team.goalsAgainst}</td>
-        <td>${team.goalDiff}</td>
-        <td><b>${team.points}</b></td>
-        <td>${renderForm(team.form)}</td>
-      </tr>
-    `;
-  });
-
-  html += `</table>`;
-
-  container.innerHTML = html;
-}
-
 function renderTable(){
 
   const el = document.getElementById("table");
+
   if(!el) return;
 
-  sortTable();
+  const teams = [...game.league.teams].sort((a,b) => {
+    if(b.points !== a.points) return b.points - a.points;
+
+    const diffA = a.goalsFor - a.goalsAgainst;
+    const diffB = b.goalsFor - b.goalsAgainst;
+
+    if(diffB !== diffA) return diffB - diffA;
+
+    return b.goalsFor - a.goalsFor;
+  });
 
   let html = `
-    <table style="width:100%; background:white; border-radius:10px;">
-      <tr style="background:#2e7d32; color:white;">
+    <table style="width:100%; font-size:14px">
+      <tr>
         <th>#</th>
         <th>Team</th>
         <th>Sp</th>
-        <th>S</th>
-        <th>U</th>
-        <th>N</th>
         <th>T</th>
         <th>Diff</th>
-        <th>P</th>
+        <th>Pkt</th>
       </tr>
   `;
-
-  const teams = game.league.teams;
-  const total = teams.length;
 
   teams.forEach((t, i) => {
 
     const diff = t.goalsFor - t.goalsAgainst;
 
-    let rowStyle = "";
+    let style = "";
 
-    // 🟢 Aufsteiger (Top 2)
+    // 🟢 Aufstieg
     if(i < 2){
-      rowStyle = "background:#c8e6c9;";
+      style = "background:#c8e6c9";
     }
 
-    // 🔴 Absteiger (letzte 2)
-    if(i >= total - 2){
-      rowStyle = "background:#ffcdd2;";
-    }
-
-    // ⭐ Dein Team hervorheben
-    if(game.team.selected && t.name === game.team.selected.name){
-      rowStyle = "background:#bbdefb;";
+    // 🔴 Abstieg
+    if(i >= teams.length - 2){
+      style = "background:#ffcdd2";
     }
 
     html += `
-      <tr style="${rowStyle}">
-        <td>${i + 1}</td>
+      <tr style="${style}">
+        <td>${i+1}</td>
         <td>${t.name}</td>
         <td>${t.played}</td>
-        <td>${t.wins}</td>
-        <td>${t.draws}</td>
-        <td>${t.losses}</td>
         <td>${t.goalsFor}:${t.goalsAgainst}</td>
         <td>${diff}</td>
         <td><b>${t.points}</b></td>
@@ -268,7 +135,7 @@ function renderTable(){
 }
 
 // =========================
-// 🌍 EXPORT
+// 🌍 GLOBAL
 // =========================
 window.createTable = createTable;
 window.updateTable = updateTable;
