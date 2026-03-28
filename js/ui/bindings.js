@@ -1,17 +1,35 @@
 function bindUI(){
 
-  document.getElementById("mainButton")
-    .addEventListener("click", handleMainAction);
+  const leagueSelect = document.getElementById("leagueSelect");
+  const teamSelect = document.getElementById("teamSelect");
+  const button = document.getElementById("mainButton");
 
-  document.getElementById("leagueSelect")
-    .addEventListener("change", (e) => {
-      selectLeague(e.target.value);
-    });
+  // =========================
+  // 🏆 Liga wählen
+  // =========================
+  leagueSelect.addEventListener("change", (e) => {
 
-  document.getElementById("teamSelect")
-    .addEventListener("change", (e) => {
-      selectTeam(e.target.value);
-    });
+    const key = e.target.value;
+
+    selectLeague(key);
+  });
+
+  // =========================
+  // 👕 Team wählen
+  // =========================
+  teamSelect.addEventListener("change", (e) => {
+
+    const teamName = e.target.value;
+
+    selectTeam(teamName);
+  });
+
+  // =========================
+  // ▶️ Start Button
+  // =========================
+  button.addEventListener("click", () => {
+    handleMainAction();
+  });
 }
 
 window.bindUI = bindUI;
