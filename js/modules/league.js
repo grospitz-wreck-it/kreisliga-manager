@@ -123,7 +123,7 @@ function selectLeague(key){
   // =========================
   // 📊 UI UPDATES
   // =========================
-  createTable?.();
+  renderTable?.();
   populateTeamSelect();
   renderSchedule?.();
 }
