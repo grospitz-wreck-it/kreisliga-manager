@@ -133,8 +133,16 @@ function createChance(match, isHome){
   const team = isHome ? match.home : match.away;
   const opponent = isHome ? match.away : match.home;
 
-  const strengthDiff = team.strength - opponent.strength;
-  const chance = Math.random() + strengthDiff * 0.01;
+   const strengthDiff = team.strength - opponent.strength;
+
+    // 🔥 Stärke hat mehr Einfluss
+  const base = 0.5 + (strengthDiff * 0.015);
+
+  // 🔥 Taktik Einfluss
+  const tacticBonus = getTacticBonus(team);
+
+// 🔥 Zufall reduziert
+const chance = base + tacticBonus + (Math.random() * 0.3);
 
   if(chance > 0.9){
     goal(team, isHome);
