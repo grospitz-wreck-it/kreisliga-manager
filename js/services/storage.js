@@ -1,14 +1,72 @@
-function saveGame(){
-  localStorage.setItem("save", JSON.stringify(game));
-}
+const STORAGE_KEY = "kreisliga_save";
 
-function loadGame(){
+// =========================
+// 💾 SAVE
+// =========================
+async function saveGame(){
 
-  const data = localStorage.getItem("save");
-  if(data){
-    Object.assign(game, JSON.parse(data));
+  try {
+    const data = {
+      game,
+      matchState
+    };
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(data)
+    );
+
+    console.log("✅ Spiel gespeichert");
+  } catch(e){
+    console.error("❌ Save Fehler", e);
   }
 }
 
+// =========================
+// 📂 LOAD
+// =========================
+async function loadGame(){
+
+  try {
+
+    const raw = localStorage.getItem(STORAGE_KEY);
+
+    if(!raw){
+      console.log("ℹ️ Kein Save gefunden");
+      return false;
+    }
+
+    const data = JSON.parse(raw);
+
+    if(data.game){
+      Object.assign(game, data.game);
+    }
+
+    if(data.matchState){
+      Object.assign(matchState, data.matchState);
+    }
+
+    console.log("✅ Spiel geladen");
+
+    return true;
+
+  } catch(e){
+    console.error("❌ Load Fehler", e);
+    return false;
+  }
+}
+
+// =========================
+// 🗑 DELETE
+// =========================
+function clearSave(){
+  localStorage.removeItem(STORAGE_KEY);
+  console.log("🗑 Save gelöscht");
+}
+
+// =========================
+// 🌍 EXPORT
+// =========================
 window.saveGame = saveGame;
 window.loadGame = loadGame;
+window.clearSave = clearSave;
