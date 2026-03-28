@@ -5,10 +5,10 @@ const LEAGUES = {
   herford: {
     name: "Kreisliga A Herford",
     teams: [
-      "SC Herford","FC Exter","TuS Bruchmühlen","SV Enger-Westerenger",
-      "SV Rödinghausen II","TuS Jöllenbeck II","VfL Holsen","SV Oetinghausen",
-      "FC Herford","TuS Hunnebrock","SC Vlotho","TuS Bardüttingdorf",
-      "SV Löhne-Obernbeck","TuS Dünne","SV Bischofshagen","FC Schweicheln"
+      "VfL Holsen II","TSV Löhne","SV Oetinghausen","FC Exter",
+"FC Herford","TuRa Löhne","TuS Hunnebrock","TuS Bardüttingdorf-Wallenbrück",
+"TuS Dünne","SV Bischofshagen-Wittel","FC Schweicheln","SG FA Herringhausen/Eickum II",
+"Bünder SV"
     ]
   }
 };
