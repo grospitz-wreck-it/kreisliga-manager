@@ -3,14 +3,11 @@ const matchState = {
   running: false,
   score: { home: 0, away: 0 },
   events: [],
-  cards: {
-    home: 0,
-    away: 0
-  }
+  cards: { home: 0, away: 0 }
 };
 
 // =========================
-// ▶️ BUTTON ACTION
+// ▶️ BUTTON
 // =========================
 function handleMainAction(){
   if(game.phase !== "live"){
@@ -19,7 +16,7 @@ function handleMainAction(){
 }
 
 // =========================
-// 🔍 SPIEL FINDEN
+// 🔍 MATCH FINDEN
 // =========================
 function findPlayerMatch(){
 
@@ -35,7 +32,7 @@ function findPlayerMatch(){
 }
 
 // =========================
-// 🏁 MATCH START
+// 🏁 START
 // =========================
 function startMatch(){
 
@@ -68,7 +65,7 @@ function startMatch(){
 }
 
 // =========================
-// 🔁 MATCH LOOP
+// 🔁 LOOP
 // =========================
 function runMatchLoop(){
 
@@ -95,50 +92,61 @@ function runMatchLoop(){
 }
 
 // =========================
-// ⚽ LIVE EVENTS
+// 🎲 EVENT STEUERUNG
 // =========================
 function simulateLiveEvent(){
 
   const match = game.match.current;
-
   if(!match) return;
+
+  const homeWeight = getAttackWeight(match.home);
+  const awayWeight = getAttackWeight(match.away);
 
   const rand = Math.random();
 
-  // 🔥 EVENT WAHRSCHEINLICHKEITEN
-  if(rand < 0.15){
-    createChance(match);
+  // 🎯 CHANCEN (taktik beeinflusst!)
+  if(rand < 0.12 + homeWeight){
+    createChance(match, true);
   }
-  else if(rand < 0.22){
+  else if(rand < 0.24 + awayWeight){
+    createChance(match, false);
+  }
+  else if(rand < 0.32){
     createFoul(match);
   }
-  else if(rand < 0.26){
+  else if(rand < 0.36){
     createOffside(match);
   }
 }
 
 // =========================
-// 🎯 CHANCE
+// 🧠 TAKTIK SYSTEM
 // =========================
-function createChance(match){
+function getAttackWeight(team){
 
-  const isHome = Math.random() > 0.5;
+  if(team.tactic === "offensive") return 0.08;
+  if(team.tactic === "defensive") return -0.05;
+
+  return 0; // balanced
+}
+
+// =========================
+// ⚽ CHANCE
+// =========================
+function createChance(match, isHome){
+
   const team = isHome ? match.home : match.away;
+  const opponent = isHome ? match.away : match.home;
 
-  const chanceQuality = Math.random();
+  const strengthDiff = team.strength - opponent.strength;
 
-  if(chanceQuality > 0.85){
-    // TOR!
-    if(isHome){
-      matchState.score.home++;
-    } else {
-      matchState.score.away++;
-    }
+  const chance = Math.random() + strengthDiff * 0.01;
 
-    addEvent(`⚽ TOR für ${team.name}!`);
+  if(chance > 0.9){
+    goal(team, isHome);
   }
-  else if(chanceQuality > 0.6){
-    addEvent(`🧤 Große Parade gegen ${team.name}!`);
+  else if(chance > 0.6){
+    addEvent(`🧤 Parade gegen ${team.name}`);
   }
   else{
     addEvent(`🎯 Chance für ${team.name}`);
@@ -146,7 +154,21 @@ function createChance(match){
 }
 
 // =========================
-// 🟥 FOUL + KARTEN
+// ⚽ TOR
+// =========================
+function goal(team, isHome){
+
+  if(isHome){
+    matchState.score.home++;
+  } else {
+    matchState.score.away++;
+  }
+
+  addEvent(`⚽ TOR für ${team.name}!`);
+}
+
+// =========================
+// 💥 FOUL + ELFMETER
 // =========================
 function createFoul(match){
 
@@ -155,21 +177,40 @@ function createFoul(match){
 
   addEvent(`💥 Foul von ${team.name}`);
 
+  // 🔥 ELFMETER CHANCE
+  if(Math.random() > 0.8){
+    createPenalty(match, !isHome);
+    return;
+  }
+
+  // Karten
   const cardRoll = Math.random();
 
-  if(cardRoll > 0.85){
-    addEvent(`🟥 ROTE KARTE für ${team.name}!`);
-
-    if(isHome){
-      matchState.cards.home++;
-      match.home.strength -= 10;
-    } else {
-      matchState.cards.away++;
-      match.away.strength -= 10;
-    }
+  if(cardRoll > 0.9){
+    addEvent(`🟥 ROT für ${team.name}`);
+    team.strength -= 10;
   }
-  else if(cardRoll > 0.6){
-    addEvent(`🟨 Gelbe Karte für ${team.name}`);
+  else if(cardRoll > 0.65){
+    addEvent(`🟨 Gelb für ${team.name}`);
+  }
+}
+
+// =========================
+// 🥅 ELFMETER
+// =========================
+function createPenalty(match, isHome){
+
+  const team = isHome ? match.home : match.away;
+
+  addEvent(`⚠️ ELFMETER für ${team.name}!`);
+
+  const scored = Math.random() < 0.75;
+
+  if(scored){
+    goal(team, isHome);
+    addEvent(`🎯 Elfmeter verwandelt!`);
+  } else {
+    addEvent(`❌ Elfmeter verschossen!`);
   }
 }
 
@@ -184,7 +225,7 @@ function createOffside(match){
 }
 
 // =========================
-// ➕ EVENT HINZUFÜGEN
+// ➕ EVENT
 // =========================
 function addEvent(text){
 
@@ -192,13 +233,13 @@ function addEvent(text){
     `${matchState.minute}' - ${text}`
   );
 
-  if(matchState.events.length > 20){
+  if(matchState.events.length > 25){
     matchState.events.pop();
   }
 }
 
 // =========================
-// 🧾 MATCHDAY SIM
+// 🧾 SPIELTAG
 // =========================
 function simulateMatchday(){
 
@@ -215,17 +256,17 @@ function simulateMatchday(){
       return;
     }
 
-    const homeGoals = Math.floor(Math.random()*3);
-    const awayGoals = Math.floor(Math.random()*3);
+    const home = Math.floor(Math.random()*3);
+    const away = Math.floor(Math.random()*3);
 
-    match.result = { home: homeGoals, away: awayGoals };
+    match.result = { home, away };
 
-    updateTable(match.home, match.away, homeGoals, awayGoals);
+    updateTable(match.home, match.away, home, away);
   });
 }
 
 // =========================
-// 🏁 MATCH ENDE
+// 🏁 ENDE
 // =========================
 function endMatch(){
 
