@@ -1,29 +1,3 @@
-// =========================
-// 🏟️ LEAGUE DATA
-// =========================
-const LEAGUES = {
-
-  herford: {
-    name: "Kreisliga Herford",
-    teams: [
-      "SC Herford","FC Löhne","SV Enger","TuS Bruchmühlen",
-      "VfL Holsen","RW Kirchlengern","TuS Hücker","SV Rödinghausen II",
-      "FC Exter","TuS Bardüttingdorf","SC Vlotho","FC Herford",
-      "SV Bünde","TuS Dünne","RW Dreyen","FC Schweicheln"
-    ]
-  },
-
-  luebbecke: {
-    name: "Kreisliga Lübbecke",
-    teams: [
-      "TuS Nettelstedt","FC Preußen Espelkamp","VfL Frotheim","TuS Gehlenbeck",
-      "SV Hüllhorst","BW Oberbauerschaft","FC Lübbecke","TuS Rahden",
-      "SV Tengern II","FC Oppenwehe","TuS Stemwede","SV Börninghausen",
-      "FC Fabbenstedt","TuS Dielingen","SV Blasheim","RW Ahlsen"
-    ]
-  }
-
-};
 
 // =========================
 // 📥 LOAD LEAGUE
