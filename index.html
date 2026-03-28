@@ -1,249 +1,105 @@
 <!DOCTYPE html>
+
 <html lang="de">
 <head>
   <meta charset="UTF-8">
   <title>Kreisliga Manager</title>
-  <link rel="stylesheet" href="style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- OVERLAY -->
-<div id="overlay" onclick="closeSetup()"></div>
-
 <!-- HEADER -->
+
 <div class="header">
-  <div class="headerOverlay"></div>
-
-  <div class="headerContent">
-    <div>
-      <div class="gameTitle" id="gameTitle">Kreisliga Manager</div>
-      <div class="subTitle" id="leagueTitle">Keine Liga gewählt</div>
-    </div>
-
-    <button id="menuBtn" onclick="toggleSetup()">☰</button>
+  <div>
+    <div id="gameTitle">Manager</div>
+    <div id="leagueTitle">Keine Liga</div>
   </div>
 </div>
 
-<!-- SETUP PANEL -->
-<div id="setupPanel">
-  <button class="closeBtn" onclick="closeSetup()">✖</button>
+<!-- SETUP -->
 
-  <div class="menuTabs">
-    <button class="tab active" onclick="openTab(event,'profil')">👤</button>
-    <button class="tab" onclick="openTab(event,'freunde')">👥</button>
-  </div>
+<div class="panel">
 
-  <div class="tabContent active" id="profil">
+  <h3>👤 Name</h3>
+  <input id="nameInput">
 
-    <div class="setupBox">
-      <h3>👤 Profil</h3>
-      <input id="nameInput" placeholder="Manager Name">
-      <button onclick="changeName()">Speichern</button>
-    </div>
+  <h3>🏆 Liga</h3>
+  <select id="leagueSelect">
+    <option value="kreisliga">Kreisliga</option>
+  </select>
 
-    <div class="setupBox">
-      <h3>🏆 Liga</h3>
-      <select id="leagueSelect"></select>
-      <button id="selectLeagueBtn" onclick="selectLeague()">Liga starten</button>
-    </div>
+  <h3>⚽ Team</h3>
+  <select id="teamSelect"></select>
 
-    <div class="setupBox">
-      <h3>⚽ Team</h3>
-      <select id="teamSelect"></select>
-      <button id="selectTeamBtn" onclick="selectTeam()">Team übernehmen</button>
-      <p id="selectedTeamText">-</p>
-    </div>
-
-    <div class="setupBox">
-      <button id="resetBtn" class="danger" onclick="resetGame()">🧨 Neues Spiel starten</button>
-    </div>
-
-  </div>
-
-  <div class="tabContent" id="freunde">
-    <div class="setupBox">
-      <h3>👥 Freunde</h3>
-
-      <div class="infoRow">
-        <span>Dein Code:</span>
-        <strong id="friendCodeDisplay">---</strong>
-      </div>
-
-      <button id="copyCodeBtn" onclick="copyFriendCode()">📋 Kopieren</button>
-
-      <input id="friendCodeInput" placeholder="Freundescode">
-      <button id="joinCodeBtn" onclick="joinFriendCode()">Beitreten</button>
-    </div>
-  </div>
 </div>
 
-<!-- MAIN -->
-<div class="layout">
+<!-- MATCH -->
 
-  <!-- 🎮 GAME -->
-  <div class="panel mainPanel">
+<div class="panel">
 
-    <div class="scoreboard big">
-      <div id="teamLeft">-</div>
-      <div id="score">0 : 0</div>
-      <div id="teamRight">-</div>
-    </div>
-
-    <div class="momentum">
-      <div id="momentumBar"></div>
-    </div>
-
-    <!-- LIVE EVENTS -->
-    <div id="liveMatch" class="live"></div>
-
-    <!-- 🎮 CONTROL -->
-    <div class="controlDesk">
-
-      <div class="quickActions">
-        <button onclick="setLiveMode('attack')" class="btn attack">🔥 Druck</button>
-        <button onclick="setLiveMode('calm')" class="btn calm">❄️ Ruhig</button>
-        <button onclick="setLiveMode('counter')" class="btn counter">⚡ Konter</button>
-      </div>
-
-      <div class="settingsRow">
-
-        <div>
-          <label>Taktik</label>
-          <select id="tacticSelect" onchange="setTactic()">
-            <option>Normal</option>
-            <option>Offensiv</option>
-            <option>Defensiv</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Formation</label>
-          <select id="formationSelect" onchange="setFormation()">
-            <option>4-4-2</option>
-            <option>4-3-3</option>
-            <option>3-5-2</option>
-            <option>5-3-2</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Wechsel</label>
-          <button onclick="makeSub()">🔄</button>
-        </div>
-
-      </div>
-
-      <div class="intensity">
-        <label>Intensität</label>
-        <input type="range" min="1" max="3" value="2" id="intensitySlider" onchange="setIntensity(this.value)">
-        <div class="labels">
-          <span>Defensiv</span>
-          <span>Balanced</span>
-          <span>All-in</span>
-        </div>
-      </div>
-
-      <!-- SPEED -->
-      <div class="speedControl">
-        <span>⏱</span>
-        <button onclick="setSpeed(1)">1x</button>
-        <button onclick="setSpeed(3)">3x</button>
-        <button onclick="setSpeed(5)">5x</button>
-      </div>
-
-      <!-- ⭐ MAIN BUTTON -->
-      <div class="primaryAction">
-        <button id="mainActionBtn">
-          ▶ Saison starten
-        </button>
-      </div>
-
-    </div>
-
-    <!-- NEWS -->
-    <div class="panel">
-      <h2>📰 Spieltagsbericht</h2>
-      <div id="newsBox"></div>
-    </div>
-
+  <div class="scoreboard">
+    <div id="teamLeft">-</div>
+    <div id="score">0 : 0</div>
+    <div id="teamRight">-</div>
   </div>
 
-  <!-- 📊 SIDE -->
-  <div class="sidePanel">
+  <div id="liveMatch"></div>
 
-    <div class="panel">
+  <div class="speedControl">
+    <button>1x</button>
+    <button>3x</button>
+    <button>5x</button>
+  </div>
 
-      <!-- TABS -->
-      <div class="tableTabs">
-        <button class="tab active" data-tab="tableTab">📊 Tabelle</button>
-        <button class="tab" data-tab="scheduleTab">📅 Spielplan</button>
-      </div>
+<button id="mainButton">▶ Start</button>
 
-      <!-- TABELLE -->
-      <div id="tableTab" class="tabContent active">
-        <table id="table" class="modernTable">
-          <thead>
-            <tr>
-              <th>Team</th>
-              <th>Sp</th>
-              <th>S</th>
-              <th>U</th>
-              <th>N</th>
-              <th>Tore</th>
-              <th>Diff</th>
-              <th>Punkte</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+</div>
 
-      <!-- SPIELPLAN -->
-      <div id="scheduleTab" class="tabContent">
-        <div id="scheduleContainer"></div>
-      </div>
+<!-- TABLE + SCHEDULE -->
 
-    </div>
+<div class="panel">
 
-    <div class="panel">
-      <h2>📢 Bandenwerbung</h2>
-      <div id="adBanner">
-        <div class="adTrack" id="adTrack"></div>
-      </div>
-    </div>
+  <div class="tableTabs">
+    <button class="tab active" data-tab="tableTab">Tabelle</button>
+    <button class="tab" data-tab="scheduleTab">Spielplan</button>
+  </div>
 
-    <div class="panel">
-      <h2>🏆 Top 10 Manager</h2>
+  <div id="tableTab" class="tabContent active">
+    <table id="table">
+      <tbody></tbody>
+    </table>
+  </div>
 
-      <div>
-        <button onclick="setLeaderboardMode('global')">🌍</button>
-        <button onclick="setLeaderboardMode('league')">🏟️</button>
-        <button onclick="setLeaderboardMode('friends')">👥</button>
-      </div>
-
-      <div id="leaderboard">Lade...</div>
-    </div>
-
+  <div id="scheduleTab" class="tabContent">
+    <div id="scheduleContainer"></div>
   </div>
 
 </div>
 
 <!-- SCRIPTS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-<script src="js/supabase.js" defer></script>
-<script src="js/league.js" defer></script>
-<script src="js/floskeln.js" defer></script>
-<script src="js/news.js" defer></script>
-<script src="js/controls.js" defer></script>
-<script src="js/ads.js" defer></script>
-<script src="js/leaderboard.js" defer></script>
-<script src="js/state.js" defer></script>
-<script src="js/matchEngine.js" defer></script>
-<script src="js/ui.js" defer></script>
-<script src="js/main.js" defer></script>
+<script src="js/services/storage.js"></script>
+
+<script src="js/core/state.js"></script>
+
+<script src="js/modules/player.js"></script>
+
+<script src="js/modules/league.js"></script>
+
+<script src="js/modules/table.js"></script>
+
+<script src="js/core/scheduler.js"></script>
+
+<script src="js/core/engine.js"></script>
+
+<script src="js/ui/bindings.js"></script>
+
+<script src="js/ui/ui.js"></script>
+
+<script src="js/main.js"></script>
 
 </body>
 </html>
