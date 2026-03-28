@@ -17,8 +17,8 @@ function populateTeamSelect(){
 
   game.league.teams.forEach(t => {
     const opt = document.createElement("option");
-    opt.value = t;
-    opt.textContent = t;
+    opt.value = t.name;
+    opt.textContent = `${t.name} (Stärke ${t.strength})`;
     select.appendChild(opt);
   });
 }
@@ -29,7 +29,7 @@ function updateMatchUI(text){
   const m = game.match.current;
 
   if(m){
-    el.innerText = `${m.home} vs ${m.away} - ${text}`;
+    el.innerText = `${m.home.name} vs ${m.away.name} - ${text}`;
   } else {
     el.innerText = text;
   }
