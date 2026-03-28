@@ -1,5 +1,6 @@
 console.log("MAIN START");
-
+function initLeagueSelect(){
+  console.log("initLeagueSelect läuft"); // 👈 TEST
 window.onload = function(){
 
   console.log("INIT START");
