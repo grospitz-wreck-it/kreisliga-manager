@@ -1,95 +1,43 @@
 // =========================
-// 🏆 LEAGUE MODULE
-// =========================
-console.log("LEAGUE MODULE");
-
-// =========================
-// 📚 LIGEN DATEN (MASTER)
+// 🏟️ LEAGUE DATA
 // =========================
 const LEAGUES = {
 
   herford: {
     name: "Kreisliga Herford",
     teams: [
-      "SC Herford",
-      "SV Enger-Westerenger",
-      "TuS Bruchmühlen",
-      "FC Exter",
-      "VfL Holsen",
-      "SV Rödinghausen II",
-      "TuS Hunnebrock",
-      "FC Löhne-Gohfeld",
-      "SV Oetinghausen",
-      "TuS Bardüttingdorf",
-      "FC Schweicheln",
-      "SV Bünde",
-      "TuS Dünne",
-      "RW Kirchlengern II",
-      "SC Hiddenhausen",
-      "SV Eidinghausen"
+      "SC Herford","FC Löhne","SV Enger","TuS Bruchmühlen",
+      "VfL Holsen","RW Kirchlengern","TuS Hücker","SV Rödinghausen II",
+      "FC Exter","TuS Bardüttingdorf","SC Vlotho","FC Herford",
+      "SV Bünde","TuS Dünne","RW Dreyen","FC Schweicheln"
     ]
   },
 
   luebbecke: {
     name: "Kreisliga Lübbecke",
     teams: [
-      "TuS Nettelstedt",
-      "FC Preußisch Oldendorf",
-      "SV Börninghausen",
-      "TuS Dielingen",
-      "VfL Frotheim",
-      "TuS Gehlenbeck",
-      "SV Hüllhorst",
-      "FC Lübbecke",
-      "TuS Tengern II",
-      "SV Oberbauerschaft",
-      "FC Oppenwehe",
-      "TuS Stemwede",
-      "SV Schnathorst",
-      "FC Blasheim",
-      "TuS Alswede",
-      "SV Rahden"
-    ]
-  },
-
-  bielefeld: {
-    name: "Kreisliga Bielefeld",
-    teams: [
-      "VfB Fichte Bielefeld",
-      "TuS Brake",
-      "SV Brackwede",
-      "TSV Altenhagen",
-      "TuS Dornberg",
-      "VfL Ummeln",
-      "SV Gadderbaum",
-      "TuS Jöllenbeck",
-      "SC Babenhausen",
-      "FC Türk Sport",
-      "SV Ubbedissen",
-      "TuS Hillegossen",
-      "SC Hoberge-Uerentrup",
-      "SV Quelle",
-      "TuS Ost",
-      "FC Heepen"
+      "TuS Nettelstedt","FC Preußen Espelkamp","VfL Frotheim","TuS Gehlenbeck",
+      "SV Hüllhorst","BW Oberbauerschaft","FC Lübbecke","TuS Rahden",
+      "SV Tengern II","FC Oppenwehe","TuS Stemwede","SV Börninghausen",
+      "FC Fabbenstedt","TuS Dielingen","SV Blasheim","RW Ahlsen"
     ]
   }
 
 };
 
 // =========================
-// 🧠 LIGA LADEN
+// 📥 LOAD LEAGUE
 // =========================
 function loadLeague(key){
 
-  console.log("📥 loadLeague:", key);
-
   const league = LEAGUES[key];
   if(!league){
-    console.error("❌ Liga nicht gefunden");
+    console.error("❌ League nicht gefunden:", key);
     return;
   }
 
-  // Teams als Objekte erzeugen
+  game.league.key = key;
+
   game.league.teams = league.teams.map(name => ({
     name,
     played: 0,
@@ -101,21 +49,15 @@ function loadLeague(key){
     points: 0
   }));
 
-  game.league.key = key;
-  game.league.currentMatchday = 0;
-  game.league.schedule = [];
+  console.log("✅ Liga geladen:", key, game.league.teams.length, "Teams");
 
-  console.log("✅ Teams geladen:", game.league.teams);
-
-  // UI Updates
   window.populateTeamSelect?.();
   window.updateTable?.();
   window.updateHeader?.();
-
 }
 
 // =========================
-// 🎮 USER ACTIONS
+// 🏆 SELECT LEAGUE
 // =========================
 function selectLeague(){
 
@@ -124,11 +66,10 @@ function selectLeague(){
 
   const key = select.value;
 
-  console.log("SELECTED KEY:", key);
-  console.log("LEAGUE EXISTS:", LEAGUES[key]);
+  console.log("SELECTED:", key);
 
   if(!LEAGUES[key]){
-    console.error("❌ Ungültiger League Key:", key);
+    console.error("❌ Ungültige Liga");
     return;
   }
 
@@ -136,9 +77,26 @@ function selectLeague(){
 }
 
 // =========================
+// ⚽ SELECT TEAM (🔥 HIER FEHLT ES BEI DIR)
+// =========================
+function selectTeam(){
+
+  const select = document.getElementById("teamSelect");
+  if(!select) return;
+
+  const team = select.value;
+
+  game.team.selected = team;
+
+  console.log("✅ Team gewählt:", team);
+
+  window.updateHeader?.();
+}
+
+// =========================
 // 🌍 EXPORTS
 // =========================
 window.LEAGUES = LEAGUES;
-window.loadLeague = loadLeague;
 window.selectLeague = selectLeague;
 window.selectTeam = selectTeam;
+window.loadLeague = loadLeague;
