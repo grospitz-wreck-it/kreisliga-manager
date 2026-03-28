@@ -1,12 +1,12 @@
-window.addEventListener("DOMContentLoaded", () => {
+window.onload = async () => {
 
   initLeagueSelect();
-  bindUI();
 
-  const leagueSelect = document.getElementById("leagueSelect");
+  const loaded = await loadGame();
 
-  if(leagueSelect.value){
-    selectLeague(leagueSelect.value);
+  if(loaded){
+    updateMatchUI("Spielstand geladen");
+  } else {
+    updateMatchUI("Bereit");
   }
-
-});
+};
