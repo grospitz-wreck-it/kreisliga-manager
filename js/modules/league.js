@@ -1,6 +1,3 @@
-// =========================
-// 📦 LIGEN DATEN
-// =========================
 const LEAGUES = {
   herford: {
     name: "Kreisliga A Herford",
@@ -34,70 +31,45 @@ const LEAGUES = {
 };
 
 // =========================
-// 👤 TEAM AUSWÄHLEN (FIX für bindings.js)
-// =========================
-function selectTeam(name){
-  game.team.selected = name;
-  console.log("👤 Team gewählt:", name);
-}
-
-window.selectTeam = selectTeam;
-
-// =========================
-// 🏗️ TEAM ERSTELLEN
-// =========================
-function createTeam(name, id){
-  return {
-    id: id,
-    name: name,
-    strength: Math.floor(Math.random() * 30) + 60
-  };
-}
-
-// =========================
-// 🏟️ LIGA AUSWÄHLEN
+// 🏆 Liga wählen
 // =========================
 function selectLeague(key){
 
   const data = LEAGUES[key];
 
-  if(!data){
-    console.error("❌ Liga nicht gefunden:", key);
-    return;
-  }
-
   game.league.key = key;
 
-  // 🔥 Teams erstellen (mit ID!)
-  game.league.teams = data.teams.map((name, i) => createTeam(name, i));
+  game.league.teams = data.teams.map(name => ({
+    name,
+    strength: Math.floor(Math.random() * 30) + 60
+  }));
 
-  console.log("🏟️ Teams geladen:", game.league.teams);
+  game.league.currentRound = 0;
 
-  // =========================
-  // 📊 Tabelle erstellen
-  // =========================
   createTable();
-
-  // =========================
-  // ⚽ Spielplan erstellen
-  // =========================
   generateSchedule();
-
-  // =========================
-  // 🎮 Team-Auswahl UI
-  // =========================
   populateTeamSelect();
-
-  // =========================
-  // 💾 Speichern
-  // =========================
-  saveGame?.();
 
   console.log("✅ Liga geladen:", data.name);
 }
 
-// =========================
-// 🌍 EXPORT
-// =========================
 window.selectLeague = selectLeague;
-window.LEAGUES = LEAGUES;
+
+// =========================
+// 👕 TEAM wählen (FIX!)
+// =========================
+function selectTeam(teamName){
+
+  const team = game.league.teams.find(t => t.name === teamName);
+
+  if(!team){
+    console.error("❌ Team nicht gefunden:", teamName);
+    return;
+  }
+
+  game.team.selected = team;
+
+  console.log("✅ Team gewählt:", team.name);
+}
+
+window.selectTeam = selectTeam;
