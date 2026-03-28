@@ -85,10 +85,29 @@ function selectLeague(key){
 
   console.log("👥 Teams geladen:", game.league.teams);
 
-  // 🔥 UI UPDATE
-  populateTeamSelect?.();
-  updateTable?.();
-  updateHeader?.();
+function selectLeague(key){
+
+  console.log("🏆 selectLeague:", key);
+
+  game.league.key = key;
+
+  const data = LEAGUES[key];
+
+  game.league.teams = data.teams.map(name => ({
+    name,
+    points: 0,
+    goalsFor: 0,
+    goalsAgainst: 0,
+    wins: 0,
+    draws: 0,
+    losses: 0,
+    played: 0
+  }));
+
+  console.log("👥 Teams geladen:", game.league.teams);
+
+  // ❌ KEIN UI HIER MEHR
+}
 }
 
 // 🌍 EXPORT
