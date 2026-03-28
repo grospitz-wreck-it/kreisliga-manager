@@ -22,16 +22,17 @@ let matchState = {
 // =========================
 function startMatch(){
 
-  const teams = game.league.teams;
+  // 🔥 Spiel aus Spielplan holen
+  const match = nextMatch();
 
-  if(!teams.length){
-    alert("Liga wählen!");
+  if(!match){
+    alert("Keine Spiele verfügbar");
     return;
   }
 
   game.match.current = {
-    home: { ...teams[0] },
-    away: { ...teams[1] }
+    home: match.home,
+    away: match.away
   };
 
   game.phase = "live";
@@ -43,11 +44,8 @@ function startMatch(){
   matchState.score.home = 0;
   matchState.score.away = 0;
 
-  matchState.cards.home = 0;
-  matchState.cards.away = 0;
-
   clearLiveFeed();
-  nextMatch();
+
   runMatchLoop();
 }
 
