@@ -108,8 +108,8 @@ function startMatch(){
   const match = game.match.current;
 
   if(!match){
-    console.error("❌ Kein Spieler-Spiel gefunden");
-    alert("Dein Spiel konnte nicht gefunden werden!");
+    alert("❌ Dein Spiel wurde nicht gefunden!");
+    console.error("Problem: Team nicht im Spieltag");
     return;
   }
 
@@ -121,6 +121,8 @@ function startMatch(){
 
   matchState.score.home = 0;
   matchState.score.away = 0;
+
+  console.log("🚀 Starte Spiel:", match.home.name, "vs", match.away.name);
 
   clearLiveFeed?.();
 
