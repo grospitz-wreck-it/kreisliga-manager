@@ -3,21 +3,14 @@
 // =========================
 
 // 🔥 globale Variable (Engine nutzt die gleiche!)
-window.speedMultiplier = window.speedMultiplier || 1;
-
+window.speedMultiplier = 1;
 
 // =========================
 // 🚀 SPEED
 // =========================
-function setSpeed(speed){
-
-  if(![1,3,5].includes(speed)) return;
-
-  window.speedMultiplier = speed;
-
-  console.log("⚡ Speed gesetzt auf:", speed);
+function setSpeed(val){
+  window.setSpeed(val); // an engine delegieren
 }
-
 
 // =========================
 // 🎮 OPTIONAL: LIVE MODES
@@ -41,3 +34,7 @@ function makeSub(){
 function setIntensity(val){
   console.log("Intensität:", val);
 }
+window.selectLeague = selectLeague;
+window.selectTeam = selectTeam;
+window.resetGame = resetGame;
+window.setSpeed = setSpeed;
