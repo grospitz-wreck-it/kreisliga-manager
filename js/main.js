@@ -1,105 +1,139 @@
 // =========================
-// 🚀 MAIN INIT (CLEAN)
+// 🏟️ LEAGUE DATA
 // =========================
-console.log("MAIN FILE LOADED");
+const LEAGUES = {
 
-window.addEventListener("DOMContentLoaded", () => {
+  herford: {
+    name: "Kreisliga Herford",
+    teams: [
+      "SC Herford","FC Löhne","SV Enger","TuS Bruchmühlen",
+      "VfL Holsen","RW Kirchlengern","TuS Hücker","SV Rödinghausen II",
+      "FC Exter","TuS Bardüttingdorf","SC Vlotho","FC Herford",
+      "SV Bünde","TuS Dünne","RW Dreyen","FC Schweicheln"
+    ]
+  },
 
-  console.log("🚀 DOM READY");
-
-  // 1️⃣ Basis
-  initPlayer?.();
-  initLeagueSelect?.();
-
-  // 2️⃣ UI EVENTS ZUERST!
-  bindUI?.();
-
-  // 3️⃣ Default Liga laden
-  const leagueSelect = document.getElementById("leagueSelect");
-
-  console.log("👉 SELECT VALUE:", leagueSelect?.value);
-
-  if(leagueSelect && leagueSelect.value){
-    selectLeague(leagueSelect.value);
-  } else {
-    console.warn("❌ Keine Default Liga gesetzt");
+  luebbecke: {
+    name: "Kreisliga Lübbecke",
+    teams: [
+      "TuS Nettelstedt","FC Preußen Espelkamp","VfL Frotheim","TuS Gehlenbeck",
+      "SV Hüllhorst","BW Oberbauerschaft","FC Lübbecke","TuS Rahden",
+      "SV Tengern II","FC Oppenwehe","TuS Stemwede","SV Börninghausen",
+      "FC Fabbenstedt","TuS Dielingen","SV Blasheim","RW Ahlsen"
+    ]
   }
 
-  // 4️⃣ UI rendern
-  populateTeamSelect?.();
-  updateTable?.();
-  updateHeader?.();
+};
 
-});
 // =========================
-// 🎮 MAIN FLOW
+// 📥 LOAD LEAGUE
 // =========================
-function handleMainAction(){
+function loadLeague(key){
 
-  console.log("🎮 Main Button:", game.phase);
-
-  switch(game.phase){
-
-    case "idle":
-      startSeason();
-      break;
-
-    case "ready":
-      startMatch();
-      break;
-
-    case "halftime":
-      resumeMatch();
-      break;
-
-    case "live":
-      pauseMatch();
-      break;
-  }
-}
-function startSeason(){
-  console.log("🏁 Saison startet");
-
-  if(!game.league.teams.length){
-    alert("Liga wählen!");
+  const league = LEAGUES[key];
+  if(!league){
+    console.error("❌ League nicht gefunden:", key);
     return;
   }
 
-  generateSchedule?.();
+  game.league.key = key;
 
-  game.phase = "ready";
+  game.league.teams = league.teams.map(name => ({
+    name,
+    played: 0,
+    wins: 0,
+    draws: 0,
+    losses: 0,
+    goalsFor: 0,
+    goalsAgainst: 0,
+    points: 0
+  }));
+
+  console.log("✅ Liga geladen:", key, game.league.teams.length, "Teams");
+
+  window.populateTeamSelect?.();
+  window.updateTable?.();
+  window.updateHeader?.();
 }
 
-function startMatch(){
-  console.log("⚽ Spiel startet");
-
-  simulateMatchday?.();
-
-  game.phase = "live";
-}
-
-function resumeMatch(){
-  console.log("▶️ 2. Halbzeit");
-
-  resumeMatchEngine?.();
-
-  game.phase = "live";
-}
-
-function pauseMatch(){
-  console.log("⏸ Pause");
-
-  pauseMatchEngine?.();
-
-  game.phase = "halftime";
-}
-
-// EXPORTS
-window.startSeason = startSeason;
-window.startMatch = startMatch;
-window.resumeMatch = resumeMatch;
-window.pauseMatch = pauseMatch;
 // =========================
-// 🌍 EXPORT (WICHTIG!)
+// 🏆 SELECT LEAGUE
 // =========================
-window.handleMainAction = handleMainAction;
+function selectLeague(key){
+
+  console.log("🏆 selectLeague:", key);
+
+  const league = LEAGUES[key];
+  if(!league){
+    console.error("❌ Liga nicht gefunden");
+    return;
+  }
+
+  game.league.key = key;
+
+  // Teams klonen (wichtig!)
+  game.league.teams = league.teams.map(name => ({
+    name,
+    played: 0,
+    wins: 0,
+    draws: 0,
+    losses: 0,
+    goalsFor: 0,
+    goalsAgainst: 0,
+    points: 0
+  }));
+
+  console.log("👥 Teams geladen:", game.league.teams);
+
+function selectLeague(key){
+
+  console.log("🏆 selectLeague:", key);
+
+  game.league.key = key;
+
+  const data = LEAGUES[key];
+
+  game.league.teams = data.teams.map(name => ({
+    name,
+    points: 0,
+    goalsFor: 0,
+    goalsAgainst: 0,
+    wins: 0,
+    draws: 0,
+    losses: 0,
+    played: 0
+  }));
+
+  console.log("👥 Teams geladen:", game.league.teams);
+
+  // ❌ KEIN UI HIER MEHR
+}
+}
+
+// 🌍 EXPORT
+window.selectLeague = selectLeague;
+
+// =========================
+// ⚽ SELECT TEAM (🔥 HIER FEHLT ES BEI DIR)
+// =========================
+function selectTeam(){
+
+  const select = document.getElementById("teamSelect");
+  if(!select) return;
+
+  const team = select.value;
+
+  game.team.selected = team;
+
+  console.log("✅ Team gewählt:", team);
+
+  window.updateHeader?.();
+}
+
+// =========================
+// 🌍 EXPORTS
+// =========================
+window.LEAGUES = LEAGUES;
+window.selectLeague = selectLeague;
+window.selectTeam = selectTeam;
+window.loadLeague = loadLeague;
