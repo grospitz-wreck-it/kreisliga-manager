@@ -1,45 +1,42 @@
-console.log("MAIN START");
-window.onload = function(){
-
-  console.log("INIT START");
-
-  loadGame?.();
-
-  initPlayer?.();
-
-  // ✅ HIER: Dropdown befüllen
-  initLeagueSelect();
-
-  // ✅ DANACH: Events binden
-  bindUI();
-
-  updateHeader?.();
-  updateTable?.();
-
-  console.log("INIT DONE");
-};
-
 // =========================
-// ▶️ FLOW
+// 🚀 MAIN INIT (CLEAN)
 // =========================
-function handleMainAction(){
+console.log("MAIN FILE LOADED");
 
-  switch(game.phase){
+document.addEventListener("DOMContentLoaded", () => {
 
-    case "idle":
-      startSeason();
-      break;
+  console.log("🚀 DOM READY");
 
-    case "ready":
-      startMatch();
-      break;
+  try {
 
-    case "halftime":
-      resumeMatch();
-      break;
+    // 🔹 Player
+    if(typeof initPlayer === "function"){
+      initPlayer();
+    }
 
-    case "live":
-      pauseMatch();
-      break;
+    // 🔹 Liga Dropdown
+    if(typeof initLeagueSelect === "function"){
+      initLeagueSelect();
+    }
+
+    // 🔹 UI Events
+    if(typeof bindUI === "function"){
+      bindUI();
+    }
+
+    // 🔹 UI Updates
+    if(typeof updateHeader === "function"){
+      updateHeader();
+    }
+
+    if(typeof updateTable === "function"){
+      updateTable();
+    }
+
+    console.log("✅ INIT COMPLETE");
+
+  } catch(err){
+    console.error("❌ INIT ERROR:", err);
   }
-}
+
+});
