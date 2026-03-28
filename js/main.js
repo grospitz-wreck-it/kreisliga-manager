@@ -1,6 +1,4 @@
 console.log("MAIN START");
-function initLeagueSelect(){
-  console.log("initLeagueSelect läuft"); // 👈 TEST
 window.onload = function(){
 
   console.log("INIT START");
@@ -9,10 +7,10 @@ window.onload = function(){
 
   initPlayer?.();
 
-  // 🔥 GANZ WICHTIG: zuerst Ligen rein
-  initLeagueSelect?.();
+  // ✅ HIER: Dropdown befüllen
+  initLeagueSelect();
 
-  // 🔥 DANN UI binden
+  // ✅ DANACH: Events binden
   bindUI();
 
   updateHeader?.();
