@@ -18,6 +18,12 @@ function updateTable(home, away, goalsHome, goalsAway){
   const h = game.table.find(t => t.name === home.name);
   const a = game.table.find(t => t.name === away.name);
 
+  // 🔥 SAFETY CHECK
+  if(!h || !a){
+    console.error("❌ Team nicht in Tabelle gefunden", home, away);
+    return;
+  }
+
   h.played++;
   a.played++;
 
