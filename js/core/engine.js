@@ -1,42 +1,205 @@
 const matchState = {
   minute: 0,
   running: false,
-  score: { home: 0, away: 0 }
+  score: { home: 0, away: 0 },
+  events: [],
+  cards: {
+    home: 0,
+    away: 0
+  }
 };
 
+// =========================
+// ▶️ BUTTON ACTION
+// =========================
 function handleMainAction(){
   if(game.phase !== "live"){
     startMatch();
-  } else {
-    endMatch();
   }
 }
 
+// =========================
+// 🔍 SPIEL FINDEN
+// =========================
 function findPlayerMatch(){
 
   const round = game.league.schedule?.[game.league.currentRound];
   const myTeam = game.team.selected;
 
-  console.log("Mein Team:", myTeam?.name);
+  if(!round || !myTeam) return null;
 
-  if(!round) return null;
-
-  return round.find(match =>
-    match.home.name === myTeam?.name ||
-    match.away.name === myTeam?.name
+  return round.find(m =>
+    m.home.name === myTeam.name ||
+    m.away.name === myTeam.name
   );
 }
 
-function simulateMatch(home, away){
+// =========================
+// 🏁 MATCH START
+// =========================
+function startMatch(){
 
-  const diff = home.strength - away.strength;
+  simulateMatchday();
 
-  return {
-    home: Math.max(0, Math.round(Math.random()*2 + diff*0.02)),
-    away: Math.max(0, Math.round(Math.random()*2 - diff*0.02))
-  };
+  let match = findPlayerMatch();
+
+  if(!match){
+    match = game.league.schedule?.[game.league.currentRound]?.[0];
+  }
+
+  if(!match) return;
+
+  game.match.current = match;
+  game.phase = "live";
+
+  matchState.minute = 0;
+  matchState.running = true;
+  matchState.score.home = 0;
+  matchState.score.away = 0;
+  matchState.events = [];
+  matchState.cards.home = 0;
+  matchState.cards.away = 0;
+
+  renderCurrentMatch();
+  updateUI();
+  renderLiveFeed();
+
+  runMatchLoop();
 }
 
+// =========================
+// 🔁 MATCH LOOP
+// =========================
+function runMatchLoop(){
+
+  const interval = setInterval(() => {
+
+    if(!matchState.running){
+      clearInterval(interval);
+      return;
+    }
+
+    matchState.minute++;
+
+    simulateLiveEvent();
+
+    updateUI();
+    renderLiveFeed();
+
+    if(matchState.minute > 90){
+      clearInterval(interval);
+      endMatch();
+    }
+
+  }, 400);
+}
+
+// =========================
+// ⚽ LIVE EVENTS
+// =========================
+function simulateLiveEvent(){
+
+  const match = game.match.current;
+
+  if(!match) return;
+
+  const rand = Math.random();
+
+  // 🔥 EVENT WAHRSCHEINLICHKEITEN
+  if(rand < 0.15){
+    createChance(match);
+  }
+  else if(rand < 0.22){
+    createFoul(match);
+  }
+  else if(rand < 0.26){
+    createOffside(match);
+  }
+}
+
+// =========================
+// 🎯 CHANCE
+// =========================
+function createChance(match){
+
+  const isHome = Math.random() > 0.5;
+  const team = isHome ? match.home : match.away;
+
+  const chanceQuality = Math.random();
+
+  if(chanceQuality > 0.85){
+    // TOR!
+    if(isHome){
+      matchState.score.home++;
+    } else {
+      matchState.score.away++;
+    }
+
+    addEvent(`⚽ TOR für ${team.name}!`);
+  }
+  else if(chanceQuality > 0.6){
+    addEvent(`🧤 Große Parade gegen ${team.name}!`);
+  }
+  else{
+    addEvent(`🎯 Chance für ${team.name}`);
+  }
+}
+
+// =========================
+// 🟥 FOUL + KARTEN
+// =========================
+function createFoul(match){
+
+  const isHome = Math.random() > 0.5;
+  const team = isHome ? match.home : match.away;
+
+  addEvent(`💥 Foul von ${team.name}`);
+
+  const cardRoll = Math.random();
+
+  if(cardRoll > 0.85){
+    addEvent(`🟥 ROTE KARTE für ${team.name}!`);
+
+    if(isHome){
+      matchState.cards.home++;
+      match.home.strength -= 10;
+    } else {
+      matchState.cards.away++;
+      match.away.strength -= 10;
+    }
+  }
+  else if(cardRoll > 0.6){
+    addEvent(`🟨 Gelbe Karte für ${team.name}`);
+  }
+}
+
+// =========================
+// 🚫 ABSEITS
+// =========================
+function createOffside(match){
+
+  const team = Math.random() > 0.5 ? match.home : match.away;
+
+  addEvent(`🚫 Abseits von ${team.name}`);
+}
+
+// =========================
+// ➕ EVENT HINZUFÜGEN
+// =========================
+function addEvent(text){
+
+  matchState.events.unshift(
+    `${matchState.minute}' - ${text}`
+  );
+
+  if(matchState.events.length > 20){
+    matchState.events.pop();
+  }
+}
+
+// =========================
+// 🧾 MATCHDAY SIM
+// =========================
 function simulateMatchday(){
 
   const round = game.league.schedule?.[game.league.currentRound];
@@ -52,64 +215,18 @@ function simulateMatchday(){
       return;
     }
 
-    const result = simulateMatch(match.home, match.away);
+    const homeGoals = Math.floor(Math.random()*3);
+    const awayGoals = Math.floor(Math.random()*3);
 
-    match.result = result;
+    match.result = { home: homeGoals, away: awayGoals };
 
-    updateTable(match.home, match.away, result.home, result.away);
+    updateTable(match.home, match.away, homeGoals, awayGoals);
   });
 }
 
-function startMatch(){
-  console.log("UI vorhanden?", typeof updateUI);
-  simulateMatchday();
-
-  let match = findPlayerMatch();
-
-  if(!match){
-    console.warn("Fallback Match");
-    match = game.league.schedule?.[game.league.currentRound]?.[0];
-  }
-
-  if(!match) return;
-
-  game.match.current = match;
-  game.phase = "live";
-
-  matchState.minute = 0;
-  matchState.running = true;
-  matchState.score.home = 0;
-  matchState.score.away = 0;
-
-  renderCurrentMatch();
-  updateUI();
-
-  runMatchLoop();
-}
-
-function runMatchLoop(){
-
-  const interval = setInterval(() => {
-
-    if(!matchState.running){
-      clearInterval(interval);
-      return;
-    }
-
-    matchState.minute++;
-
-    // 🔥 SAFE CALL
-    if(typeof updateUI === "function"){
-      updateUI();
-    }
-
-    if(matchState.minute > 90){
-      clearInterval(interval);
-      endMatch();
-    }
-
-  }, 300);
-}
+// =========================
+// 🏁 MATCH ENDE
+// =========================
 function endMatch(){
 
   const match = game.match.current;
@@ -132,4 +249,7 @@ function endMatch(){
   renderSchedule();
 }
 
+// =========================
+// 🌍 GLOBAL
+// =========================
 window.handleMainAction = handleMainAction;
