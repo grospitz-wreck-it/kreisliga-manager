@@ -197,7 +197,104 @@ function clearLiveEvents(){
 
   box.innerHTML = "";
 }
+function renderSchedule(){
 
+  const container = document.getElementById("scheduleContainer");
+  if(!container) return;
+
+  const schedule = game.league.schedule;
+
+  if(!schedule || schedule.length === 0){
+    container.innerHTML = "<p>Kein Spielplan vorhanden</p>";
+    return;
+  }
+
+  let html = "";
+
+  schedule.forEach((round, index) => {
+
+    const isCurrent = index === game.league.currentMatchday;
+
+    html += `
+      <div class="matchday ${isCurrent ? "current" : ""}">
+        <h4>Spieltag ${index + 1}</h4>
+    `;
+
+    round.forEach(match => {
+
+      const isUser =
+        match.home === game.team.selected ||
+        match.away === game.team.selected;
+
+      html += `
+        <div class="match ${isUser ? "highlight" : ""}">
+          <span>${match.home}</span>
+          <span>vs</span>
+          <span>${match.away}</span>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+function bindUI(){
+
+  console.log("🔗 bindUI aktiv");
+
+  // ===== SETUP =====
+  document.getElementById("menuBtn")
+    ?.addEventListener("click", toggleSetup);
+
+  document.querySelector(".closeBtn")
+    ?.addEventListener("click", closeSetup);
+
+  document.getElementById("selectLeagueBtn")
+    ?.addEventListener("click", selectLeague);
+
+  document.getElementById("selectTeamBtn")
+    ?.addEventListener("click", selectTeam);
+
+  document.getElementById("resetBtn")
+    ?.addEventListener("click", resetGame);
+
+  // ===== TABS =====
+  document.querySelectorAll(".tableTabs .tab").forEach(tab => {
+
+    tab.addEventListener("click", () => {
+
+      // Buttons
+      document.querySelectorAll(".tableTabs .tab")
+        .forEach(t => t.classList.remove("active"));
+
+      tab.classList.add("active");
+
+      // Inhalte
+      document.querySelectorAll(".tabContent")
+        .forEach(c => c.classList.remove("active"));
+
+      const target = document.getElementById(tab.dataset.tab);
+      target?.classList.add("active");
+
+      // 🔥 Spielplan rendern beim Öffnen
+      if(tab.dataset.tab === "scheduleTab"){
+        renderSchedule();
+      }
+    });
+
+  });
+
+  // ===== SPEED =====
+  document.querySelectorAll(".speedControl button")
+    .forEach(btn => {
+      btn.addEventListener("click", () => {
+        setSpeed(Number(btn.innerText.replace("x","")));
+      });
+    });
+
+}
 // =========================
 // 🌍 EXPORT
 // =========================
