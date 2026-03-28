@@ -270,11 +270,10 @@ function endMatch(){
     return;
   }
 
-  // ❗ doppelte Verarbeitung verhindern
-  if(match.result){
-    console.warn("⚠️ Match wurde bereits ausgewertet");
-    return;
-  }
+  if(match.result && match._processed){
+  console.warn("⚠️ Match bereits verarbeitet");
+  return;
+}
 
   // ✅ Ergebnis setzen
   match.result = {
