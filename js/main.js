@@ -23,27 +23,19 @@ const game = {
 window.game = game;
 
 // =========================
-// 📢 AD ENGINE START (FIX)
+// 📢 ADS START (SAUBER)
 // =========================
-function startAdsSafe(){
+function startAds(){
 
-  const interval = setInterval(() => {
+  if(typeof window.startAdEngine === "function"){
+    console.log("✅ Ads starten direkt");
+    window.startAdEngine();
+  } else {
+    console.warn("❌ startAdEngine nicht gefunden (ads.js fehlt?)");
+  }
 
-    // 👉 warten bis ads.js geladen ist
-    if(typeof window.startAdEngine === "function"){
-
-      console.log("✅ ads.js bereit → starte Ads");
-
-      clearInterval(interval);
-
-      window.startAdEngine(); // 👉 DIE aus ads.js!
-
-    } else {
-      console.log("⏳ warte auf ads.js...");
-    }
-
-  }, 200);
 }
+
 // =========================
 // 🚀 INIT
 // =========================
@@ -51,15 +43,12 @@ function init(){
 
   console.log("🚀 Spiel wird gestartet...");
 
-  // Dropdowns initialisieren
+  // UI vorbereiten
   initLeagueSelect();
-
-  // UI Events binden
   bindUI();
 
-  // 🔥 NEU: AD ENGINE STARTEN
-  // ✅ NEU
-  startAdsSafe();
+  // Ads starten (einmal, sauber)
+  startAds();
 
   // Optional: Save laden
   if(typeof loadGame === "function"){
@@ -81,6 +70,8 @@ function init(){
 }
 
 // =========================
-// ▶️ START
+// ▶️ START (WICHTIG!)
 // =========================
-window.onload = init;
+window.addEventListener("load", () => {
+  init();
+});
