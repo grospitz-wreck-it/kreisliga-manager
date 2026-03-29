@@ -180,6 +180,13 @@ function render(){
 
   getData().forEach(c => {
 
+    // ✅ FIX: immer definiert
+    const donationPercent = c.donationPercent || 0;
+
+    const donationAmount = c.donationAmount !== undefined
+      ? c.donationAmount
+      : (c.budget * donationPercent / 100);
+
     const div = document.createElement("div");
     div.className = "adRow";
 
@@ -188,9 +195,7 @@ function render(){
         <img src="${c.image}">
         <b>${c.name}</b><br>
         ${c.customer}<br>
-        const donationAmount = c.donationAmount ?? (c.budget * (c.donationPercent || 0) / 100);
-
-💚 ${c.donationPercent || 0}% (€${donationAmount.toFixed(2)})
+        💚 ${donationPercent}% (€${donationAmount.toFixed(2)})
       </div>
 
       <button onclick="del(${c.id})">❌</button>
