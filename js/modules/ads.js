@@ -1,35 +1,19 @@
 // =========================
-// 📢 ADS SYSTEM (LED BANDE)
+// 📢 ADS SYSTEM
 // =========================
 
-// 🔥 Werbeanzeigen (Fallback / Default)
-let ads = [
+// 👉 Default Ads (Fallback)
+const DEFAULT_ADS = [
   {
-    name: "Sponsor A",
-    image: "ads/ad1.jpg",
-    link: "https://ausbildung.hettich.com/",
-    start: "2026-01-01",
-    end: "2026-12-31",
-    weight: 1
-  },
-  {
-    name: "Sponsor B",
-    image: "ads/ad2.jpg",
-    link: "https://www.haecker-kuechen.com/de/karriere",
-    start: "2026-01-01",
-    end: "2026-12-31",
+    name: "Kreisliga Sponsor",
+    image: "ads/fallback.png",
+    link: "",
     weight: 1
   }
 ];
-// 🔥 LOCAL STORAGE LADEN
-const storedAds = localStorage.getItem("ads");
-if(storedAds){
-  ads = JSON.parse(storedAds);
-}
-
 
 // =========================
-// 🔥 NEU: ADMIN ADS LADEN
+// 📦 ADMIN ADS LADEN
 // =========================
 function getAdminAds(){
 
@@ -37,171 +21,130 @@ function getAdminAds(){
     const stored = JSON.parse(localStorage.getItem("ads") || "[]");
 
     return stored.map(ad => ({
-      name: ad.name || "Anzeige",        // ✅ FIX
+      name: ad.name || "Anzeige",
       image: ad.image || "ads/fallback.png",
       link: ad.link || "",
-      start: ad.start || null,           // ✅ FIX
-      end: ad.end || null,               // ✅ FIX
-      weight: ad.weight || 1             // ✅ FIX
+      start: ad.start || null,
+      end: ad.end || null,
+      weight: ad.weight || 1
     }));
 
   } catch(e){
-    console.error("Admin Ads Fehler:", e);
+    console.error("❌ Admin Ads Fehler:", e);
     return [];
   }
 }
+
 // =========================
-// 🧠 AKTIVE ADS FILTERN
+// ⏱️ FILTER AKTIVE ADS
 // =========================
 function getActiveAds(){
 
   const now = new Date();
 
-  // 🔥 NEU: beide Quellen kombinieren
-  let allAds = [...ads, ...getAdminAds()];
+  const allAds = [
+    ...DEFAULT_ADS,
+    ...getAdminAds()
+  ];
 
   return allAds.filter(ad => {
 
-    // 🔥 keine Laufzeit → immer aktiv
-    if(!ad.start || !ad.end) return true;
+    if(ad.start && new Date(ad.start) > now) return false;
+    if(ad.end && new Date(ad.end) < now) return false;
 
-    let start = new Date(ad.start);
-    let end = new Date(ad.end);
-
-    // ✅ FIX: ungültige Daten abfangen
-    if(isNaN(start) || isNaN(end)){
-      console.warn("Ungültiges Datum bei Ad:", ad.name);
-      return true;
-    }
-
-    return now >= start && now <= end;
+    return true;
   });
 }
 
-
 // =========================
-// ⚖️ GEWICHTUNG (BONUS)
+// 🎯 GEWICHTETE AUSWAHL
 // =========================
-function expandAdsByWeight(list){
+function pickWeightedAd(list){
 
-  let expanded = [];
+  if(!list.length) return null;
 
-  list.forEach(ad => {
-    let w = ad.weight || 1;
+  const total = list.reduce((sum, ad) => sum + (ad.weight || 1), 0);
+  let r = Math.random() * total;
 
-    for(let i = 0; i < w; i++){
-      expanded.push(ad);
-    }
-  });
+  for(let ad of list){
+    r -= (ad.weight || 1);
+    if(r <= 0) return ad;
+  }
 
-  return expanded;
+  return list[0];
 }
 
-
 // =========================
-// 🎞 LED BANDE ERZEUGEN
+// 🧱 BANNER BAUEN
 // =========================
 function buildAdTrack(){
 
   const track = document.getElementById("adTrack");
+
   if(!track){
-    console.warn("adTrack fehlt im HTML");
+    console.warn("❌ adTrack nicht gefunden");
     return;
   }
 
   track.innerHTML = "";
 
-  let active = [];
+  const active = getActiveAds();
 
-  // 🔥 sicherer Zugriff
-  if(typeof getActiveAds === "function"){
-    active = getActiveAds();
-  } else {
-    active = ads;
-  }
-
-  // 🔥 Gewichtung anwenden
-  active = expandAdsByWeight(active);
-
-  // ✅ DEBUG (hilft extrem)
-  console.log("Aktive Ads:", active.length);
+  console.log("📢 Aktive Ads:", active.length);
 
   if(active.length === 0){
     track.innerHTML = "<span style='color:white'>Keine Werbung</span>";
     return;
   }
 
-  // 🔥 doppeln für Endlos-Loop
-  let fullList = [...active, ...active];
+  // =========================
+  // 👉 NUR EINE AD (realistisch)
+  // =========================
+  const ad = pickWeightedAd(active);
 
-  fullList.forEach(ad => {
+  const div = document.createElement("div");
+  div.className = "adItem";
 
-    let item = document.createElement("div");
-    item.className = "adItem";
+  const img = document.createElement("img");
+  img.src = ad.image;
+  img.alt = ad.name;
 
-    let img = document.createElement("img");
-    img.src = ad.image;
-    img.alt = ad.name || "Werbung";
+  // 👉 klickbar machen (optional)
+  if(ad.link){
+    img.style.cursor = "pointer";
+    img.onclick = () => window.open(ad.link, "_blank");
+  }
 
-    // 🔥 Fallback bei Fehler
-    img.onerror = function(){
-      this.src = "ads/fallback.png";
-    };
-
-    // 🔥 Klickbar machen (optional)
-    if(ad.link){
-      let a = document.createElement("a");
-      a.href = ad.link;
-      a.target = "_blank";
-
-      // 🔥 zukünftiges Tracking vorbereiten
-      a.onclick = () => {
-        console.log("Ad Click:", ad.name);
-      };
-
-      a.appendChild(img);
-      item.appendChild(a);
-    } else {
-      item.appendChild(img);
-    }
-
-    track.appendChild(item);
-  });
-
-  // ✅ FIX: kleine Verzögerung für CSS Animation (Render Bug vermeiden)
-  requestAnimationFrame(() => {
-    track.style.animation = "none";
-    track.offsetHeight;
-    track.style.animation = "";
-  });
+  div.appendChild(img);
+  track.appendChild(div);
 }
 
-
 // =========================
-// 🔄 ADS NEU LADEN (NEU, aber safe)
-// =========================
-function refreshAds(){
-  buildAdTrack();
-}
-
-
-// =========================
-// 🚀 START
+// 🚀 START ADS
 // =========================
 function startAds(){
 
-  console.log("Ads gestartet");
+  console.log("🚀 Ads gestartet");
 
-  // ✅ FIX: mehrfaches Starten verhindern
   if(window.adsInitialized){
-    console.log("Ads bereits initialisiert");
+    console.log("⚠️ Ads bereits initialisiert");
     return;
   }
 
   window.adsInitialized = true;
 
   buildAdTrack();
-
-  // 🔁 optional später auto-refresh (zukunftssicher)
-  // setInterval(buildAdTrack, 60000);
 }
+
+// =========================
+// 🔄 OPTIONAL REFRESH
+// =========================
+function refreshAds(){
+  buildAdTrack();
+}
+
+// =========================
+// 🌍 GLOBAL
+// =========================
+window.startAds = startAds;
+window.refreshAds = refreshAds;
