@@ -61,12 +61,12 @@ function renderAds(){
   const ad = ads[window.__adIndex % ads.length];
 
   track.innerHTML = `
-    <div class="leaderboardAd">
-      ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
-        <img src="${ad.image}" alt="ad">
-      ${ad.link ? `</a>` : ""}
-    </div>
-  `;
+  <div class="leaderboardAd">
+    ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
+      <img src="${ad.image}">
+    ${ad.link ? `</a>` : ""}
+  </div>
+`;
 }
 
 // =========================
