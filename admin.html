@@ -37,13 +37,18 @@ small{color:#666}
 <h2>Neue Kampagne</h2>
 
 <div class="grid">
-<input id="name" placeholder="Kampagnenname">
-<input id="customer" placeholder="Kunde">
-<input id="budget" type="number" placeholder="Budget €">
-<select id="typeCampaign">
-<option value="TKP">TKP</option>
-<option value="SPONSOR">Sponsor</option>
-</select>
+  <input id="name" placeholder="Kampagnenname">
+  <input id="customer" placeholder="Kunde">
+  <input id="budget" type="number" placeholder="Budget €">
+
+  <select id="typeCampaign">
+    <option value="TKP">TKP</option>
+    <option value="SPONSOR">Sponsor</option>
+  </select>
+
+  <!-- 📅 Datepicker -->
+  <input type="date" id="startDate">
+  <input type="date" id="endDate">
 </div>
 
 <h3>🎯 Targeting</h3>
