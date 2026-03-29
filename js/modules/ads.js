@@ -1,217 +1,118 @@
-(function(){
-
-const KEY = "ad_v2";
-
-// =====================
-// STORAGE
-// =====================
+// =========================
+// 📦 STORAGE
+// =========================
 function getCampaigns(){
-  return JSON.parse(localStorage.getItem(KEY) || "[]");
+  return JSON.parse(localStorage.getItem("ad_v2") || "[]");
 }
 
-function saveCampaigns(data){
-  localStorage.setItem(KEY, JSON.stringify(data));
-}
+// =========================
+// 🎯 MATCHING
+// =========================
+function getMatchingAds(ctx){
 
-// =====================
-// GAME CONTEXT (FIXED)
-// =====================
-function getGameContext(){
-  return {
-    country: "DE",
+  const now = Date.now();
 
-    // 👉 entspricht deiner League-Struktur
-    district: window.game?.league?.key || null,
+  return getCampaigns().filter(c => {
 
-    // 👉 GANZES OBJEKT!
-    team: window.game?.team?.selected || null
-  };
-}
+    if(!c) return false;
 
-// =====================
-// CPM LOGIK
-// =====================
-function getCPM(t){
-  if(t.team) return 20;
-  if(t.district) return 10;
-  if(t.state) return 5;
-  if(t.country) return 2;
-  return 1;
-}
+    if(c.start && now < c.start) return false;
+    if(c.end && now > c.end) return false;
 
-// =====================
-// PACING
-// =====================
-function shouldServe(c){
+    if(c.targeting?.global) return true;
 
-  if(!c.start || !c.end) return true;
+    if(c.targeting?.league === ctx.league) return true;
 
-  const total = (c.end - c.start);
-  const passed = (Date.now() - c.start);
-
-  if(total <= 0) return true;
-
-  const expected = (passed / total) * (c.impressionsBooked || 1);
-
-  return (c.impressionsDelivered || 0) <= expected * 1.2;
-}
-
-// =====================
-// TARGET MATCH (FIXED)
-// =====================
-function match(c, ctx){
-
-  if(c.targeting?.team){
-    return ctx.team && ctx.team.name === c.targeting.team;
-  }
-
-  if(c.targeting?.district){
-    return ctx.district === c.targeting.district;
-  }
-
-  if(c.targeting?.state){
-    return ctx.state === c.targeting.state;
-  }
-
-  if(c.targeting?.country){
-    return true;
-  }
-
-  return true;
-}
-
-// =====================
-// DELIVERY ENGINE (FIXED)
-// =====================
-function pickCampaign(campaigns){
-
-  if(!campaigns.length) return null;
-
-  return campaigns[Math.floor(Math.random() * campaigns.length)];
-}
-
-// =====================
-// SERVE AD (FIXED)
-// =====================
-window.serveAd = function(){
-
-  let campaigns = getCampaigns();
-  const ctx = getGameContext();
-
-  campaigns = campaigns.filter(c => {
-
-    // 🔥 MUSS EIN BILD HABEN
-    if(!c.image) return false;
-
-    // Zeitraum
-    if(c.start && Date.now() < c.start) return false;
-    if(c.end && Date.now() > c.end) return false;
-
-    // TKP Stop
-    if(c.type === "TKP" && c.impressionsBooked){
-      if((c.impressionsDelivered || 0) >= c.impressionsBooked){
-        return false;
-      }
+    if(c.targeting?.team){
+      return c.targeting.team === ctx.team || c.targeting.team === "all";
     }
 
-    // Pacing
-    if(!shouldServe(c)) return false;
+    return false;
+  });
+}
 
-    // Targeting
-    if(!match(c, ctx)) return false;
+// =========================
+// 🎬 RENDER
+// =========================
+function renderAds(){
 
-    return true;
+  const el = document.getElementById("adTrack");
+  if(!el) return;
+
+  const ads = getMatchingAds({
+    league: game.league.key,
+    team: game.team.selected
   });
 
-  if(!campaigns.length) return null;
-
-  const selected = pickCampaign(campaigns);
-
-  if(!selected) return null;
-
-  // =====================
-  // TRACKING
-  // =====================
-  selected.impressionsDelivered = (selected.impressionsDelivered || 0) + 1;
-
-  if(selected.type === "TKP"){
-    const cpm = selected.cpm || getCPM(selected.targeting || {});
-    selected.spent = (selected.spent || 0) + (cpm / 1000);
+  if(!ads.length){
+    el.innerHTML = `<div style="color:#fff">Keine Werbung</div>`;
+    return;
   }
 
-  // =====================
-  // SAVE BACK
-  // =====================
-  const all = getCampaigns().map(c => 
-    c.id === selected.id ? selected : c
-  );
+  // 👉 Loop erzeugen
+  const loop = [...ads, ...ads];
 
-  saveCampaigns(all);
+  el.innerHTML = `
+    <div class="ads">
+      ${loop.map(a => `
+        <a href="${a.link || '#'}" target="_blank">
+          <img src="${a.image}">
+        </a>
+      `).join("")}
+    </div>
+  `;
+}
 
-  return selected;
-};
+// =========================
+// 🎨 STYLES (LEAN)
+// =========================
+function injectStyles(){
 
-// =====================
-// MULTI RENDER (NEU – STABIL)
-// =====================
-window.renderAds = function(){
+  if(document.getElementById("ads-css")) return;
 
-  const track = document.getElementById("adTrack");
-  if(!track) return;
+  const s = document.createElement("style");
+  s.id = "ads-css";
 
-  let html = "";
-
-  for(let i = 0; i < 3; i++){
-
-    const ad = serveAd();
-
-    if(ad){
-
-      const img = ad.image || "https://via.placeholder.com/200x80?text=Ad";
-
-      html += `
-        <div class="adItem">
-          ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
-          <img src="${img}" style="height:60px;object-fit:contain">
-          ${ad.link ? `</a>` : ""}
-        </div>
-      `;
+  s.innerHTML = `
+    #adTrack{
+      overflow:hidden;
+      background:#111;
+      height:70px;
+      display:flex;
+      align-items:center;
     }
-  }
 
-  if(!html){
-    html = "<span style='color:white'>Keine Werbung aktiv</span>";
-  }
+    .ads{
+      display:flex;
+      gap:40px;
+      animation:scroll 25s linear infinite;
+    }
 
-  track.innerHTML = html;
-};
+    .ads img{
+      height:50px;
+      transition:.3s;
+    }
 
-// =====================
-// AUTO ROTATION
-// =====================
-setInterval(()=>{
-  if(window.renderAds){
-    renderAds();
-  }
-}, 4000);
+    .ads img:hover{
+      transform:scale(1.05);
+    }
 
-// =====================
-// INIT
-// =====================
-window.startAds = function(){
-  if(window.adsInitialized) return;
-  window.adsInitialized = true;
+    @keyframes scroll{
+      from{transform:translateX(0)}
+      to{transform:translateX(-50%)}
+    }
+  `;
 
-  console.log("📢 Ads gestartet (FULL)");
+  document.head.appendChild(s);
+}
 
+// =========================
+// 🚀 START
+// =========================
+window.startAdEngine = function(){
+
+  injectStyles();
   renderAds();
+
+  setInterval(renderAds, 10000);
 };
-
-// =====================
-// GAME HOOKS
-// =====================
-window.onMatchStart = renderAds;
-window.onHalftime = renderAds;
-window.onMatchEnd = renderAds;
-
-})();
