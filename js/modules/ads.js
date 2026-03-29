@@ -12,17 +12,27 @@ function getMatchingAds(){
 
   const now = Date.now();
 
+  // 🔒 SAFE ACCESS
+  const leagueKey = window.game?.league?.key;
+  const teamKey   = window.game?.team?.selected;
+
   return getCampaigns().filter(c => {
 
     if(c.start && now < c.start) return false;
     if(c.end && now > c.end) return false;
 
+    // 🌍 GLOBAL
     if(c.targeting?.global) return true;
 
-    if(c.targeting?.league === game.league.key) return true;
+    // ❗ wenn game noch nicht ready → nix matchen außer global
+    if(!leagueKey) return false;
 
+    // 🏆 LEAGUE
+    if(c.targeting?.league === leagueKey) return true;
+
+    // 👕 TEAM
     if(c.targeting?.team){
-      return c.targeting.team === game.team.selected || c.targeting.team === "all";
+      return c.targeting.team === teamKey || c.targeting.team === "all";
     }
 
     return false;
