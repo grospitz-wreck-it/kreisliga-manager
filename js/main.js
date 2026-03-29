@@ -27,29 +27,12 @@ window.game = game;
 // =========================
 function startAdEngine(){
 
-  console.log("📢 Ad Engine gestartet");
+  if(!window.renderAdBand){
+    console.warn("Ads noch nicht geladen...");
+    return;
+  }
 
-  setInterval(()=>{
-
-    if(!window.serveAd) return;
-
-    const ad = serveAd(); // ❗ KEINE PARAMETER
-
-    const track = document.getElementById("adTrack");
-    if(!track) return;
-
-    if(!ad){
-      track.innerHTML = "<span style='color:white'>Keine Werbung aktiv</span>";
-      return;
-    }
-
-    track.innerHTML = `
-      ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
-      <img src="${ad.image}" style="height:60px;object-fit:contain">
-      ${ad.link ? `</a>` : ""}
-    `;
-
-  }, 3000);
+  window.startAdEngine(); // aus ads.js
 }
 // =========================
 // 🚀 INIT
