@@ -236,7 +236,9 @@ body {
 #adBanner img{
   width:auto !important;
 }
-
+#adBanner {
+  align-self: center; /* verhindert Stretch */
+}
 /* =========================
 🔘 BUTTONS
 ========================= */
