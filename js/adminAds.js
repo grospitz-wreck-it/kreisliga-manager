@@ -1,114 +1,94 @@
-// =========================
-// 📦 LOAD ADS
-// =========================
-function loadAds() {
-  const saved = JSON.parse(localStorage.getItem("kreisliga_ads")) || [];
-  const container = document.getElementById("adsContainer");
+const STORAGE_KEY = "kreisliga_ads";
 
-  container.innerHTML = "";
-
-  saved.forEach(url => {
-    addAdInput(url);
-  });
+// 📦 Alle Ads laden
+function getAds() {
+  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 }
 
-// =========================
-// 💾 SAVE ADS
-// =========================
-function persistAds(){
-  localStorage.setItem("ads", JSON.stringify(ads));
+// 💾 Speichern
+function saveAds(ads) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(ads));
 }
 
-// =========================
-// 🖼 IMAGE UPLOAD
-// =========================
-function handleUpload(callback){
+// ➕ Neue Ad speichern
+function saveAd() {
+  const name = document.getElementById("adName").value;
+  const link = document.getElementById("adLink").value;
+  const start = document.getElementById("adStart").value;
+  const end = document.getElementById("adEnd").value;
+  const weight = parseInt(document.getElementById("adWeight").value) || 1;
+  const file = document.getElementById("adImageUpload").files[0];
 
-  const fileInput = document.getElementById("adImageUpload");
-  const file = fileInput.files[0];
-
-  if(!file){
-    alert("Bild wählen!");
+  if (!file) {
+    alert("Bitte Bild auswählen");
     return;
   }
 
   const reader = new FileReader();
 
-  reader.onload = function(e){
-    callback(e.target.result);
+  reader.onload = function(e) {
+    const ads = getAds();
+
+    const newAd = {
+      id: Date.now(),
+      name,
+      link,
+      start,
+      end,
+      weight,
+      image: e.target.result // 👉 Base64
+    };
+
+    ads.push(newAd);
+    saveAds(ads);
+
+    renderAds();
+    clearForm();
+
+    console.log("✅ Ad gespeichert", newAd);
   };
 
   reader.readAsDataURL(file);
 }
 
-// =========================
-// ➕ SAVE AD
-// =========================
-function saveAds() {
-  const inputs = document.querySelectorAll(".adInput");
-  const ads = [];
-
-  inputs.forEach(input => {
-    const value = input.value.trim();
-    if (value) ads.push(value);
-  });
-
-  localStorage.setItem("kreisliga_ads", JSON.stringify(ads));
-
-  console.log("✅ Ads gespeichert:", ads);
-
-  alert("Ads gespeichert!");
+// 🧹 Formular leeren
+function clearForm() {
+  document.getElementById("adName").value = "";
+  document.getElementById("adLink").value = "";
+  document.getElementById("adStart").value = "";
+  document.getElementById("adEnd").value = "";
+  document.getElementById("adWeight").value = 1;
+  document.getElementById("adImageUpload").value = "";
 }
 
-// =========================
-// 👁 PREVIEW
-// =========================
-function showPreview(src){
+// 🖼️ Vorschau + Liste
+function renderAds() {
+  const ads = getAds();
+  const list = document.getElementById("adList");
 
-  const box = document.getElementById("preview");
-  box.innerHTML = `<img src="${src}">`;
-}
+  list.innerHTML = "";
 
-// =========================
-// 📋 LISTE
-// =========================
-function renderAds(){
+  ads.forEach(ad => {
+    const div = document.createElement("div");
+    div.style.marginBottom = "10px";
 
-  const box = document.getElementById("adList");
-  box.innerHTML = "";
-
-  ads.forEach((ad, index)=>{
-
-    let row = document.createElement("div");
-    row.className = "adRow";
-
-    row.innerHTML = `
-      <img src="${ad.image}">
-      <span>${ad.name}</span>
-      <span>Gewicht: ${ad.weight}</span>
-      <button onclick="deleteAd(${index})">❌</button>
+    div.innerHTML = `
+      <strong>${ad.name}</strong><br>
+      <img src="${ad.image}" style="height:50px"><br>
+      <button onclick="deleteAd(${ad.id})">❌ Löschen</button>
     `;
 
-    box.appendChild(row);
+    list.appendChild(div);
   });
 }
 
-// =========================
-// ❌ DELETE
-// =========================
-function deleteAd(index){
-
-  if(!confirm("Ad löschen?")) return;
-
-  ads.splice(index, 1);
-
-  persistAds();
-
+// ❌ Löschen
+function deleteAd(id) {
+  let ads = getAds();
+  ads = ads.filter(ad => ad.id !== id);
+  saveAds(ads);
   renderAds();
 }
 
-// =========================
-// 🚀 INIT
-// =========================
-loadAdsFromStorage();
-renderAds();
+// 🚀 Init
+window.onload = renderAds;
