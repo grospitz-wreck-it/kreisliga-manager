@@ -211,51 +211,93 @@ button {
 💣 ADS ISOLATED (FINAL)
 ========================= */
 
+/* =========================
+💣 ADS HARD FIX (ISOLIERT)
+========================= */
+
 #adBanner{
-  width:100%;
-  display:block;
+  position: relative;
 
-  margin:12px 0;
+  width: 100%;
+  height: 90px;
+
+  margin: 12px 0;
+
+  /* 🔥 DAS IST DER GAMECHANGER */
+  display: block !important;
 }
 
-/* eigene Box → komplett unabhängig */
-.adInner{
-  width:100%;
-  max-width:970px;
-  height:90px;
-
-  margin:0 auto;
-
-  position:relative;
-  overflow:hidden;
-  background:#000;
-  border-radius:10px;
+/* feste "Stage" */
+#adBanner::before{
+  content: "";
+  display: block;
+  height: 90px;
 }
 
-/* Track liegt darüber */
+/* Track wird komplett entkoppelt */
 #adTrack{
-  position:absolute;
-  inset:0;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
 
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  height: 90px;
+  width: 970px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
 }
 
-/* Bild passt sich exakt an */
-#adTrack img {
-  height: 90px !important;
-  max-height: 90px !important;
+/* Banner selbst */
+.leaderboardAd{
+  height: 90px;
+  width: 970px;
 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #000;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+/* 🔥 HIER PASSIERT DIE MAGIE */
+.leaderboardAd img{
+  height: 90px !important;
   width: auto !important;
+
+  max-height: 90px !important;
   object-fit: contain;
+
   display: block;
 }
 
-/* 📱 Mobile */
+/* 📱 MOBILE */
 @media (max-width:600px){
-  #adTrack img {
+
+  #adBanner{
+    height: 50px;
+  }
+
+  #adBanner::before{
+    height: 50px;
+  }
+
+  #adTrack{
+    height: 50px;
+    width: 320px;
+  }
+
+  .leaderboardAd{
+    height: 50px;
+    width: 320px;
+  }
+
+  .leaderboardAd img{
     height: 50px !important;
-    max-height: 50px !important;
   }
 }
