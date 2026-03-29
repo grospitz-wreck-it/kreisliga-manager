@@ -14,25 +14,39 @@ function saveCampaigns(data){
 }
 
 // =====================
-// TARGETING UI
+// TARGETING UI (FIXED)
 // =====================
 window.updateTargetingUI = function(){
 
-  const type = document.getElementById("targetingType")?.value;
+  const type = document.getElementById("targetType")?.value;
+  const container = document.getElementById("targetFields");
 
-  const leagueWrap = document.getElementById("leagueWrap");
-  const teamWrap = document.getElementById("teamWrap");
+  if(!container) return;
 
-  if(leagueWrap) leagueWrap.style.display = "none";
-  if(teamWrap) teamWrap.style.display = "none";
+  container.innerHTML = "";
 
-  if(type === "league"){
-    if(leagueWrap) leagueWrap.style.display = "block";
+  // 👉 Liga
+  if(type === "district"){
+    container.innerHTML = `
+      <select id="leagueSelectAds" onchange="loadTeamsForLeague()">
+        <option value="">Liga wählen</option>
+      </select>
+    `;
+    loadLeagues();
   }
 
+  // 👉 Team
   if(type === "team"){
-    if(leagueWrap) leagueWrap.style.display = "block";
-    if(teamWrap) teamWrap.style.display = "block";
+    container.innerHTML = `
+      <select id="leagueSelectAds" onchange="loadTeamsForLeague()">
+        <option value="">Liga wählen</option>
+      </select>
+
+      <select id="teamSelectAds">
+        <option value="all">Alle Teams</option>
+      </select>
+    `;
+    loadLeagues();
   }
 };
 
@@ -43,15 +57,7 @@ function loadLeagues(){
 
   const select = document.getElementById("leagueSelectAds");
 
-  if(!select){
-    console.error("❌ leagueSelectAds fehlt im HTML");
-    return;
-  }
-
-  if(!window.LEAGUES){
-    console.error("❌ LEAGUES nicht geladen");
-    return;
-  }
+  if(!select || !window.LEAGUES) return;
 
   select.innerHTML = `<option value="">Liga wählen</option>`;
 
@@ -61,8 +67,6 @@ function loadLeagues(){
     opt.textContent = league.name;
     select.appendChild(opt);
   });
-
-  console.log("✅ Ligen geladen");
 }
 
 // =====================
@@ -73,22 +77,10 @@ window.loadTeamsForLeague = function(){
   const leagueKey = document.getElementById("leagueSelectAds")?.value;
   const teamSelect = document.getElementById("teamSelectAds");
 
-  if(!leagueKey){
-    console.warn("⚠️ Keine Liga gewählt");
-    return;
-  }
-
-  if(!teamSelect){
-    console.error("❌ teamSelectAds fehlt");
-    return;
-  }
+  if(!leagueKey || !teamSelect) return;
 
   const league = LEAGUES[leagueKey];
-
-  if(!league){
-    console.error("❌ Liga nicht gefunden:", leagueKey);
-    return;
-  }
+  if(!league) return;
 
   teamSelect.innerHTML = `<option value="all">Alle Teams</option>`;
 
@@ -98,12 +90,10 @@ window.loadTeamsForLeague = function(){
     opt.textContent = team;
     teamSelect.appendChild(opt);
   });
-
-  console.log("✅ Teams geladen:", league.teams.length);
 };
 
 // =====================
-// CREATE CAMPAIGN
+// CREATE CAMPAIGN (FIXED)
 // =====================
 window.createCampaign = function(){
 
@@ -112,16 +102,21 @@ window.createCampaign = function(){
   const budget = Number(document.getElementById("budget")?.value || 0);
   const link = document.getElementById("link")?.value || "";
 
-  const start = new Date(document.getElementById("startDate")?.value).getTime();
-  const end = new Date(document.getElementById("endDate")?.value).getTime();
+  const startRaw = document.getElementById("startDate")?.value;
+  const endRaw = document.getElementById("endDate")?.value;
 
-  const type = document.getElementById("targetingType")?.value;
-  const league = document.getElementById("leagueSelectAds")?.value;
-  const team = document.getElementById("teamSelectAds")?.value;
+  const start = startRaw ? new Date(startRaw).getTime() : null;
+  const end = endRaw ? new Date(endRaw).getTime() : null;
+
+  const type = document.getElementById("targetType")?.value;
+
+  const league = document.getElementById("leagueSelectAds")?.value || null;
+  const team = document.getElementById("teamSelectAds")?.value || "all";
 
   const donationPercent = Number(document.getElementById("donation")?.value || 0);
 
-  const imageInput = document.getElementById("imageUpload");
+  // 🔥 FIX: richtige ID
+  const imageInput = document.getElementById("image");
 
   if(!imageInput || !imageInput.files[0]){
     alert("Bitte Bild hochladen");
@@ -146,7 +141,7 @@ window.createCampaign = function(){
       spent: 0,
       targeting: {
         global: type === "global",
-        league: type === "league" ? league : null,
+        league: type === "district" ? league : null,
         team: type === "team" ? team : null
       }
     };
@@ -157,6 +152,8 @@ window.createCampaign = function(){
 
     clearForm();
     render();
+
+    alert("✅ Kampagne gespeichert");
   };
 
   reader.readAsDataURL(imageInput.files[0]);
@@ -172,8 +169,10 @@ function clearForm(){
     if(el) el.value = "";
   });
 
-  const img = document.getElementById("imageUpload");
+  const img = document.getElementById("image");
   if(img) img.value = "";
+
+  document.getElementById("targetFields").innerHTML = "";
 }
 
 // =====================
@@ -191,8 +190,7 @@ window.deleteCampaign = function(id){
 // =====================
 function formatDate(ts){
   if(!ts) return "-";
-  const d = new Date(ts);
-  return d.toLocaleDateString();
+  return new Date(ts).toLocaleDateString();
 }
 
 function getDuration(start, end){
@@ -202,11 +200,12 @@ function getDuration(start, end){
 }
 
 // =====================
-// RENDER
+// RENDER (FIXED)
 // =====================
 function render(){
 
-  const container = document.getElementById("campaignList");
+  const container = document.getElementById("list"); // 🔥 FIX
+
   if(!container) return;
 
   const campaigns = getCampaigns();
@@ -226,13 +225,15 @@ function render(){
     div.className = "adRow";
 
     div.innerHTML = `
-      <img src="${c.image}" />
-      <div>
-        <strong>${c.customer || "Kein Kunde"}</strong><br>
-        Budget: ${c.budget}€<br>
-        Zeitraum: ${formatDate(c.start)} - ${formatDate(c.end)}<br>
-        Dauer: ${getDuration(c.start, c.end)}<br>
-        Spende: ${c.donationPercent}% (${donationAmount.toFixed(2)}€)
+      <div class="adLeft">
+        <img src="${c.image}" />
+        <div>
+          <strong>${c.customer || "Kein Kunde"}</strong><br>
+          Budget: ${c.budget}€<br>
+          Zeitraum: ${formatDate(c.start)} - ${formatDate(c.end)}<br>
+          Dauer: ${getDuration(c.start, c.end)}<br>
+          Spende: ${c.donationPercent}% (${donationAmount.toFixed(2)}€)
+        </div>
       </div>
       <button onclick="deleteCampaign(${c.id})">🗑️</button>
     `;
@@ -245,7 +246,6 @@ function render(){
 // INIT
 // =====================
 window.onload = function(){
-  loadLeagues();
   render();
 };
 
