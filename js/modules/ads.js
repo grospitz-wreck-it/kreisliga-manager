@@ -30,90 +30,53 @@ function getMatchingAds(){
 }
 
 // =========================
-// 🧠 CORE (🔥 NEU)
-// =========================
-window.serveAd = function(){
-  return getMatchingAds(); // 👉 gibt IMMER ARRAY zurück
-};
-
-// =========================
 // 🎬 RENDER
 // =========================
+let currentIndex = 0;
+let adsCache = [];
+
 function renderAds(){
 
   const el = document.getElementById("adTrack");
   if(!el) return;
 
-  const ads = window.serveAd();
+  adsCache = getMatchingAds();
 
-  if(!ads.length){
+  if(!adsCache.length){
     el.innerHTML = `<div style="color:#fff">Keine Werbung</div>`;
     return;
   }
 
-  // 👉 Shuffle
-  const shuffled = [...ads].sort(() => Math.random() - 0.5);
-
-  // 👉 max 5
-  const visible = shuffled.slice(0, 5);
-
-  // 👉 Loop für smooth scroll
-  const loop = [...visible, ...visible];
-
   el.innerHTML = `
-    <div class="ads">
-      ${loop.map(a => `
-        <a href="${a.link || '#'}" target="_blank">
-          <img src="${a.image}">
-        </a>
+    <div class="adsSlider">
+      ${adsCache.map(a => `
+        <div class="adSlide">
+          ${a.link ? `<a href="${a.link}" target="_blank">` : ""}
+            <img src="${a.image}">
+          ${a.link ? `</a>` : ""}
+        </div>
       `).join("")}
     </div>
   `;
+
+  currentIndex = 0;
 }
 
 // =========================
-// 🎨 STYLES
+// 🔁 ROTATION
 // =========================
-function injectStyles(){
+function rotateAds(){
 
-  if(document.getElementById("ads-css")) return;
+  const slider = document.querySelector(".adsSlider");
+  if(!slider || adsCache.length <= 1) return;
 
-  const s = document.createElement("style");
-  s.id = "ads-css";
+  currentIndex++;
 
-  s.innerHTML = `
-    #adTrack{
-      overflow:hidden;
-      background:#111;
-      height:70px;
-      display:flex;
-      align-items:center;
-    }
+  if(currentIndex >= adsCache.length){
+    currentIndex = 0;
+  }
 
-    .ads{
-      display:flex;
-      gap:40px;
-      animation:scroll 20s linear infinite;
-    }
-
-    .ads img{
-      height:50px;
-      transition:.3s;
-      filter:brightness(.95);
-    }
-
-    .ads img:hover{
-      transform:scale(1.08);
-      filter:brightness(1.1);
-    }
-
-    @keyframes scroll{
-      from{transform:translateX(0)}
-      to{transform:translateX(-50%)}
-    }
-  `;
-
-  document.head.appendChild(s);
+  slider.style.transform = `translateX(-${currentIndex * 100}%)`;
 }
 
 // =========================
@@ -123,8 +86,11 @@ window.startAdEngine = function(){
 
   console.log("📢 Ad Engine gestartet");
 
-  injectStyles();
-
   renderAds();
-  setInterval(renderAds, 8000);
+
+  // 👉 alle 5s wechseln
+  setInterval(rotateAds, 5000);
+
+  // 👉 alle 20s neu laden (falls neue Kampagnen)
+  setInterval(renderAds, 20000);
 };
