@@ -30,6 +30,13 @@ function getMatchingAds(){
 }
 
 // =========================
+// 🧠 CORE (🔥 NEU)
+// =========================
+window.serveAd = function(){
+  return getMatchingAds(); // 👉 gibt IMMER ARRAY zurück
+};
+
+// =========================
 // 🎬 RENDER
 // =========================
 function renderAds(){
@@ -37,19 +44,20 @@ function renderAds(){
   const el = document.getElementById("adTrack");
   if(!el) return;
 
-  const ads = getMatchingAds();
+  const ads = window.serveAd();
 
   if(!ads.length){
     el.innerHTML = `<div style="color:#fff">Keine Werbung</div>`;
     return;
   }
 
-  // 👉 Zufällige Reihenfolge für Variation
-  const shuffled = ads.sort(() => Math.random() - 0.5);
+  // 👉 Shuffle
+  const shuffled = [...ads].sort(() => Math.random() - 0.5);
 
-  // 👉 max 5 gleichzeitig anzeigen
+  // 👉 max 5
   const visible = shuffled.slice(0, 5);
 
+  // 👉 Loop für smooth scroll
   const loop = [...visible, ...visible];
 
   el.innerHTML = `
@@ -117,9 +125,6 @@ window.startAdEngine = function(){
 
   injectStyles();
 
-  // 👉 initial
   renderAds();
-
-  // 👉 alle 8s neue Ads rein (wie Rotation)
   setInterval(renderAds, 8000);
 };
