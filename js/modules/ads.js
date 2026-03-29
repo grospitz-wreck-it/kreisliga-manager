@@ -49,14 +49,14 @@ function renderAds(){
   if(!el) return;
 
   const ads = getMatchingAds();
+  // 👇 HIER REIN
+  console.log("ADS:", ads);
+  el.style.background = "red";
   
   if(!ads.length){
     el.innerHTML = `<div class="leaderboardAd" style="color:#fff">Keine Werbung</div>`;
     return;
   }
-  console.log("ADS:", ads);
-console.log("HTML:", el.innerHTML);
-el.style.background = "red";
   // 👉 nur eine Ad gleichzeitig für echtes Leaderboard
   const ad = ads[Math.floor(Math.random() * ads.length)];
 
