@@ -1,12 +1,6 @@
 const KEY="ad_v2";
 
 /* =====================
-   🌍 GEO DATA
-===================== */
-const COUNTRIES=["Deutschland","Österreich","Schweiz"];
-const STATES=["Bayern","NRW","Hessen","Niedersachsen","Sachsen","Berlin"];
-
-/* =====================
    STORAGE
 ===================== */
 function getData(){
@@ -18,38 +12,22 @@ function saveData(d){
 }
 
 /* =====================
-   🎯 TARGETING UI
+   TARGETING UI
 ===================== */
 function updateTargetingUI(){
 
-  const type=targetType.value;
-  targetFields.innerHTML="";
+  const type=document.getElementById("targetType").value;
+  const container=document.getElementById("targetFields");
 
-  if(type==="global") return;
-
-  if(type==="country"){
-    targetFields.innerHTML=`
-      <select id="countrySelect">
-        ${COUNTRIES.sort().map(c=>`<option value="${c}">${c}</option>`).join("")}
-      </select>
-    `;
-  }
-
-  if(type==="state"){
-    targetFields.innerHTML=`
-      <select id="stateSelect">
-        ${STATES.sort().map(s=>`<option value="${s}">${s}</option>`).join("")}
-      </select>
-    `;
-  }
+  container.innerHTML="";
 
   if(type==="district"){
-    targetFields.innerHTML=`<select id="leagueSelect"></select>`;
+    container.innerHTML=`<select id="leagueSelect"></select>`;
     loadLeagues();
   }
 
   if(type==="team"){
-    targetFields.innerHTML=`
+    container.innerHTML=`
       <select id="leagueSelect"></select>
       <select id="teamSelect"></select>
     `;
@@ -58,12 +36,12 @@ function updateTargetingUI(){
 }
 
 /* =====================
-   🏆 LEAGUES FIX (WICHTIG)
+   LEAGUES (ROBUST)
 ===================== */
 function loadLeagues(withTeams=false){
 
-  if(typeof LEAGUES==="undefined"){
-    console.warn("❌ LEAGUES fehlt");
+  if(!window.LEAGUES){
+    console.warn("❌ LEAGUES nicht geladen");
     return;
   }
 
@@ -98,7 +76,6 @@ function loadLeagues(withTeams=false){
 
       league.teams.forEach(team=>{
 
-        // 🔥 unterstützt string ODER object
         const name = typeof team === "string" ? team : team.name;
 
         const opt=document.createElement("option");
@@ -112,80 +89,61 @@ function loadLeagues(withTeams=false){
 }
 
 /* =====================
-   💰 CPM
-===================== */
-function getCPM(type){
-  if(type==="team") return 20;
-  if(type==="district") return 10;
-  if(type==="state") return 5;
-  if(type==="country") return 2;
-  return 1;
-}
-
-/* =====================
-   📅 HELPER
-===================== */
-function getDays(start,end){
-  return Math.ceil((end-start)/86400000);
-}
-
-/* =====================
-   🚀 CREATE CAMPAIGN
+   CREATE CAMPAIGN
 ===================== */
 function createCampaign(){
 
-  const file=image.files[0];
+  const file=document.getElementById("image").files[0];
   if(!file) return alert("Bild fehlt");
 
   const reader=new FileReader();
 
   reader.onload=function(e){
 
-    const type=targetType.value;
+    const type=document.getElementById("targetType").value;
 
     let targeting={type};
 
-    if(type==="country"){
-      targeting.value=countrySelect.value;
-    }
-
-    if(type==="state"){
-      targeting.value=stateSelect.value;
-    }
-
     if(type==="district"){
-      targeting.league=leagueSelect.value;
+      targeting.league=document.getElementById("leagueSelect")?.value || null;
     }
 
     if(type==="team"){
-      targeting.league=leagueSelect.value;
-      targeting.team=teamSelect.value;
+      targeting.league=document.getElementById("leagueSelect")?.value || null;
+      targeting.team=document.getElementById("teamSelect")?.value || null;
     }
+
+    const budget=parseFloat(document.getElementById("budget").value)||0;
+    const donationPercent=parseInt(document.getElementById("donation").value)||0;
 
     const startVal=document.getElementById("startDate").value;
     const endVal=document.getElementById("endDate").value;
 
     const start=startVal ? new Date(startVal).getTime() : Date.now();
-    const end=endVal ? new Date(endVal).getTime() : (Date.now()+30*86400000);
+    const end=endVal ? new Date(endVal).getTime() : Date.now()+30*86400000;
 
-    const budget=parseFloat(budget.value)||0;
-    const cpm=getCPM(type);
+    const cpm=5;
 
     const campaign={
       id:Date.now(),
-      name:name.value||"⚠️ Kein Name",
-      customer:customer.value||"-",
+
+      name:document.getElementById("name").value || "⚠️ Kein Name",
+      customer:document.getElementById("customer").value || "-",
+      link:document.getElementById("link").value || "",
+
       budget,
       spent:0,
 
-      typeCampaign:typeCampaign.value,
-      type:typeCampaign.value,
+      typeCampaign:document.getElementById("typeCampaign").value,
+      type:document.getElementById("typeCampaign").value,
 
       cpm,
       impressionsBooked:(budget/cpm)*1000,
       impressionsDelivered:0,
 
-      donation:parseFloat(donation.value)||0,
+      // 💚 Spende vom Gesamtbudget
+      donationPercent,
+      donationAmount: budget * (donationPercent/100),
 
       targeting,
 
@@ -200,42 +158,43 @@ function createCampaign(){
     saveData(data);
 
     render();
-    resetForm(); // 🔥 NEU
+    resetForm();
   };
 
   reader.readAsDataURL(file);
 }
 
 /* =====================
-   🔄 RESET FORM
+   RESET FORM
 ===================== */
 function resetForm(){
 
-  name.value="";
-  customer.value="";
-  budget.value="";
-  donation.value=0;
+  document.getElementById("name").value="";
+  document.getElementById("customer").value="";
+  document.getElementById("budget").value="";
+  document.getElementById("link").value="";
 
-  image.value="";
+  document.getElementById("startDate").value="";
+  document.getElementById("endDate").value="";
 
-  startDate.value="";
-  endDate.value="";
+  document.getElementById("donation").value="0";
+  document.getElementById("image").value="";
 
-  targetType.value="global";
-  updateTargetingUI();
+  document.getElementById("targetType").value="global";
+  document.getElementById("targetFields").innerHTML="";
 }
 
 /* =====================
-   📊 RENDER
+   RENDER
 ===================== */
 function render(){
 
+  const list=document.getElementById("list");
   list.innerHTML="";
 
   getData().forEach(c=>{
 
-    const donationVal=c.spent*(c.donation/100);
-    const days=getDays(c.start,c.end);
+    const days=Math.ceil((c.end-c.start)/86400000);
 
     const div=document.createElement("div");
     div.className="adRow";
@@ -245,16 +204,14 @@ function render(){
         <img src="${c.image}">
         <div>
           <b>${c.name}</b><br>
-          <small>${c.customer}</small><br>
-          <small>${c.targeting.type}</small><br>
-          <small>⏱️ ${days} Tage</small>
+          ${c.customer}<br>
+          ⏱️ ${days} Tage<br>
+          💚 ${c.donationPercent}% = €${c.donationAmount.toFixed(2)}
         </div>
       </div>
 
       <div>
-        €${c.spent.toFixed(2)}<br>
-        💚 ${donationVal.toFixed(2)}€<br>
-        <button class="danger" onclick="del(${c.id})">❌</button>
+        <button onclick="del(${c.id})">❌</button>
       </div>
     `;
 
@@ -263,7 +220,7 @@ function render(){
 }
 
 /* =====================
-   ❌ DELETE
+   DELETE
 ===================== */
 function del(id){
 
@@ -280,8 +237,5 @@ function del(id){
    INIT
 ===================== */
 window.onload=function(){
-
-  updateTargetingUI();
   render();
-
 };
