@@ -23,6 +23,39 @@ const game = {
 window.game = game;
 
 // =========================
+// 📢 AD ENGINE START
+// =========================
+function startAdEngine(){
+
+  console.log("📢 Ad Engine gestartet");
+
+  setInterval(()=>{
+
+    // 👉 falls Engine noch nicht geladen
+    if(!window.serveAd) return;
+
+    const ad = serveAd({
+      league: window.currentLeagueId,
+      team: window.currentTeamId,
+      global: true
+    });
+
+    const track = document.getElementById("adTrack");
+    if(!track) return;
+
+    if(!ad){
+      track.innerHTML = "<span style='color:white'>Keine Werbung aktiv</span>";
+      return;
+    }
+
+    track.innerHTML = `
+      <img src="${ad.image}" style="height:60px;object-fit:contain">
+    `;
+
+  }, 3000);
+}
+
+// =========================
 // 🚀 INIT
 // =========================
 function init(){
@@ -34,7 +67,10 @@ function init(){
 
   // UI Events binden
   bindUI();
- startAds();
+
+  // 🔥 NEU: AD ENGINE STARTEN
+  startAdEngine();
+
   // Optional: Save laden
   if(typeof loadGame === "function"){
     const loaded = loadGame();
@@ -42,7 +78,6 @@ function init(){
     if(loaded){
       console.log("💾 Save geladen");
 
-      // UI nachladen
       if(game.league.teams.length > 0){
         populateTeamSelect();
         renderSchedule();
@@ -54,9 +89,7 @@ function init(){
 
   console.log("✅ Init fertig");
 }
-if(window.startAds){
-  startAds();
-}
+
 // =========================
 // ▶️ START
 // =========================
