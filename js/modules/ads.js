@@ -36,14 +36,13 @@ function getAdminAds(){
   try{
     const stored = JSON.parse(localStorage.getItem("ads") || "[]");
 
-    // 🔥 Mapping auf dein bestehendes Format
     return stored.map(ad => ({
-      name: ad.title || "Anzeige",
-      image: ad.image || "ads/fallback.png", // optional später erweitern
+      name: ad.name || "Anzeige",        // ✅ FIX
+      image: ad.image || "ads/fallback.png",
       link: ad.link || "",
-      start: null,
-      end: null,
-      weight: 1
+      start: ad.start || null,           // ✅ FIX
+      end: ad.end || null,               // ✅ FIX
+      weight: ad.weight || 1             // ✅ FIX
     }));
 
   } catch(e){
@@ -51,8 +50,6 @@ function getAdminAds(){
     return [];
   }
 }
-
-
 // =========================
 // 🧠 AKTIVE ADS FILTERN
 // =========================
