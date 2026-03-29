@@ -8,23 +8,21 @@ function getCampaigns(){
 // =========================
 // 🎯 MATCHING
 // =========================
-function getMatchingAds(ctx){
+function getMatchingAds(){
 
   const now = Date.now();
 
   return getCampaigns().filter(c => {
-
-    if(!c) return false;
 
     if(c.start && now < c.start) return false;
     if(c.end && now > c.end) return false;
 
     if(c.targeting?.global) return true;
 
-    if(c.targeting?.league === ctx.league) return true;
+    if(c.targeting?.league === game.league.key) return true;
 
     if(c.targeting?.team){
-      return c.targeting.team === ctx.team || c.targeting.team === "all";
+      return c.targeting.team === game.team.selected || c.targeting.team === "all";
     }
 
     return false;
@@ -39,18 +37,20 @@ function renderAds(){
   const el = document.getElementById("adTrack");
   if(!el) return;
 
-  const ads = getMatchingAds({
-    league: game.league.key,
-    team: game.team.selected
-  });
+  const ads = getMatchingAds();
 
   if(!ads.length){
     el.innerHTML = `<div style="color:#fff">Keine Werbung</div>`;
     return;
   }
 
-  // 👉 Loop erzeugen
-  const loop = [...ads, ...ads];
+  // 👉 Zufällige Reihenfolge für Variation
+  const shuffled = ads.sort(() => Math.random() - 0.5);
+
+  // 👉 max 5 gleichzeitig anzeigen
+  const visible = shuffled.slice(0, 5);
+
+  const loop = [...visible, ...visible];
 
   el.innerHTML = `
     <div class="ads">
@@ -64,7 +64,7 @@ function renderAds(){
 }
 
 // =========================
-// 🎨 STYLES (LEAN)
+// 🎨 STYLES
 // =========================
 function injectStyles(){
 
@@ -85,16 +85,18 @@ function injectStyles(){
     .ads{
       display:flex;
       gap:40px;
-      animation:scroll 25s linear infinite;
+      animation:scroll 20s linear infinite;
     }
 
     .ads img{
       height:50px;
       transition:.3s;
+      filter:brightness(.95);
     }
 
     .ads img:hover{
-      transform:scale(1.05);
+      transform:scale(1.08);
+      filter:brightness(1.1);
     }
 
     @keyframes scroll{
@@ -107,12 +109,17 @@ function injectStyles(){
 }
 
 // =========================
-// 🚀 START
+// 🚀 ENGINE
 // =========================
 window.startAdEngine = function(){
 
+  console.log("📢 Ad Engine gestartet");
+
   injectStyles();
+
+  // 👉 initial
   renderAds();
 
-  setInterval(renderAds, 10000);
+  // 👉 alle 8s neue Ads rein (wie Rotation)
+  setInterval(renderAds, 8000);
 };
