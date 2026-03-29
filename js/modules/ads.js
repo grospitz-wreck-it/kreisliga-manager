@@ -45,28 +45,26 @@ function getMatchingAds(){
 // =========================
 function renderAds(){
 
-  const track = document.getElementById("adTrack");
-  if(!track) return;
+  const el = document.getElementById("adTrack");
+  if(!el) return;
 
   const ads = getMatchingAds();
 
   if(!ads.length){
-    track.innerHTML = `<div class="adFallback">Keine Werbung</div>`;
+    el.innerHTML = `<div class="leaderboardAd" style="color:#fff">Keine Werbung</div>`;
     return;
   }
 
-  // 👉 aktuelle Ad (Index rotierend)
-  if(!window.__adIndex) window.__adIndex = 0;
+  // 👉 nur eine Ad gleichzeitig für echtes Leaderboard
+  const ad = ads[Math.floor(Math.random() * ads.length)];
 
-  const ad = ads[window.__adIndex % ads.length];
-
-  track.innerHTML = `
-  <div class="leaderboardAd">
-    ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
-      <img src="${ad.image}">
-    ${ad.link ? `</a>` : ""}
-  </div>
-`;
+  el.innerHTML = `
+    <div class="leaderboardAd">
+      ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
+        <img src="${ad.image}">
+      ${ad.link ? `</a>` : ""}
+    </div>
+  `;
 }
 
 // =========================
