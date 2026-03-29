@@ -188,7 +188,9 @@ function render(){
         <img src="${c.image}">
         <b>${c.name}</b><br>
         ${c.customer}<br>
-        💚 ${c.donationPercent}% (€${c.donationAmount.toFixed(2)})
+        const donationAmount = c.donationAmount ?? (c.budget * (c.donationPercent || 0) / 100);
+
+💚 ${c.donationPercent || 0}% (€${donationAmount.toFixed(2)})
       </div>
 
       <button onclick="del(${c.id})">❌</button>
