@@ -48,31 +48,31 @@ let adsCache = [];
 
 function renderAds(){
 
-  const el = document.getElementById("adTrack");
-  if(!el) return;
+  const track = document.getElementById("adTrack");
+  if(!track) return;
 
-  adsCache = getMatchingAds();
+  const ads = getMatchingAds();
 
-  if(!adsCache.length){
-    el.innerHTML = `<div style="color:#fff">Keine Werbung</div>`;
+  if(!ads.length){
+    track.innerHTML = `<div style="color:#fff">Keine Werbung</div>`;
     return;
   }
 
-  el.innerHTML = `
-    <div class="adsSlider">
-      ${adsCache.map(a => `
+  // 🔥 loop für smooth scroll
+  const loop = [...ads, ...ads];
+
+  track.innerHTML = `
+    <div class="adSlider">
+      ${loop.map(ad => `
         <div class="adSlide">
-          ${a.link ? `<a href="${a.link}" target="_blank">` : ""}
-            <img src="${a.image}">
-          ${a.link ? `</a>` : ""}
+          ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
+            <img src="${ad.image || 'https://via.placeholder.com/300x70?text=Ad'}">
+          ${ad.link ? `</a>` : ""}
         </div>
       `).join("")}
     </div>
   `;
-
-  currentIndex = 0;
 }
-
 // =========================
 // 🔁 ROTATION
 // =========================
