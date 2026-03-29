@@ -31,14 +31,9 @@ function startAdEngine(){
 
   setInterval(()=>{
 
-    // 👉 falls Engine noch nicht geladen
     if(!window.serveAd) return;
 
-    const ad = serveAd({
-      league: window.currentLeagueId,
-      team: window.currentTeamId,
-      global: true
-    });
+    const ad = serveAd(); // ❗ KEINE PARAMETER
 
     const track = document.getElementById("adTrack");
     if(!track) return;
@@ -49,12 +44,13 @@ function startAdEngine(){
     }
 
     track.innerHTML = `
+      ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
       <img src="${ad.image}" style="height:60px;object-fit:contain">
+      ${ad.link ? `</a>` : ""}
     `;
 
   }, 3000);
 }
-
 // =========================
 // 🚀 INIT
 // =========================
