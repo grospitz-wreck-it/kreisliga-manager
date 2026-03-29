@@ -42,7 +42,6 @@ function initLeagueSelect(){
     select.appendChild(opt);
   });
 
-  // 🔥 EVENT FIX
   select.onchange = function(){
     selectLeague(this.value);
   };
@@ -67,7 +66,6 @@ function populateTeamSelect(){
     select.appendChild(opt);
   });
 
-  // 🔥 EVENT FIX
   select.onchange = function(){
     selectTeam(this.value);
   };
@@ -90,9 +88,7 @@ function selectLeague(key){
   game.team.selected = null;
   game.match.current = null;
 
-  // =========================
-  // 🧱 TEAMS ERSTELLEN
-  // =========================
+  // Teams erzeugen
   game.league.teams = data.teams.map(name => ({
     name,
     strength: Math.floor(Math.random() * 30) + 60,
@@ -107,15 +103,8 @@ function selectLeague(key){
     played: 0
   }));
 
-  if(game.league.teams.length !== 16){
-    console.error("❌ FALSCHE TEAMANZAHL:", game.league.teams.length);
-  } else {
-    console.log("✅ Teams erstellt:", game.league.teams.length);
-  }
+  console.log("✅ Teams erstellt:", game.league.teams.length);
 
-  // =========================
-  // ⚽ SPIELPLAN
-  // =========================
   generateSchedule();
 
   if(!game.league.schedule || game.league.schedule.length === 0){
@@ -125,16 +114,13 @@ function selectLeague(key){
 
   console.log("📅 Spielplan ready:", game.league.schedule.length);
 
-  // =========================
-  // 📊 UI
-  // =========================
   renderTable?.();
   populateTeamSelect();
   renderSchedule?.();
 }
 
 // =========================
-// 👤 TEAM WÄHLEN (🔥 FIX)
+// 👤 TEAM WÄHLEN (FINAL CLEAN)
 // =========================
 function selectTeam(teamName){
 
@@ -150,11 +136,8 @@ function selectTeam(teamName){
     return;
   }
 
-  // 🔥 WICHTIG: STRING statt Objekt!
+  // ✅ EINZIGE WAHRHEIT = STRING
   game.team.selected = team.name;
-
-  // optional für Spiel-Logik
-  game.team.data = team;
 
   console.log("✅ Team gewählt:", team.name);
 
@@ -167,9 +150,20 @@ function selectTeam(teamName){
 }
 
 // =========================
+// 🧠 HELPER (SEHR WICHTIG)
+// =========================
+function getSelectedTeam(){
+
+  if(!game.team.selected) return null;
+
+  return game.league.teams.find(t => t.name === game.team.selected);
+}
+
+// =========================
 // 🌍 EXPORTS
 // =========================
 window.initLeagueSelect = initLeagueSelect;
 window.populateTeamSelect = populateTeamSelect;
 window.selectLeague = selectLeague;
 window.selectTeam = selectTeam;
+window.getSelectedTeam = getSelectedTeam;
