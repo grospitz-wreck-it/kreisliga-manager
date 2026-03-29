@@ -254,12 +254,8 @@ button {
 
 /* 📱 Mobile */
 @media (max-width:600px){
-  .adInner{
-    height:50px;
-    max-width:320px;
-  }
-
-  #adTrack img{
-    height:50px;
+  #adTrack img {
+    height: 50px !important;
+    max-height: 50px !important;
   }
 }
