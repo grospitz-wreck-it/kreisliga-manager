@@ -307,64 +307,88 @@ background: rgba(244,67,54,0.15);
 }
 
 /* =========================
-📢 ADS (🔥 PRO VERSION)
+📢 PRO ADS BANNER
 ========================= */
+
 #adBanner {
-width: 100%;
-height: 80px;
-border-radius: 14px;
-overflow: hidden;
+  width: 100%;
+  height: 90px;
+  background: linear-gradient(180deg, #0f172a, #020617);
+  border-top: 2px solid rgba(255,255,255,0.08);
+  border-bottom: 2px solid rgba(255,255,255,0.08);
 
-background: linear-gradient(to bottom, #1c1f26, #0f1115);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-border-top: 2px solid #2a2f3a;
-border-bottom: 2px solid #2a2f3a;
-
-box-shadow:
-  inset 0 8px 20px rgba(0,0,0,0.6),
-  inset 0 -8px 20px rgba(0,0,0,0.6);
+  overflow: hidden;
+  position: relative;
 }
 
-/* SCROLLER */
+/* Glow Effekt */
+#adBanner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  animation: shine 6s infinite linear;
+}
+
+@keyframes shine {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+/* Track */
 #adTrack {
-display: flex;
-align-items: center;
-gap: 60px;
-
-animation: scrollAds 28s linear infinite;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
-/* ITEM */
-.adItem {
-flex: 0 0 auto;
-padding: 6px 14px;
-border-radius: 10px;
-background: rgba(255,255,255,0.03);
-transition: all 0.3s ease;
+/* Slide Container */
+.adsSlider {
+  display: flex;
+  height: 100%;
+  transition: transform 0.8s ease-in-out;
 }
 
-.adItem img {
-height: 55px;
-object-fit: contain;
-opacity: 0.9;
-transition: all 0.3s ease;
+/* Einzelne Ad */
+.adSlide {
+  min-width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+  box-sizing: border-box;
 }
 
-/* HOVER */
-.adItem:hover {
-transform: translateY(-2px);
-background: rgba(255,255,255,0.06);
+/* Bild */
+.adSlide img {
+  max-height: 70px;
+  max-width: 95%;
+  object-fit: contain;
+
+  filter: brightness(0.95);
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-.adItem:hover img {
-transform: scale(1.1);
-filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+.adSlide img:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
 }
 
-/* ANIMATION */
-@keyframes scrollAds {
-0% { transform: translateX(0); }
-100% { transform: translateX(-50%); }
+/* Klickfläche */
+.adSlide a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
 /* =========================
