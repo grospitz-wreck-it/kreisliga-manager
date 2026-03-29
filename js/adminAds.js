@@ -40,29 +40,20 @@ function handleUpload(callback){
 // =========================
 // ➕ SAVE AD
 // =========================
-function saveAd(){
+function saveAds() {
+  const inputs = document.querySelectorAll(".adInput");
+  const ads = [];
 
-  handleUpload((base64Image)=>{
-
-    const newAd = {
-      name: document.getElementById("adName").value || "Unbenannt",
-      image: base64Image,
-      link: document.getElementById("adLink").value,
-      start: document.getElementById("adStart").value,
-      end: document.getElementById("adEnd").value,
-      weight: parseInt(document.getElementById("adWeight").value) || 1
-    };
-
-    ads.push(newAd);
-
-    persistAds();
-
-    renderAds();
-
-    showPreview(newAd.image);
-
-    console.log("Ad gespeichert:", newAd);
+  inputs.forEach(input => {
+    const value = input.value.trim();
+    if (value) ads.push(value);
   });
+
+  localStorage.setItem("kreisliga_ads", JSON.stringify(ads));
+
+  console.log("✅ Ads gespeichert:", ads);
+
+  alert("Ads gespeichert!");
 }
 
 // =========================
