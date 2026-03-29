@@ -306,52 +306,48 @@ background: rgba(76,175,80,0.18);
 background: rgba(244,67,54,0.15);
 }
 
-/* =========================
-📢 LEADERBOARD – FIT TO HEIGHT (FIX)
-========================= */
+/* 🔥 FORCE LEADERBOARD FIX */
 
 #adBanner{
-  width:100%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin:10px 0;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
 }
 
 #adTrack{
-  width:100%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  width:100% !important;
 }
 
-/* Banner Container */
+/* 🔒 feste Banner-Größe */
 .leaderboardAd{
-  height:90px;            /* 🔥 feste Höhe */
-  width:100%;
-  max-width:970px;        /* Desktop Limit */
+  height:90px !important;
+  width:970px !important;
+  max-width:100% !important;
 
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+
+  overflow:hidden !important;
   background:#000;
-  border-radius:10px;
-  overflow:hidden;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
 }
 
-/* 🔥 DAS IST DER WICHTIGE PART */
+/* 🔥 DAS IST DER KEY FIX */
 .leaderboardAd img{
-  height:100%;            /* 👉 Höhe ist führend */
-  width:auto;             /* 👉 Breite passt sich an */
-  display:block;
+  height:100% !important;
+  width:auto !important;
+  max-width:none !important;
+  display:block !important;
 }
 
 /* 📱 Mobile */
 @media (max-width:600px){
   .leaderboardAd{
-    height:50px;
-    max-width:320px;
+    width:320px !important;
+    height:50px !important;
   }
 }
 
