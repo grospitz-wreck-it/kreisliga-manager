@@ -114,3 +114,6 @@ window.startAdEngine = function(){
 
   }, 500);
 };
+window.serveAd = function(){
+  return getMatchingAds();
+};
