@@ -85,14 +85,24 @@ function buildAdTrack() {
 
   const ads = JSON.parse(localStorage.getItem("kreisliga_ads")) || [];
 
-  ads.forEach(url => {
+  ads.forEach(ad => {
+
     const div = document.createElement("div");
     div.className = "adItem";
 
     const img = document.createElement("img");
-    img.src = url;
+    img.src = ad.image;
 
-    div.appendChild(img);
+    if (ad.link) {
+      const a = document.createElement("a");
+      a.href = ad.link;
+      a.target = "_blank";
+      a.appendChild(img);
+      div.appendChild(a);
+    } else {
+      div.appendChild(img);
+    }
+
     track.appendChild(div);
   });
 }
