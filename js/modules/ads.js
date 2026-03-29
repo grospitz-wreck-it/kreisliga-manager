@@ -17,14 +17,13 @@ function saveCampaigns(data){
 // GAME CONTEXT
 // =====================
 function getGameContext(){
-
   return {
     country: "DE",
-
     state: null,
     district: window.game?.league?.key || null,
 
-    team: window.game?.team?.selected?.name || null
+    // ❗ GANZES OBJEKT, NICHT .name
+    team: window.game?.team?.selected || null
   };
 }
 // =====================
