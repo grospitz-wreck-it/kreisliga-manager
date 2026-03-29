@@ -307,7 +307,7 @@ background: rgba(244,67,54,0.15);
 }
 
 /* =========================
-📢 LEADERBOARD ADS (STANDARD)
+📢 LEADERBOARD – FIT TO HEIGHT (FIX)
 ========================= */
 
 #adBanner{
@@ -325,35 +325,34 @@ background: rgba(244,67,54,0.15);
   align-items:center;
 }
 
-/* DESKTOP 970x90 */
+/* Banner Container */
 .leaderboardAd{
-  width:970px;
-  height:90px;
-  max-width:100%;
+  height:90px;            /* 🔥 feste Höhe */
+  width:100%;
+  max-width:970px;        /* Desktop Limit */
 
-  background:#111;
+  background:#000;
   border-radius:10px;
   overflow:hidden;
 
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
 }
 
+/* 🔥 DAS IST DER WICHTIGE PART */
 .leaderboardAd img{
-  height:100%;
-  width:auto;
+  height:100%;            /* 👉 Höhe ist führend */
+  width:auto;             /* 👉 Breite passt sich an */
   display:block;
 }
 
-/* MOBILE 320x50 */
-@media (max-width: 600px){
-
+/* 📱 Mobile */
+@media (max-width:600px){
   .leaderboardAd{
-    width:320px;
     height:50px;
+    max-width:320px;
   }
-
 }
 
 /* =========================
