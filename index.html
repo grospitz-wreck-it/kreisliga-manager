@@ -6,146 +6,188 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kreisliga Manager</title>
 
-  <!-- ✅ DEINE EXTERNE CSS -->
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui;
+      background: #f2f2f2;
+    }
 
-  <link rel="stylesheet" href="style.css">
+    /* 🔥 MINIMAL Desktop Fix */
+    .container {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #2e7d32;
+      color: white;
+      font-weight: bold;
+    }
+
+    #score {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    #match {
+      text-align: center;
+      font-size: 16px;
+    }
+
+    #progressBar {
+      height: 10px;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #progressFill {
+      height: 100%;
+      width: 0%;
+      background: green;
+    }
+
+    #liveFeed {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      max-height: 250px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    #liveFeed p {
+      margin: 6px 0;
+    }
+
+    /* 🔥 ADS FIX (minimal, stabil) */
+    #adBanner {
+      width: 100%;
+      height: 70px;
+      background: #111;
+      border-radius: 10px;
+      padding: 8px;
+      box-sizing: border-box;
+      overflow: hidden;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #adTrack {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .adItem img {
+      height: 50px;
+      max-width: 120px;
+      object-fit: contain;
+    }
+
+  </style>
+
 </head>
-
 <body>
 
-  <!-- 🔥 NEU: App Wrapper -->
+  <div class="container">
 
-  <div class="appWrapper">
-    
-<!-- 🏆 HEADER -->
-<div class="header">
-  <div class="headerOverlay"></div>
-  <div class="headerContent">
-    <div>
-      <div class="gameTitle">Kreisliga Manager</div>
-      <div class="subTitle">Dein Weg nach oben</div>
-    </div>
-    <div id="menuBtn">☰</div>
-  </div>
+<input id="nameInput" placeholder="Dein Name">
+
+<select id="leagueSelect"></select>
+<select id="teamSelect"></select>
+<div id="currentMatch"></div>
+
+<button id="mainButton">Spiel starten</button>
+<button onclick="saveGame()">Speichern</button>
+<button onclick="loadGame()">Laden</button>
+<button onclick="clearSave()">Reset</button>
+
+<div id="score">0 : 0</div>
+<div id="match"></div>
+
+<div id="progressBar">
+  <div id="progressFill"></div>
 </div>
 
-<!-- 📱 OVERLAY -->
-<div id="overlay"></div>
-
-<!-- 📱 SIDE PANEL -->
-<div id="setupPanel">
-  <div class="panel">
-    <h2>Manager Setup</h2>
-
-    <input id="nameInput" placeholder="Dein Name">
-    <select id="leagueSelect"></select>
-    <select id="teamSelect"></select>
-
-    <button id="mainButton">Spiel starten</button>
-    <button onclick="saveGame()">Speichern</button>
-    <button onclick="loadGame()">Laden</button>
-    <button onclick="clearSave()">Reset</button>
-  </div>
+<div>
+  <label><b>🎯 Taktik anpassen</b></label>
+  <select id="tacticSelect">
+    <option value="balanced">Ausgeglichen</option>
+    <option value="offensive">Offensiv</option>
+    <option value="defensive">Defensiv</option>
+    <option value="pressing">Pressing</option>
+    <option value="counter">Konter</option>
+  </select>
 </div>
 
-<!-- 🧱 MAIN LAYOUT -->
-<div class="layout">
+<div id="schedule"></div>
 
-  <!-- 🎮 MAIN PANEL -->
-  <div class="mainPanel">
+<div id="liveFeed"></div>
 
-    <!-- ⚽ SCORE -->
-    <div class="panel">
-      <div class="scoreboard big">
-        <div id="match"></div>
-        <div id="score">0 : 0</div>
-      </div>
+<div id="table">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Team</th>
+        <th>Sp</th>
+        <th>Tore</th>
+        <th>Diff</th>
+        <th>Punkte</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
 
-      <!-- 📊 Momentum -->
-      <div class="momentum">
-        <div id="momentumBar"></div>
-      </div>
-    </div>
-
-    <!-- 🎯 TAKTIK -->
-    <div class="panel">
-      <h2>🎯 Taktik</h2>
-      <select id="tacticSelect">
-        <option value="balanced">Ausgeglichen</option>
-        <option value="offensive">Offensiv</option>
-        <option value="defensive">Defensiv</option>
-        <option value="pressing">Pressing</option>
-        <option value="counter">Konter</option>
-      </select>
-    </div>
-
-    <!-- 📺 LIVE MATCH -->
-    <div class="panel">
-      <h2>📺 Live-Spiel</h2>
-      <div id="liveFeed" class="live"></div>
-    </div>
-
-  </div>
-
-  <!-- 📊 SIDE PANEL -->
-  <div class="sidePanel">
-
-    <!-- 📅 SPIELPLAN -->
-    <div class="panel">
-      <h2>📅 Spielplan</h2>
-      <div id="schedule"></div>
-    </div>
-
-    <!-- 🏆 TABELLE -->
-    <div class="panel">
-      <h2>🏆 Tabelle</h2>
-      <table class="modernTable">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Team</th>
-            <th>Sp</th>
-            <th>Tore</th>
-            <th>Diff</th>
-            <th>Punkte</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
-
-    <!-- 📢 ADS -->
-    <div id="adBanner">
-      <div id="adTrack"></div>
-    </div>
-
-  </div>
-
+<!-- 📢 ADS -->
+<div id="adBanner">
+  <div id="adTrack"></div>
 </div>
 
   </div>
 
-  <!-- 🧠 SCRIPTS -->
+  <!-- 🧠 SCRIPTS (FIXED ORDER + defer) -->
 
-  <script src="js/core/state.js"></script>
+  <script src="js/core/state.js" defer></script>
 
-  <script src="js/ui/ui.js"></script>
+  <script src="js/ui/ui.js" defer></script>
 
-  <script src="js/modules/league.js"></script>
+  <script src="js/modules/league.js" defer></script>
 
-  <script src="js/modules/table.js"></script>
+  <script src="js/modules/table.js" defer></script>
 
-  <script src="js/modules/scheduler.js"></script>
+  <script src="js/modules/scheduler.js" defer></script>
 
-  <script src="js/services/storage.js"></script>
+  <script src="js/services/storage.js" defer></script>
 
-  <script src="js/core/engine.js"></script>
+  <script src="js/core/engine.js" defer></script>
 
   <script src="js/ui/bindings.js" defer></script>
 
-  <script src="js/modules/ads.js"></script>
+  <script src="js/modules/ads.js" defer></script>
 
-  <script src="js/main.js"></script>
+  <script src="js/main.js" defer></script>
 
 </body>
 </html>
