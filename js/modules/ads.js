@@ -86,8 +86,12 @@ window.startAdEngine = function(){
 
   console.log("📢 Leaderboard Ads gestartet");
 
+  // 🔥 SOFORT erstes Ad rendern
   renderAds();
 
-  // 👉 alle 6 Sekunden wechseln
+  // 🔄 regelmäßig neu laden
+  setInterval(renderAds, 10000);
+
+  // 🔄 Rotation (falls mehrere Ads)
   setInterval(rotateAds, 6000);
 };
