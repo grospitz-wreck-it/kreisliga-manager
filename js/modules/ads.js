@@ -105,30 +105,57 @@ function renderAds(){
   const track = document.getElementById("adTrack");
   if(!track) return;
 
+  let campaigns = getCampaigns();
+  const ctx = getGameContext();
+
+  // 🔥 Filter wie in serveAd – aber OHNE Verbrauch
+  campaigns = campaigns.filter(c => {
+
+    if(c.start && Date.now() < c.start) return false;
+    if(c.end && Date.now() > c.end) return false;
+
+    if(c.type === "TKP" &&
+       c.impressionsDelivered >= c.impressionsBooked){
+      return false;
+    }
+
+    return match(c, ctx);
+  });
+
+  if(!campaigns.length){
+    track.innerHTML = "<span style='color:white'>Keine Werbung aktiv</span>";
+    return;
+  }
+
+  // 👉 max 3 anzeigen
+  const selected = campaigns.slice(0,3);
+
   let output = "";
 
-  for(let i=0;i<3;i++){
+  selected.forEach(c => {
 
-    const ad = serveAd();
+    const imgSrc = c.image || "https://via.placeholder.com/200x80?text=Ad";
 
-    if(ad){
-      output += `
-        <div class="adItem">
-          ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
-          <img src="${ad.image}">
-          ${ad.link ? `</a>` : ""}
-        </div>
-      `;
+    output += `
+      <div class="adItem">
+        ${c.link ? `<a href="${c.link}" target="_blank">` : ""}
+        <img src="${imgSrc}" style="max-height:80px;">
+        ${c.link ? `</a>` : ""}
+      </div>
+    `;
+
+    // 👉 Tracking HIER statt in serveAd
+    c.impressionsDelivered = (c.impressionsDelivered || 0) + 1;
+
+    if(c.type === "TKP"){
+      c.spent = (c.spent || 0) + (c.cpm / 1000);
     }
-  }
+  });
 
-  if(!output){
-    output = "<span style='color:white'>Keine Werbung aktiv</span>";
-  }
+  saveCampaigns(campaigns);
 
   track.innerHTML = output;
 }
-
 // =====================
 // INIT
 // =====================
