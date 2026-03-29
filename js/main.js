@@ -36,17 +36,26 @@ function startAdEngine(){
   }
 
   // 🔥 WARTE BIS ADS READY
-  const waitForAds = setInterval(() => {
+ function waitForAdsAndStart(){
 
-    if(typeof window.serveAd === "function"){
-      clearInterval(waitForAds);
-      console.log("✅ Ads geladen → starte Rotation");
-      runAds();
+  const interval = setInterval(() => {
+
+    if(typeof window.startAdEngine === "function"){
+
+      console.log("✅ Ads geladen → starte Engine");
+
+      clearInterval(interval);
+
+      window.startAdEngine();
     } else {
-      console.log("⏳ warte auf Ads...");
+      console.log("⏳ warte auf ads.js...");
     }
 
-  }, 300);
+  }, 200);
+}
+
+// 👉 beim Init aufrufen
+waitForAdsAndStart();
 
   function runAds(){
 
