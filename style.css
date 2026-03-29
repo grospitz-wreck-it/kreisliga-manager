@@ -330,11 +330,64 @@ button {
   }
 }
 
-/* 💣 GLOBAL OVERRIDE (falls irgendwas reinfunkt) */
-#adBanner img{
-  width:auto !important;
+/* =========================
+💣 ADS ABSOLUTE LOCK FIX
+========================= */
+
+#adBanner{
+  position: relative !important;
+  height: 90px !important;
+  min-height: 90px !important;
+  max-height: 90px !important;
+
+  overflow: hidden !important;
 }
-/* 🔥 FINAL FIX – Container killen */
-.container {
-  display: block !important;
+
+/* verhindert JEDE Vererbung */
+#adBanner *{
+  max-height: 90px !important;
+}
+
+/* Track fixieren */
+#adTrack{
+  position: absolute !important;
+  inset: 0 !important;
+
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* echtes Leaderboard */
+.leaderboardAd{
+  height: 90px !important;
+  width: 100% !important;
+  max-width: 970px !important;
+
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+
+  overflow: hidden !important;
+}
+
+/* 🔥 DAS ist der wichtigste Teil */
+.leaderboardAd img{
+  height: 90px !important;
+  width: auto !important;
+  max-height: 90px !important;
+  object-fit: contain !important;
+}
+
+/* Mobile */
+@media (max-width:600px){
+  #adBanner{
+    height: 50px !important;
+    min-height: 50px !important;
+    max-height: 50px !important;
+  }
+
+  .leaderboardAd img{
+    height: 50px !important;
+  }
 }
