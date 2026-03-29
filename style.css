@@ -399,3 +399,25 @@ button {
   font-weight: bold;
   border: 1px solid #ccc;
 }
+#adBanner {
+  overflow: hidden;
+  background: #111;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+#adTrack {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  animation: scrollAds 20s linear infinite;
+}
+
+.adItem img {
+  height: 50px;
+}
+
+@keyframes scrollAds {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
