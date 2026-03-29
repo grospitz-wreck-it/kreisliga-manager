@@ -1,160 +1,69 @@
-// =========================
-// 📢 ADS SYSTEM
-// =========================
+const STORAGE_KEY = "kreisliga_ads";
 
-// 👉 Default Ads (Fallback)
-const DEFAULT_ADS = [
-  {
-    name: "Kreisliga Sponsor",
-    image: "ads/fallback.png",
-    link: "",
-    weight: 1
-  }
-];
+function startAds() {
+if (window.adsInitialized) return;
+window.adsInitialized = true;
 
-// =========================
-// 📦 ADMIN ADS LADEN
-// =========================
-function getAdminAds(){
+console.log("📢 Ads gestartet");
 
-  try{
-    const stored = JSON.parse(localStorage.getItem("ads") || "[]");
-
-    return stored.map(ad => ({
-      name: ad.name || "Anzeige",
-      image: ad.image || "ads/fallback.png",
-      link: ad.link || "",
-      start: ad.start || null,
-      end: ad.end || null,
-      weight: ad.weight || 1
-    }));
-
-  } catch(e){
-    console.error("❌ Admin Ads Fehler:", e);
-    return [];
-  }
+buildAdTrack();
 }
 
-// =========================
-// ⏱️ FILTER AKTIVE ADS
-// =========================
-function getActiveAds(){
-
-  const now = new Date();
-
-  const allAds = [
-    ...DEFAULT_ADS,
-    ...getAdminAds()
-  ];
-
-  return allAds.filter(ad => {
-
-    if(ad.start && new Date(ad.start) > now) return false;
-    if(ad.end && new Date(ad.end) < now) return false;
-
-    return true;
-  });
-}
-
-// =========================
-// 🎯 GEWICHTETE AUSWAHL
-// =========================
-function pickWeightedAd(list){
-
-  if(!list.length) return null;
-
-  const total = list.reduce((sum, ad) => sum + (ad.weight || 1), 0);
-  let r = Math.random() * total;
-
-  for(let ad of list){
-    r -= (ad.weight || 1);
-    if(r <= 0) return ad;
-  }
-
-  return list[0];
-}
-
-// =========================
-// 🧱 BANNER BAUEN
-// =========================
 function buildAdTrack() {
-  const track = document.getElementById("adTrack");
-  if (!track) return;
+const track = document.getElementById("adTrack");
+if (!track) return;
 
-  track.innerHTML = "";
+track.innerHTML = "";
 
-  const ads = JSON.parse(localStorage.getItem("kreisliga_ads")) || [];
+let ads = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-  ads.forEach(ad => {
+// 📅 Nur aktive Ads filtern
+const today = new Date().toISOString().split("T")[0];
 
-    const div = document.createElement("div");
-    div.className = "adItem";
+ads = ads.filter(ad => {
+if (ad.start && ad.start > today) return false;
+if (ad.end && ad.end < today) return false;
+return true;
+});
 
-    const img = document.createElement("img");
-    img.src = ad.image;
-
-    if (ad.link) {
-      const a = document.createElement("a");
-      a.href = ad.link;
-      a.target = "_blank";
-      a.appendChild(img);
-      div.appendChild(a);
-    } else {
-      div.appendChild(img);
-    }
-
-    track.appendChild(div);
-  });
+if (!ads.length) {
+track.innerHTML = "<span style='color:white'>Keine Werbung aktiv</span>";
+return;
 }
 
-  // =========================
-  // 👉 NUR EINE AD (realistisch)
-  // =========================
-  const ad = pickWeightedAd(active);
+// 🎯 Gewichtung berücksichtigen
+const weightedAds = [];
 
-  const div = document.createElement("div");
-  div.className = "adItem";
+ads.forEach(ad => {
+const w = ad.weight || 1;
+for (let i = 0; i < w; i++) {
+weightedAds.push(ad);
+}
+});
 
-  const img = document.createElement("img");
-  img.src = ad.image;
-  img.alt = ad.name;
+// 👉 Max 5 Ads anzeigen (UI sauber halten)
+const selectedAds = weightedAds.slice(0, 5);
 
-  // 👉 klickbar machen (optional)
-  if(ad.link){
-    img.style.cursor = "pointer";
-    img.onclick = () => window.open(ad.link, "_blank");
-  }
+selectedAds.forEach(ad => {
+const div = document.createElement("div");
+div.className = "adItem";
 
+```
+const img = document.createElement("img");
+img.src = ad.image;
+
+if (ad.link) {
+  const a = document.createElement("a");
+  a.href = ad.link;
+  a.target = "_blank";
+  a.appendChild(img);
+  div.appendChild(a);
+} else {
   div.appendChild(img);
-  track.appendChild(div);
 }
 
-// =========================
-// 🚀 START ADS
-// =========================
-function startAds(){
+track.appendChild(div);
+```
 
-  console.log("🚀 Ads gestartet");
-
-  if(window.adsInitialized){
-    console.log("⚠️ Ads bereits initialisiert");
-    return;
-  }
-
-  window.adsInitialized = true;
-
-  buildAdTrack();
+});
 }
-
-// =========================
-// 🔄 OPTIONAL REFRESH
-// =========================
-function refreshAds(){
-  buildAdTrack();
-}
-
-// =========================
-// 🌍 GLOBAL
-// =========================
-window.startAds = startAds;
-window.refreshAds = refreshAds;
