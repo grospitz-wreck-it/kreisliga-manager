@@ -245,6 +245,8 @@ body {
   display:flex;
   justify-content:center;
   align-items:center;
+  height:90px !important;   /* 🔥 DAS FEHLT */
+  flex: 0 0 auto !important; /* 🔥 verhindert Stretch */
 }
 
 /* 🔒 echtes Leaderboard */
