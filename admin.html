@@ -131,15 +131,18 @@ small{color:#666}
 
 <h3>🎯 Targeting</h3>
 
-<div class="targeting">
+<h3>🎯 Targeting</h3>
 
-<label><input type="checkbox" id="global"><span>Global</span></label>
-<label><input type="checkbox" id="country"><span>Deutschland</span></label>
-<label><input type="checkbox" id="state"><span>Bundesland</span></label>
-<label><input type="checkbox" id="district"><span>Kreis</span></label>
-<label><input type="checkbox" id="team"><span>Mannschaft</span></label>
+<select id="targetType" onchange="updateTargetingUI()">
+  <option value="global">Global</option>
+  <option value="country">Land</option>
+  <option value="state">Bundesland</option>
+  <option value="district">Kreis / Liga</option>
+  <option value="team">Team</option>
+</select>
 
-</div>
+<!-- Dynamische Felder -->
+<div id="targetFields"></div>
 
 <br>
 
