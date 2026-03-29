@@ -3,86 +3,186 @@
 <head>
 <meta charset="UTF-8">
 <title>Ad System V2</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
-body{font-family:Arial;background:#111;color:#fff;padding:20px}
-input,select{margin:5px;padding:8px}
-.box{background:#222;padding:15px;margin:10px 0}
-button{cursor:pointer}
+body{
+  font-family:'Inter',system-ui;
+  background:#f5f7fb;
+  margin:0;
+  color:#1a1a1a;
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+
+h1{
+  font-size:28px;
+  margin-bottom:20px;
+}
+
+.box{
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.05);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+input,select{
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  font-size:14px;
+  width:100%;
+}
+
+input:focus,select:focus{
+  outline:none;
+  border-color:#4CAF50;
+  box-shadow:0 0 0 3px rgba(76,175,80,0.15);
+}
+
+button{
+  margin-top:10px;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#4CAF50;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#43a047;
+}
+
+button.danger{
+  background:#e53935;
+}
+
+.targeting{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.targeting label{
+  background:#f1f3f7;
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.adRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 5px 15px rgba(0,0,0,0.04);
+  margin-bottom:10px;
+}
+
+.adLeft{
+  display:flex;
+  gap:15px;
+  align-items:center;
+}
+
+.adRow img{
+  height:50px;
+  border-radius:8px;
+}
+
+small{
+  color:#666;
+}
 </style>
 </head>
+
 <body>
 
-<h1>🚀 Ad System V2 (Full)</h1>
+<div class="container">
 
+<h1>🚀 Ad System Dashboard</h1>
+
+<!-- ===================== -->
+<!-- CREATE -->
+<!-- ===================== -->
 <div class="box">
 <h2>Neue Kampagne</h2>
 
-<input id="name" placeholder="Name">
+<div class="grid">
+<input id="name" placeholder="Kampagnenname">
 <input id="customer" placeholder="Kunde">
 <input id="budget" type="number" placeholder="Budget €">
-
 <select id="type">
 <option value="TKP">TKP</option>
 <option value="SPONSOR">Sponsor</option>
 </select>
+</div>
 
-<h3>🌍 Targeting</h3>
+<h3>🎯 Targeting</h3>
 
+<div class="targeting">
 <label><input type="checkbox" id="global"> Global</label>
 <label><input type="checkbox" id="country"> Deutschland</label>
 <label><input type="checkbox" id="state"> Bundesland</label>
 <label><input type="checkbox" id="district"> Kreis</label>
 <label><input type="checkbox" id="team"> Mannschaft</label>
-
-<br><br>
-
-<!-- 🔥 NEU: ECHTES TARGETING -->
-<select id="leagueSelect">
-<option value="">-- Liga wählen --</option>
-</select>
-
-<select id="teamSelect">
-<option value="">-- Team wählen --</option>
-</select>
+</div>
 
 <br>
 
+<select id="leagueSelect"></select>
+<select id="teamSelect"></select>
+
 <input id="donation" type="number" placeholder="Spende %" value="0">
 
-<h3>Banner</h3>
 <input type="file" id="image">
 
-<button onclick="createCampaign()">Speichern</button>
+<button onclick="createCampaign()">💾 Kampagne speichern</button>
 </div>
 
+<!-- ===================== -->
+<!-- LIST -->
+<!-- ===================== -->
 <div class="box">
 <h2>📊 Kampagnen</h2>
 <div id="list"></div>
 </div>
 
+</div>
+
 <script>
 const KEY="ad_v2";
 
-// =====================
-// 📦 LOAD / SAVE
-// =====================
 function getData(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
 function saveData(d){localStorage.setItem(KEY,JSON.stringify(d))}
 
 // =====================
-// 🔥 LEAGUES LADEN
+// LEAGUES
 // =====================
 function loadLeagues(){
 
- if(!window.LEAGUES){
-  console.warn("LEAGUES fehlt");
-  return;
- }
+ if(!window.LEAGUES) return;
 
- const leagueSelect=document.getElementById("leagueSelect");
- const teamSelect=document.getElementById("teamSelect");
-
- leagueSelect.innerHTML=`<option value="">-- Liga wählen --</option>`;
+ leagueSelect.innerHTML=`<option value="">Liga wählen</option>`;
 
  Object.keys(LEAGUES).forEach(key=>{
   const opt=document.createElement("option");
@@ -91,24 +191,23 @@ function loadLeagues(){
   leagueSelect.appendChild(opt);
  });
 
- leagueSelect.addEventListener("change",()=>{
+ leagueSelect.onchange=()=>{
+  teamSelect.innerHTML=`<option value="">Team wählen</option>`;
+
   const key=leagueSelect.value;
-
-  teamSelect.innerHTML=`<option value="">-- Team wählen --</option>`;
-
   if(!key) return;
 
-  LEAGUES[key].teams.forEach(team=>{
+  LEAGUES[key].teams.forEach(t=>{
     const opt=document.createElement("option");
-    opt.value=team;
-    opt.textContent=team;
+    opt.value=t;
+    opt.textContent=t;
     teamSelect.appendChild(opt);
   });
- });
+ };
 }
 
 // =====================
-// CPM LOGIK
+// CPM
 // =====================
 function getCPM(t){
  if(t.team) return 20;
@@ -119,7 +218,7 @@ function getCPM(t){
 }
 
 // =====================
-// CREATE CAMPAIGN
+// CREATE
 // =====================
 function createCampaign(){
 
@@ -138,9 +237,6 @@ function createCampaign(){
   team:team.checked
  };
 
- const leagueId=leagueSelect.value;
- const teamId=teamSelect.value;
-
  const cpm=getCPM(targeting);
  const b=parseFloat(budget.value);
 
@@ -156,11 +252,8 @@ function createCampaign(){
   impressionsDelivered:0,
   donation:parseFloat(donation.value)||0,
   targeting,
-
-  // 🔥 NEU
-  leagueId,
-  teamId,
-
+  leagueId:leagueSelect.value,
+  teamId:teamSelect.value,
   start:Date.now(),
   end:Date.now()+1000*60*60*24*30,
   image:e.target.result
@@ -176,97 +269,69 @@ function createCampaign(){
 }
 
 // =====================
-// PACING
-// =====================
-function shouldServe(c){
- const totalDays=(c.end-c.start)/86400000;
- const passedDays=(Date.now()-c.start)/86400000;
- const expected=(passedDays/totalDays)*c.impressionsBooked;
- return c.impressionsDelivered <= expected*1.2;
-}
-
-// =====================
-// 🔥 TARGETING MATCH FIX
+// MATCH
 // =====================
 function match(c,ctx){
-
- // 🔥 TEAM HAT PRIORITÄT
- if(c.teamId){
-  return c.teamId === ctx.team;
- }
-
- if(c.leagueId){
-  return c.leagueId === ctx.league;
- }
-
- if(c.targeting.team) return ctx.team;
- if(c.targeting.district) return ctx.district;
- if(c.targeting.state) return ctx.state;
- if(c.targeting.country) return ctx.country;
-
+ if(c.teamId) return c.teamId===ctx.team;
+ if(c.leagueId) return c.leagueId===ctx.league;
  return true;
 }
 
 // =====================
-// DELIVERY ENGINE
+// SERVE
 // =====================
-function serveAd(ctx={global:true}){
+function serveAd(ctx={}){
 
- let data=getData();
+ let d=getData();
 
- data=data.filter(c=>{
-  if(c.type==="TKP"){
-   if(c.impressionsDelivered>=c.impressionsBooked) return false;
-  }
-  return shouldServe(c);
+ d=d.filter(c=>{
+  if(c.type==="TKP" && c.impressionsDelivered>=c.impressionsBooked) return false;
+  return true;
  });
 
- data=data.filter(c=>match(c,ctx));
+ d=d.filter(c=>match(c,ctx));
 
- if(!data.length) return null;
+ if(!d.length) return null;
 
- const c=data[Math.floor(Math.random()*data.length)];
+ const c=d[Math.floor(Math.random()*d.length)];
 
  c.impressionsDelivered++;
+ if(c.type==="TKP") c.spent+=c.cpm/1000;
 
- if(c.type==="TKP"){
-  c.spent+=c.cpm/1000;
- }
-
- saveData(data);
-
+ saveData(d);
  return c;
 }
 
 // =====================
-// UI
+// RENDER UI
 // =====================
 function render(){
 
- const d=getData();
  list.innerHTML="";
 
- d.forEach(c=>{
-
- const donationVal=c.spent*(c.donation/100);
+ getData().forEach(c=>{
 
  const div=document.createElement("div");
- div.className="box";
+ div.className="adRow";
 
  div.innerHTML=`
- <b>${c.name}</b><br>
- Budget: €${c.budget}<br>
- Spend: €${c.spent.toFixed(2)}<br>
- Impressions: ${c.impressionsDelivered}/${Math.floor(c.impressionsBooked)}<br>
- Liga: ${c.leagueId || "Global"}<br>
- Team: ${c.teamId || "-"}<br>
- 💚 Spende: €${donationVal.toFixed(2)}<br>
- <button onclick="del(${c.id})">❌</button>
+ <div class="adLeft">
+  <img src="${c.image}">
+  <div>
+   <b>${c.name}</b><br>
+   <small>${c.customer}</small><br>
+   <small>${c.leagueId||"Global"} / ${c.teamId||"-"}</small>
+  </div>
+ </div>
+
+ <div>
+  €${c.spent.toFixed(2)}<br>
+  <button class="danger" onclick="del(${c.id})">❌</button>
+ </div>
  `;
 
  list.appendChild(div);
  });
-
 }
 
 function del(id){
@@ -274,20 +339,6 @@ function del(id){
  d=d.filter(x=>x.id!==id);
  saveData(d);
  render();
-}
-
-// =====================
-// 🎮 GAME HOOK
-// =====================
-function renderAdToGame(containerId,context){
-
- const ad=serveAd(context);
- if(!ad) return;
-
- const el=document.getElementById(containerId);
- if(!el) return;
-
- el.innerHTML=`<img src="${ad.image}" style="max-width:100%">`;
 }
 
 // =====================
