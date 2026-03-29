@@ -34,7 +34,9 @@ function init(){
 
   // UI Events binden
   bindUI();
-
+  if(window.initAds){
+  initAds();
+}
   // Optional: Save laden
   if(typeof loadGame === "function"){
     const loaded = loadGame();
