@@ -44,12 +44,14 @@ function getMatchingAds(){
 // 🎬 RENDER LEADERBOARD
 // =========================
 function renderAds(){
-
+  console.log("ADS:", ads);
+console.log("HTML:", el.innerHTML);
+el.style.background = "red";
   const el = document.getElementById("adTrack");
   if(!el) return;
 
   const ads = getMatchingAds();
-
+  
   if(!ads.length){
     el.innerHTML = `<div class="leaderboardAd" style="color:#fff">Keine Werbung</div>`;
     return;
