@@ -391,33 +391,30 @@ button {
   font-weight: bold;
   color: orange;
 }
+
 #adBanner {
-  background: white;
-  border-radius: 10px;
-  padding: 10px;
-  text-align: center;
-  font-weight: bold;
-  border: 1px solid #ccc;
-}
-#adBanner {
-  overflow: hidden;
+  width: 100%;
   background: #111;
   border-radius: 10px;
-  padding: 5px;
+  padding: 8px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 #adTrack {
   display: flex;
-  gap: 20px;
   align-items: center;
-  animation: scrollAds 20s linear infinite;
+  justify-content: center; /* 👉 zentriert */
+  gap: 20px;
+  width: 100%;
+}
+
+.adItem {
+  flex: 0 0 auto;
 }
 
 .adItem img {
   height: 50px;
-}
-
-@keyframes scrollAds {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  max-width: 120px;
+  object-fit: contain;
 }
