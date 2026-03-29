@@ -73,16 +73,33 @@ window.loadTeamsForLeague = function(){
   const leagueKey = document.getElementById("leagueSelectAds")?.value;
   const teamSelect = document.getElementById("teamSelectAds");
 
-  if(!teamSelect || !leagueKey || !LEAGUES[leagueKey]) return;
+  if(!leagueKey){
+    console.warn("⚠️ Keine Liga gewählt");
+    return;
+  }
+
+  if(!teamSelect){
+    console.error("❌ teamSelectAds fehlt");
+    return;
+  }
+
+  const league = LEAGUES[leagueKey];
+
+  if(!league){
+    console.error("❌ Liga nicht gefunden:", leagueKey);
+    return;
+  }
 
   teamSelect.innerHTML = `<option value="all">Alle Teams</option>`;
 
-  LEAGUES[leagueKey].teams.forEach(team => {
+  league.teams.forEach(team => {
     const opt = document.createElement("option");
     opt.value = team;
     opt.textContent = team;
     teamSelect.appendChild(opt);
   });
+
+  console.log("✅ Teams geladen:", league.teams.length);
 };
 
 // =====================
