@@ -1,7 +1,3 @@
-<!-- ===================================== -->
-<!-- COMPLETE NEXT-LEVEL AD SYSTEM V2 -->
-<!-- COPY & REPLACE YOUR CURRENT ADMIN -->
-<!-- ===================================== -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -20,6 +16,7 @@ button{cursor:pointer}
 
 <div class="box">
 <h2>Neue Kampagne</h2>
+
 <input id="name" placeholder="Name">
 <input id="customer" placeholder="Kunde">
 <input id="budget" type="number" placeholder="Budget €">
@@ -29,14 +26,27 @@ button{cursor:pointer}
 <option value="SPONSOR">Sponsor</option>
 </select>
 
-<h3>Targeting</h3>
+<h3>🌍 Targeting</h3>
+
 <label><input type="checkbox" id="global"> Global</label>
 <label><input type="checkbox" id="country"> Deutschland</label>
 <label><input type="checkbox" id="state"> Bundesland</label>
 <label><input type="checkbox" id="district"> Kreis</label>
 <label><input type="checkbox" id="team"> Mannschaft</label>
 
+<br><br>
+
+<!-- 🔥 NEU: ECHTES TARGETING -->
+<select id="leagueSelect">
+<option value="">-- Liga wählen --</option>
+</select>
+
+<select id="teamSelect">
+<option value="">-- Team wählen --</option>
+</select>
+
 <br>
+
 <input id="donation" type="number" placeholder="Spende %" value="0">
 
 <h3>Banner</h3>
@@ -53,8 +63,49 @@ button{cursor:pointer}
 <script>
 const KEY="ad_v2";
 
+// =====================
+// 📦 LOAD / SAVE
+// =====================
 function getData(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
 function saveData(d){localStorage.setItem(KEY,JSON.stringify(d))}
+
+// =====================
+// 🔥 LEAGUES LADEN
+// =====================
+function loadLeagues(){
+
+ if(!window.LEAGUES){
+  console.warn("LEAGUES fehlt");
+  return;
+ }
+
+ const leagueSelect=document.getElementById("leagueSelect");
+ const teamSelect=document.getElementById("teamSelect");
+
+ leagueSelect.innerHTML=`<option value="">-- Liga wählen --</option>`;
+
+ Object.keys(LEAGUES).forEach(key=>{
+  const opt=document.createElement("option");
+  opt.value=key;
+  opt.textContent=LEAGUES[key].name;
+  leagueSelect.appendChild(opt);
+ });
+
+ leagueSelect.addEventListener("change",()=>{
+  const key=leagueSelect.value;
+
+  teamSelect.innerHTML=`<option value="">-- Team wählen --</option>`;
+
+  if(!key) return;
+
+  LEAGUES[key].teams.forEach(team=>{
+    const opt=document.createElement("option");
+    opt.value=team;
+    opt.textContent=team;
+    teamSelect.appendChild(opt);
+  });
+ });
+}
 
 // =====================
 // CPM LOGIK
@@ -71,10 +122,12 @@ function getCPM(t){
 // CREATE CAMPAIGN
 // =====================
 function createCampaign(){
+
  const file=image.files[0];
  if(!file) return alert("Bild fehlt");
 
  const reader=new FileReader();
+
  reader.onload=function(e){
 
  const targeting={
@@ -84,6 +137,9 @@ function createCampaign(){
   district:district.checked,
   team:team.checked
  };
+
+ const leagueId=leagueSelect.value;
+ const teamId=teamSelect.value;
 
  const cpm=getCPM(targeting);
  const b=parseFloat(budget.value);
@@ -100,6 +156,11 @@ function createCampaign(){
   impressionsDelivered:0,
   donation:parseFloat(donation.value)||0,
   targeting,
+
+  // 🔥 NEU
+  leagueId,
+  teamId,
+
   start:Date.now(),
   end:Date.now()+1000*60*60*24*30,
   image:e.target.result
@@ -110,6 +171,7 @@ function createCampaign(){
  saveData(d);
  render();
  };
+
  reader.readAsDataURL(file);
 }
 
@@ -119,20 +181,29 @@ function createCampaign(){
 function shouldServe(c){
  const totalDays=(c.end-c.start)/86400000;
  const passedDays=(Date.now()-c.start)/86400000;
-
  const expected=(passedDays/totalDays)*c.impressionsBooked;
-
- return c.impressionsDelivered <= expected*1.2; // leicht überliefern ok
+ return c.impressionsDelivered <= expected*1.2;
 }
 
 // =====================
-// TARGETING MATCH
+// 🔥 TARGETING MATCH FIX
 // =====================
 function match(c,ctx){
+
+ // 🔥 TEAM HAT PRIORITÄT
+ if(c.teamId){
+  return c.teamId === ctx.team;
+ }
+
+ if(c.leagueId){
+  return c.leagueId === ctx.league;
+ }
+
  if(c.targeting.team) return ctx.team;
  if(c.targeting.district) return ctx.district;
  if(c.targeting.state) return ctx.state;
  if(c.targeting.country) return ctx.country;
+
  return true;
 }
 
@@ -140,6 +211,7 @@ function match(c,ctx){
 // DELIVERY ENGINE
 // =====================
 function serveAd(ctx={global:true}){
+
  let data=getData();
 
  data=data.filter(c=>{
@@ -156,74 +228,45 @@ function serveAd(ctx={global:true}){
  const c=data[Math.floor(Math.random()*data.length)];
 
  c.impressionsDelivered++;
- if(c.type==="TKP") c.spent+=c.cpm/1000;
+
+ if(c.type==="TKP"){
+  c.spent+=c.cpm/1000;
+ }
 
  saveData(data);
+
  return c;
-}
-
-// =====================
-// REVENUE DASHBOARD
-// =====================
-function getStats(){
- const d=getData();
- let total=0,donation=0;
-
- d.forEach(c=>{
-  total+=c.spent;
-  donation+=c.spent*(c.donation/100);
- });
-
- return {total,donation};
-}
-
-// =====================
-// INVOICE
-// =====================
-function invoice(c){
- return {
-  kunde:c.customer,
-  spent:c.spent.toFixed(2),
-  impressions:c.impressionsDelivered
- };
 }
 
 // =====================
 // UI
 // =====================
 function render(){
+
  const d=getData();
  list.innerHTML="";
 
  d.forEach(c=>{
 
+ const donationVal=c.spent*(c.donation/100);
+
  const div=document.createElement("div");
  div.className="box";
-
- const donationVal=c.spent*(c.donation/100);
 
  div.innerHTML=`
  <b>${c.name}</b><br>
  Budget: €${c.budget}<br>
  Spend: €${c.spent.toFixed(2)}<br>
  Impressions: ${c.impressionsDelivered}/${Math.floor(c.impressionsBooked)}<br>
+ Liga: ${c.leagueId || "Global"}<br>
+ Team: ${c.teamId || "-"}<br>
  💚 Spende: €${donationVal.toFixed(2)}<br>
- <button onclick="showInvoice(${c.id})">Rechnung</button>
  <button onclick="del(${c.id})">❌</button>
  `;
 
  list.appendChild(div);
  });
 
- const stats=getStats();
- const s=document.createElement("div");
- s.className="box";
- s.innerHTML=`
- <h3>💰 Gesamt</h3>
- Umsatz: €${stats.total.toFixed(2)}<br>
- Spenden: €${stats.donation.toFixed(2)}
- `;
- list.appendChild(s);
 }
 
 function del(id){
@@ -233,39 +276,26 @@ function del(id){
  render();
 }
 
-function showInvoice(id){
- const c=getData().find(x=>x.id===id);
- alert(JSON.stringify(invoice(c),null,2));
-}
-
 // =====================
-// GAME INTEGRATION
+// 🎮 GAME HOOK
 // =====================
-// 👉 DAS HIER IN DEIN SPIEL EINBAUEN
-
 function renderAdToGame(containerId,context){
+
  const ad=serveAd(context);
  if(!ad) return;
 
  const el=document.getElementById(containerId);
  if(!el) return;
 
- el.innerHTML=`
- <img src="${ad.image}" style="max-width:100%">
- `;
+ el.innerHTML=`<img src="${ad.image}" style="max-width:100%">`;
 }
 
-// Demo alle 3s
-setInterval(()=>{
- renderAdToGame("gameAd",{global:true});
-},3000);
-
+// =====================
+// INIT
+// =====================
 render();
+loadLeagues();
 </script>
-
-<hr>
-<h2>🎮 Game Ad Slot</h2>
-<div id="gameAd"></div>
 
 </body>
 </html>
