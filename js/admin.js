@@ -22,15 +22,13 @@ function saveData(d){
 ===================== */
 function updateTargetingUI(){
 
-  const type=document.getElementById("targetType").value;
-  const container=document.getElementById("targetFields");
-
-  container.innerHTML="";
+  const type=targetType.value;
+  targetFields.innerHTML="";
 
   if(type==="global") return;
 
   if(type==="country"){
-    container.innerHTML=`
+    targetFields.innerHTML=`
       <select id="countrySelect">
         ${COUNTRIES.sort().map(c=>`<option value="${c}">${c}</option>`).join("")}
       </select>
@@ -38,7 +36,7 @@ function updateTargetingUI(){
   }
 
   if(type==="state"){
-    container.innerHTML=`
+    targetFields.innerHTML=`
       <select id="stateSelect">
         ${STATES.sort().map(s=>`<option value="${s}">${s}</option>`).join("")}
       </select>
@@ -46,26 +44,26 @@ function updateTargetingUI(){
   }
 
   if(type==="district"){
-    container.innerHTML=`<select id="leagueSelect"></select>`;
+    targetFields.innerHTML=`<select id="leagueSelect"></select>`;
     loadLeagues();
   }
 
   if(type==="team"){
-    container.innerHTML=`
+    targetFields.innerHTML=`
       <select id="leagueSelect"></select>
       <select id="teamSelect"></select>
     `;
-    loadLeagues();
+    loadLeagues(true);
   }
 }
 
 /* =====================
-   🏆 LEAGUES LADEN
+   🏆 LEAGUES FIX (WICHTIG)
 ===================== */
-function loadLeagues(){
+function loadLeagues(withTeams=false){
 
   if(typeof LEAGUES==="undefined"){
-    console.warn("❌ LEAGUES nicht geladen");
+    console.warn("❌ LEAGUES fehlt");
     return;
   }
 
@@ -76,25 +74,37 @@ function loadLeagues(){
 
   leagueSelect.innerHTML=`<option value="">Liga wählen</option>`;
 
-  Object.keys(LEAGUES).forEach(key=>{
+  Object.entries(LEAGUES).forEach(([key,league])=>{
+
     const opt=document.createElement("option");
     opt.value=key;
-    opt.textContent=LEAGUES[key].name;
+    opt.textContent=league.name || key;
+
     leagueSelect.appendChild(opt);
   });
 
-  if(teamSelect){
+  if(withTeams && teamSelect){
+
     leagueSelect.onchange=()=>{
 
       teamSelect.innerHTML=`<option value="">Team wählen</option>`;
 
       const league=LEAGUES[leagueSelect.value];
-      if(!league) return;
+
+      if(!league || !league.teams){
+        console.warn("⚠️ Keine Teams gefunden", leagueSelect.value);
+        return;
+      }
 
       league.teams.forEach(team=>{
+
+        // 🔥 unterstützt string ODER object
+        const name = typeof team === "string" ? team : team.name;
+
         const opt=document.createElement("option");
-        opt.value=team;
-        opt.textContent=team;
+        opt.value=name;
+        opt.textContent=name;
+
         teamSelect.appendChild(opt);
       });
     };
@@ -102,7 +112,7 @@ function loadLeagues(){
 }
 
 /* =====================
-   💰 CPM LOGIK
+   💰 CPM
 ===================== */
 function getCPM(type){
   if(type==="team") return 20;
@@ -113,64 +123,74 @@ function getCPM(type){
 }
 
 /* =====================
+   📅 HELPER
+===================== */
+function getDays(start,end){
+  return Math.ceil((end-start)/86400000);
+}
+
+/* =====================
    🚀 CREATE CAMPAIGN
 ===================== */
 function createCampaign(){
 
-  const file=document.getElementById("image").files[0];
+  const file=image.files[0];
   if(!file) return alert("Bild fehlt");
 
   const reader=new FileReader();
 
   reader.onload=function(e){
 
-    const type=document.getElementById("targetType").value;
+    const type=targetType.value;
 
     let targeting={type};
 
     if(type==="country"){
-      targeting.value=document.getElementById("countrySelect").value;
+      targeting.value=countrySelect.value;
     }
 
     if(type==="state"){
-      targeting.value=document.getElementById("stateSelect").value;
+      targeting.value=stateSelect.value;
     }
 
     if(type==="district"){
-      targeting.league=document.getElementById("leagueSelect").value;
+      targeting.league=leagueSelect.value;
     }
 
     if(type==="team"){
-      targeting.league=document.getElementById("leagueSelect").value;
-      targeting.team=document.getElementById("teamSelect").value;
+      targeting.league=leagueSelect.value;
+      targeting.team=teamSelect.value;
     }
 
-    const budget=parseFloat(document.getElementById("budget").value)||0;
-    const days=parseInt(document.getElementById("duration").value)||30;
+    const startVal=document.getElementById("startDate").value;
+    const endVal=document.getElementById("endDate").value;
 
+    const start=startVal ? new Date(startVal).getTime() : Date.now();
+    const end=endVal ? new Date(endVal).getTime() : (Date.now()+30*86400000);
+
+    const budget=parseFloat(budget.value)||0;
     const cpm=getCPM(type);
 
     const campaign={
       id:Date.now(),
-      name:document.getElementById("name").value || "⚠️ Kein Name",
-      customer:document.getElementById("customer").value || "-",
-      budget:budget,
+      name:name.value||"⚠️ Kein Name",
+      customer:customer.value||"-",
+      budget,
       spent:0,
 
-      // 🔥 wichtig für kompatibilität
-      typeCampaign:document.getElementById("typeCampaign").value,
-      type:document.getElementById("typeCampaign").value,
+      typeCampaign:typeCampaign.value,
+      type:typeCampaign.value,
 
       cpm,
       impressionsBooked:(budget/cpm)*1000,
       impressionsDelivered:0,
 
-      donation:parseFloat(document.getElementById("donation").value)||0,
+      donation:parseFloat(donation.value)||0,
 
       targeting,
 
-      start:Date.now(),
-      end:Date.now()+days*86400000,
+      start,
+      end,
 
       image:e.target.result
     };
@@ -180,24 +200,42 @@ function createCampaign(){
     saveData(data);
 
     render();
+    resetForm(); // 🔥 NEU
   };
 
   reader.readAsDataURL(file);
 }
 
 /* =====================
-   📊 RENDER UI
+   🔄 RESET FORM
+===================== */
+function resetForm(){
+
+  name.value="";
+  customer.value="";
+  budget.value="";
+  donation.value=0;
+
+  image.value="";
+
+  startDate.value="";
+  endDate.value="";
+
+  targetType.value="global";
+  updateTargetingUI();
+}
+
+/* =====================
+   📊 RENDER
 ===================== */
 function render(){
 
-  const list=document.getElementById("list");
   list.innerHTML="";
 
-  const data=getData();
-
-  data.forEach(c=>{
+  getData().forEach(c=>{
 
     const donationVal=c.spent*(c.donation/100);
+    const days=getDays(c.start,c.end);
 
     const div=document.createElement("div");
     div.className="adRow";
@@ -208,7 +246,8 @@ function render(){
         <div>
           <b>${c.name}</b><br>
           <small>${c.customer}</small><br>
-          <small>${c.targeting.type}</small>
+          <small>${c.targeting.type}</small><br>
+          <small>⏱️ ${days} Tage</small>
         </div>
       </div>
 
@@ -227,8 +266,12 @@ function render(){
    ❌ DELETE
 ===================== */
 function del(id){
+
+  if(!confirm("Kampagne löschen?")) return;
+
   let d=getData();
   d=d.filter(x=>x.id!==id);
+
   saveData(d);
   render();
 }
@@ -237,6 +280,8 @@ function del(id){
    INIT
 ===================== */
 window.onload=function(){
+
   updateTargetingUI();
   render();
+
 };
