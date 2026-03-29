@@ -3,6 +3,7 @@
 const KEY = "ad_v2";
 
 let campaigns = [];
+let editId = null;
 
 // =====================
 // STORAGE
@@ -16,15 +17,72 @@ function save(){
 }
 
 // =====================
-// IMAGE HELPER
+// IMAGE
 // =====================
 function readImage(file){
-  return new Promise((resolve)=>{
+  return new Promise(resolve=>{
     const reader = new FileReader();
     reader.onload = e => resolve(e.target.result);
     reader.readAsDataURL(file);
   });
 }
+
+// =====================
+// TARGETING UI
+// =====================
+window.updateTargetingUI = function(){
+
+  const type = document.getElementById("targetType").value;
+
+  document.getElementById("leagueWrap").style.display = "none";
+  document.getElementById("teamWrap").style.display = "none";
+
+  if(type === "league"){
+    document.getElementById("leagueWrap").style.display = "block";
+    fillLeagues();
+  }
+
+  if(type === "team"){
+    document.getElementById("leagueWrap").style.display = "block";
+    document.getElementById("teamWrap").style.display = "block";
+    fillLeagues();
+  }
+};
+
+// =====================
+// LEAGUES
+// =====================
+function fillLeagues(){
+
+  const select = document.getElementById("leagueSelectAdmin");
+  select.innerHTML = `<option value="">Liga wählen</option>`;
+
+  Object.keys(window.LEAGUES || {}).forEach(key=>{
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = window.LEAGUES[key].name;
+    select.appendChild(opt);
+  });
+}
+
+window.onLeagueChange = function(){
+
+  const leagueKey = document.getElementById("leagueSelectAdmin").value;
+  const teamSelect = document.getElementById("teamSelectAdmin");
+
+  teamSelect.innerHTML = `<option value="ALL">Alle Teams</option>`;
+
+  if(!leagueKey) return;
+
+  const league = window.LEAGUES[leagueKey];
+
+  league.teams.forEach(t=>{
+    const opt = document.createElement("option");
+    opt.value = t;
+    opt.textContent = t;
+    teamSelect.appendChild(opt);
+  });
+};
 
 // =====================
 // CREATE / UPDATE
@@ -36,40 +94,72 @@ window.createCampaign = async function(){
   const link = document.getElementById("link").value;
   const budget = parseFloat(document.getElementById("budget").value) || 0;
 
-  const startDate = document.getElementById("startDate").value;
-  const endDate = document.getElementById("endDate").value;
+  const start = document.getElementById("startDate").value;
+  const end = document.getElementById("endDate").value;
 
-  const imageFile = document.getElementById("imageUpload").files[0];
+  const targetType = document.getElementById("targetType").value;
+  const league = document.getElementById("leagueSelectAdmin").value;
+  const team = document.getElementById("teamSelectAdmin").value;
+
+  const file = document.getElementById("imageUpload").files[0];
 
   let image = "";
 
-  // 👉 WICHTIG: IMAGE WIRD JETZT IMMER GESETZT
-  if(imageFile){
-    image = await readImage(imageFile);
+  if(editId){
+    const existing = campaigns.find(c => c.id === editId);
+    image = existing?.image || "";
+  }
+
+  if(file){
+    image = await readImage(file);
+  }
+
+  if(!image){
+    alert("Bitte Bild hochladen");
+    return;
+  }
+
+  const targeting = {};
+
+  if(targetType === "global"){
+    targeting.country = true;
+  }
+
+  if(targetType === "league"){
+    targeting.district = league;
+  }
+
+  if(targetType === "team"){
+    targeting.district = league;
+    if(team !== "ALL"){
+      targeting.team = team;
+    }
   }
 
   const campaign = {
-    id: Date.now(),
+    id: editId || Date.now(),
     name,
     customer,
     link,
     budget,
-    image, // 🔥 FIX
-    start: startDate ? new Date(startDate).getTime() : null,
-    end: endDate ? new Date(endDate).getTime() : null,
-
-    targeting: {
-      country: true // default global
-    },
-
+    image,
+    targeting,
+    start: start ? new Date(start).getTime() : null,
+    end: end ? new Date(end).getTime() : null,
     impressionsDelivered: 0
   };
 
-  campaigns.push(campaign);
-  save();
+  if(editId){
+    campaigns = campaigns.map(c => c.id === editId ? campaign : c);
+  } else {
+    campaigns.push(campaign);
+  }
 
+  save();
   clearForm();
   render();
+
+  editId = null;
 };
 
 // =====================
@@ -82,16 +172,42 @@ window.deleteCampaign = function(id){
 };
 
 // =====================
-// CLEAR FORM
+// EDIT
+// =====================
+window.editCampaign = function(id){
+
+  const c = campaigns.find(x => x.id === id);
+  if(!c) return;
+
+  editId = id;
+
+  document.getElementById("name").value = c.name;
+  document.getElementById("customer").value = c.customer;
+  document.getElementById("link").value = c.link;
+  document.getElementById("budget").value = c.budget;
+
+  if(c.start){
+    document.getElementById("startDate").value = new Date(c.start).toISOString().split("T")[0];
+  }
+
+  if(c.end){
+    document.getElementById("endDate").value = new Date(c.end).toISOString().split("T")[0];
+  }
+
+  if(c.targeting?.team){
+    document.getElementById("targetType").value = "team";
+    updateTargetingUI();
+    document.getElementById("leagueSelectAdmin").value = c.targeting.district;
+    onLeagueChange();
+    document.getElementById("teamSelectAdmin").value = c.targeting.team;
+  }
+};
+
+// =====================
+// CLEAR
 // =====================
 function clearForm(){
-  document.getElementById("name").value = "";
-  document.getElementById("customer").value = "";
-  document.getElementById("link").value = "";
-  document.getElementById("budget").value = "";
-  document.getElementById("startDate").value = "";
-  document.getElementById("endDate").value = "";
-  document.getElementById("imageUpload").value = "";
+  document.querySelectorAll("input").forEach(i=>i.value="");
 }
 
 // =====================
@@ -100,40 +216,30 @@ function clearForm(){
 function render(){
 
   const box = document.getElementById("campaignList");
-  if(!box) return;
-
   box.innerHTML = "";
 
-  campaigns.forEach(c => {
+  campaigns.forEach(c=>{
 
     const div = document.createElement("div");
     div.className = "adRow";
 
-    const img = c.image 
-      ? `<img src="${c.image}" style="height:50px">`
-      : "❌ Kein Bild";
+    const duration = (c.start && c.end)
+      ? Math.ceil((c.end - c.start) / (1000*60*60*24)) + " Tage"
+      : "-";
 
     div.innerHTML = `
-      ${img}
+      <img src="${c.image}" style="height:60px">
       <div>
-        <strong>${c.customer || "Ohne Kunde"}</strong><br>
+        <b>${c.customer}</b><br>
         Budget: ${c.budget}€<br>
-        Laufzeit: ${formatDate(c.start)} - ${formatDate(c.end)}
+        Laufzeit: ${duration}
       </div>
+      <button onclick="editCampaign(${c.id})">✏️</button>
       <button onclick="deleteCampaign(${c.id})">❌</button>
     `;
 
     box.appendChild(div);
   });
-}
-
-// =====================
-// HELPERS
-// =====================
-function formatDate(ts){
-  if(!ts) return "-";
-  const d = new Date(ts);
-  return d.toLocaleDateString();
 }
 
 // =====================
