@@ -341,9 +341,9 @@ background: rgba(244,67,54,0.15);
 }
 
 .leaderboardAd img{
-  width:100%;
   height:100%;
-  object-fit:contain; /* 🔥 kein Cropping */
+  width:auto;
+  display:block;
 }
 
 /* MOBILE 320x50 */
