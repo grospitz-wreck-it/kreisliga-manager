@@ -3,7 +3,7 @@
 const KEY = "ad_v2";
 
 // =====================
-// STORAGE
+// 📦 STORAGE
 // =====================
 function getCampaigns(){
   return JSON.parse(localStorage.getItem(KEY) || "[]");
@@ -14,7 +14,7 @@ function saveCampaigns(data){
 }
 
 // =====================
-// 🎮 GAME CONTEXT (NEU)
+// 🎮 GAME CONTEXT
 // =====================
 function getGameContext(){
   return {
@@ -26,20 +26,26 @@ function getGameContext(){
 }
 
 // =====================
-// CPM LOGIK (BLEIBT)
+// 💰 CPM LOGIK
 // =====================
-function getCPM(t){
-  if(t?.type === "team") return 20;
-  if(t?.type === "district") return 10;
-  if(t?.type === "state") return 5;
-  if(t?.type === "country") return 2;
+function getCPM(targeting){
+  if(!targeting) return 1;
+
+  if(targeting.type === "team") return 20;
+  if(targeting.type === "district") return 10;
+  if(targeting.type === "state") return 5;
+  if(targeting.type === "country") return 2;
+
   return 1;
 }
 
 // =====================
-// PACING (BLEIBT)
+// ⏱️ PACING
 // =====================
 function shouldServe(c){
+
+  if(!c.start || !c.end) return true;
+
   const total = (c.end - c.start);
   const passed = (Date.now() - c.start);
 
@@ -51,14 +57,14 @@ function shouldServe(c){
 }
 
 // =====================
-// 🎯 TARGET MATCH (NEU + ALT SUPPORT)
+// 🎯 TARGET MATCH
 // =====================
 function match(c, ctx){
 
   const t = c.targeting;
 
   // 🔥 NEUES SYSTEM
-  if(t?.type){
+  if(t && t.type){
 
     if(t.type === "global") return true;
 
@@ -89,7 +95,7 @@ function match(c, ctx){
 }
 
 // =====================
-// DELIVERY ENGINE
+// 🚚 DELIVERY ENGINE
 // =====================
 function serveAd(){
 
@@ -98,13 +104,14 @@ function serveAd(){
 
   campaigns = campaigns.filter(c => {
 
-    // Zeitraum
+    // Zeitraum prüfen
     if(c.start && Date.now() < c.start) return false;
     if(c.end && Date.now() > c.end) return false;
 
-    // TKP Stop
-    if((c.type === "TKP" || c.typeCampaign === "TKP") &&
-       c.impressionsDelivered >= c.impressionsBooked){
+    // TKP Limit
+    const isTKP = c.type === "TKP" || c.typeCampaign === "TKP";
+
+    if(isTKP && c.impressionsDelivered >= c.impressionsBooked){
       return false;
     }
 
@@ -114,11 +121,12 @@ function serveAd(){
     return true;
   });
 
-  // Targeting
+  // Targeting anwenden
   campaigns = campaigns.filter(c => match(c, ctx));
 
   if(!campaigns.length) return null;
 
+  // Zufällige Auswahl
   const c = campaigns[Math.floor(Math.random() * campaigns.length)];
 
   // Tracking
@@ -131,7 +139,7 @@ function serveAd(){
     c.spent = (c.spent || 0) + (cpm / 1000);
   }
 
-  // speichern
+  // Speichern
   const all = getCampaigns().map(x => x.id === c.id ? c : x);
   saveCampaigns(all);
 
@@ -139,7 +147,7 @@ function serveAd(){
 }
 
 // =====================
-// RENDER (MULTI ADS)
+// 🖼️ RENDER (MULTI ADS)
 // =====================
 function renderAds(){
 
@@ -148,6 +156,7 @@ function renderAds(){
 
   let output = "";
 
+  // 👉 Anzahl Ads gleichzeitig
   for(let i=0;i<3;i++){
 
     const ad = serveAd();
@@ -171,18 +180,19 @@ function renderAds(){
 }
 
 // =====================
-// AUTO ROTATION
+// 🔁 AUTO ROTATION
 // =====================
 setInterval(renderAds, 4000);
 
 // =====================
-// INIT
+// 🚀 INIT
 // =====================
 window.startAds = function() {
+
   if (window.adsInitialized) return;
   window.adsInitialized = true;
 
-  console.log("📢 Ads gestartet (V3)");
+  console.log("📢 Ads gestartet (FINAL)");
 
   renderAds();
 };
