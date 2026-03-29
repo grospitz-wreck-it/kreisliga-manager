@@ -14,10 +14,9 @@ function saveCampaigns(data){
 }
 
 // =====================
-// GAME CONTEXT (MIT GAME STATE)
+// GAME CONTEXT
 // =====================
 function getGameContext(){
-
   return {
     league: window.game?.league?.key || null,
     team: window.game?.team?.selected || null
@@ -25,7 +24,7 @@ function getGameContext(){
 }
 
 // =====================
-// TARGET MATCH (FIXED!)
+// MATCHING (FIXED)
 // =====================
 function match(c, ctx){
 
@@ -33,18 +32,15 @@ function match(c, ctx){
 
   const t = c.targeting;
 
-  // GLOBAL
   if(t.type === "global") return true;
 
-  // LIGA
   if(t.type === "district"){
     return t.league === ctx.league;
   }
 
-  // TEAM
   if(t.type === "team"){
 
-    // ganze Liga (ALLE TEAMS)
+    // ganze Liga
     if(!t.team){
       return t.league === ctx.league;
     }
@@ -60,7 +56,7 @@ function match(c, ctx){
 }
 
 // =====================
-// DELIVERY ENGINE
+// ENGINE
 // =====================
 function serveAd(){
 
@@ -69,11 +65,9 @@ function serveAd(){
 
   campaigns = campaigns.filter(c => {
 
-    // Zeitraum
     if(c.start && Date.now() < c.start) return false;
     if(c.end && Date.now() > c.end) return false;
 
-    // TKP Limit
     if(c.type === "TKP" &&
        c.impressionsDelivered >= c.impressionsBooked){
       return false;
@@ -82,21 +76,18 @@ function serveAd(){
     return true;
   });
 
-  // TARGETING FILTER
   campaigns = campaigns.filter(c => match(c, ctx));
 
   if(!campaigns.length) return null;
 
   const c = campaigns[Math.floor(Math.random() * campaigns.length)];
 
-  // TRACKING
   c.impressionsDelivered = (c.impressionsDelivered || 0) + 1;
 
   if(c.type === "TKP"){
     c.spent = (c.spent || 0) + (c.cpm / 1000);
   }
 
-  // SAVE BACK
   const updated = getCampaigns().map(x =>
     x.id === c.id ? c : x
   );
@@ -146,17 +137,10 @@ window.startAds = function(){
   if(window.adsInitialized) return;
   window.adsInitialized = true;
 
-  console.log("📢 Ads gestartet (FIXED)");
+  console.log("📢 Ads gestartet");
 
   renderAds();
   setInterval(renderAds, 4000);
 };
-
-// =====================
-// GAME HOOKS
-// =====================
-window.onMatchStart = renderAds;
-window.onHalftime = renderAds;
-window.onMatchEnd = renderAds;
 
 })();
