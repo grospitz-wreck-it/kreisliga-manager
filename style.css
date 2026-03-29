@@ -207,3 +207,56 @@ button {
   .mainPanel { flex: 2; }
   .sidePanel { flex: 1; }
 }
+/* =========================
+💣 ADS ISOLATED (FINAL)
+========================= */
+
+#adBanner{
+  width:100%;
+  display:block;
+
+  margin:12px 0;
+}
+
+/* eigene Box → komplett unabhängig */
+.adInner{
+  width:100%;
+  max-width:970px;
+  height:90px;
+
+  margin:0 auto;
+
+  position:relative;
+  overflow:hidden;
+  background:#000;
+  border-radius:10px;
+}
+
+/* Track liegt darüber */
+#adTrack{
+  position:absolute;
+  inset:0;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Bild passt sich exakt an */
+#adTrack img{
+  height:100%;
+  width:auto;
+  object-fit:contain;
+}
+
+/* 📱 Mobile */
+@media (max-width:600px){
+  .adInner{
+    height:50px;
+    max-width:320px;
+  }
+
+  #adTrack img{
+    height:50px;
+  }
+}
