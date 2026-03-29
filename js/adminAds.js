@@ -1,11 +1,15 @@
 // =========================
 // 📦 LOAD ADS
 // =========================
-function loadAdsFromStorage(){
-  const stored = localStorage.getItem("ads");
-  if(stored){
-    ads = JSON.parse(stored);
-  }
+function loadAds() {
+  const saved = JSON.parse(localStorage.getItem("kreisliga_ads")) || [];
+  const container = document.getElementById("adsContainer");
+
+  container.innerHTML = "";
+
+  saved.forEach(url => {
+    addAdInput(url);
+  });
 }
 
 // =========================
