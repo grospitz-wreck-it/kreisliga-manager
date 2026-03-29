@@ -44,9 +44,7 @@ function getMatchingAds(){
 // 🎬 RENDER LEADERBOARD
 // =========================
 function renderAds(){
-  console.log("ADS:", ads);
-console.log("HTML:", el.innerHTML);
-el.style.background = "red";
+
   const el = document.getElementById("adTrack");
   if(!el) return;
 
@@ -56,7 +54,9 @@ el.style.background = "red";
     el.innerHTML = `<div class="leaderboardAd" style="color:#fff">Keine Werbung</div>`;
     return;
   }
-
+  console.log("ADS:", ads);
+console.log("HTML:", el.innerHTML);
+el.style.background = "red";
   // 👉 nur eine Ad gleichzeitig für echtes Leaderboard
   const ad = ads[Math.floor(Math.random() * ads.length)];
 
