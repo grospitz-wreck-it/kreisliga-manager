@@ -2,27 +2,122 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Ad System V2</title>
+<title>Ad System Dashboard</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-<!-- 🔥 WICHTIG -->
 <script src="league.js"></script>
+<script src="admin.js" defer></script>
 
 <style>
-body{font-family:'Inter';background:#f5f7fb;margin:0;color:#1a1a1a}
-.container{max-width:1100px;margin:auto;padding:20px}
-.box{background:#fff;border-radius:16px;padding:20px;margin-bottom:20px;box-shadow:0 8px 25px rgba(0,0,0,0.05)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-input,select{padding:12px;border-radius:10px;border:1px solid #ddd;width:100%}
-button{padding:12px;border:none;border-radius:10px;background:#4CAF50;color:#fff;font-weight:600;cursor:pointer}
-button.danger{background:#e53935}
+body{
+  font-family:'Inter';
+  background:#f5f7fb;
+  margin:0;
+  color:#1a1a1a;
+}
 
-.adRow{display:flex;justify-content:space-between;align-items:center;padding:15px;border-radius:14px;background:#fff;box-shadow:0 5px 15px rgba(0,0,0,0.04);margin-bottom:10px}
-.adLeft{display:flex;gap:15px;align-items:center}
-.adRow img{height:50px;border-radius:8px}
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:30px;
+}
 
-small{color:#666}
+h1{
+  margin-bottom:20px;
+}
+
+.box{
+  background:#fff;
+  border-radius:16px;
+  padding:25px;
+  margin-bottom:25px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.05);
+}
+
+/* GRID FIX */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+  margin-bottom:15px;
+}
+
+.full{
+  grid-column:1 / -1;
+}
+
+input, select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+input:focus, select:focus{
+  outline:none;
+  border-color:#4CAF50;
+}
+
+/* BUTTONS */
+button{
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#4CAF50;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+button.danger{
+  background:#e53935;
+}
+
+/* TARGET BOX */
+#targetFields{
+  margin-top:10px;
+}
+
+/* LIST */
+.adRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 5px 15px rgba(0,0,0,0.04);
+  margin-bottom:10px;
+}
+
+.adLeft{
+  display:flex;
+  gap:15px;
+  align-items:center;
+}
+
+.adRow img{
+  height:50px;
+  border-radius:8px;
+}
+
+small{
+  color:#666;
+}
+
+/* MOBILE */
+@media(max-width:700px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+}
 </style>
 </head>
 
@@ -37,38 +132,49 @@ small{color:#666}
 <h2>Neue Kampagne</h2>
 
 <div class="grid">
-  <input id="name" placeholder="Kampagnenname">
-  <input id="customer" placeholder="Kunde">
-  <input id="budget" type="number" placeholder="Budget €">
 
-  <select id="typeCampaign">
-    <option value="TKP">TKP</option>
-    <option value="SPONSOR">Sponsor</option>
-  </select>
+<input id="name" placeholder="Kampagnenname">
+<input id="customer" placeholder="Kunde">
 
-  <!-- 📅 Datepicker -->
-  <input type="date" id="startDate">
-  <input type="date" id="endDate">
+<input id="budget" type="number" placeholder="Budget €">
+
+<select id="typeCampaign">
+<option value="TKP">TKP</option>
+<option value="SPONSOR">Sponsor</option>
+</select>
+
+<!-- 📅 DATUM -->
+<div>
+<small>Startdatum</small>
+<input type="date" id="startDate">
 </div>
 
-<h3>🎯 Targeting</h3>
+<div>
+<small>Enddatum</small>
+<input type="date" id="endDate">
+</div>
 
+<!-- 🎯 TARGET -->
+<div class="full">
+<small>Targeting</small>
 <select id="targetType" onchange="updateTargetingUI()">
 <option value="global">Global</option>
 <option value="country">Land</option>
 <option value="state">Bundesland</option>
-<option value="district">Kreis / Liga</option>
+<option value="district">Liga</option>
 <option value="team">Team</option>
 </select>
 
 <div id="targetFields"></div>
+</div>
 
-<input id="duration" type="number" value="30" placeholder="Laufzeit (Tage)">
-<input id="donation" type="number" value="0" placeholder="Spende %">
+<input id="donation" type="number" placeholder="Spende %" value="0">
 
-<input type="file" id="image">
+<input type="file" id="image" class="full">
 
-<button onclick="createCampaign()">💾 Kampagne speichern</button>
+<button class="full" onclick="createCampaign()">💾 Kampagne speichern</button>
+
+</div>
 
 </div>
 
@@ -78,177 +184,6 @@ small{color:#666}
 </div>
 
 </div>
-
-<script>
-const KEY="ad_v2";
-
-/* =====================
-   🌍 GEO DATA
-===================== */
-const COUNTRIES=["Deutschland","Österreich","Schweiz"];
-const STATES=["Bayern","NRW","Hessen","Niedersachsen","Sachsen","Berlin"];
-
-/* =====================
-   STORAGE
-===================== */
-function getData(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
-function saveData(d){localStorage.setItem(KEY,JSON.stringify(d))}
-
-/* =====================
-   UI TARGETING
-===================== */
-function updateTargetingUI(){
-
- const type=targetType.value;
- targetFields.innerHTML="";
-
- if(type==="global") return;
-
- if(type==="country"){
-  targetFields.innerHTML=`<select id="countrySelect">${COUNTRIES.sort().map(c=>`<option>${c}</option>`).join("")}</select>`;
- }
-
- if(type==="state"){
-  targetFields.innerHTML=`<select id="stateSelect">${STATES.sort().map(s=>`<option>${s}</option>`).join("")}</select>`;
- }
-
- if(type==="district"){
-  targetFields.innerHTML=`<select id="leagueSelect"></select>`;
-  loadLeagues();
- }
-
- if(type==="team"){
-  targetFields.innerHTML=`<select id="leagueSelect"></select><select id="teamSelect"></select>`;
-  loadLeagues();
- }
-}
-
-/* =====================
-   LEAGUES
-===================== */
-function loadLeagues(){
-
- if(typeof LEAGUES==="undefined") return;
-
- const ls=document.getElementById("leagueSelect");
- const ts=document.getElementById("teamSelect");
-
- ls.innerHTML=`<option value="">Liga wählen</option>`;
-
- Object.keys(LEAGUES).forEach(key=>{
-  const opt=document.createElement("option");
-  opt.value=key;
-  opt.textContent=LEAGUES[key].name;
-  ls.appendChild(opt);
- });
-
- if(ts){
-  ls.onchange=()=>{
-   ts.innerHTML=`<option value="">Team wählen</option>`;
-   LEAGUES[ls.value].teams.forEach(t=>{
-    const opt=document.createElement("option");
-    opt.value=t;
-    opt.textContent=t;
-    ts.appendChild(opt);
-   });
-  };
- }
-}
-
-/* =====================
-   CREATE
-===================== */
-function createCampaign(){
-
- const file=image.files[0];
- if(!file) return alert("Bild fehlt");
-
- const reader=new FileReader();
-
- reader.onload=function(e){
-
- const type=targetType.value;
-
- let targeting={type};
-
- if(type==="country") targeting.value=countrySelect.value;
- if(type==="state") targeting.value=stateSelect.value;
- if(type==="district") targeting.league=leagueSelect.value;
- if(type==="team"){
-  targeting.league=leagueSelect.value;
-  targeting.team=teamSelect.value;
- }
-
- const days=parseInt(duration.value)||30;
- const budgetVal=parseFloat(budget.value)||0;
-
- const c={
-  id:Date.now(),
-  name:name.value||"⚠️ Kein Name",
-  customer:customer.value||"-",
-  budget:budgetVal,
-  spent:0,
-  typeCampaign:typeCampaign.value,
-  impressionsDelivered:0,
-  impressionsBooked:100000,
-  donation:parseFloat(donation.value)||0,
-  targeting,
-  start:Date.now(),
-  end:Date.now()+days*86400000,
-  image:e.target.result
- };
-
- const d=getData();
- d.push(c);
- saveData(d);
- render();
- };
-
- reader.readAsDataURL(file);
-}
-
-/* =====================
-   UI
-===================== */
-function render(){
-
- list.innerHTML="";
-
- getData().forEach(c=>{
-
- const div=document.createElement("div");
- div.className="adRow";
-
- div.innerHTML=`
- <div class="adLeft">
-  <img src="${c.image}">
-  <div>
-   <b>${c.name}</b><br>
-   <small>${c.customer}</small><br>
-   <small>${c.targeting.type}</small>
-  </div>
- </div>
-
- <div>
-  €${c.spent.toFixed(2)}<br>
-  <button class="danger" onclick="del(${c.id})">❌</button>
- </div>
- `;
-
- list.appendChild(div);
- });
-}
-
-function del(id){
- let d=getData();
- d=d.filter(x=>x.id!==id);
- saveData(d);
- render();
-}
-
-render();
-updateTargetingUI();
-</script>
 
 </body>
 </html>
