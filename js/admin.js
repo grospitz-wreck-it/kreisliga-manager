@@ -1,14 +1,21 @@
-const KEY="ad_v2";
+const KEY = "ad_v2";
+
+/* =====================
+   GLOBAL (für HTML)
+===================== */
+window.updateTargetingUI = updateTargetingUI;
+window.createCampaign = createCampaign;
+window.del = del;
 
 /* =====================
    STORAGE
 ===================== */
 function getData(){
-  return JSON.parse(localStorage.getItem(KEY)||"[]");
+  return JSON.parse(localStorage.getItem(KEY) || "[]");
 }
 
-function saveData(d){
-  localStorage.setItem(KEY,JSON.stringify(d));
+function saveData(data){
+  localStorage.setItem(KEY, JSON.stringify(data));
 }
 
 /* =====================
@@ -16,18 +23,18 @@ function saveData(d){
 ===================== */
 function updateTargetingUI(){
 
-  const type=document.getElementById("targetType").value;
-  const container=document.getElementById("targetFields");
+  const type = document.getElementById("targetType").value;
+  const container = document.getElementById("targetFields");
 
-  container.innerHTML="";
+  container.innerHTML = "";
 
-  if(type==="district"){
-    container.innerHTML=`<select id="leagueSelect"></select>`;
+  if(type === "district"){
+    container.innerHTML = `<select id="leagueSelect"></select>`;
     loadLeagues();
   }
 
-  if(type==="team"){
-    container.innerHTML=`
+  if(type === "team"){
+    container.innerHTML = `
       <select id="leagueSelect"></select>
       <select id="teamSelect"></select>
     `;
@@ -36,51 +43,46 @@ function updateTargetingUI(){
 }
 
 /* =====================
-   LEAGUES (ROBUST)
+   LEAGUES
 ===================== */
 function loadLeagues(withTeams=false){
 
   if(!window.LEAGUES){
-    console.warn("❌ LEAGUES nicht geladen");
+    console.error("❌ league.js nicht geladen");
+    alert("league.js fehlt!");
     return;
   }
 
-  const leagueSelect=document.getElementById("leagueSelect");
-  const teamSelect=document.getElementById("teamSelect");
+  const leagueSelect = document.getElementById("leagueSelect");
+  const teamSelect = document.getElementById("teamSelect");
 
-  if(!leagueSelect) return;
+  leagueSelect.innerHTML = `<option value="">Liga wählen</option>`;
 
-  leagueSelect.innerHTML=`<option value="">Liga wählen</option>`;
+  Object.keys(LEAGUES).forEach(key => {
 
-  Object.entries(LEAGUES).forEach(([key,league])=>{
-
-    const opt=document.createElement("option");
-    opt.value=key;
-    opt.textContent=league.name || key;
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = LEAGUES[key].name;
 
     leagueSelect.appendChild(opt);
   });
 
-  if(withTeams && teamSelect){
+  if(withTeams){
 
-    leagueSelect.onchange=()=>{
+    leagueSelect.onchange = () => {
 
-      teamSelect.innerHTML=`<option value="">Team wählen</option>`;
+      teamSelect.innerHTML = `<option value="">Team wählen</option>`;
 
-      const league=LEAGUES[leagueSelect.value];
+      const league = LEAGUES[leagueSelect.value];
+      if(!league) return;
 
-      if(!league || !league.teams){
-        console.warn("⚠️ Keine Teams gefunden", leagueSelect.value);
-        return;
-      }
-
-      league.teams.forEach(team=>{
+      league.teams.forEach(team => {
 
         const name = typeof team === "string" ? team : team.name;
 
-        const opt=document.createElement("option");
-        opt.value=name;
-        opt.textContent=name;
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
 
         teamSelect.appendChild(opt);
       });
@@ -93,69 +95,63 @@ function loadLeagues(withTeams=false){
 ===================== */
 function createCampaign(){
 
-  const file=document.getElementById("image").files[0];
+  const file = document.getElementById("image").files[0];
   if(!file) return alert("Bild fehlt");
 
-  const reader=new FileReader();
+  const reader = new FileReader();
 
-  reader.onload=function(e){
+  reader.onload = function(e){
 
-    const type=document.getElementById("targetType").value;
+    const type = document.getElementById("targetType").value;
 
-    let targeting={type};
+    let targeting = { type };
 
-    if(type==="district"){
-      targeting.league=document.getElementById("leagueSelect")?.value || null;
+    if(type === "district"){
+      targeting.league = document.getElementById("leagueSelect")?.value;
     }
 
-    if(type==="team"){
-      targeting.league=document.getElementById("leagueSelect")?.value || null;
-      targeting.team=document.getElementById("teamSelect")?.value || null;
+    if(type === "team"){
+      targeting.league = document.getElementById("leagueSelect")?.value;
+      targeting.team = document.getElementById("teamSelect")?.value;
     }
 
-    const budget=parseFloat(document.getElementById("budget").value)||0;
-    const donationPercent=parseInt(document.getElementById("donation").value)||0;
+    const budget = parseFloat(document.getElementById("budget").value) || 0;
+    const donationPercent = parseInt(document.getElementById("donation").value) || 0;
 
-    const startVal=document.getElementById("startDate").value;
-    const endVal=document.getElementById("endDate").value;
+    const start = new Date(document.getElementById("startDate").value || Date.now()).getTime();
+    const end = new Date(document.getElementById("endDate").value || Date.now()+30*86400000).getTime();
 
-    const start=startVal ? new Date(startVal).getTime() : Date.now();
-    const end=endVal ? new Date(endVal).getTime() : Date.now()+30*86400000;
+    const campaign = {
+      id: Date.now(),
 
-    const cpm=5;
-
-    const campaign={
-      id:Date.now(),
-
-      name:document.getElementById("name").value || "⚠️ Kein Name",
-      customer:document.getElementById("customer").value || "-",
-      link:document.getElementById("link").value || "",
+      name: document.getElementById("name").value,
+      customer: document.getElementById("customer").value,
+      link: document.getElementById("link").value,
 
       budget,
-      spent:0,
+      spent: 0,
 
-      typeCampaign:document.getElementById("typeCampaign").value,
-      type:document.getElementById("typeCampaign").value,
+      type: document.getElementById("typeCampaign").value,
 
-      cpm,
-      impressionsBooked:(budget/cpm)*1000,
-      impressionsDelivered:0,
+      cpm: 5,
+      impressionsBooked: (budget/5)*1000,
+      impressionsDelivered: 0,
 
-      // 💚 Spende vom Gesamtbudget
       donationPercent,
       donationAmount: budget * (donationPercent/100),
 
       targeting,
-
       start,
       end,
 
-      image:e.target.result
+      image: e.target.result
     };
 
-    const data=getData();
+    const data = getData();
     data.push(campaign);
     saveData(data);
+
+    console.log("✅ gespeichert", campaign);
 
     render();
     resetForm();
@@ -165,23 +161,13 @@ function createCampaign(){
 }
 
 /* =====================
-   RESET FORM
+   RESET
 ===================== */
 function resetForm(){
-
-  document.getElementById("name").value="";
-  document.getElementById("customer").value="";
-  document.getElementById("budget").value="";
-  document.getElementById("link").value="";
-
-  document.getElementById("startDate").value="";
-  document.getElementById("endDate").value="";
-
-  document.getElementById("donation").value="0";
-  document.getElementById("image").value="";
-
-  document.getElementById("targetType").value="global";
-  document.getElementById("targetFields").innerHTML="";
+  document.querySelectorAll("input").forEach(i=>{
+    if(i.type !== "file") i.value = "";
+  });
+  document.getElementById("donation").value = "0";
 }
 
 /* =====================
@@ -189,30 +175,23 @@ function resetForm(){
 ===================== */
 function render(){
 
-  const list=document.getElementById("list");
-  list.innerHTML="";
+  const list = document.getElementById("list");
+  list.innerHTML = "";
 
-  getData().forEach(c=>{
+  getData().forEach(c => {
 
-    const days=Math.ceil((c.end-c.start)/86400000);
+    const div = document.createElement("div");
+    div.className = "adRow";
 
-    const div=document.createElement("div");
-    div.className="adRow";
-
-    div.innerHTML=`
-      <div class="adLeft">
-        <img src="${c.image}">
-        <div>
-          <b>${c.name}</b><br>
-          ${c.customer}<br>
-          ⏱️ ${days} Tage<br>
-          💚 ${c.donationPercent}% = €${c.donationAmount.toFixed(2)}
-        </div>
-      </div>
-
+    div.innerHTML = `
       <div>
-        <button onclick="del(${c.id})">❌</button>
+        <img src="${c.image}">
+        <b>${c.name}</b><br>
+        ${c.customer}<br>
+        💚 ${c.donationPercent}% (€${c.donationAmount.toFixed(2)})
       </div>
+
+      <button onclick="del(${c.id})">❌</button>
     `;
 
     list.appendChild(div);
@@ -224,18 +203,18 @@ function render(){
 ===================== */
 function del(id){
 
-  if(!confirm("Kampagne löschen?")) return;
+  if(!confirm("Löschen?")) return;
 
-  let d=getData();
-  d=d.filter(x=>x.id!==id);
+  let data = getData();
+  data = data.filter(x => x.id !== id);
 
-  saveData(d);
+  saveData(data);
   render();
 }
 
 /* =====================
    INIT
 ===================== */
-window.onload=function(){
+window.onload = function(){
   render();
 };
