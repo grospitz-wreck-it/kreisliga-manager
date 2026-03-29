@@ -1,5 +1,5 @@
 /* =========================
-🌍 BASIS (UPGRADED)
+🌍 BASIS
 ========================= */
 body {
   margin: 0;
@@ -10,77 +10,10 @@ body {
   overflow-x: hidden;
 }
 
-/* 🔥 APP WRAPPER */
 .appWrapper {
   max-width: 920px;
   margin: 0 auto;
   width: 100%;
-}
-
-/* =========================
-🍔 MENU BUTTON
-========================= */
-#menuBtn {
-  width: 52px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(8px);
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-#menuBtn:hover {
-  background: rgba(255,255,255,0.1);
-}
-
-#menuBtn:active {
-  transform: scale(0.95);
-}
-
-/* =========================
-📱 OVERLAY
-========================= */
-#overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-  z-index: 1400;
-}
-
-#overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* =========================
-📱 SIDE PANEL
-========================= */
-#setupPanel {
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: 85%;
-  max-width: 360px;
-  height: 100%;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(10px);
-  transform: translateX(100%);
-  transition: 0.35s ease;
-  z-index: 1500;
-  overflow-y: auto;
-  box-shadow: -10px 0 30px rgba(0,0,0,0.2);
-}
-
-#setupPanel.open {
-  transform: translateX(0);
 }
 
 /* =========================
@@ -181,64 +114,75 @@ body {
 }
 
 /* =========================
-📢 ADS – FINAL FIX
+📢 ADS – CLEAN FINAL FIX
 ========================= */
 
-#adBanner{
-  width:100%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin:10px 0;
+/* 🔥 FLEX-KILL */
+#adBanner {
+  position: relative;
+  height: 90px;
+  min-height: 90px;
+  max-height: 90px;
+
+  width: 100%;
+  overflow: hidden;
+
+  display: block; /* ❗ killt flex komplett */
 }
 
-#adTrack{
-  width:100%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:90px !important;   /* 🔥 DAS FEHLT */
-  flex: 0 0 auto !important; /* 🔥 verhindert Stretch */
+/* Track liegt absolut drin → kein Stretch möglich */
+#adTrack {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* 🔒 echtes Leaderboard */
-.leaderboardAd{
-  height:90px;
-  width:100%;
-  max-width:970px;
+/* echtes Leaderboard */
+.leaderboardAd {
+  height: 90px;
+  width: 100%;
+  max-width: 970px;
 
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  margin:0 auto;
-  overflow:hidden;
-  background:#000;
-  border-radius:10px;
+  overflow: hidden;
+  background: #000;
+  border-radius: 10px;
 }
 
-/* 🔥 FIT TO HEIGHT */
-.leaderboardAd img{
-  height:100%;
-  width:auto;
-  display:block;
+/* 🔥 FIT TO HEIGHT (DER KEY) */
+.leaderboardAd img {
+  height: 100%;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
 
-/* 📱 Mobile */
-@media (max-width:600px){
-  .leaderboardAd{
-    height:50px;
-    max-width:320px;
+/* =========================
+📱 MOBILE ADS
+========================= */
+@media (max-width: 600px) {
+  #adBanner {
+    height: 50px;
+    min-height: 50px;
+    max-height: 50px;
+  }
+
+  .leaderboardAd {
+    max-width: 320px;
+    height: 50px;
+  }
+
+  .leaderboardAd img {
+    height: 50px;
   }
 }
 
-/* 🔥 GLOBAL IMAGE FIX */
-#adBanner img{
-  width:auto !important;
-}
-#adBanner {
-  align-self: center; /* verhindert Stretch */
-}
 /* =========================
 🔘 BUTTONS
 ========================= */
@@ -254,7 +198,7 @@ button {
 /* =========================
 🖥️ DESKTOP
 ========================= */
-@media (min-width: 769px){
+@media (min-width: 769px) {
   .layout {
     flex-direction: row;
     padding: 20px;
@@ -262,132 +206,4 @@ button {
 
   .mainPanel { flex: 2; }
   .sidePanel { flex: 1; }
-}
-
-
-/* =========================
-🔥 ADS FINAL HARD FIX
-========================= */
-
-#adBanner{
-  height:90px !important;
-  width:100% !important;
-
-  display:flex !important;
-  justify-content:center !important;
-  align-items:center !important;
-
-  flex: 0 0 90px !important;   /* 🔥 verhindert Flex-Stretch */
-  overflow:hidden !important;
-}
-
-#adTrack{
-  height:100% !important;
-  width:100% !important;
-
-  display:flex !important;
-  justify-content:center !important;
-  align-items:center !important;
-
-  flex: 0 0 auto !important;   /* 🔥 GANZ wichtig */
-}
-
-/* Leaderboard */
-.leaderboardAd{
-  height:100% !important;
-  max-height:90px !important;
-
-  width:100% !important;
-  max-width:970px !important;
-
-  display:flex !important;
-  justify-content:center !important;
-  align-items:center !important;
-
-  margin:0 auto !important;
-  overflow:hidden !important;
-  background:#000;
-  border-radius:10px;
-}
-
-/* 🔥 FIT TO HEIGHT FIX */
-.leaderboardAd img{
-  height:100% !important;
-  width:auto !important;
-  max-width:none !important;
-  display:block !important;
-}
-
-/* 📱 Mobile */
-@media (max-width:600px){
-  #adBanner{
-    height:50px !important;
-    flex: 0 0 50px !important;
-  }
-
-  .leaderboardAd{
-    max-width:320px !important;
-  }
-}
-
-/* =========================
-💣 ADS ABSOLUTE LOCK FIX
-========================= */
-
-#adBanner{
-  position: relative !important;
-  height: 90px !important;
-  min-height: 90px !important;
-  max-height: 90px !important;
-
-  overflow: hidden !important;
-}
-
-/* verhindert JEDE Vererbung */
-#adBanner *{
-  max-height: 90px !important;
-}
-
-/* Track fixieren */
-#adTrack{
-  position: absolute !important;
-  inset: 0 !important;
-
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-}
-
-/* echtes Leaderboard */
-.leaderboardAd{
-  height: 90px !important;
-  width: 100% !important;
-  max-width: 970px !important;
-
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-
-  overflow: hidden !important;
-}
-
-/* 🔥 DAS ist der wichtigste Teil */
-.leaderboardAd img{
-  height: 90px !important;
-  width: auto !important;
-  max-height: 90px !important;
-  object-fit: contain !important;
-}
-
-/* Mobile */
-@media (max-width:600px){
-  #adBanner{
-    height: 50px !important;
-    min-height: 50px !important;
-    max-height: 50px !important;
-  }
-
-  .leaderboardAd img{
-    height: 50px !important;
-  }
 }
