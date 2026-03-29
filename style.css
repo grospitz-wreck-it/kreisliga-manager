@@ -243,10 +243,13 @@ button {
 }
 
 /* Bild passt sich exakt an */
-#adTrack img{
-  height:100%;
-  width:auto;
-  object-fit:contain;
+#adTrack img {
+  height: 90px !important;
+  max-height: 90px !important;
+
+  width: auto !important;
+  object-fit: contain;
+  display: block;
 }
 
 /* 📱 Mobile */
