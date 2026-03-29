@@ -41,6 +41,11 @@ function initLeagueSelect(){
     opt.textContent = LEAGUES[key].name;
     select.appendChild(opt);
   });
+
+  // 🔥 EVENT FIX
+  select.onchange = function(){
+    selectLeague(this.value);
+  };
 }
 
 // =========================
@@ -61,6 +66,11 @@ function populateTeamSelect(){
     opt.textContent = `${team.name} (Stärke ${team.strength})`;
     select.appendChild(opt);
   });
+
+  // 🔥 EVENT FIX
+  select.onchange = function(){
+    selectTeam(this.value);
+  };
 }
 
 // =========================
@@ -75,7 +85,6 @@ function selectLeague(key){
     return;
   }
 
-  // Reset
   game.league.key = key;
   game.league.currentRound = 0;
   game.team.selected = null;
@@ -87,14 +96,8 @@ function selectLeague(key){
   game.league.teams = data.teams.map(name => ({
     name,
     strength: Math.floor(Math.random() * 30) + 60,
-
-    // 🔥 TAKTIK SYSTEM
     tactic: "balanced",
-
-    // 🔥 FORM (für spätere Features)
     form: [],
-
-    // 📊 STATS
     points: 0,
     goalsFor: 0,
     goalsAgainst: 0,
@@ -104,7 +107,6 @@ function selectLeague(key){
     played: 0
   }));
 
-  // 🔥 SAFETY CHECK
   if(game.league.teams.length !== 16){
     console.error("❌ FALSCHE TEAMANZAHL:", game.league.teams.length);
   } else {
@@ -124,7 +126,7 @@ function selectLeague(key){
   console.log("📅 Spielplan ready:", game.league.schedule.length);
 
   // =========================
-  // 📊 UI UPDATES
+  // 📊 UI
   // =========================
   renderTable?.();
   populateTeamSelect();
@@ -132,7 +134,7 @@ function selectLeague(key){
 }
 
 // =========================
-// 👤 TEAM WÄHLEN
+// 👤 TEAM WÄHLEN (🔥 FIX)
 // =========================
 function selectTeam(teamName){
 
@@ -147,32 +149,25 @@ function selectTeam(teamName){
     console.error("❌ Team nicht gefunden:", teamName);
     return;
   }
-  const select = document.getElementById("tacticSelect");
 
-if(select){
-  select.value = team.tactic;
-}
-  game.team.selected = team;
+  // 🔥 WICHTIG: STRING statt Objekt!
+  game.team.selected = team.name;
+
+  // optional für Spiel-Logik
+  game.team.data = team;
 
   console.log("✅ Team gewählt:", team.name);
 
-  // =========================
-  // 🔄 TAKTIK DROPDOWN SYNC
-  // =========================
   const tacticSelect = document.getElementById("tacticSelect");
-
   if(tacticSelect){
     tacticSelect.value = team.tactic;
   }
 
-  // =========================
-  // 📊 UI UPDATE
-  // =========================
   renderCurrentMatch?.();
 }
 
 // =========================
-// 🌍 GLOBAL EXPORTS
+// 🌍 EXPORTS
 // =========================
 window.initLeagueSelect = initLeagueSelect;
 window.populateTeamSelect = populateTeamSelect;
