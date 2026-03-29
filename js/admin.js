@@ -1,197 +1,242 @@
-(function(){
+const KEY="ad_v2";
 
-const KEY = "ad_v2";
+/* =====================
+   🌍 GEO DATA
+===================== */
+const COUNTRIES=["Deutschland","Österreich","Schweiz"];
+const STATES=["Bayern","NRW","Hessen","Niedersachsen","Sachsen","Berlin"];
 
-// =====================
-// STORAGE
-// =====================
-function getCampaigns(){
-  return JSON.parse(localStorage.getItem(KEY) || "[]");
+/* =====================
+   STORAGE
+===================== */
+function getData(){
+  return JSON.parse(localStorage.getItem(KEY)||"[]");
 }
 
-function saveCampaigns(data){
-  localStorage.setItem(KEY, JSON.stringify(data));
+function saveData(d){
+  localStorage.setItem(KEY,JSON.stringify(d));
 }
 
-// =====================
-// 🎮 GAME CONTEXT (NEU)
-// =====================
-function getGameContext(){
-  return {
-    country: "Deutschland", // default
-    state: window.currentState || null,
-    league: window.currentLeagueId || null,
-    team: window.currentTeamId || null
-  };
+/* =====================
+   🎯 TARGETING UI
+===================== */
+function updateTargetingUI(){
+
+  const type=document.getElementById("targetType").value;
+  const container=document.getElementById("targetFields");
+
+  container.innerHTML="";
+
+  if(type==="global") return;
+
+  if(type==="country"){
+    container.innerHTML=`
+      <select id="countrySelect">
+        ${COUNTRIES.sort().map(c=>`<option value="${c}">${c}</option>`).join("")}
+      </select>
+    `;
+  }
+
+  if(type==="state"){
+    container.innerHTML=`
+      <select id="stateSelect">
+        ${STATES.sort().map(s=>`<option value="${s}">${s}</option>`).join("")}
+      </select>
+    `;
+  }
+
+  if(type==="district"){
+    container.innerHTML=`<select id="leagueSelect"></select>`;
+    loadLeagues();
+  }
+
+  if(type==="team"){
+    container.innerHTML=`
+      <select id="leagueSelect"></select>
+      <select id="teamSelect"></select>
+    `;
+    loadLeagues();
+  }
 }
 
-// =====================
-// CPM LOGIK (BLEIBT)
-// =====================
-function getCPM(t){
-  if(t?.type === "team") return 20;
-  if(t?.type === "district") return 10;
-  if(t?.type === "state") return 5;
-  if(t?.type === "country") return 2;
+/* =====================
+   🏆 LEAGUES LADEN
+===================== */
+function loadLeagues(){
+
+  if(typeof LEAGUES==="undefined"){
+    console.warn("❌ LEAGUES nicht geladen");
+    return;
+  }
+
+  const leagueSelect=document.getElementById("leagueSelect");
+  const teamSelect=document.getElementById("teamSelect");
+
+  if(!leagueSelect) return;
+
+  leagueSelect.innerHTML=`<option value="">Liga wählen</option>`;
+
+  Object.keys(LEAGUES).forEach(key=>{
+    const opt=document.createElement("option");
+    opt.value=key;
+    opt.textContent=LEAGUES[key].name;
+    leagueSelect.appendChild(opt);
+  });
+
+  if(teamSelect){
+    leagueSelect.onchange=()=>{
+
+      teamSelect.innerHTML=`<option value="">Team wählen</option>`;
+
+      const league=LEAGUES[leagueSelect.value];
+      if(!league) return;
+
+      league.teams.forEach(team=>{
+        const opt=document.createElement("option");
+        opt.value=team;
+        opt.textContent=team;
+        teamSelect.appendChild(opt);
+      });
+    };
+  }
+}
+
+/* =====================
+   💰 CPM LOGIK
+===================== */
+function getCPM(type){
+  if(type==="team") return 20;
+  if(type==="district") return 10;
+  if(type==="state") return 5;
+  if(type==="country") return 2;
   return 1;
 }
 
-// =====================
-// PACING (BLEIBT)
-// =====================
-function shouldServe(c){
-  const total = (c.end - c.start);
-  const passed = (Date.now() - c.start);
+/* =====================
+   🚀 CREATE CAMPAIGN
+===================== */
+function createCampaign(){
 
-  if(total <= 0) return true;
+  const file=document.getElementById("image").files[0];
+  if(!file) return alert("Bild fehlt");
 
-  const expected = (passed / total) * (c.impressionsBooked || 0);
+  const reader=new FileReader();
 
-  return (c.impressionsDelivered || 0) <= expected * 1.2;
+  reader.onload=function(e){
+
+    const type=document.getElementById("targetType").value;
+
+    let targeting={type};
+
+    if(type==="country"){
+      targeting.value=document.getElementById("countrySelect").value;
+    }
+
+    if(type==="state"){
+      targeting.value=document.getElementById("stateSelect").value;
+    }
+
+    if(type==="district"){
+      targeting.league=document.getElementById("leagueSelect").value;
+    }
+
+    if(type==="team"){
+      targeting.league=document.getElementById("leagueSelect").value;
+      targeting.team=document.getElementById("teamSelect").value;
+    }
+
+    const budget=parseFloat(document.getElementById("budget").value)||0;
+    const days=parseInt(document.getElementById("duration").value)||30;
+
+    const cpm=getCPM(type);
+
+    const campaign={
+      id:Date.now(),
+      name:document.getElementById("name").value || "⚠️ Kein Name",
+      customer:document.getElementById("customer").value || "-",
+      budget:budget,
+      spent:0,
+
+      // 🔥 wichtig für kompatibilität
+      typeCampaign:document.getElementById("typeCampaign").value,
+      type:document.getElementById("typeCampaign").value,
+
+      cpm,
+      impressionsBooked:(budget/cpm)*1000,
+      impressionsDelivered:0,
+
+      donation:parseFloat(document.getElementById("donation").value)||0,
+
+      targeting,
+
+      start:Date.now(),
+      end:Date.now()+days*86400000,
+
+      image:e.target.result
+    };
+
+    const data=getData();
+    data.push(campaign);
+    saveData(data);
+
+    render();
+  };
+
+  reader.readAsDataURL(file);
 }
 
-// =====================
-// 🎯 TARGET MATCH (NEU + ALT SUPPORT)
-// =====================
-function match(c, ctx){
+/* =====================
+   📊 RENDER UI
+===================== */
+function render(){
 
-  const t = c.targeting;
+  const list=document.getElementById("list");
+  list.innerHTML="";
 
-  // 🔥 NEUES SYSTEM
-  if(t?.type){
+  const data=getData();
 
-    if(t.type === "global") return true;
+  data.forEach(c=>{
 
-    if(t.type === "country"){
-      return ctx.country === t.value;
-    }
+    const donationVal=c.spent*(c.donation/100);
 
-    if(t.type === "state"){
-      return ctx.state === t.value;
-    }
+    const div=document.createElement("div");
+    div.className="adRow";
 
-    if(t.type === "district"){
-      return ctx.league === t.league;
-    }
-
-    if(t.type === "team"){
-      return ctx.team === t.team;
-    }
-  }
-
-  // 🧯 FALLBACK (ALTES SYSTEM)
-  if(t?.team) return !!ctx.team;
-  if(t?.district) return !!ctx.league;
-  if(t?.state) return !!ctx.state;
-  if(t?.country) return !!ctx.country;
-
-  return true;
-}
-
-// =====================
-// DELIVERY ENGINE
-// =====================
-function serveAd(){
-
-  let campaigns = getCampaigns();
-  const ctx = getGameContext();
-
-  campaigns = campaigns.filter(c => {
-
-    // Zeitraum
-    if(c.start && Date.now() < c.start) return false;
-    if(c.end && Date.now() > c.end) return false;
-
-    // TKP Stop
-    if((c.type === "TKP" || c.typeCampaign === "TKP") &&
-       c.impressionsDelivered >= c.impressionsBooked){
-      return false;
-    }
-
-    // Pacing
-    if(!shouldServe(c)) return false;
-
-    return true;
-  });
-
-  // Targeting
-  campaigns = campaigns.filter(c => match(c, ctx));
-
-  if(!campaigns.length) return null;
-
-  const c = campaigns[Math.floor(Math.random() * campaigns.length)];
-
-  // Tracking
-  c.impressionsDelivered = (c.impressionsDelivered || 0) + 1;
-
-  const isTKP = c.type === "TKP" || c.typeCampaign === "TKP";
-
-  if(isTKP){
-    const cpm = c.cpm || getCPM(c.targeting);
-    c.spent = (c.spent || 0) + (cpm / 1000);
-  }
-
-  // speichern
-  const all = getCampaigns().map(x => x.id === c.id ? c : x);
-  saveCampaigns(all);
-
-  return c;
-}
-
-// =====================
-// RENDER (MULTI ADS)
-// =====================
-function renderAds(){
-
-  const track = document.getElementById("adTrack");
-  if(!track) return;
-
-  let output = "";
-
-  for(let i=0;i<3;i++){
-
-    const ad = serveAd();
-
-    if(ad){
-      output += `
-        <div class="adItem">
-          ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
-          <img src="${ad.image}">
-          ${ad.link ? `</a>` : ""}
+    div.innerHTML=`
+      <div class="adLeft">
+        <img src="${c.image}">
+        <div>
+          <b>${c.name}</b><br>
+          <small>${c.customer}</small><br>
+          <small>${c.targeting.type}</small>
         </div>
-      `;
-    }
-  }
+      </div>
 
-  if(!output){
-    output = "<span style='color:white'>Keine Werbung aktiv</span>";
-  }
+      <div>
+        €${c.spent.toFixed(2)}<br>
+        💚 ${donationVal.toFixed(2)}€<br>
+        <button class="danger" onclick="del(${c.id})">❌</button>
+      </div>
+    `;
 
-  track.innerHTML = output;
+    list.appendChild(div);
+  });
 }
 
-// =====================
-// AUTO ROTATION
-// =====================
-setInterval(renderAds, 4000);
+/* =====================
+   ❌ DELETE
+===================== */
+function del(id){
+  let d=getData();
+  d=d.filter(x=>x.id!==id);
+  saveData(d);
+  render();
+}
 
-// =====================
-// INIT
-// =====================
-window.startAds = function() {
-  if (window.adsInitialized) return;
-  window.adsInitialized = true;
-
-  console.log("📢 Ads gestartet (V3)");
-
-  renderAds();
+/* =====================
+   INIT
+===================== */
+window.onload=function(){
+  updateTargetingUI();
+  render();
 };
-
-// =====================
-// 🎮 GAME HOOKS
-// =====================
-window.onMatchStart = renderAds;
-window.onHalftime = renderAds;
-window.onMatchEnd = renderAds;
-
-})();
