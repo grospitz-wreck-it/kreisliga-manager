@@ -1,13 +1,15 @@
+(function(){
+
 const STORAGE_KEY = "kreisliga_ads";
 
-function startAds() {
+window.startAds = function() {
 if (window.adsInitialized) return;
 window.adsInitialized = true;
 
 console.log("📢 Ads gestartet");
 
 buildAdTrack();
-}
+};
 
 function buildAdTrack() {
 const track = document.getElementById("adTrack");
@@ -17,7 +19,6 @@ track.innerHTML = "";
 
 let ads = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-// 📅 Nur aktive Ads filtern
 const today = new Date().toISOString().split("T")[0];
 
 ads = ads.filter(ad => {
@@ -31,24 +32,12 @@ track.innerHTML = "<span style='color:white'>Keine Werbung aktiv</span>";
 return;
 }
 
-// 🎯 Gewichtung berücksichtigen
-const weightedAds = [];
-
-ads.forEach(ad => {
-const w = ad.weight || 1;
-for (let i = 0; i < w; i++) {
-weightedAds.push(ad);
-}
-});
-
-// 👉 Max 5 Ads anzeigen (UI sauber halten)
-const selectedAds = weightedAds.slice(0, 5);
+const selectedAds = ads.slice(0, 5);
 
 selectedAds.forEach(ad => {
 const div = document.createElement("div");
 div.className = "adItem";
 
-```
 const img = document.createElement("img");
 img.src = ad.image;
 
@@ -63,7 +52,7 @@ if (ad.link) {
 }
 
 track.appendChild(div);
-```
-
 });
 }
+
+})();
