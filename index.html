@@ -14,16 +14,25 @@
     }
 
     /* 🔥 MINIMAL Desktop Fix */
-    .container {
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+ .container {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 
-      max-width: 600px;
-      margin: 0 auto;
-    }
+  max-width: 600px;
+  margin: 0 auto;
+}
 
+/* 🔥 verhindert dass irgendwas gestretched wird */
+.container > * {
+  flex: 0 0 auto;
+}
+
+/* optional nice */
+#adBanner {
+  align-self: center;
+}
     input, select, button {
       width: 100%;
       padding: 12px;
