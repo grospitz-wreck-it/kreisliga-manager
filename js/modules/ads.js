@@ -41,11 +41,8 @@ function getMatchingAds(){
 }
 
 // =========================
-// 🎬 RENDER
+// 🎬 RENDER LEADERBOARD
 // =========================
-let currentIndex = 0;
-let adsCache = [];
-
 function renderAds(){
 
   const track = document.getElementById("adTrack");
@@ -54,40 +51,34 @@ function renderAds(){
   const ads = getMatchingAds();
 
   if(!ads.length){
-    track.innerHTML = `<div style="color:#fff">Keine Werbung</div>`;
+    track.innerHTML = `<div class="adFallback">Keine Werbung</div>`;
     return;
   }
 
-  // 🔥 loop für smooth scroll
-  const loop = [...ads, ...ads];
+  // 👉 aktuelle Ad (Index rotierend)
+  if(!window.__adIndex) window.__adIndex = 0;
+
+  const ad = ads[window.__adIndex % ads.length];
 
   track.innerHTML = `
-    <div class="adSlider">
-      ${loop.map(ad => `
-        <div class="adSlide">
-          ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
-            <img src="${ad.image || 'https://via.placeholder.com/300x70?text=Ad'}">
-          ${ad.link ? `</a>` : ""}
-        </div>
-      `).join("")}
+    <div class="leaderboardAd">
+      ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
+        <img src="${ad.image}" alt="ad">
+      ${ad.link ? `</a>` : ""}
     </div>
   `;
 }
+
 // =========================
-// 🔁 ROTATION
+// 🔄 ROTATION
 // =========================
 function rotateAds(){
+  const ads = getMatchingAds();
+  if(!ads.length) return;
 
-  const slider = document.querySelector(".adsSlider");
-  if(!slider || adsCache.length <= 1) return;
+  window.__adIndex = (window.__adIndex || 0) + 1;
 
-  currentIndex++;
-
-  if(currentIndex >= adsCache.length){
-    currentIndex = 0;
-  }
-
-  slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+  renderAds();
 }
 
 // =========================
@@ -95,28 +86,10 @@ function rotateAds(){
 // =========================
 window.startAdEngine = function(){
 
-  console.log("📢 Ad Engine gestartet");
+  console.log("📢 Leaderboard Ads gestartet");
 
-  const waitForGame = setInterval(() => {
-
-    if(!window.game){
-      console.log("⏳ warte auf game...");
-      return;
-    }
-
-    clearInterval(waitForGame);
-
-    console.log("✅ game erkannt → starte ads");
-
-    setInterval(() => {
   renderAds();
-}, 10000);
 
-    setInterval(rotateAds, 5000);
-    setInterval(renderAds, 20000);
-
-  }, 500);
-};
-window.serveAd = function(){
-  return getMatchingAds();
+  // 👉 alle 6 Sekunden wechseln
+  setInterval(rotateAds, 6000);
 };
