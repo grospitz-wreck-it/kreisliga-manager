@@ -42,16 +42,27 @@ window.updateTargetingUI = function(){
 function loadLeagues(){
 
   const select = document.getElementById("leagueSelectAds");
-  if(!select || !window.LEAGUES) return;
+
+  if(!select){
+    console.error("❌ leagueSelectAds fehlt im HTML");
+    return;
+  }
+
+  if(!window.LEAGUES){
+    console.error("❌ LEAGUES nicht geladen");
+    return;
+  }
 
   select.innerHTML = `<option value="">Liga wählen</option>`;
 
-  Object.keys(LEAGUES).forEach(key => {
+  Object.entries(LEAGUES).forEach(([key, league]) => {
     const opt = document.createElement("option");
     opt.value = key;
-    opt.textContent = LEAGUES[key].name;
+    opt.textContent = league.name;
     select.appendChild(opt);
   });
+
+  console.log("✅ Ligen geladen");
 }
 
 // =====================
