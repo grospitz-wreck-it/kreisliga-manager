@@ -4,107 +4,23 @@
 <meta charset="UTF-8">
 <title>Ad System V2</title>
 
-<!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-<!-- 🔥 WICHTIG: LEAGUES LADEN -->
+<!-- 🔥 WICHTIG -->
 <script src="league.js"></script>
 
 <style>
-body{
-  font-family:'Inter',system-ui;
-  background:#f5f7fb;
-  margin:0;
-  color:#1a1a1a;
-}
-
-.container{
-  max-width:1100px;
-  margin:auto;
-  padding:20px;
-}
-
-h1{font-size:28px;}
-
-.box{
-  background:#fff;
-  border-radius:16px;
-  padding:20px;
-  margin-bottom:20px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.05);
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-input,select{
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  width:100%;
-}
-
-button{
-  margin-top:10px;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  background:#4CAF50;
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-}
-
+body{font-family:'Inter';background:#f5f7fb;margin:0;color:#1a1a1a}
+.container{max-width:1100px;margin:auto;padding:20px}
+.box{background:#fff;border-radius:16px;padding:20px;margin-bottom:20px;box-shadow:0 8px 25px rgba(0,0,0,0.05)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input,select{padding:12px;border-radius:10px;border:1px solid #ddd;width:100%}
+button{padding:12px;border:none;border-radius:10px;background:#4CAF50;color:#fff;font-weight:600;cursor:pointer}
 button.danger{background:#e53935}
 
-/* 🔥 MODERNE CHECKBOXEN */
-.targeting{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-
-.targeting input{
-  display:none;
-}
-
-.targeting label span{
-  display:inline-block;
-  padding:10px 16px;
-  border-radius:999px;
-  background:#eef1f6;
-}
-
-.targeting input:checked + span{
-  background:#4CAF50;
-  color:#fff;
-}
-
-/* LIST */
-.adRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px;
-  border-radius:14px;
-  background:#fff;
-  box-shadow:0 5px 15px rgba(0,0,0,0.04);
-  margin-bottom:10px;
-}
-
-.adLeft{
-  display:flex;
-  gap:15px;
-  align-items:center;
-}
-
-.adRow img{
-  height:50px;
-  border-radius:8px;
-}
+.adRow{display:flex;justify-content:space-between;align-items:center;padding:15px;border-radius:14px;background:#fff;box-shadow:0 5px 15px rgba(0,0,0,0.04);margin-bottom:10px}
+.adLeft{display:flex;gap:15px;align-items:center}
+.adRow img{height:50px;border-radius:8px}
 
 small{color:#666}
 </style>
@@ -117,13 +33,14 @@ small{color:#666}
 <h1>🚀 Ad System Dashboard</h1>
 
 <div class="box">
+
 <h2>Neue Kampagne</h2>
 
 <div class="grid">
 <input id="name" placeholder="Kampagnenname">
 <input id="customer" placeholder="Kunde">
 <input id="budget" type="number" placeholder="Budget €">
-<select id="type">
+<select id="typeCampaign">
 <option value="TKP">TKP</option>
 <option value="SPONSOR">Sponsor</option>
 </select>
@@ -131,31 +48,23 @@ small{color:#666}
 
 <h3>🎯 Targeting</h3>
 
-<h3>🎯 Targeting</h3>
-
 <select id="targetType" onchange="updateTargetingUI()">
-  <option value="global">Global</option>
-  <option value="country">Land</option>
-  <option value="state">Bundesland</option>
-  <option value="district">Kreis / Liga</option>
-  <option value="team">Team</option>
+<option value="global">Global</option>
+<option value="country">Land</option>
+<option value="state">Bundesland</option>
+<option value="district">Kreis / Liga</option>
+<option value="team">Team</option>
 </select>
 
-<!-- Dynamische Felder -->
 <div id="targetFields"></div>
 
-<br>
-
-<select id="leagueSelect"></select>
-<select id="teamSelect"></select>
-
-<input id="budget" type="number" placeholder="Budget €">
-<input id="duration" type="number" placeholder="Laufzeit (Tage)" value="30">
-<input id="donation" type="number" placeholder="Spende %" value="0">
+<input id="duration" type="number" value="30" placeholder="Laufzeit (Tage)">
+<input id="donation" type="number" value="0" placeholder="Spende %">
 
 <input type="file" id="image">
 
 <button onclick="createCampaign()">💾 Kampagne speichern</button>
+
 </div>
 
 <div class="box">
@@ -168,57 +77,82 @@ small{color:#666}
 <script>
 const KEY="ad_v2";
 
+/* =====================
+   🌍 GEO DATA
+===================== */
+const COUNTRIES=["Deutschland","Österreich","Schweiz"];
+const STATES=["Bayern","NRW","Hessen","Niedersachsen","Sachsen","Berlin"];
+
+/* =====================
+   STORAGE
+===================== */
 function getData(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
 function saveData(d){localStorage.setItem(KEY,JSON.stringify(d))}
 
-// =====================
-// LEAGUES
-// =====================
-function loadLeagues(){
+/* =====================
+   UI TARGETING
+===================== */
+function updateTargetingUI(){
 
- if(typeof LEAGUES==="undefined"){
-  console.error("❌ LEAGUES fehlt");
-  return;
+ const type=targetType.value;
+ targetFields.innerHTML="";
+
+ if(type==="global") return;
+
+ if(type==="country"){
+  targetFields.innerHTML=`<select id="countrySelect">${COUNTRIES.sort().map(c=>`<option>${c}</option>`).join("")}</select>`;
  }
 
- leagueSelect.innerHTML=`<option value="">Liga wählen</option>`;
+ if(type==="state"){
+  targetFields.innerHTML=`<select id="stateSelect">${STATES.sort().map(s=>`<option>${s}</option>`).join("")}</select>`;
+ }
+
+ if(type==="district"){
+  targetFields.innerHTML=`<select id="leagueSelect"></select>`;
+  loadLeagues();
+ }
+
+ if(type==="team"){
+  targetFields.innerHTML=`<select id="leagueSelect"></select><select id="teamSelect"></select>`;
+  loadLeagues();
+ }
+}
+
+/* =====================
+   LEAGUES
+===================== */
+function loadLeagues(){
+
+ if(typeof LEAGUES==="undefined") return;
+
+ const ls=document.getElementById("leagueSelect");
+ const ts=document.getElementById("teamSelect");
+
+ ls.innerHTML=`<option value="">Liga wählen</option>`;
 
  Object.keys(LEAGUES).forEach(key=>{
   const opt=document.createElement("option");
   opt.value=key;
   opt.textContent=LEAGUES[key].name;
-  leagueSelect.appendChild(opt);
+  ls.appendChild(opt);
  });
 
- leagueSelect.onchange=()=>{
-  teamSelect.innerHTML=`<option value="">Team wählen</option>`;
-
-  const key=leagueSelect.value;
-  if(!key) return;
-
-  LEAGUES[key].teams.forEach(t=>{
+ if(ts){
+  ls.onchange=()=>{
+   ts.innerHTML=`<option value="">Team wählen</option>`;
+   LEAGUES[ls.value].teams.forEach(t=>{
     const opt=document.createElement("option");
     opt.value=t;
     opt.textContent=t;
-    teamSelect.appendChild(opt);
-  });
- };
+    ts.appendChild(opt);
+   });
+  };
+ }
 }
 
-// =====================
-// CPM
-// =====================
-function getCPM(t){
- if(t.team) return 20;
- if(t.district) return 10;
- if(t.state) return 5;
- if(t.country) return 2;
- return 1;
-}
-
-// =====================
-// CREATE
-// =====================
+/* =====================
+   CREATE
+===================== */
 function createCampaign(){
 
  const file=image.files[0];
@@ -228,32 +162,32 @@ function createCampaign(){
 
  reader.onload=function(e){
 
- const targeting={
-  global:global.checked,
-  country:country.checked,
-  state:state.checked,
-  district:district.checked,
-  team:team.checked
- };
+ const type=targetType.value;
+
+ let targeting={type};
+
+ if(type==="country") targeting.value=countrySelect.value;
+ if(type==="state") targeting.value=stateSelect.value;
+ if(type==="district") targeting.league=leagueSelect.value;
+ if(type==="team"){
+  targeting.league=leagueSelect.value;
+  targeting.team=teamSelect.value;
+ }
 
  const days=parseInt(duration.value)||30;
- const cpm=getCPM(targeting);
- const b=parseFloat(budget.value);
+ const budgetVal=parseFloat(budget.value)||0;
 
  const c={
   id:Date.now(),
-  name:name.value || "⚠️ Kein Name",
-  customer:customer.value || "-",
-  budget:b,
+  name:name.value||"⚠️ Kein Name",
+  customer:customer.value||"-",
+  budget:budgetVal,
   spent:0,
-  type:type.value,
-  cpm,
-  impressionsBooked:(b/cpm)*1000,
+  typeCampaign:typeCampaign.value,
   impressionsDelivered:0,
+  impressionsBooked:100000,
   donation:parseFloat(donation.value)||0,
   targeting,
-  leagueId:leagueSelect.value,
-  teamId:teamSelect.value,
   start:Date.now(),
   end:Date.now()+days*86400000,
   image:e.target.result
@@ -268,43 +202,9 @@ function createCampaign(){
  reader.readAsDataURL(file);
 }
 
-// =====================
-// MATCH
-// =====================
-function match(c,ctx){
- if(c.teamId) return c.teamId===ctx.team;
- if(c.leagueId) return c.leagueId===ctx.league;
- return true;
-}
-
-// =====================
-// SERVE
-// =====================
-function serveAd(ctx={}){
-
- let d=getData();
-
- d=d.filter(c=>{
-  if(c.type==="TKP" && c.impressionsDelivered>=c.impressionsBooked) return false;
-  return true;
- });
-
- d=d.filter(c=>match(c,ctx));
-
- if(!d.length) return null;
-
- const c=d[Math.floor(Math.random()*d.length)];
-
- c.impressionsDelivered++;
- if(c.type==="TKP") c.spent+=c.cpm/1000;
-
- saveData(d);
- return c;
-}
-
-// =====================
-// UI
-// =====================
+/* =====================
+   UI
+===================== */
 function render(){
 
  list.innerHTML="";
@@ -320,7 +220,7 @@ function render(){
   <div>
    <b>${c.name}</b><br>
    <small>${c.customer}</small><br>
-   <small>${c.leagueId||"Global"} → ${c.teamId||"-"}</small>
+   <small>${c.targeting.type}</small>
   </div>
  </div>
 
@@ -341,11 +241,8 @@ function del(id){
  render();
 }
 
-// =====================
-// INIT
-// =====================
 render();
-loadLeagues();
+updateTargetingUI();
 </script>
 
 </body>
