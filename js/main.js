@@ -58,7 +58,8 @@ function init(){
   bindUI();
 
   // 🔥 NEU: AD ENGINE STARTEN
-  startAdEngine();
+  // ✅ NEU
+  startAdsSafe();
 
   // Optional: Save laden
   if(typeof loadGame === "function"){
