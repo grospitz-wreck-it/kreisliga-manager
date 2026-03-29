@@ -23,68 +23,26 @@ const game = {
 window.game = game;
 
 // =========================
-// 📢 AD ENGINE START
+// 📢 AD ENGINE START (FIX)
 // =========================
-function startAdEngine(){
-
-  console.log("📢 Ad Engine startet...");
-
-  const track = document.getElementById("adTrack");
-  if(!track){
-    console.warn("❌ adTrack fehlt");
-    return;
-  }
-
-  // 🔥 WARTE BIS ADS READY
- function waitForAdsAndStart(){
+function startAdsSafe(){
 
   const interval = setInterval(() => {
 
+    // 👉 warten bis ads.js geladen ist
     if(typeof window.startAdEngine === "function"){
 
-      console.log("✅ Ads geladen → starte Engine");
+      console.log("✅ ads.js bereit → starte Ads");
 
       clearInterval(interval);
 
-      window.startAdEngine();
+      window.startAdEngine(); // 👉 DIE aus ads.js!
+
     } else {
       console.log("⏳ warte auf ads.js...");
     }
 
   }, 200);
-}
-
-// 👉 beim Init aufrufen
-waitForAdsAndStart();
-
-  function runAds(){
-
-    setInterval(() => {
-
-      const ads = window.serveAd(); // jetzt safe
-
-      if(!ads || !ads.length){
-        track.innerHTML = "<span style='color:white'>Keine Werbung aktiv</span>";
-        return;
-      }
-
-      // 🔥 DUPLICATE für smooth scroll
-      const loopAds = [...ads, ...ads];
-
-      track.innerHTML = `
-        <div class="ads">
-          ${loopAds.map(ad => `
-            <div class="adItem">
-              ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
-                <img src="${ad.image}">
-              ${ad.link ? `</a>` : ""}
-            </div>
-          `).join("")}
-        </div>
-      `;
-
-    }, 8000); // langsamer = hochwertiger
-  }
 }
 // =========================
 // 🚀 INIT
