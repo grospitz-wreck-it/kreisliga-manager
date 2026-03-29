@@ -77,25 +77,25 @@ function pickWeightedAd(list){
 // =========================
 // 🧱 BANNER BAUEN
 // =========================
-function buildAdTrack(){
-
+function buildAdTrack() {
   const track = document.getElementById("adTrack");
-
-  if(!track){
-    console.warn("❌ adTrack nicht gefunden");
-    return;
-  }
+  if (!track) return;
 
   track.innerHTML = "";
 
-  const active = getActiveAds();
+  const ads = JSON.parse(localStorage.getItem("kreisliga_ads")) || [];
 
-  console.log("📢 Aktive Ads:", active.length);
+  ads.forEach(url => {
+    const div = document.createElement("div");
+    div.className = "adItem";
 
-  if(active.length === 0){
-    track.innerHTML = "<span style='color:white'>Keine Werbung</span>";
-    return;
-  }
+    const img = document.createElement("img");
+    img.src = url;
+
+    div.appendChild(img);
+    track.appendChild(div);
+  });
+}
 
   // =========================
   // 👉 NUR EINE AD (realistisch)
