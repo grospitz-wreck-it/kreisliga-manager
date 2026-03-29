@@ -54,7 +54,9 @@ function init(){
 
   console.log("✅ Init fertig");
 }
-
+if(window.startAds){
+  startAds();
+}
 // =========================
 // ▶️ START
 // =========================
