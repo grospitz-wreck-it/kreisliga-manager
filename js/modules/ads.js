@@ -108,7 +108,9 @@ window.startAdEngine = function(){
 
     console.log("✅ game erkannt → starte ads");
 
-    renderAds();
+    setInterval(() => {
+  renderAds();
+}, 10000);
 
     setInterval(rotateAds, 5000);
     setInterval(renderAds, 20000);
