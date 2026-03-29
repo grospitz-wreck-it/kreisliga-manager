@@ -14,33 +14,30 @@ function saveCampaigns(data){
 }
 
 // =====================
-// GAME CONTEXT (ANPASSBAR)
+// 🎮 GAME CONTEXT (NEU)
 // =====================
 function getGameContext(){
   return {
-    global: true,
-    country: true,
-
-    // 👉 später mit echten Daten verbinden
+    country: "Deutschland", // default
     state: window.currentState || null,
-    district: window.currentDistrict || null,
-    team: window.selectedTeam || null
+    league: window.currentLeagueId || null,
+    team: window.currentTeamId || null
   };
 }
 
 // =====================
-// CPM LOGIK
+// CPM LOGIK (BLEIBT)
 // =====================
 function getCPM(t){
-  if(t.team) return 20;
-  if(t.district) return 10;
-  if(t.state) return 5;
-  if(t.country) return 2;
+  if(t?.type === "team") return 20;
+  if(t?.type === "district") return 10;
+  if(t?.type === "state") return 5;
+  if(t?.type === "country") return 2;
   return 1;
 }
 
 // =====================
-// PACING
+// PACING (BLEIBT)
 // =====================
 function shouldServe(c){
   const total = (c.end - c.start);
@@ -48,20 +45,45 @@ function shouldServe(c){
 
   if(total <= 0) return true;
 
-  const expected = (passed / total) * c.impressionsBooked;
+  const expected = (passed / total) * (c.impressionsBooked || 0);
 
-  return c.impressionsDelivered <= expected * 1.2;
+  return (c.impressionsDelivered || 0) <= expected * 1.2;
 }
 
 // =====================
-// TARGET MATCH
+// 🎯 TARGET MATCH (NEU + ALT SUPPORT)
 // =====================
 function match(c, ctx){
 
-  if(c.targeting?.team) return !!ctx.team;
-  if(c.targeting?.district) return !!ctx.district;
-  if(c.targeting?.state) return !!ctx.state;
-  if(c.targeting?.country) return !!ctx.country;
+  const t = c.targeting;
+
+  // 🔥 NEUES SYSTEM
+  if(t?.type){
+
+    if(t.type === "global") return true;
+
+    if(t.type === "country"){
+      return ctx.country === t.value;
+    }
+
+    if(t.type === "state"){
+      return ctx.state === t.value;
+    }
+
+    if(t.type === "district"){
+      return ctx.league === t.league;
+    }
+
+    if(t.type === "team"){
+      return ctx.team === t.team;
+    }
+  }
+
+  // 🧯 FALLBACK (ALTES SYSTEM)
+  if(t?.team) return !!ctx.team;
+  if(t?.district) return !!ctx.league;
+  if(t?.state) return !!ctx.state;
+  if(t?.country) return !!ctx.country;
 
   return true;
 }
@@ -81,7 +103,8 @@ function serveAd(){
     if(c.end && Date.now() > c.end) return false;
 
     // TKP Stop
-    if(c.type === "TKP" && c.impressionsDelivered >= c.impressionsBooked){
+    if((c.type === "TKP" || c.typeCampaign === "TKP") &&
+       c.impressionsDelivered >= c.impressionsBooked){
       return false;
     }
 
@@ -101,8 +124,11 @@ function serveAd(){
   // Tracking
   c.impressionsDelivered = (c.impressionsDelivered || 0) + 1;
 
-  if(c.type === "TKP"){
-    c.spent = (c.spent || 0) + (c.cpm / 1000);
+  const isTKP = c.type === "TKP" || c.typeCampaign === "TKP";
+
+  if(isTKP){
+    const cpm = c.cpm || getCPM(c.targeting);
+    c.spent = (c.spent || 0) + (cpm / 1000);
   }
 
   // speichern
@@ -122,8 +148,8 @@ function renderAds(){
 
   let output = "";
 
-  // 👉 Anzahl Ads gleichzeitig (wie vorher)
   for(let i=0;i<3;i++){
+
     const ad = serveAd();
 
     if(ad){
@@ -150,30 +176,22 @@ function renderAds(){
 setInterval(renderAds, 4000);
 
 // =====================
-// INIT (WICHTIG!)
+// INIT
 // =====================
 window.startAds = function() {
   if (window.adsInitialized) return;
   window.adsInitialized = true;
 
-  console.log("📢 Ads gestartet (V2)");
+  console.log("📢 Ads gestartet (V3)");
 
   renderAds();
 };
 
 // =====================
-// GAME HOOKS
+// 🎮 GAME HOOKS
 // =====================
-window.onMatchStart = function(){
-  renderAds();
-};
-
-window.onHalftime = function(){
-  renderAds();
-};
-
-window.onMatchEnd = function(){
-  renderAds();
-};
+window.onMatchStart = renderAds;
+window.onHalftime = renderAds;
+window.onMatchEnd = renderAds;
 
 })();
