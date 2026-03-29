@@ -334,3 +334,7 @@ button {
 #adBanner img{
   width:auto !important;
 }
+/* 🔥 FINAL FIX – Container killen */
+.container {
+  display: block !important;
+}
