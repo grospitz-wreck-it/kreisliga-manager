@@ -2,17 +2,30 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Ad System Dashboard</title>
+<title>Ad Admin</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-<script src="league.js"></script>
-<script src="admin.js" defer></script>
-
 <style>
-body{font-family:'Inter';background:#f5f7fb;margin:0}
-.container{max-width:1100px;margin:auto;padding:30px}
-.box{background:#fff;border-radius:16px;padding:25px;margin-bottom:25px;box-shadow:0 10px 30px rgba(0,0,0,0.05)}
+body{
+  font-family:'Inter';
+  background:#0f172a;
+  color:#fff;
+  margin:0;
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:30px;
+}
+
+.box{
+  background:#1e293b;
+  padding:25px;
+  border-radius:16px;
+  margin-bottom:20px;
+}
 
 .grid{
   display:grid;
@@ -25,16 +38,18 @@ body{font-family:'Inter';background:#f5f7fb;margin:0}
 input,select{
   padding:12px;
   border-radius:10px;
-  border:1px solid #ddd;
-  width:100%;
+  border:none;
+  background:#334155;
+  color:#fff;
 }
 
 button{
   padding:12px;
   border:none;
   border-radius:10px;
-  background:#4CAF50;
-  color:#fff;
+  background:#22c55e;
+  color:#000;
+  font-weight:bold;
   cursor:pointer;
 }
 
@@ -42,14 +57,16 @@ button{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  background:#1e293b;
   padding:15px;
-  margin-top:10px;
-  background:#fff;
   border-radius:12px;
+  margin-top:10px;
 }
 
-.adLeft{display:flex;gap:10px;align-items:center}
-.adRow img{height:50px;border-radius:8px}
+.adRow img{
+  height:50px;
+  border-radius:8px;
+}
 </style>
 </head>
 
@@ -65,7 +82,7 @@ button{
 
 <div class="grid">
 
-<input id="name" placeholder="Kampagnenname">
+<input id="name" placeholder="Name">
 <input id="customer" placeholder="Kunde">
 
 <input id="budget" type="number" placeholder="Budget €">
@@ -75,40 +92,31 @@ button{
 <option value="SPONSOR">Sponsor</option>
 </select>
 
-<div>
-<small>Start</small>
 <input type="date" id="startDate">
-</div>
-
-<div>
-<small>Ende</small>
 <input type="date" id="endDate">
-</div>
 
-<div class="full">
-<small>Targeting</small>
-<select id="targetType" onchange="updateTargetingUI()">
+<!-- TARGETING -->
+<select id="targetType" onchange="updateTargetingUI()" class="full">
 <option value="global">Global</option>
 <option value="district">Liga</option>
 <option value="team">Team</option>
 </select>
 
-<div id="targetFields"></div>
-</div>
+<div id="targetFields" class="full"></div>
 
-<!-- 💚 SPENDE -->
+<!-- SPENDE -->
 <select id="donation">
 <option value="0">Keine Spende</option>
-<option value="1">1% Vereinsspende</option>
-<option value="5">5% Vereinsspende</option>
-<option value="10">10% Vereinsspende</option>
+<option value="1">1%</option>
+<option value="5">5%</option>
+<option value="10">10%</option>
 </select>
 
 <input id="link" placeholder="https://zielseite.de">
 
 <input type="file" id="image" class="full">
 
-<button class="full" onclick="createCampaign()">💾 Speichern</button>
+<button onclick="createCampaign()" class="full">💾 Speichern</button>
 
 </div>
 </div>
@@ -119,6 +127,10 @@ button{
 </div>
 
 </div>
+
+<!-- 🔥 WICHTIG: REIHENFOLGE -->
+<script src="js/modules/league.js"></script>
+<script src="js/admin.js"></script>
 
 </body>
 </html>
