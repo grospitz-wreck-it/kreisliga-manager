@@ -17,12 +17,16 @@ function saveCampaigns(data){
 // GAME CONTEXT
 // =====================
 function getGameContext(){
+
   return {
-    league: window.game?.league?.key || null,
-    team: window.game?.team?.selected || null
+    country: "DE",
+
+    state: null,
+    district: window.game?.league?.key || null,
+
+    team: window.game?.team?.selected?.name || null
   };
 }
-
 // =====================
 // MATCHING (FIXED)
 // =====================
