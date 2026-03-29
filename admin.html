@@ -1,43 +1,178 @@
+<!-- ========================= -->
+<!-- admin.html (REPLACE FULL) -->
+<!-- ========================= -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Ad Admin</title>
-  <link rel="stylesheet" href="admin.css">
+<meta charset="UTF-8">
+<title>Campaign Manager</title>
+<style>
+body{font-family:Arial;background:#111;color:#fff;padding:20px}
+input,select{margin:5px;padding:8px}
+.box{background:#222;padding:15px;margin:10px 0}
+</style>
 </head>
 <body>
 
-<h1>📢 Ad Verwaltung</h1>
+<h1>📢 Kampagnen Manager</h1>
 
-<div class="form">
+<div class="box">
+<h2>Neue Kampagne</h2>
 
-  <input type="text" id="adName" placeholder="Name">
+<input id="name" placeholder="Name">
+<input id="customer" placeholder="Kundennummer">
+<input id="budget" type="number" placeholder="Budget €">
 
-  <input type="text" id="adLink" placeholder="Link (optional)">
+<select id="type">
+<option value="TKP">TKP</option>
+<option value="SPONSOR">Sponsor</option>
+</select>
 
-  <input type="date" id="adStart">
-  <input type="date" id="adEnd">
+<h3>Targeting</h3>
+<label><input type="checkbox" id="global"> Global</label>
+<label><input type="checkbox" id="country"> Deutschland</label>
+<label><input type="checkbox" id="state"> Bundesland</label>
+<label><input type="checkbox" id="district"> Kreis</label>
+<label><input type="checkbox" id="team"> Mannschaft</label>
 
-  <input type="number" id="adWeight" placeholder="Gewichtung" value="1">
+<br>
+<input id="donation" type="number" placeholder="Spende %" value="0">
 
-  <input type="file" id="adImageUpload" accept="image/*">
+<h3>Banner</h3>
+<input type="file" id="image">
 
-  <button onclick="saveAd()">➕ Ad speichern</button>
-
+<button onclick="createCampaign()">Speichern</button>
 </div>
 
-<hr>
+<div class="box">
+<h2>📊 Kampagnen</h2>
+<div id="list"></div>
+</div>
 
-<h2>📺 Vorschau</h2>
-<div id="preview"></div>
+<script>
+const KEY = "campaigns_v2";
 
-<hr>
+function getData(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
+function saveData(d){localStorage.setItem(KEY,JSON.stringify(d))}
 
-<h2>📋 Aktive Ads</h2>
-<div id="adList"></div>
+function getCPM(t){
+ if(t.team) return 20;
+ if(t.district) return 10;
+ if(t.state) return 5;
+ if(t.country) return 2;
+ return 1;
+}
 
-<script src="js/ads.js"></script>
-<script src="js/adminAds.js"></script>
+function createCampaign(){
+ const file = document.getElementById("image").files[0];
+ if(!file) return alert("Bild fehlt");
+
+ const reader = new FileReader();
+ reader.onload = function(e){
+
+ const targeting={
+  global:global.checked,
+  country:country.checked,
+  state:state.checked,
+  district:district.checked,
+  team:team.checked
+ };
+
+ const cpm = getCPM(targeting);
+ const budget = parseFloat(budgetInput.value);
+
+ const campaign={
+  id:Date.now(),
+  name:name.value,
+  customer:customer.value,
+  budget,
+  spent:0,
+  type:type.value,
+  cpm,
+  impressionsBooked:(budget/cpm)*1000,
+  impressionsDelivered:0,
+  donation:parseFloat(donation.value)||0,
+  targeting,
+  image:e.target.result
+ };
+
+ const data=getData();
+ data.push(campaign);
+ saveData(data);
+ render();
+ };
+ reader.readAsDataURL(file);
+}
+
+function render(){
+ const data=getData();
+ const list=document.getElementById("list");
+ list.innerHTML="";
+
+ data.forEach(c=>{
+
+ const donationVal = c.spent*(c.donation/100);
+
+ const div=document.createElement("div");
+ div.className="box";
+ div.innerHTML=`
+ <b>${c.name}</b><br>
+ Budget: €${c.budget}<br>
+ Ausgegeben: €${c.spent.toFixed(2)}<br>
+ Impressions: ${c.impressionsDelivered}/${Math.floor(c.impressionsBooked)}<br>
+ 💚 Spende: €${donationVal.toFixed(2)}<br>
+ <button onclick="deleteC(${c.id})">❌</button>
+ `;
+
+ list.appendChild(div);
+ });
+}
+
+function deleteC(id){
+ let d=getData();
+ d=d.filter(x=>x.id!==id);
+ saveData(d);
+ render();
+}
+
+// =========================
+// DELIVERY ENGINE
+// =========================
+
+function serveAd(context={}){
+ let data=getData();
+
+ data=data.filter(c=>{
+  if(c.type==="TKP"){
+   return c.impressionsDelivered < c.impressionsBooked;
+  }
+  return true;
+ });
+
+ if(!data.length) return null;
+
+ const c=data[Math.floor(Math.random()*data.length)];
+
+ c.impressionsDelivered++;
+ if(c.type==="TKP"){
+  c.spent += c.cpm/1000;
+ }
+
+ saveData(data);
+
+ return c;
+}
+
+// DEMO RENDER AD
+setInterval(()=>{
+ const ad=serveAd();
+ if(!ad) return;
+
+ console.log("Ad ausgespielt:", ad.name);
+},2000);
+
+render();
+</script>
 
 </body>
 </html>
