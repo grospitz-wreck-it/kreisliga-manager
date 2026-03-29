@@ -96,11 +96,21 @@ window.startAdEngine = function(){
 
   console.log("📢 Ad Engine gestartet");
 
-  renderAds();
+  const waitForGame = setInterval(() => {
 
-  // 👉 alle 5s wechseln
-  setInterval(rotateAds, 5000);
+    if(!window.game){
+      console.log("⏳ warte auf game...");
+      return;
+    }
 
-  // 👉 alle 20s neu laden (falls neue Kampagnen)
-  setInterval(renderAds, 20000);
+    clearInterval(waitForGame);
+
+    console.log("✅ game erkannt → starte ads");
+
+    renderAds();
+
+    setInterval(rotateAds, 5000);
+    setInterval(renderAds, 20000);
+
+  }, 500);
 };
