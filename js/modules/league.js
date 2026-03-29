@@ -1,7 +1,7 @@
 // =========================
 // 📦 LIGEN DATEN
 // =========================
-const LEAGUES = {
+window.LEAGUES = {
   herford: {
     name: "Kreisliga A Herford",
     teams: [
