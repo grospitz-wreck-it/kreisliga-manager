@@ -1,94 +1,87 @@
+(function(){
+
 const STORAGE_KEY = "kreisliga_ads";
 
-// 📦 Alle Ads laden
-function getAds() {
+// =====================
+// LOAD ADS (DEIN SYSTEM)
+// =====================
+function getAds(){
   return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 }
 
-// 💾 Speichern
-function saveAds(ads) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(ads));
-}
+// =====================
+// FILTER (DATUM)
+// =====================
+function getActiveAds(){
 
-// ➕ Neue Ad speichern
-function saveAd() {
-  const name = document.getElementById("adName").value;
-  const link = document.getElementById("adLink").value;
-  const start = document.getElementById("adStart").value;
-  const end = document.getElementById("adEnd").value;
-  const weight = parseInt(document.getElementById("adWeight").value) || 1;
-  const file = document.getElementById("adImageUpload").files[0];
-
-  if (!file) {
-    alert("Bitte Bild auswählen");
-    return;
-  }
-
-  const reader = new FileReader();
-
-  reader.onload = function(e) {
-    const ads = getAds();
-
-    const newAd = {
-      id: Date.now(),
-      name,
-      link,
-      start,
-      end,
-      weight,
-      image: e.target.result // 👉 Base64
-    };
-
-    ads.push(newAd);
-    saveAds(ads);
-
-    renderAds();
-    clearForm();
-
-    console.log("✅ Ad gespeichert", newAd);
-  };
-
-  reader.readAsDataURL(file);
-}
-
-// 🧹 Formular leeren
-function clearForm() {
-  document.getElementById("adName").value = "";
-  document.getElementById("adLink").value = "";
-  document.getElementById("adStart").value = "";
-  document.getElementById("adEnd").value = "";
-  document.getElementById("adWeight").value = 1;
-  document.getElementById("adImageUpload").value = "";
-}
-
-// 🖼️ Vorschau + Liste
-function renderAds() {
   const ads = getAds();
-  const list = document.getElementById("adList");
+  const today = new Date().toISOString().split("T")[0];
 
-  list.innerHTML = "";
-
-  ads.forEach(ad => {
-    const div = document.createElement("div");
-    div.style.marginBottom = "10px";
-
-    div.innerHTML = `
-      <strong>${ad.name}</strong><br>
-      <img src="${ad.image}" style="height:50px"><br>
-      <button onclick="deleteAd(${ad.id})">❌ Löschen</button>
-    `;
-
-    list.appendChild(div);
+  return ads.filter(ad => {
+    if (ad.start && ad.start > today) return false;
+    if (ad.end && ad.end < today) return false;
+    return true;
   });
 }
 
-// ❌ Löschen
-function deleteAd(id) {
-  let ads = getAds();
-  ads = ads.filter(ad => ad.id !== id);
-  saveAds(ads);
-  renderAds();
+// =====================
+// RENDER (MEHRERE ADS)
+// =====================
+function renderAds(){
+
+  const track = document.getElementById("adTrack");
+  if(!track) return;
+
+  let ads = getActiveAds();
+
+  if(!ads.length){
+    track.innerHTML = "<span style='color:white'>Keine Werbung aktiv</span>";
+    return;
+  }
+
+  // 🔥 Zufällige Ads mischen
+  ads = ads.sort(() => 0.5 - Math.random());
+
+  // 👉 max 3 anzeigen
+  const selected = ads.slice(0, 3);
+
+  let html = "";
+
+  selected.forEach(ad => {
+    html += `
+      <div class="adItem">
+        ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
+        <img src="${ad.image}">
+        ${ad.link ? `</a>` : ""}
+      </div>
+    `;
+  });
+
+  track.innerHTML = html;
 }
 
-// 🚀 Init
-window.onload = renderAds;
+// =====================
+// AUTO ROTATION
+// =====================
+setInterval(renderAds, 4000);
+
+// =====================
+// INIT
+// =====================
+window.startAds = function(){
+  if(window.adsInitialized) return;
+  window.adsInitialized = true;
+
+  console.log("📢 Ads gestartet (Legacy System)");
+
+  renderAds();
+};
+
+// =====================
+// GAME HOOKS
+// =====================
+window.onMatchStart = renderAds;
+window.onHalftime = renderAds;
+window.onMatchEnd = renderAds;
+
+})();
