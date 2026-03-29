@@ -14,163 +14,204 @@ function saveCampaigns(data){
 }
 
 // =====================
-// GAME CONTEXT
+// GAME CONTEXT (FIXED)
 // =====================
 function getGameContext(){
   return {
     country: "DE",
-    state: null,
+
+    // 👉 entspricht deiner League-Struktur
     district: window.game?.league?.key || null,
 
-    // ❗ GANZES OBJEKT, NICHT .name
+    // 👉 GANZES OBJEKT!
     team: window.game?.team?.selected || null
   };
 }
+
 // =====================
-// MATCHING (FIXED)
+// CPM LOGIK
+// =====================
+function getCPM(t){
+  if(t.team) return 20;
+  if(t.district) return 10;
+  if(t.state) return 5;
+  if(t.country) return 2;
+  return 1;
+}
+
+// =====================
+// PACING
+// =====================
+function shouldServe(c){
+
+  if(!c.start || !c.end) return true;
+
+  const total = (c.end - c.start);
+  const passed = (Date.now() - c.start);
+
+  if(total <= 0) return true;
+
+  const expected = (passed / total) * (c.impressionsBooked || 1);
+
+  return (c.impressionsDelivered || 0) <= expected * 1.2;
+}
+
+// =====================
+// TARGET MATCH (FIXED)
 // =====================
 function match(c, ctx){
 
-  if(!c.targeting) return true;
-
-  const t = c.targeting;
-
-  if(t.type === "global") return true;
-
-  if(t.type === "district"){
-    return t.league === ctx.league;
+  if(c.targeting?.team){
+    return ctx.team && ctx.team.name === c.targeting.team;
   }
 
-  if(t.type === "team"){
+  if(c.targeting?.district){
+    return ctx.district === c.targeting.district;
+  }
 
-    // ganze Liga
-    if(!t.team){
-      return t.league === ctx.league;
-    }
+  if(c.targeting?.state){
+    return ctx.state === c.targeting.state;
+  }
 
-    // einzelnes Team
-    return (
-      t.league === ctx.league &&
-      t.team === ctx.team
-    );
+  if(c.targeting?.country){
+    return true;
   }
 
   return true;
 }
 
 // =====================
-// ENGINE
+// DELIVERY ENGINE (FIXED)
 // =====================
-function serveAd(){
+function pickCampaign(campaigns){
+
+  if(!campaigns.length) return null;
+
+  return campaigns[Math.floor(Math.random() * campaigns.length)];
+}
+
+// =====================
+// SERVE AD (FIXED)
+// =====================
+window.serveAd = function(){
 
   let campaigns = getCampaigns();
   const ctx = getGameContext();
 
   campaigns = campaigns.filter(c => {
 
+    // 🔥 MUSS EIN BILD HABEN
+    if(!c.image) return false;
+
+    // Zeitraum
     if(c.start && Date.now() < c.start) return false;
     if(c.end && Date.now() > c.end) return false;
 
-    if(c.type === "TKP" &&
-       c.impressionsDelivered >= c.impressionsBooked){
-      return false;
+    // TKP Stop
+    if(c.type === "TKP" && c.impressionsBooked){
+      if((c.impressionsDelivered || 0) >= c.impressionsBooked){
+        return false;
+      }
     }
+
+    // Pacing
+    if(!shouldServe(c)) return false;
+
+    // Targeting
+    if(!match(c, ctx)) return false;
 
     return true;
   });
 
-  campaigns = campaigns.filter(c => match(c, ctx));
-
   if(!campaigns.length) return null;
 
-  const c = campaigns[Math.floor(Math.random() * campaigns.length)];
+  const selected = pickCampaign(campaigns);
 
-  c.impressionsDelivered = (c.impressionsDelivered || 0) + 1;
+  if(!selected) return null;
 
-  if(c.type === "TKP"){
-    c.spent = (c.spent || 0) + (c.cpm / 1000);
+  // =====================
+  // TRACKING
+  // =====================
+  selected.impressionsDelivered = (selected.impressionsDelivered || 0) + 1;
+
+  if(selected.type === "TKP"){
+    const cpm = selected.cpm || getCPM(selected.targeting || {});
+    selected.spent = (selected.spent || 0) + (cpm / 1000);
   }
 
-  const updated = getCampaigns().map(x =>
-    x.id === c.id ? c : x
+  // =====================
+  // SAVE BACK
+  // =====================
+  const all = getCampaigns().map(c => 
+    c.id === selected.id ? selected : c
   );
 
-  saveCampaigns(updated);
+  saveCampaigns(all);
 
-  return c;
-}
+  return selected;
+};
 
 // =====================
-// RENDER
+// MULTI RENDER (NEU – STABIL)
 // =====================
-function renderAds(){
+window.renderAds = function(){
 
   const track = document.getElementById("adTrack");
   if(!track) return;
 
-  let campaigns = getCampaigns();
-  const ctx = getGameContext();
+  let html = "";
 
-  // 🔥 Filter wie in serveAd – aber OHNE Verbrauch
-  campaigns = campaigns.filter(c => {
+  for(let i = 0; i < 3; i++){
 
-    if(c.start && Date.now() < c.start) return false;
-    if(c.end && Date.now() > c.end) return false;
+    const ad = serveAd();
 
-    if(c.type === "TKP" &&
-       c.impressionsDelivered >= c.impressionsBooked){
-      return false;
+    if(ad){
+
+      const img = ad.image || "https://via.placeholder.com/200x80?text=Ad";
+
+      html += `
+        <div class="adItem">
+          ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
+          <img src="${img}" style="height:60px;object-fit:contain">
+          ${ad.link ? `</a>` : ""}
+        </div>
+      `;
     }
-
-    return match(c, ctx);
-  });
-
-  if(!campaigns.length){
-    track.innerHTML = "<span style='color:white'>Keine Werbung aktiv</span>";
-    return;
   }
 
-  // 👉 max 3 anzeigen
-  const selected = campaigns.slice(0,3);
+  if(!html){
+    html = "<span style='color:white'>Keine Werbung aktiv</span>";
+  }
 
-  let output = "";
+  track.innerHTML = html;
+};
 
-  selected.forEach(c => {
+// =====================
+// AUTO ROTATION
+// =====================
+setInterval(()=>{
+  if(window.renderAds){
+    renderAds();
+  }
+}, 4000);
 
-    const imgSrc = c.image || "https://via.placeholder.com/200x80?text=Ad";
-
-    output += `
-      <div class="adItem">
-        ${c.link ? `<a href="${c.link}" target="_blank">` : ""}
-        <img src="${imgSrc}" style="max-height:80px;">
-        ${c.link ? `</a>` : ""}
-      </div>
-    `;
-
-    // 👉 Tracking HIER statt in serveAd
-    c.impressionsDelivered = (c.impressionsDelivered || 0) + 1;
-
-    if(c.type === "TKP"){
-      c.spent = (c.spent || 0) + (c.cpm / 1000);
-    }
-  });
-
-  saveCampaigns(campaigns);
-
-  track.innerHTML = output;
-}
 // =====================
 // INIT
 // =====================
 window.startAds = function(){
-
   if(window.adsInitialized) return;
   window.adsInitialized = true;
 
-  console.log("📢 Ads gestartet");
+  console.log("📢 Ads gestartet (FULL)");
 
   renderAds();
-  setInterval(renderAds, 4000);
 };
+
+// =====================
+// GAME HOOKS
+// =====================
+window.onMatchStart = renderAds;
+window.onHalftime = renderAds;
+window.onMatchEnd = renderAds;
 
 })();
