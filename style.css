@@ -391,3 +391,11 @@ button {
   font-weight: bold;
   color: orange;
 }
+#adBanner {
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid #ccc;
+}
