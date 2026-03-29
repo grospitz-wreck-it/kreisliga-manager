@@ -307,88 +307,53 @@ background: rgba(244,67,54,0.15);
 }
 
 /* =========================
-📢 PRO ADS BANNER
+📢 LEADERBOARD ADS (STANDARD)
 ========================= */
 
-#adBanner {
-  width: 100%;
-  height: 90px;
-  background: linear-gradient(180deg, #0f172a, #020617);
-  border-top: 2px solid rgba(255,255,255,0.08);
-  border-bottom: 2px solid rgba(255,255,255,0.08);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: hidden;
-  position: relative;
+#adBanner{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:10px 0;
 }
 
-/* Glow Effekt */
-#adBanner::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-  animation: shine 6s infinite linear;
+#adTrack{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-@keyframes shine {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
+/* DESKTOP 970x90 */
+.leaderboardAd{
+  width:970px;
+  height:90px;
+  max-width:100%;
+
+  background:#111;
+  border-radius:10px;
+  overflow:hidden;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-/* Track */
-#adTrack {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
+.leaderboardAd img{
+  width:100%;
+  height:100%;
+  object-fit:contain; /* 🔥 kein Cropping */
 }
 
-/* Slide Container */
-.adsSlider {
-  display: flex;
-  height: 100%;
-  transition: transform 0.8s ease-in-out;
-}
+/* MOBILE 320x50 */
+@media (max-width: 600px){
 
-/* Einzelne Ad */
-.adSlide {
-  min-width: 100%;
-  height: 100%;
+  .leaderboardAd{
+    width:320px;
+    height:50px;
+  }
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-/* Bild */
-.adSlide img {
-  max-height: 70px;
-  max-width: 95%;
-  object-fit: contain;
-
-  filter: brightness(0.95);
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.adSlide img:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
-}
-
-/* Klickfläche */
-.adSlide a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
 }
 
 /* =========================
