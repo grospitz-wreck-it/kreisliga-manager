@@ -199,9 +199,8 @@ function advanceSchedule(){
   game.league.currentMatchIndex = matchIndex;
 }
 
-// =========================
-// 🌍 GLOBAL
-// =========================
-window.generateSchedule = generateSchedule;
-window.nextMatch = nextMatch;
-window.advanceSchedule = advanceSchedule;
+export {
+  generateSchedule,
+  nextMatch,
+  advanceSchedule
+};
