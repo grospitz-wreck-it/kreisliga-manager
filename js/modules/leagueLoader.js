@@ -2,11 +2,9 @@ import { loadCSV } from "./loader.js";
 
 export async function loadLeaguesFromCSV(path){
 
-  // ✅ ERST laden
-  const rows = await loadCSV(path);
+  const rows = await loadCSV(path); // ✅ MUSS ZUERST kommen
 
-  // ✅ DANN debuggen
-  console.log("🧪 Erste CSV-Zeile:", rows?.[0]);
+  console.log("🧪 Erste CSV-Zeile:", rows?.[0]); // ✅ DANACH
 
   if(!rows || rows.length === 0){
     console.warn("⚠️ CSV leer oder nicht geladen");
@@ -17,7 +15,6 @@ export async function loadLeaguesFromCSV(path){
 
   rows.forEach(row => {
 
-    // 👉 KEYS NORMALISIEREN (wichtig!)
     const normalized = {};
     Object.keys(row).forEach(k => {
       normalized[k.toLowerCase().trim()] = row[k];
