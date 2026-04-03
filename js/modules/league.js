@@ -37,6 +37,25 @@ const LEAGUES = {
 
 
 // =========================
+// 🧠 HELPERS
+// =========================
+function ensureTeamPlayers(team){
+
+  if(team.players && team.players.length > 0){
+    return team.players;
+  }
+
+  console.log(`⚽ Generiere Kader für ${team.name}`);
+
+  team.players = generateTeam(team);
+
+  console.log(`✅ ${team.players.length} Spieler für ${team.name}`);
+
+  return team.players;
+}
+
+
+// =========================
 // 🏆 LIGA DROPDOWN
 // =========================
 function initLeagueSelect(){
@@ -53,9 +72,13 @@ function initLeagueSelect(){
     select.appendChild(opt);
   });
 
- select.onchange = (e) => {
-  selectTeam(e.target.value);
-};
+  // ✅ FIX: richtige Funktion + Guard
+  select.onchange = (e) => {
+    const value = e.target.value;
+    if(!value) return;
+
+    selectLeague(value);
+  };
 }
 
 
@@ -80,9 +103,13 @@ function populateTeamSelect(){
     select.appendChild(opt);
   });
 
-  select.addEventListener("change", (e) => {
-    selectTeam(e.target.value);
-  });
+  // ✅ FIX: kein addEventListener → kein stacking
+  select.onchange = (e) => {
+    const value = e.target.value;
+    if(!value) return;
+
+    selectTeam(value);
+  };
 }
 
 
@@ -145,26 +172,13 @@ function selectLeague(key){
   renderSchedule();
 }
 
-function ensureTeamPlayers(team){
-
-  // 🆕 besserer Check
-  if(team.players && team.players.length > 0){
-    return team.players;
-  }
-
-  console.log(`⚽ Generiere Kader für ${team.name}`);
-
-  team.players = generateTeam(team);
-
-  console.log(`✅ ${team.players.length} Spieler für ${team.name}`);
-
-  return team.players;
-}
 
 // =========================
 // 👤 TEAM WÄHLEN
 // =========================
 function selectTeam(teamName){
+
+  console.log("👉 selectTeam Input:", teamName); // 🔍 Debug
 
   const teams = game.league.teams;
 
@@ -176,13 +190,14 @@ function selectTeam(teamName){
   const team = teams.find(t => t.name === teamName);
 
   if(!team){
-    console.error("❌ Team nicht gefunden:", teamName);
+    console.warn("⚠️ Ungültiger Team-Wert:", teamName);
     return;
   }
 
   game.team.selected = team.name;
 
   console.log("✅ Team gewählt:", team.name);
+
   // 🆕 👉 Lazy Spieler laden
   const players = ensureTeamPlayers(team);
   game.team.players = players;
@@ -200,18 +215,19 @@ function selectTeam(teamName){
 // 🧠 GET SELECTED TEAM
 // =========================
 function getSelectedTeam(){
-return game.league.teams.find(
-t => t.name === game.team.selected
-);
+  return game.league.teams.find(
+    t => t.name === game.team.selected
+  );
 }
+
 
 // =========================
 // 📦 EXPORTS
 // =========================
 export {
-initLeagueSelect,
-populateTeamSelect,
-selectLeague,
-selectTeam,
-getSelectedTeam
+  initLeagueSelect,
+  populateTeamSelect,
+  selectLeague,
+  selectTeam,
+  getSelectedTeam
 };
