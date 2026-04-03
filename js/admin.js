@@ -171,16 +171,6 @@ const campaign = {
   }
 };
 
-const all = getCampaigns();
-all.push(campaign);
-saveCampaigns(all);
-
-clearForm();
-render();
-
-alert("✅ Kampagne gespeichert (richtig skaliert)");
-
-};
 
 img.src = e.target.result;
 };
