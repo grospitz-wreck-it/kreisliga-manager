@@ -15,12 +15,10 @@ import "./modules/scheduler.js";
 import "./modules/table.js";
 import { initLeagueSelect, populateTeamSelect } from "./modules/league.js";
 
-// 🆕 👉 Spieler-Module (minimal ergänzt)
+// 🆕 👉 Spieler-Module (bereinigt)
 import { loadCSV } from "./modules/loader.js";
 import { extractTeams } from "./modules/teamGenerator.js";
-import { assignPlayers } from "./modules/assigner.js";
 import { initPlayerPool } from "./modules/playerPool.js";
-import { loadCSV } from "./modules/loader.js";
 
 // =========================
 // 🎮 ENGINE
@@ -55,45 +53,47 @@ startAdEngine();
 const loaded = loadGame();
 
 if(loaded){
-console.log("💾 Save geladen");
+  console.log("💾 Save geladen");
 
+  game.phase = "idle";
 
-game.phase = "idle";
+  // 🔥 UI nach Load wieder aufbauen
+  initLeagueSelect();
 
-// 🔥 UI nach Load wieder aufbauen
-initLeagueSelect();
-
-if(game.league.teams?.length > 0){
-  populateTeamSelect();
-  renderSchedule();
-}
-
+  if(game.league.teams?.length > 0){
+    populateTeamSelect();
+    renderSchedule();
+  }
 
 } else {
 
-// 👉 Kein Save → Splash
-game.phase = "setup";
+  // 👉 Kein Save → Splash
+  game.phase = "setup";
 
-// =========================
-// 🆕 👉 SPIELER GENERIERUNG (nur bei neuem Spiel)
-// =========================
-try {
-  console.log("⚽ Generiere Spieler & Teams...");
+  // =========================
+  // 🆕 👉 SPIELER + TEAM BASIS LADEN (Lazy vorbereitet)
+  // =========================
+  try {
+    console.log("⚽ Lade Spieler & Team-Struktur...");
 
-  const players = loadCSV("./data/spieler.csv");
-  const teamsRaw = loadCSV("./data/teams.csv");
+    const players = loadCSV("./data/spieler.csv");
+    const teamsRaw = loadCSV("./data/teams.csv");
 
-  const teams = extractTeams(teamsRaw);
-  const assignedPlayers = assignPlayers(players, teams);
+    const teams = extractTeams(teamsRaw);
 
-  // 👉 in Game State speichern (wichtig!)
-  game.players = assignedPlayers;
+    // 👉 PlayerPool initialisieren (KEINE Zuweisung!)
+    initPlayerPool(players);
 
-  console.log(`✅ ${assignedPlayers.length} Spieler zugewiesen`);
+    // 👉 in Game State speichern
+    game.players = players; // kompletter Pool
+    game.teams = teams;     // nur Struktur
 
-} catch (e) {
-  console.warn("❌ Spieler-Setup fehlgeschlagen:", e);
-}
+    console.log(`✅ PlayerPool: ${players.length} Spieler`);
+    console.log(`✅ Teams: ${teams.length}`);
+
+  } catch (e) {
+    console.warn("❌ Spieler-Setup fehlgeschlagen:", e);
+  }
 
 }
 
@@ -112,6 +112,6 @@ document.addEventListener("DOMContentLoaded", init);
 // 📦 EXPORTS
 // =========================
 export {
-init,
-handleMainAction
+  init,
+  handleMainAction
 };
