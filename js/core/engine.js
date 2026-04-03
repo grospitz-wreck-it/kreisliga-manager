@@ -110,7 +110,9 @@ function runMatchLoop(){
     }
 
     matchState.minute++;
-
+    emit(EVENTS.STATE_CHANGED, {
+  minute: matchState.minute
+});
     simulateLiveEvent();
 
     updateUI?.();
