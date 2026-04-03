@@ -2,7 +2,7 @@
 // 🔗 UI BINDINGS
 // =========================
 import { selectLeague, selectTeam } from "../modules/league.js";
-import { handleMainAction } from "../modules/engine.js";
+import { handleMainAction } from "../core/engine.js";
 function bindUI(){
 
   const leagueSelect = document.getElementById("leagueSelect");
