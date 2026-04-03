@@ -16,11 +16,11 @@ window.game = {
   league: {
     key: null,
 
-    teams: [],       // Team-Objekte
-    schedule: [],    // Spielplan
-    currentRound: 0, // aktueller Spieltag
+    teams: [],
+    schedule: [],
+    currentRound: 0,
 
-    table: []        // Tabelle (separat von teams!)
+    table: []
   },
 
   // =========================
@@ -33,25 +33,43 @@ window.game = {
   // =========================
   // ⚽ MATCH
   // =========================
- match: {
-  current: null,
+  match: {
+    current: null,
 
-  // 🔥 NEU (Live Daten)
-  live: {
-    minute: 0,
-    running: false,
-    score: { home: 0, away: 0 },
-    events: []
-  }
-},
+    // 🔥 LIVE STATE
+    live: {
+      minute: 0,
+      running: false,
+      score: { home: 0, away: 0 },
+      events: []
+    }
+  },
 
   // =========================
-// 📡 EVENTS (NEU)
-// =========================
-events: {
-  history: [],   // alle Events (für Replay / Debug)
-  last: null     // letztes Event
-},
+  // 📡 EVENTS
+  // =========================
+  events: {
+    history: [],
+    last: null
+  },
+
+  // =========================
+  // ⚙️ SETTINGS
+  // =========================
+  settings: {
+    sound: true,
+    notifications: true
+  },
+
+  // =========================
+  // 🌐 ONLINE (PREP)
+  // =========================
+  online: {
+    leagueId: null,
+    playerId: null,
+    connected: false
+  },
+
   // =========================
   // 🏁 SPIELPHASE
   // =========================
@@ -66,13 +84,14 @@ events: {
 };
 
 // =========================
-// 🧪 DEBUG HELPER (optional)
+// 🧪 DEBUG HELPER
 // =========================
 window.resetGame = function(){
 
   localStorage.clear();
 
   game.player.name = "";
+
   game.league = {
     key: null,
     teams: [],
@@ -82,16 +101,22 @@ window.resetGame = function(){
   };
 
   game.team.selected = null;
+
   game.match.current = null;
+
+  // 🔥 wichtig: live reset
+  game.match.live = {
+    minute: 0,
+    running: false,
+    score: { home: 0, away: 0 },
+    events: []
+  };
+
+  game.events.history = [];
+  game.events.last = null;
+
   game.phase = "setup";
   game.season.year = 1;
 
   console.log("🧹 Game komplett zurückgesetzt");
 };
-// =========================
-// ⚙️ SETTINGS (NEU)
-// =========================
-settings: {
-  sound: true,
-  notifications: true
-},
