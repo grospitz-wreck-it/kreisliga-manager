@@ -39,6 +39,7 @@ function handleMainAction(){
 function startMatch(){
 
   console.log("🚀 Spiel wird gestartet...");
+  emit(EVENTS.GAME_START);
 
   // 🔥 WICHTIG: Team gewählt?
   if(!game.team.selected){
