@@ -180,6 +180,9 @@ function selectTeam(teamName){
   game.team.selected = team.name;
 
   console.log("✅ Team gewählt:", team.name);
+  // 🆕 👉 Lazy Spieler laden
+  const players = ensureTeamPlayers(team);
+  game.team.players = players;
 
   const tacticSelect = document.getElementById("tacticSelect");
   if(tacticSelect){
