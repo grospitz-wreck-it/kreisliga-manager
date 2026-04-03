@@ -19,6 +19,8 @@ import { initLeagueSelect, populateTeamSelect } from "./modules/league.js";
 import { loadCSV } from "./modules/loader.js";
 import { extractTeams } from "./modules/teamGenerator.js";
 import { assignPlayers } from "./modules/assigner.js";
+import { initPlayerPool } from "./modules/playerPool.js";
+import { loadCSV } from "./modules/loader.js";
 
 // =========================
 // 🎮 ENGINE
