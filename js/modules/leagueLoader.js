@@ -1,5 +1,5 @@
 import { loadCSV } from "./loader.js";
-
+console.log("🧪 Erste Zeile:", rows[0]);
 export async function loadLeaguesFromCSV(path){
 
   const rows = await loadCSV(path);
