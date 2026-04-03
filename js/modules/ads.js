@@ -21,33 +21,41 @@ const now = Date.now();
 const leagueKey = game.league?.key;
 const teamKey   = game.team?.selected;
 
-return getCampaigns().filter(c => {
+const campaigns = getCampaigns();
 
-```
+if(!Array.isArray(campaigns)) return [];
+
+return campaigns.filter(c => {
+
+// 👉 kaputte Einträge skippen
+if(!c || typeof c !== "object") return false;
+
+// 👉 targeting absichern
+const targeting = c.targeting || {};
+
 // 🕒 Zeitraum
 if(c.start && now < c.start) return false;
 if(c.end && now > c.end) return false;
 
 // 🌍 GLOBAL
-if(c.targeting?.global) return true;
+if(targeting.global) return true;
 
-// 👉 Setup Phase → alles zeigen
-if(game.phase === "setup") return true;
+// 👉 kein Spielstatus → alles anzeigen
+if(!leagueKey && !teamKey) return true;
 
 // 🏆 Liga
-if(c.targeting?.league && c.targeting.league === leagueKey) return true;
+if(targeting.league && targeting.league === leagueKey) return true;
 
 // 👕 Team
-if(c.targeting?.team){
-  if(c.targeting.team === "all") return true;
-  if(c.targeting.team === teamKey) return true;
+if(targeting.team){
+  if(targeting.team === "all") return true;
+  if(targeting.team === teamKey) return true;
 }
 
 return false;
-```
-
 });
 }
+
 
 // =========================
 // 🔄 STATE
