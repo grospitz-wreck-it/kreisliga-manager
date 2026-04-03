@@ -1,8 +1,6 @@
-
- =========================
- 🌍 GLOBAL GAME STATE (MODULE)
- =========================
-
+// =========================
+// 🌍 GLOBAL GAME STATE (MODULE)
+// =========================
 
 const game = {
 
@@ -18,14 +16,11 @@ name: ""
 // =========================
 league: {
 key: null,
-
 teams: [],
 schedule: [],
 currentRound: 0,
 currentMatchIndex: 0,
-
 table: []
-
 },
 
 // =========================
@@ -40,14 +35,12 @@ selected: null
 // =========================
 match: {
 current: null,
-
 live: {
-  minute: 0,
-  running: false,
-  score: { home: 0, away: 0 },
-  events: []
+minute: 0,
+running: false,
+score: { home: 0, away: 0 },
+events: []
 }
-
 },
 
 // =========================
@@ -78,7 +71,7 @@ connected: false
 // =========================
 // 🏁 SPIELPHASE
 // =========================
-phase: "setup", // setup | idle | live
+phase: "setup",
 
 // =========================
 // 📅 SAISON
