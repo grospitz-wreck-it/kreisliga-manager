@@ -1,0 +1,13 @@
+export const EVENTS = {
+
+  // Game Flow
+  GAME_START: "GAME_START",
+  PLAY_MATCH: "PLAY_MATCH",
+  MATCH_FINISHED: "MATCH_FINISHED",
+
+  // Player
+  TEAM_UPDATE: "TEAM_UPDATE",
+
+  // UI
+  STATE_CHANGED: "STATE_CHANGED"
+};
