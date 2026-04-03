@@ -50,7 +50,7 @@ const reader = new FileReader();
 
 reader.onload = function(e){
 
-```
+
 const img = new Image();
 
 img.onload = function(){
@@ -107,7 +107,7 @@ img.onload = function(){
 };
 
 img.src = e.target.result;
-```
+
 
 };
 
@@ -156,7 +156,7 @@ container.innerHTML = "";
 
 campaigns.forEach(c => {
 
-```
+
 const div = document.createElement("div");
 div.className = "adRow";
 
@@ -167,7 +167,7 @@ div.innerHTML = `
 `;
 
 container.appendChild(div);
-```
+
 
 });
 }
