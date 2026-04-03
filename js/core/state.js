@@ -33,9 +33,17 @@ window.game = {
   // =========================
   // ⚽ MATCH
   // =========================
-  match: {
-    current: null
-  },
+ match: {
+  current: null,
+
+  // 🔥 NEU (Live Daten)
+  live: {
+    minute: 0,
+    running: false,
+    score: { home: 0, away: 0 },
+    events: []
+  }
+},
 
   // =========================
   // 🏁 SPIELPHASE
