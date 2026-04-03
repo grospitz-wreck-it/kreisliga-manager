@@ -1,3 +1,9 @@
+// =========================
+// 👤 PLAYER MODULE
+// =========================
+import { game } from "../core/state.js";
+import { updateHeader } from "../ui/ui.js";
+
 console.log("PLAYER MODULE");
 
 // =========================
@@ -5,36 +11,37 @@ console.log("PLAYER MODULE");
 // =========================
 function initPlayer(){
 
-  if(!game.player){
-    game.player = {};
+if(!game.player){
+game.player = {};
+}
+
+if(!game.player.name){
+
+```
+const saved = localStorage.getItem("playerName");
+
+if(saved){
+  game.player.name = saved;
+} else {
+
+  let name = prompt("Manager Name?");
+  if(!name){
+    name = "Manager_" + Math.floor(Math.random() * 1000);
   }
 
-  // Name laden oder neu setzen
-  if(!game.player.name){
+  game.player.name = name;
+  localStorage.setItem("playerName", name);
+}
+```
 
-    let saved = localStorage.getItem("playerName");
+}
 
-    if(saved){
-      game.player.name = saved;
-    } else {
+const input = document.getElementById("nameInput");
+if(input){
+input.value = game.player.name;
+}
 
-      let name = prompt("Manager Name?");
-      if(!name){
-        name = "Manager_" + Math.floor(Math.random()*1000);
-      }
-
-      game.player.name = name;
-      localStorage.setItem("playerName", name);
-    }
-  }
-
-  // Input setzen
-  const input = document.getElementById("nameInput");
-  if(input){
-    input.value = game.player.name;
-  }
-
-  console.log("👤 Player:", game.player.name);
+console.log("👤 Player:", game.player.name);
 }
 
 // =========================
@@ -42,20 +49,22 @@ function initPlayer(){
 // =========================
 function changeName(){
 
-  const input = document.getElementById("nameInput");
-  if(!input) return;
+const input = document.getElementById("nameInput");
+if(!input) return;
 
-  const name = input.value.trim();
-  if(!name) return;
+const name = input.value.trim();
+if(!name) return;
 
-  game.player.name = name;
-  localStorage.setItem("playerName", name);
+game.player.name = name;
+localStorage.setItem("playerName", name);
 
-  updateHeader?.();
+updateHeader?.();
 }
 
 // =========================
-// 🌍 EXPORT
+// 📦 EXPORTS
 // =========================
-window.initPlayer = initPlayer;
-window.changeName = changeName;
+export {
+initPlayer,
+changeName
+};
