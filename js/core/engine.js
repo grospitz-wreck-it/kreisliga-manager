@@ -2,6 +2,7 @@
 // 🌍 MATCH STATE
 // =========================
 import { renderSchedule } from "../ui/ui.js";
+import { updateUI, renderLiveFeed } from "../ui/ui.js";
 import { emit } from "./events.js";
 import { EVENTS } from "./events.constants.js";
 const matchState = {
