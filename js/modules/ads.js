@@ -66,9 +66,14 @@ return;
 }
 
 const isMobile = window.innerWidth <= 600;
-
+// 👉 einmal hinzufügen
+window.addEventListener("resize", () => {
+renderAds();
+});
 // 👉 nutzt jetzt sicheren Index
-const ad = ads[adIndex % ads.length];
+adIndex = adIndex % ads.length;
+const ad = ads[adIndex];
+
 
 const image = isMobile && ad.imageMobile
 ? ad.imageMobile
