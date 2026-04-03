@@ -46,6 +46,13 @@ window.game = {
 },
 
   // =========================
+// 📡 EVENTS (NEU)
+// =========================
+events: {
+  history: [],   // alle Events (für Replay / Debug)
+  last: null     // letztes Event
+},
+  // =========================
   // 🏁 SPIELPHASE
   // =========================
   phase: "setup", // setup | idle | live
