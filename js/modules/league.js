@@ -145,6 +145,18 @@ function selectLeague(key){
   renderSchedule();
 }
 
+function ensureTeamPlayers(team){
+
+  if(!team.players){
+    console.log(`⚽ Generiere Kader für ${team.name}`);
+
+    team.players = generateTeam(team);
+
+    console.log(`✅ ${team.players.length} Spieler für ${team.name}`);
+  }
+
+  return team.players;
+}
 
 // =========================
 // 👤 TEAM WÄHLEN
