@@ -1,4 +1,12 @@
 // =========================
+// 📦 IMPORTS
+// =========================
+import { generateSchedule } from "./scheduler.js";
+import { renderSchedule, renderCurrentMatch } from "../ui/ui.js";
+import { renderTable } from "./table.js";
+
+
+// =========================
 // 📦 LIGEN DATEN
 // =========================
 const LEAGUES = {
@@ -25,9 +33,6 @@ const LEAGUES = {
   }
 };
 
-// 👉 OPTIONAL global lassen (für Debug)
-window.LEAGUES = LEAGUES;
-
 
 // =========================
 // 🏆 LIGA DROPDOWN
@@ -46,9 +51,9 @@ function initLeagueSelect(){
     select.appendChild(opt);
   });
 
-  select.onchange = function(){
-    selectLeague(this.value);
-  };
+  select.addEventListener("change", (e) => {
+    selectLeague(e.target.value);
+  });
 }
 
 
@@ -62,18 +67,20 @@ function populateTeamSelect(){
 
   select.innerHTML = `<option value="">Team wählen</option>`;
 
-  if(!game.league.teams) return;
+  const teams = game.league.teams;
 
-  game.league.teams.forEach(team => {
+  if(!teams || teams.length === 0) return;
+
+  teams.forEach(team => {
     const opt = document.createElement("option");
     opt.value = team.name;
     opt.textContent = `${team.name} (Stärke ${team.strength})`;
     select.appendChild(opt);
   });
 
-  select.onchange = function(){
-    selectTeam(this.value);
-  };
+  select.addEventListener("change", (e) => {
+    selectTeam(e.target.value);
+  });
 }
 
 
@@ -89,12 +96,17 @@ function selectLeague(key){
     return;
   }
 
+  // Reset
   game.league.key = key;
   game.league.currentRound = 0;
+  game.league.currentMatchIndex = 0;
+
   game.team.selected = null;
   game.match.current = null;
 
-  // Teams erzeugen
+  // =========================
+  // 🧠 TEAMS ERZEUGEN
+  // =========================
   game.league.teams = data.teams.map(name => ({
     name,
     strength: Math.floor(Math.random() * 30) + 60,
@@ -111,6 +123,9 @@ function selectLeague(key){
 
   console.log("✅ Teams erstellt:", game.league.teams.length);
 
+  // =========================
+  // 📅 SPIELPLAN
+  // =========================
   generateSchedule();
 
   if(!game.league.schedule || game.league.schedule.length === 0){
@@ -120,9 +135,12 @@ function selectLeague(key){
 
   console.log("📅 Spielplan ready:", game.league.schedule.length);
 
-  renderTable?.();
+  // =========================
+  // 🖥️ UI UPDATE
+  // =========================
+  renderTable();
   populateTeamSelect();
-  renderSchedule?.();
+  renderSchedule();
 }
 
 
@@ -131,12 +149,14 @@ function selectLeague(key){
 // =========================
 function selectTeam(teamName){
 
-  if(!game.league.teams){
+  const teams = game.league.teams;
+
+  if(!teams || teams.length === 0){
     console.error("❌ Keine Teams geladen");
     return;
   }
 
-  const team = game.league.teams.find(t => t.name === teamName);
+  const team = teams.find(t => t.name === teamName);
 
   if(!team){
     console.error("❌ Team nicht gefunden:", teamName);
@@ -152,7 +172,7 @@ function selectTeam(teamName){
     tacticSelect.value = team.tactic;
   }
 
-  renderCurrentMatch?.();
+  renderCurrentMatch();
 }
 
 
@@ -163,12 +183,14 @@ function getSelectedTeam(){
 
   if(!game.team.selected) return null;
 
-  return game.league.teams.find(t => t.name === game.team.selected);
+  return game.league.teams.find(
+    t => t.name === game.team.selected
+  );
 }
 
 
 // =========================
-// 🌍 EXPORTS (NEU!!!)
+// 📦 EXPORTS
 // =========================
 export {
   initLeagueSelect,
