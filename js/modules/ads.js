@@ -88,8 +88,6 @@ el.innerHTML = `
 // =========================
 // 🔄 ROTATION
 // =========================
-let adIndex = 0;
-
 function rotateAds(){
 
 const ads = getMatchingAds();
@@ -97,21 +95,24 @@ if(!ads.length) return;
 
 adIndex = (adIndex + 1) % ads.length;
 
-renderAds();
+renderAds(); // 👉 nutzt jetzt index korrekt
 }
+
 
 // =========================
 // 🚀 ENGINE
 // =========================
 function startAdEngine(){
 
-console.log("📢 Leaderboard Ads gestartet");
+console.log("📢 Ads gestartet");
 
 renderAds();
 
-setInterval(renderAds, 10000);
-setInterval(rotateAds, 6000);
+// 👉 NUR EINE LOGIK
+setInterval(rotateAds, 8000);
+
 }
+
 
 // =========================
 // 📦 EXPORTS
