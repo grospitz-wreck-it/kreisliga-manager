@@ -8,7 +8,6 @@ function updateUI(){
   const progress = document.getElementById("progressFill");
 
   if(!scoreEl || !matchEl || !progress){
-    console.warn("⚠️ UI Elemente fehlen");
     return;
   }
 
@@ -17,7 +16,6 @@ function updateUI(){
   const seasonYear = game.season?.year ?? 1;
   const matchday = (game.league?.currentRound ?? 0) + 1;
 
-  // ❌ KEIN MATCH
   if(!match){
     scoreEl.textContent = "0 : 0";
     matchEl.textContent = `Saison ${seasonYear} | Kein Spiel aktiv`;
@@ -25,23 +23,20 @@ function updateUI(){
     return;
   }
 
-  // ⚽ SCORE
   scoreEl.textContent =
     matchState.score.home + " : " + matchState.score.away;
 
-  // 📅 INFO
   matchEl.textContent =
     `Saison ${seasonYear} | Spieltag ${matchday} | ` +
     `${match.home.name} vs ${match.away.name} | ${matchState.minute}'`;
 
-  // 📊 PROGRESS
   const percent = Math.min((matchState.minute / 90) * 100, 100);
   progress.style.width = percent + "%";
 }
 
 
 // =========================
-// 🎮 AKTUELLES SPIEL
+// 🎮 MATCH VIEW
 // =========================
 function renderCurrentMatch(){
 
@@ -55,9 +50,7 @@ function renderCurrentMatch(){
     return;
   }
 
-  el.innerHTML = `
-    <h3>${match.home.name} vs ${match.away.name}</h3>
-  `;
+  el.innerHTML = `<h3>${match.home.name} vs ${match.away.name}</h3>`;
 }
 
 
@@ -110,9 +103,11 @@ function renderSchedule(){
 
 
 // =========================
-// 🌍 GLOBAL (EINMAL!)
+// 📦 EXPORTS
 // =========================
-window.updateUI = updateUI;
-window.renderSchedule = renderSchedule;
-window.renderCurrentMatch = renderCurrentMatch;
-window.renderLiveFeed = renderLiveFeed;
+export {
+  updateUI,
+  renderCurrentMatch,
+  renderLiveFeed,
+  renderSchedule
+};
