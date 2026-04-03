@@ -1,7 +1,7 @@
 // =========================
 // 📦 CORE
 // =========================
-import "./core/state.js";
+import { game } from "./core/state.js";
 import "./core/events.js";
 import "./core/events.constants.js";
 import "./core/eventStore.js";
@@ -9,7 +9,7 @@ import "./core/eventStore.js";
 // =========================
 // 🔧 MODULES
 // =========================
-import "./modules/ads.js";
+import { startAdEngine } from "./modules/ads.js";
 import "./modules/scheduler.js";
 import "./modules/table.js";
 import { initLeagueSelect, populateTeamSelect } from "./modules/league.js";
@@ -20,24 +20,15 @@ import { initLeagueSelect, populateTeamSelect } from "./modules/league.js";
 import { handleMainAction } from "./core/engine.js";
 
 // =========================
+// 💾 STORAGE
+// =========================
+import { loadGame } from "./services/storage.js";
+
+// =========================
 // 🖥 UI
 // =========================
 import { bindUI } from "./ui/bindings.js";
 import { renderSchedule } from "./ui/ui.js";
-
-// =========================
-// 📢 ADS START
-// =========================
-function startAds(){
-
-if(typeof window.startAdEngine === "function"){
-console.log("✅ Ads starten direkt");
-window.startAdEngine();
-} else {
-console.warn("❌ startAdEngine nicht gefunden");
-}
-
-}
 
 // =========================
 // 🚀 INIT
@@ -46,29 +37,28 @@ function init(){
 
 console.log("🚀 Init läuft...");
 
+// 👉 UI vorbereiten
 initLeagueSelect();
 bindUI();
 
-startAds();
+// 👉 Ads starten
+startAdEngine();
 
-if(typeof window.loadGame === "function"){
-
-```
-const loaded = window.loadGame();
+// 👉 Save laden
+const loaded = loadGame();
 
 if(loaded){
-  console.log("💾 Save geladen");
-
-  if(window.game.league.teams.length > 0){
-    populateTeamSelect();
-    renderSchedule();
-  }
+console.log("💾 Save geladen");
+  
+if(game.league.teams.length > 0){
+  populateTeamSelect();
+  renderSchedule();
 }
-```
 
 }
 
-window.game.phase = "setup";
+// 👉 Phase setzen
+game.phase = "setup";
 
 console.log("✅ Init fertig");
 }
@@ -77,3 +67,11 @@ console.log("✅ Init fertig");
 // ▶️ START
 // =========================
 window.addEventListener("load", init);
+
+// =========================
+// 📦 OPTIONAL EXPORTS
+// =========================
+export {
+init,
+handleMainAction
+};
