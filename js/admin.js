@@ -125,26 +125,60 @@ window.createCampaign = function(){
 
   const reader = new FileReader();
 
-  reader.onload = function(e){
+ reader.onload = function(e){
 
-    const campaign = {
-      id: Date.now(),
-      name,
-      customer,
-      budget,
-      link,
-      start,
-      end,
-      donationPercent,
-      image: e.target.result,
-      impressionsDelivered: 0,
-      spent: 0,
-      targeting: {
-        global: type === "global",
-        league: type === "district" ? league : null,
-        team: type === "team" ? team : null
-      }
-    };
+const img = new Image();
+
+img.onload = function(){
+
+// 👉 Zielgröße
+const MAX_HEIGHT = 90;
+const ratio = img.width / img.height;
+
+const canvas = document.createElement("canvas");
+canvas.height = MAX_HEIGHT;
+canvas.width = MAX_HEIGHT * ratio;
+
+const ctx = canvas.getContext("2d");
+
+ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+const resizedBase64 = canvas.toDataURL("image/jpeg", 0.8);
+
+const campaign = {
+  id: Date.now(),
+  name,
+  customer,
+  budget,
+  link,
+  start,
+  end,
+  donationPercent,
+  image: resizedBase64, // 🔥 jetzt klein!
+  impressionsDelivered: 0,
+  spent: 0,
+  targeting: {
+    global: type === "global",
+    league: type === "district" ? league : null,
+    team: type === "team" ? team : null
+  }
+};
+
+const all = getCampaigns();
+all.push(campaign);
+saveCampaigns(all);
+
+clearForm();
+render();
+
+alert("✅ Kampagne gespeichert (optimiert)");
+
+
+};
+
+img.src = e.target.result;
+};
+
 
     const all = getCampaigns();
     all.push(campaign);
