@@ -1,11 +1,21 @@
 // =========================
 // 🔗 UI BINDINGS
 // =========================
-import { selectLeague, selectTeam, getSelectedTeam } from "../modules/league.js";
+import {
+selectLeague,
+selectTeam,
+getSelectedTeam,
+initLeagueSelect,
+populateTeamSelect
+} from "../modules/league.js";
+
 import { handleMainAction } from "../core/engine.js";
 import { setPlayerName } from "../modules/player.js";
 import { renderApp } from "./layout.js";
+
 import { saveGame, loadGame, clearSave } from "../services/storage.js";
+import { renderSchedule } from "./ui.js";
+
 import { game } from "../core/state.js";
 
 function bindUI(){
@@ -28,6 +38,7 @@ const resetBtn = document.getElementById("resetBtn");
 if(leagueSelect){
 leagueSelect.addEventListener("change", (e) => {
 selectLeague(e.target.value);
+populateTeamSelect(); // 🔥 wichtig
 });
 }
 
@@ -55,6 +66,7 @@ handleMainAction();
 if(tacticSelect){
 tacticSelect.addEventListener("change", (e) => {
 
+
   const team = getSelectedTeam();
 
   if(!team){
@@ -67,6 +79,7 @@ tacticSelect.addEventListener("change", (e) => {
   console.log("🧠 Neue Taktik:", team.tactic);
 });
 
+
 }
 
 // =========================
@@ -75,14 +88,20 @@ tacticSelect.addEventListener("change", (e) => {
 if(startBtn){
 startBtn.addEventListener("click", () => {
 
+
   const input = document.getElementById("nameInput");
   if(!input) return;
 
   setPlayerName(input.value);
 
   game.phase = "idle";
+
   renderApp();
+
+  // 🔥 NACH SPLASH UI INITIALISIEREN
+  initLeagueSelect();
 });
+
 
 }
 
@@ -112,13 +131,24 @@ saveGame();
 // =========================
 if(loadBtn){
 loadBtn.addEventListener("click", () => {
-const loaded = loadGame();
+
+  const loaded = loadGame();
 
   if(loaded){
     game.phase = "idle";
+
     renderApp();
+
+    // 🔥 UI wiederherstellen
+    initLeagueSelect();
+
+    if(game.league.teams?.length){
+      populateTeamSelect();
+      renderSchedule();
+    }
   }
 });
+
 
 }
 
@@ -128,7 +158,7 @@ const loaded = loadGame();
 if(resetBtn){
 resetBtn.addEventListener("click", () => {
 clearSave();
-location.reload(); // sauberer Reset
+location.reload();
 });
 }
 }
