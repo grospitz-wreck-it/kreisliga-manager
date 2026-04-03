@@ -1,5 +1,6 @@
 import { on } from "./events.js";
 import { EVENTS } from "./events.constants.js";
+import { game } from "../core/state.js";
 
 // =========================
 // 📡 EVENT → STATE SYNC
