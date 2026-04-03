@@ -298,6 +298,9 @@ function endMatch(){
   renderSchedule?.();
 
   console.log("✅ Spiel beendet");
+  emit(EVENTS.MATCH_FINISHED, {
+  score: matchState.score
+});
 }
 
 // =========================
