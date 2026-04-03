@@ -1,25 +1,25 @@
+import { getSelectedTeam } from "./league.js";
+
 // =========================
 // 📊 SORTIERUNG
 // =========================
 function sortTable(table){
-  return table.sort((a, b) => {
+return table.sort((a, b) => {
 
-    // Punkte
-    if(b.points !== a.points){
-      return b.points - a.points;
-    }
+if(b.points !== a.points){
+  return b.points - a.points;
+}
 
-    // Tordifferenz
-    const diffA = a.goalsFor - a.goalsAgainst;
-    const diffB = b.goalsFor - b.goalsAgainst;
+const diffA = a.goalsFor - a.goalsAgainst;
+const diffB = b.goalsFor - b.goalsAgainst;
 
-    if(diffB !== diffA){
-      return diffB - diffA;
-    }
+if(diffB !== diffA){
+  return diffB - diffA;
+}
 
-    // Tore
-    return b.goalsFor - a.goalsFor;
-  });
+return b.goalsFor - a.goalsFor;
+
+});
 }
 
 // =========================
@@ -27,42 +27,42 @@ function sortTable(table){
 // =========================
 function getLiveTable(){
 
-  const table = game.league.teams.map(team => ({
-    ...team
-  }));
+const table = game.league.teams.map(team => ({
+...team
+}));
 
-  const match = game.match.current;
+const match = game.match.current;
 
-  if(!match) return table;
+if(!match) return table;
 
-  const home = table.find(t => t.name === match.home.name);
-  const away = table.find(t => t.name === match.away.name);
+const home = table.find(t => t.name === match.home.name);
+const away = table.find(t => t.name === match.away.name);
 
-  if(!home || !away) return table;
+if(!home || !away) return table;
 
-  const h = matchState.score.home;
-  const a = matchState.score.away;
+const h = game.match.live.score.home;
+const a = game.match.live.score.away;
 
-  // Tore simulieren
-  home.goalsFor += h;
-  home.goalsAgainst += a;
+// Tore simulieren
+home.goalsFor += h;
+home.goalsAgainst += a;
 
-  away.goalsFor += a;
-  away.goalsAgainst += h;
+away.goalsFor += a;
+away.goalsAgainst += h;
 
-  // Punkte simulieren
-  if(h > a){
-    home.points += 3;
-  }
-  else if(a > h){
-    away.points += 3;
-  }
-  else{
-    home.points += 1;
-    away.points += 1;
-  }
+// Punkte simulieren
+if(h > a){
+home.points += 3;
+}
+else if(a > h){
+away.points += 3;
+}
+else{
+home.points += 1;
+away.points += 1;
+}
 
-  return table;
+return table;
 }
 
 // =========================
@@ -70,70 +70,70 @@ function getLiveTable(){
 // =========================
 function renderTable(customTable){
 
-  const tableData = customTable || game.league.teams;
-  const sorted = sortTable([...tableData]);
+const tableData = customTable || game.league.teams;
+const sorted = sortTable([...tableData]);
 
-  const tbody = document.getElementById("tableBody");
-  if(!tbody) return;
+const tbody = document.getElementById("tableBody");
+if(!tbody) return;
 
-  tbody.innerHTML = "";
+tbody.innerHTML = "";
 
-  sorted.forEach((team, index) => {
+sorted.forEach((team, index) => {
 
-    const tr = document.createElement("tr");
+const tr = document.createElement("tr");
 
-    const diff = team.goalsFor - team.goalsAgainst;
+const diff = team.goalsFor - team.goalsAgainst;
 
-    // =========================
-    // 🎨 MARKIERUNGEN
-    // =========================
+// 🟢 Aufstieg
+if(index < 2){
+  tr.style.background = "#c8f7c5";
+}
 
-    // 🟢 Aufstieg (Top 2)
-    if(index < 2){
-      tr.style.background = "#c8f7c5";
-    }
+// 🔴 Abstieg
+if(index >= sorted.length - 2){
+  tr.style.background = "#f7c5c5";
+}
 
-    // 🔴 Abstieg (letzte 2)
-    if(index >= sorted.length - 2){
-      tr.style.background = "#f7c5c5";
-    }
+// ⭐ aktuelles Spiel
+const match = game.match.current;
 
-    // ⭐ aktuelles Spiel hervorheben
-    if(game.match.current){
-      if(
-        team.name === game.match.current.home.name ||
-        team.name === game.match.current.away.name
-      ){
-        tr.style.fontWeight = "bold";
-      }
-    }
+if(match){
+  if(
+    team.name === match.home.name ||
+    team.name === match.away.name
+  ){
+    tr.style.fontWeight = "bold";
+  }
+}
 
-    // =========================
-    // 🧱 ROW
-    // =========================
-    tr.innerHTML = `
-      <td>${index + 1}</td>
-      <td>${team.name}</td>
-      <td>${team.played}</td>
-      <td>${team.goalsFor}:${team.goalsAgainst}</td>
-      <td>${diff}</td>
-      <td>${team.points}</td>
-    `;
+tr.innerHTML = `
+  <td>${index + 1}</td>
+  <td>${team.name}</td>
+  <td>${team.played}</td>
+  <td>${team.goalsFor}:${team.goalsAgainst}</td>
+  <td>${diff}</td>
+  <td>${team.points}</td>
+`;
 
-    tbody.appendChild(tr);
-  });
+tbody.appendChild(tr);
+
+});
 }
 
 // =========================
 // ⚡ LIVE RENDER
 // =========================
 function renderLiveTable(){
-  const live = getLiveTable();
-  renderTable(live);
+const live = getLiveTable();
+renderTable(live);
 }
 
 // =========================
-// 🌍 GLOBAL
+// 📦 EXPORTS
 // =========================
-window.renderTable = renderTable;
-window.renderLiveTable = renderLiveTable;
+export {
+renderTable,
+renderLiveTable,
+getLiveTable,
+sortTable
+};
