@@ -1,29 +1,51 @@
 import { loadCSV } from "./loader.js";
-console.log("🧪 Erste Zeile:", rows[0]);
+
 export async function loadLeaguesFromCSV(path){
 
   const rows = await loadCSV(path);
+
+  if(!rows || rows.length === 0){
+    console.warn("⚠️ CSV leer oder nicht geladen");
+    return {};
+  }
 
   const leagues = {};
 
   rows.forEach(row => {
 
-    const liga = row.liga?.trim();
-    const team = row.team?.trim();
+    // 👉 KEYS NORMALISIEREN
+    const normalized = {};
+    Object.keys(row).forEach(k => {
+      normalized[k.toLowerCase()] = row[k];
+    });
 
-    if(!liga || !team) return;
+    const ligaRaw =
+      normalized.liga ||
+      normalized.kreis ||
+      normalized.league;
 
+    const team =
+      normalized.team ||
+      normalized.mannschaft;
+
+    if(!ligaRaw || !team) return;
+
+    const liga = ligaRaw.trim();
     const key = liga.toLowerCase().replace(/\s+/g, "_");
 
     if(!leagues[key]){
       leagues[key] = {
-        name: `Kreisliga A ${liga}`,
+        name: liga.includes("Kreisliga")
+          ? liga
+          : `Kreisliga A ${liga}`,
         teams: []
       };
     }
 
-    leagues[key].teams.push(team);
+    leagues[key].teams.push(team.trim());
   });
+
+  console.log("📊 Geladene Ligen:", Object.keys(leagues).length);
 
   return leagues;
 }
