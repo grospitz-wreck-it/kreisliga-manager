@@ -2,7 +2,6 @@
 // 📦 CORE
 // =========================
 import { renderApp } from "./ui/layout.js";
-import { loadGame } from "./services/storage.js";
 import { game } from "./core/state.js";
 import "./core/events.js";
 import "./core/events.constants.js";
@@ -39,8 +38,7 @@ function init(){
 
 console.log("🚀 Init läuft...");
 
-// 👉 UI vorbereiten
-initLeagueSelect();
+// 👉 UI Events binden
 bindUI();
 
 // 👉 Ads starten
@@ -53,30 +51,30 @@ if(loaded){
 console.log("💾 Save geladen");
 
 
-if(game.league.teams.length > 0){
+game.phase = "idle";
+
+// 🔥 UI nach Load wieder aufbauen
+initLeagueSelect();
+
+if(game.league.teams?.length > 0){
   populateTeamSelect();
   renderSchedule();
 }
 
-// 👉 Wenn Save existiert → direkt ins Spiel
-game.phase = "idle";
-
 
 } else {
 
-
-// 👉 Kein Save → Splash anzeigen
+// 👉 Kein Save → Splash
 game.phase = "setup";
 
 
 }
 
-// 👉 UI anzeigen (WICHTIG!)
+// 👉 UI rendern (IMMER am Ende)
 renderApp();
 
 console.log("✅ Init fertig");
 }
-
 
 // =========================
 // ▶️ START
@@ -84,7 +82,7 @@ console.log("✅ Init fertig");
 document.addEventListener("DOMContentLoaded", init);
 
 // =========================
-// 📦 OPTIONAL EXPORTS
+// 📦 EXPORTS
 // =========================
 export {
 init,
