@@ -53,9 +53,9 @@ function initLeagueSelect(){
     select.appendChild(opt);
   });
 
-  select.addEventListener("change", (e) => {
-    selectLeague(e.target.value);
-  });
+ select.onchange = (e) => {
+  selectTeam(e.target.value);
+};
 }
 
 
