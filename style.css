@@ -1,304 +1,262 @@
 /* =========================
-🌍 BASIS
+🌍 BASE
 ========================= */
+
+* {
+  box-sizing: border-box;
+  }
+
 body {
-  margin: 0;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: linear-gradient(180deg, #eef1ee 0%, #dde3dd 100%);
-  color: #1f1f1f;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+margin: 0;
+font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+background: linear-gradient(180deg, #eef1ee 0%, #dde3dd 100%);
+color: #1f1f1f;
+-webkit-font-smoothing: antialiased;
 }
 
+/* =========================
+📦 APP WRAPPER
+========================= */
 .appWrapper {
-  max-width: 920px;
-  margin: 0 auto;
-  width: 100%;
+max-width: 920px;
+margin: 0 auto;
+width: 100%;
 }
 
 /* =========================
 🧱 LAYOUT
 ========================= */
 .layout {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 12px;
+display: flex;
+flex-direction: column;
+gap: 12px;
+padding: 12px;
 }
 
 .mainPanel,
 .sidePanel {
-  width: 100%;
+width: 100%;
 }
 
 /* =========================
 🧊 PANEL
 ========================= */
 .panel {
-  background: rgba(255,255,255,0.75);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  border: 1px solid rgba(255,255,255,0.5);
+background: rgba(255,255,255,0.75);
+backdrop-filter: blur(10px);
+border-radius: 16px;
+padding: 16px;
+box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+border: 1px solid rgba(255,255,255,0.5);
+transition: transform 0.2s ease;
 }
 
 .panel:hover {
-  transform: translateY(-2px);
+transform: translateY(-2px);
 }
 
 /* =========================
 ⚽ SCOREBOARD
 ========================= */
-.scoreboard.big {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 20px;
-  font-weight: bold;
+.scoreboard {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-weight: bold;
 }
 
 #score {
-  background: linear-gradient(135deg, #2e7d32, #1b5e20);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-size: 26px;
+background: linear-gradient(135deg, #2e7d32, #1b5e20);
+color: white;
+padding: 10px 20px;
+border-radius: 12px;
+font-size: 26px;
 }
 
 /* =========================
-📊 MOMENTUM
+📊 PROGRESS / MOMENTUM
 ========================= */
 .momentum {
-  height: 10px;
-  background: #ccc;
-  border-radius: 10px;
-  margin: 12px 0;
-  overflow: hidden;
+height: 10px;
+background: #ccc;
+border-radius: 10px;
+overflow: hidden;
+margin-top: 10px;
 }
 
-#momentumBar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(to right, #4caf50, #ff5252);
-  transition: width 0.4s ease;
+#momentumBar,
+#progressFill {
+height: 100%;
+width: 0%;
+background: linear-gradient(to right, #4caf50, #ff5252);
+transition: width 0.3s ease;
 }
 
 /* =========================
-📺 LIVE MATCH
+📺 LIVE FEED
 ========================= */
 .live {
-  position: relative;
-  height: 220px;
-  overflow-y: auto;
-  border-radius: 14px;
-  background: url("gfx/field.svg") center/cover no-repeat;
+position: relative;
+height: 220px;
+overflow-y: auto;
+border-radius: 14px;
+background: url("gfx/field.svg") center/cover no-repeat;
 }
 
 .live::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  border-radius: 14px;
+content: "";
+position: absolute;
+inset: 0;
+background: rgba(0,0,0,0.65);
+border-radius: 14px;
 }
 
 .live p {
-  position: relative;
-  margin: 4px 0;
-  padding: 6px 8px;
-  border-radius: 6px;
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-  font-size: 13px;
+position: relative;
+margin: 4px 0;
+padding: 6px 8px;
+border-radius: 6px;
+background: rgba(0,0,0,0.6);
+color: #fff;
+font-size: 13px;
 }
 
 /* =========================
-📢 ADS – CLEAN FINAL FIX
+📅 SCHEDULE
 ========================= */
-
-/* 🔥 FLEX-KILL */
-#adBanner {
-  position: relative;
-  height: 90px;
-  min-height: 90px;
-  max-height: 90px;
-
-  width: 100%;
-  overflow: hidden;
-
-  display: block; /* ❗ killt flex komplett */
-}
-
-/* Track liegt absolut drin → kein Stretch möglich */
-#adTrack {
-  position: absolute;
-  inset: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-/* echtes Leaderboard */
-.leaderboardAd {
-  height: 90px;
-  width: 100%;
-  max-width: 970px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  overflow: hidden;
-  background: #000;
-  border-radius: 10px;
-}
-
-/* 🔥 FIT TO HEIGHT (DER KEY) */
-.leaderboardAd img {
-  height: 100%;
-  width: auto;
-  display: block;
-  object-fit: contain;
+#schedule div {
+padding: 6px 0;
+border-bottom: 1px solid #ddd;
+font-size: 14px;
 }
 
 /* =========================
-📱 MOBILE ADS
+📊 TABLE
+========================= */
+table {
+width: 100%;
+border-collapse: collapse;
+font-size: 14px;
+}
+
+th, td {
+padding: 6px;
+text-align: left;
+}
+
+thead {
+background: #eee;
+}
+
+tbody tr:nth-child(even) {
+background: rgba(0,0,0,0.03);
+}
+
+/* =========================
+🔘 FORM ELEMENTS
+========================= */
+input, select, button {
+width: 100%;
+padding: 10px;
+font-size: 15px;
+border-radius: 10px;
+border: 1px solid #ccc;
+}
+
+button {
+background: linear-gradient(135deg, #43a047, #2e7d32);
+color: white;
+border: none;
+cursor: pointer;
+font-weight: bold;
+}
+
+button:hover {
+opacity: 0.95;
+}
+
+/* =========================
+📢 ADS (CLEAN FINAL)
+========================= */
+#adBanner {
+width: 100%;
+height: 90px;
+margin: 12px 0;
+
+display: flex;
+justify-content: center;
+align-items: center;
+
+overflow: hidden;
+}
+
+#adTrack {
+width: 100%;
+height: 100%;
+
+display: flex;
+justify-content: center;
+align-items: center;
+
+overflow: hidden;
+}
+
+.leaderboardAd {
+height: 100%;
+width: 100%;
+max-width: 970px;
+
+display: flex;
+justify-content: center;
+align-items: center;
+
+background: #000;
+border-radius: 10px;
+overflow: hidden;
+}
+
+.leaderboardAd img {
+height: 100%;
+width: auto;
+max-width: 100%;
+object-fit: contain;
+display: block;
+}
+
+/* =========================
+📱 MOBILE
 ========================= */
 @media (max-width: 600px) {
-  #adBanner {
-    height: 50px;
-    min-height: 50px;
-    max-height: 50px;
-  }
 
-  .leaderboardAd {
-    max-width: 320px;
-    height: 50px;
-  }
-
-  .leaderboardAd img {
-    height: 50px;
-  }
+.layout {
+padding: 10px;
 }
 
-/* =========================
-🔘 BUTTONS
-========================= */
-button {
-  background: linear-gradient(135deg, #43a047, #2e7d32);
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
+#adBanner {
+height: 50px;
+}
+
+.leaderboardAd {
+max-width: 320px;
+}
+
 }
 
 /* =========================
 🖥️ DESKTOP
 ========================= */
 @media (min-width: 769px) {
-  .layout {
-    flex-direction: row;
-    padding: 20px;
-  }
 
-  .mainPanel { flex: 2; }
-  .sidePanel { flex: 1; }
-}
-/* =========================
-💣 ADS ISOLATED (FINAL)
-========================= */
-
-/* =========================
-💣 ADS HARD FIX (ISOLIERT)
-========================= */
-
-#adBanner{
-  position: relative;
-
-  width: 100%;
-  height: 90px;
-
-  margin: 12px 0;
-
-  /* 🔥 DAS IST DER GAMECHANGER */
-  display: block !important;
+.layout {
+flex-direction: row;
+padding: 20px;
 }
 
-/* feste "Stage" */
-#adBanner::before{
-  content: "";
-  display: block;
-  height: 90px;
+.mainPanel {
+flex: 2;
 }
 
-/* Track wird komplett entkoppelt */
-#adTrack{
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-
-  height: 90px;
-  width: 970px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  overflow: hidden;
+.sidePanel {
+flex: 1;
 }
-
-/* Banner selbst */
-.leaderboardAd{
-  height: 90px;
-  width: 970px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background: #000;
-  overflow: hidden;
-  border-radius: 10px;
-}
-
-/* 🔥 HIER PASSIERT DIE MAGIE */
-.leaderboardAd img{
-  height: 90px !important;
-  width: auto !important;
-
-  max-height: 90px !important;
-  object-fit: contain;
-
-  display: block;
-}
-
-/* 📱 MOBILE */
-@media (max-width:600px){
-
-  #adBanner{
-    height: 50px;
-  }
-
-  #adBanner::before{
-    height: 50px;
-  }
-
-  #adTrack{
-    height: 50px;
-    width: 320px;
-  }
-
-  .leaderboardAd{
-    height: 50px;
-    width: 320px;
-  }
-
-  .leaderboardAd img{
-    height: 50px !important;
-  }
 }
