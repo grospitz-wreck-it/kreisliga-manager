@@ -1,44 +1,36 @@
 // =========================
-// 🌍 GLOBAL GAME STATE
+// 📦 IMPORTS
 // =========================
 
+// 🔥 Core zuerst
 import "./core/state.js";
+
+// 🔧 Modules
 import "./modules/ads.js";
-import "./ui/ui.js";
 import "./modules/league.js";
 import "./modules/table.js";
 import "./modules/scheduler.js";
 import "./services/storage.js";
+
+// 📡 Event System
 import "./core/events.js";
-import "./core/eventStore.js";
 import "./core/events.constants.js";
+import "./core/eventStore.js";
+
+// 🎮 Engine
 import "./core/engine.js";
-import "./ui/bindings.js";
 
+// 🖥 UI
+import "./ui/ui.js";
+import { bindUI } from "./ui/bindings.js";
 
-const game = {
-  phase: "setup",
+// 📦 Funktionen explizit importieren
+import { initLeagueSelect, populateTeamSelect } from "./modules/league.js";
+import { renderSchedule } from "./modules/scheduler.js";
 
-  league: {
-    key: null,
-    teams: [],
-    schedule: [],
-    currentRound: 0
-  },
-
-  team: {
-    selected: null
-  },
-
-  match: {
-    current: null
-  }
-};
-
-window.game = game;
 
 // =========================
-// 📢 ADS START (SAUBER)
+// 📢 ADS START
 // =========================
 function startAds(){
 
@@ -51,42 +43,44 @@ function startAds(){
 
 }
 
+
 // =========================
 // 🚀 INIT
 // =========================
 function init(){
 
-  console.log("🚀 Spiel wird gestartet...");
+  console.log("🚀 Init läuft...");
 
-  // UI vorbereiten
+  // 👉 UI vorbereiten
   initLeagueSelect();
   bindUI();
 
-  // Ads starten (einmal, sauber)
+  // 👉 Ads starten
   startAds();
 
-  // Optional: Save laden
-  if(typeof loadGame === "function"){
-    const loaded = loadGame();
+  // 👉 Save laden
+  if(typeof window.loadGame === "function"){
+
+    const loaded = window.loadGame();
 
     if(loaded){
       console.log("💾 Save geladen");
 
-      if(game.league.teams.length > 0){
+      if(window.game.league.teams.length > 0){
         populateTeamSelect();
         renderSchedule();
       }
     }
   }
 
-  game.phase = "setup";
+  // 👉 Phase setzen (aus state.js!)
+  window.game.phase = "setup";
 
   console.log("✅ Init fertig");
 }
 
+
 // =========================
-// ▶️ START (WICHTIG!)
+// ▶️ START
 // =========================
-window.addEventListener("load", () => {
-  init();
-});
+window.addEventListener("load", init);
