@@ -200,7 +200,15 @@ function goal(team, isHome){
     matchState.score.away++;
   }
 
-  addEvent(`⚽ TOR für ${team.name}!`);
+  const text = `⚽ TOR für ${team.name}!`;
+
+addEvent(text);
+
+emit(EVENTS.MATCH_EVENT, {
+  type: "goal",
+  team: team.name,
+  minute: matchState.minute
+});
 }
 
 // =========================
