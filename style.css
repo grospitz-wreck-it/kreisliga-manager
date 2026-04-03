@@ -1,5 +1,5 @@
 /* =========================
-🌍 BASE
+🌍 GLOBAL
 ========================= */
 
 * {
@@ -8,131 +8,163 @@
 
 body {
 margin: 0;
-font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-background: linear-gradient(180deg, #eef1ee 0%, #dde3dd 100%);
-color: #1f1f1f;
--webkit-font-smoothing: antialiased;
+font-family: system-ui;
+background: #f2f2f2;
 }
 
 /* =========================
-📦 APP WRAPPER
+🟡 SPLASH
 ========================= */
-.appWrapper {
-max-width: 920px;
-margin: 0 auto;
+#splash {
+display: flex;
+height: 100vh;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+gap: 12px;
+background: #111;
+color: white;
+padding: 20px;
+}
+
+#splash input,
+#splash button {
+max-width: 300px;
 width: 100%;
 }
 
 /* =========================
-🧱 LAYOUT
+🔵 APP
 ========================= */
-.layout {
+#app {
+display: none;
+}
+
+/* =========================
+📦 CONTAINER
+========================= */
+.container {
+max-width: 600px;
+margin: 0 auto;
+padding: 12px;
+
 display: flex;
 flex-direction: column;
 gap: 12px;
+}
+
+/* 🔥 verhindert Layout-Stretch */
+.container > * {
+flex: none;
+}
+
+/* =========================
+🧷 HEADER
+========================= */
+#header {
+position: sticky;
+top: 0;
+background: #111;
+color: white;
 padding: 12px;
-}
-
-.mainPanel,
-.sidePanel {
-width: 100%;
-}
-
-/* =========================
-🧊 PANEL
-========================= */
-.panel {
-background: rgba(255,255,255,0.75);
-backdrop-filter: blur(10px);
-border-radius: 16px;
-padding: 16px;
-box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-border: 1px solid rgba(255,255,255,0.5);
-transition: transform 0.2s ease;
-}
-
-.panel:hover {
-transform: translateY(-2px);
-}
-
-/* =========================
-⚽ SCOREBOARD
-========================= */
-.scoreboard {
 display: flex;
-justify-content: space-between;
 align-items: center;
+gap: 10px;
+z-index: 10;
+}
+
+/* =========================
+🍔 SIDEBAR
+========================= */
+#sidebar {
+position: fixed;
+top: 0;
+left: 0;
+width: 220px;
+height: 100%;
+background: #222;
+padding: 20px;
+transform: translateX(-100%);
+transition: transform 0.3s;
+z-index: 20;
+}
+
+#sidebar.open {
+transform: translateX(0);
+}
+
+/* =========================
+🧱 FORM ELEMENTS
+========================= */
+input,
+select,
+button {
+width: 100%;
+padding: 12px;
+font-size: 16px;
+border-radius: 8px;
+border: 1px solid #ccc;
+}
+
+button {
+background: #2e7d32;
+color: white;
 font-weight: bold;
 }
 
+/* =========================
+⚽ MATCH UI
+========================= */
 #score {
-background: linear-gradient(135deg, #2e7d32, #1b5e20);
-color: white;
-padding: 10px 20px;
-border-radius: 12px;
-font-size: 26px;
+text-align: center;
+font-size: 32px;
+font-weight: bold;
 }
 
-/* =========================
-📊 PROGRESS / MOMENTUM
-========================= */
-.momentum {
+#match {
+text-align: center;
+font-size: 16px;
+}
+
+#progressBar {
 height: 10px;
-background: #ccc;
+background: #ddd;
 border-radius: 10px;
 overflow: hidden;
-margin-top: 10px;
 }
 
-#momentumBar,
 #progressFill {
 height: 100%;
 width: 0%;
-background: linear-gradient(to right, #4caf50, #ff5252);
-transition: width 0.3s ease;
+background: green;
 }
 
 /* =========================
-📺 LIVE FEED
+📡 LIVE FEED
 ========================= */
-.live {
-position: relative;
-height: 220px;
+#liveFeed {
+background: white;
+border-radius: 10px;
+padding: 10px;
+max-height: 250px;
 overflow-y: auto;
-border-radius: 14px;
-background: url("gfx/field.svg") center/cover no-repeat;
-}
-
-.live::before {
-content: "";
-position: absolute;
-inset: 0;
-background: rgba(0,0,0,0.65);
-border-radius: 14px;
-}
-
-.live p {
-position: relative;
-margin: 4px 0;
-padding: 6px 8px;
-border-radius: 6px;
-background: rgba(0,0,0,0.6);
-color: #fff;
-font-size: 13px;
-}
-
-/* =========================
-📅 SCHEDULE
-========================= */
-#schedule div {
-padding: 6px 0;
-border-bottom: 1px solid #ddd;
 font-size: 14px;
+}
+
+#liveFeed p {
+margin: 6px 0;
 }
 
 /* =========================
 📊 TABLE
 ========================= */
+#table {
+background: white;
+border-radius: 10px;
+padding: 10px;
+overflow-x: auto;
+}
+
 table {
 width: 100%;
 border-collapse: collapse;
@@ -141,57 +173,30 @@ font-size: 14px;
 
 th, td {
 padding: 6px;
-text-align: left;
-}
-
-thead {
-background: #eee;
-}
-
-tbody tr:nth-child(even) {
-background: rgba(0,0,0,0.03);
+text-align: center;
+border-bottom: 1px solid #ddd;
 }
 
 /* =========================
-🔘 FORM ELEMENTS
-========================= */
-input, select, button {
-width: 100%;
-padding: 10px;
-font-size: 15px;
-border-radius: 10px;
-border: 1px solid #ccc;
-}
-
-button {
-background: linear-gradient(135deg, #43a047, #2e7d32);
-color: white;
-border: none;
-cursor: pointer;
-font-weight: bold;
-}
-
-button:hover {
-opacity: 0.95;
-}
-
-/* =========================
-📢 ADS – FINAL REAL FIX
+📢 ADS (FINAL FIX)
 ========================= */
 
+/* OUTER */
 #adBanner {
 width: 100%;
-display: flex;
-justify-content: center;
+height: 90px;
+min-height: 90px;
+max-height: 90px;
+
 margin: 12px 0;
+
+display: block;
 }
 
-/* feste Bühne */
+/* STAGE */
 #adTrack {
 width: 100%;
-max-width: 970px;
-
-height: 90px;
+height: 100%;
 
 display: flex;
 justify-content: center;
@@ -202,7 +207,7 @@ border-radius: 10px;
 overflow: hidden;
 }
 
-/* Wrapper */
+/* WRAPPER */
 .leaderboardAd {
 width: 100%;
 height: 100%;
@@ -212,7 +217,7 @@ justify-content: center;
 align-items: center;
 }
 
-/* Link */
+/* LINK */
 .leaderboardAd a {
 width: 100%;
 height: 100%;
@@ -222,13 +227,11 @@ justify-content: center;
 align-items: center;
 }
 
-/* 🔥 HARTE NORMALISIERUNG */
+/* 🔥 IMAGE FIX */
 .leaderboardAd img {
-width: 100%;
-height: 100%;
-
-object-fit: contain; /* KEY */
-
+height: 100% !important;
+width: auto !important;
+object-fit: contain;
 display: block;
 }
 
@@ -237,10 +240,14 @@ display: block;
 ========================= */
 @media (max-width: 600px) {
 
-#adTrack {
-max-width: 320px;
+.container {
+padding: 10px;
+}
+
+#adBanner {
 height: 50px;
+min-height: 50px;
+max-height: 50px;
 }
 
 }
-
