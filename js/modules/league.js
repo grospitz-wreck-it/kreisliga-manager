@@ -6,34 +6,13 @@ import { renderSchedule, renderCurrentMatch } from "../ui/ui.js";
 import { renderTable } from "./table.js";
 import { game } from "../core/state.js";
 import { generateTeam } from "./teamLoader.js";
+import { loadLeaguesFromCSV } from "./leagueLoader.js";
 
 
 // =========================
-// 📦 LIGEN DATEN
+// 📦 LIGEN DATEN (DYNAMISCH)
 // =========================
-const LEAGUES = {
-  herford: {
-    name: "Kreisliga A Herford",
-    teams: [
-      "VfL Holsen II",
-      "TSV Löhne",
-      "SV Oetinghausen",
-      "FC Exter",
-      "FC Herford",
-      "TuRa Löhne",
-      "TuS Hunnebrock",
-      "TuS Bardüttingdorf-Wallenbrück",
-      "TuS Dünne",
-      "SV Bischofshagen-Wittel",
-      "FC Schweicheln",
-      "SG FA Herringhausen/Eickum II",
-      "Bünder SV",
-      "SC Enger",
-      "RW Kirchlengern II",
-      "SpVg Hiddenhausen"
-    ]
-  }
-};
+let LEAGUES = {};
 
 
 // =========================
@@ -58,10 +37,19 @@ function ensureTeamPlayers(team){
 // =========================
 // 🏆 LIGA DROPDOWN
 // =========================
-function initLeagueSelect(){
+async function initLeagueSelect(){
 
   const select = document.getElementById("leagueSelect");
   if(!select) return;
+
+  // 🆕 CSV laden
+  try {
+    LEAGUES = await loadLeaguesFromCSV("./data/ligen.csv");
+    console.log("✅ Ligen geladen:", Object.keys(LEAGUES).length);
+  } catch(e){
+    console.error("❌ Fehler beim Laden der Ligen CSV:", e);
+    return;
+  }
 
   select.innerHTML = `<option value="">Liga wählen</option>`;
 
@@ -72,7 +60,6 @@ function initLeagueSelect(){
     select.appendChild(opt);
   });
 
-  // ✅ FIX: richtige Funktion + Guard
   select.onchange = (e) => {
     const value = e.target.value;
     if(!value) return;
@@ -103,7 +90,6 @@ function populateTeamSelect(){
     select.appendChild(opt);
   });
 
-  // ✅ FIX: kein addEventListener → kein stacking
   select.onchange = (e) => {
     const value = e.target.value;
     if(!value) return;
@@ -178,7 +164,7 @@ function selectLeague(key){
 // =========================
 function selectTeam(teamName){
 
-  console.log("👉 selectTeam Input:", teamName); // 🔍 Debug
+  console.log("👉 selectTeam Input:", teamName);
 
   const teams = game.league.teams;
 
@@ -198,7 +184,7 @@ function selectTeam(teamName){
 
   console.log("✅ Team gewählt:", team.name);
 
-  // 🆕 👉 Lazy Spieler laden
+  // 🆕 Lazy Spieler laden
   const players = ensureTeamPlayers(team);
   game.team.players = players;
 
