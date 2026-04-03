@@ -131,17 +131,24 @@ const img = new Image();
 
 img.onload = function(){
 
-// 👉 Zielgröße
+
+const MAX_WIDTH = 320;
 const MAX_HEIGHT = 90;
-const ratio = img.width / img.height;
+
+let width = img.width;
+let height = img.height;
+
+const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+
+width = width * ratio;
+height = height * ratio;
 
 const canvas = document.createElement("canvas");
-canvas.height = MAX_HEIGHT;
-canvas.width = MAX_HEIGHT * ratio;
+canvas.width = width;
+canvas.height = height;
 
 const ctx = canvas.getContext("2d");
-
-ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+ctx.drawImage(img, 0, 0, width, height);
 
 const resizedBase64 = canvas.toDataURL("image/jpeg", 0.8);
 
@@ -154,7 +161,7 @@ const campaign = {
   start,
   end,
   donationPercent,
-  image: resizedBase64, // 🔥 jetzt klein!
+  image: resizedBase64,
   impressionsDelivered: 0,
   spent: 0,
   targeting: {
@@ -163,6 +170,21 @@ const campaign = {
     team: type === "team" ? team : null
   }
 };
+
+const all = getCampaigns();
+all.push(campaign);
+saveCampaigns(all);
+
+clearForm();
+render();
+
+alert("✅ Kampagne gespeichert (richtig skaliert)");
+
+};
+
+img.src = e.target.result;
+};
+
 
 const all = getCampaigns();
 all.push(campaign);
