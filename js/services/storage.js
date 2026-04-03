@@ -13,10 +13,9 @@ function saveGame(){
 
 try {
 
-```
+
 const data = {
-  game,
-  matchState
+  game
 };
 
 localStorage.setItem(
@@ -25,7 +24,7 @@ localStorage.setItem(
 );
 
 console.log("✅ Spiel gespeichert");
-```
+
 
 } catch(e){
 console.error("❌ Save Fehler", e);
@@ -39,7 +38,7 @@ function loadGame(){
 
 try {
 
-```
+
 const raw = localStorage.getItem(STORAGE_KEY);
 
 if(!raw){
@@ -54,10 +53,6 @@ if(data.game){
   Object.assign(game, data.game);
 }
 
-// 👉 MATCH STATE
-if(data.matchState){
-  Object.assign(matchState, data.matchState);
-}
 
 // 👉 FALLBACK: Spielplan fehlt
 if(
@@ -71,7 +66,7 @@ if(
 console.log("✅ Spiel geladen");
 
 return true;
-```
+
 
 } catch(e){
 console.error("❌ Load Fehler", e);
