@@ -76,8 +76,8 @@ if(loaded){
   try {
     console.log("⚽ Lade Spieler & Team-Struktur...");
 
-    const players = loadCSV("./data/spieler.csv");
-    const teamsRaw = loadCSV("./data/teams.csv");
+    const players = await loadCSV("./data/spieler.csv");
+    const teamsRaw = await loadCSV("./data/teams.csv");
 
     const teams = extractTeams(teamsRaw);
 
