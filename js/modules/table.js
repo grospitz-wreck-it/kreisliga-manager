@@ -1,4 +1,5 @@
 import { getSelectedTeam } from "./league.js";
+import { game } from "../core/state.js";
 
 // =========================
 // 📊 SORTIERUNG
