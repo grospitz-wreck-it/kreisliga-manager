@@ -1,7 +1,7 @@
 // =========================
 // 📦 LIGEN DATEN
 // =========================
-window.LEAGUES = {
+const LEAGUES = {
   herford: {
     name: "Kreisliga A Herford",
     teams: [
@@ -25,6 +25,10 @@ window.LEAGUES = {
   }
 };
 
+// 👉 OPTIONAL global lassen (für Debug)
+window.LEAGUES = LEAGUES;
+
+
 // =========================
 // 🏆 LIGA DROPDOWN
 // =========================
@@ -46,6 +50,7 @@ function initLeagueSelect(){
     selectLeague(this.value);
   };
 }
+
 
 // =========================
 // 👕 TEAM DROPDOWN
@@ -70,6 +75,7 @@ function populateTeamSelect(){
     selectTeam(this.value);
   };
 }
+
 
 // =========================
 // 🏟️ LIGA LADEN
@@ -119,8 +125,9 @@ function selectLeague(key){
   renderSchedule?.();
 }
 
+
 // =========================
-// 👤 TEAM WÄHLEN (FINAL CLEAN)
+// 👤 TEAM WÄHLEN
 // =========================
 function selectTeam(teamName){
 
@@ -136,7 +143,6 @@ function selectTeam(teamName){
     return;
   }
 
-  // ✅ EINZIGE WAHRHEIT = STRING
   game.team.selected = team.name;
 
   console.log("✅ Team gewählt:", team.name);
@@ -149,8 +155,9 @@ function selectTeam(teamName){
   renderCurrentMatch?.();
 }
 
+
 // =========================
-// 🧠 HELPER (SEHR WICHTIG)
+// 🧠 HELPER
 // =========================
 function getSelectedTeam(){
 
@@ -159,11 +166,14 @@ function getSelectedTeam(){
   return game.league.teams.find(t => t.name === game.team.selected);
 }
 
+
 // =========================
-// 🌍 EXPORTS
+// 🌍 EXPORTS (NEU!!!)
 // =========================
-window.initLeagueSelect = initLeagueSelect;
-window.populateTeamSelect = populateTeamSelect;
-window.selectLeague = selectLeague;
-window.selectTeam = selectTeam;
-window.getSelectedTeam = getSelectedTeam;
+export {
+  initLeagueSelect,
+  populateTeamSelect,
+  selectLeague,
+  selectTeam,
+  getSelectedTeam
+};
