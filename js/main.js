@@ -39,7 +39,7 @@ import { renderSchedule } from "./ui/ui.js";
 // =========================
 // 🚀 INIT
 // =========================
-function init(){
+async function init(){
 
 console.log("🚀 Init läuft...");
 
