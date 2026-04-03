@@ -48,16 +48,15 @@ if(!raw){
 
 const data = JSON.parse(raw);
 
-// 👉 GAME STATE
+// 👉 GAME STATE (DEEP MERGE statt Object.assign)
 if(data.game){
-  Object.assign(game, data.game);
+  deepMerge(game, data.game);
 }
-
 
 // 👉 FALLBACK: Spielplan fehlt
 if(
   (!game.league.schedule || game.league.schedule.length === 0) &&
-  game.league.teams?.length
+  game.league.teams && game.league.teams.length
 ){
   console.warn("⚠️ Kein Spielplan im Save → neu generieren");
   generateSchedule();
@@ -80,6 +79,32 @@ return false;
 function clearSave(){
 localStorage.removeItem(STORAGE_KEY);
 console.log("🗑 Save gelöscht");
+}
+
+// =========================
+// 🧠 DEEP MERGE (FIX!)
+// =========================
+function deepMerge(target, source){
+
+for(const key in source){
+
+
+if(
+  source[key] &&
+  typeof source[key] === "object" &&
+  !Array.isArray(source[key])
+){
+  if(!target[key]){
+    target[key] = {};
+  }
+
+  deepMerge(target[key], source[key]);
+}
+else{
+  target[key] = source[key];
+}
+
+}
 }
 
 // =========================
