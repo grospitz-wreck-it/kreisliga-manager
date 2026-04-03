@@ -55,7 +55,6 @@ handleMainAction();
 if(tacticSelect){
 tacticSelect.addEventListener("change", (e) => {
 
-```
   const team = getSelectedTeam();
 
   if(!team){
@@ -67,7 +66,6 @@ tacticSelect.addEventListener("change", (e) => {
 
   console.log("🧠 Neue Taktik:", team.tactic);
 });
-```
 
 }
 
@@ -77,7 +75,6 @@ tacticSelect.addEventListener("change", (e) => {
 if(startBtn){
 startBtn.addEventListener("click", () => {
 
-```
   const input = document.getElementById("nameInput");
   if(!input) return;
 
@@ -86,7 +83,6 @@ startBtn.addEventListener("click", () => {
   game.phase = "idle";
   renderApp();
 });
-```
 
 }
 
@@ -118,13 +114,11 @@ if(loadBtn){
 loadBtn.addEventListener("click", () => {
 const loaded = loadGame();
 
-```
   if(loaded){
     game.phase = "idle";
     renderApp();
   }
 });
-```
 
 }
 
