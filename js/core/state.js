@@ -1,122 +1,135 @@
+
+* =========================
+* 🌍 GLOBAL GAME STATE (MODULE)
+* =========================
+  */
+
+const game = {
+
 // =========================
-// 🌍 GLOBAL GAME STATE
+// 👤 SPIELER
 // =========================
-window.game = {
+player: {
+name: ""
+},
 
-  // =========================
-  // 👤 SPIELER
-  // =========================
-  player: {
-    name: ""
-  },
+// =========================
+// 🏆 LIGA
+// =========================
+league: {
+key: null,
 
-  // =========================
-  // 🏆 LIGA
-  // =========================
-  league: {
-    key: null,
+teams: [],
+schedule: [],
+currentRound: 0,
+currentMatchIndex: 0,
 
-    teams: [],
-    schedule: [],
-    currentRound: 0,
+table: []
 
-    table: []
-  },
+},
 
-  // =========================
-  // 👕 DEIN TEAM
-  // =========================
-  team: {
-    selected: null
-  },
+// =========================
+// 👕 DEIN TEAM
+// =========================
+team: {
+selected: null
+},
 
-  // =========================
-  // ⚽ MATCH
-  // =========================
-  match: {
-    current: null,
+// =========================
+// ⚽ MATCH
+// =========================
+match: {
+current: null,
 
-    // 🔥 LIVE STATE
-    live: {
-      minute: 0,
-      running: false,
-      score: { home: 0, away: 0 },
-      events: []
-    }
-  },
+live: {
+  minute: 0,
+  running: false,
+  score: { home: 0, away: 0 },
+  events: []
+}
 
-  // =========================
-  // 📡 EVENTS
-  // =========================
-  events: {
-    history: [],
-    last: null
-  },
+},
 
-  // =========================
-  // ⚙️ SETTINGS
-  // =========================
-  settings: {
-    sound: true,
-    notifications: true
-  },
+// =========================
+// 📡 EVENTS
+// =========================
+events: {
+history: [],
+last: null
+},
 
-  // =========================
-  // 🌐 ONLINE (PREP)
-  // =========================
-  online: {
-    leagueId: null,
-    playerId: null,
-    connected: false
-  },
+// =========================
+// ⚙️ SETTINGS
+// =========================
+settings: {
+sound: true,
+notifications: true
+},
 
-  // =========================
-  // 🏁 SPIELPHASE
-  // =========================
-  phase: "setup", // setup | idle | live
+// =========================
+// 🌐 ONLINE (PREP)
+// =========================
+online: {
+leagueId: null,
+playerId: null,
+connected: false
+},
 
-  // =========================
-  // 📅 SAISON
-  // =========================
-  season: {
-    year: 1
-  }
+// =========================
+// 🏁 SPIELPHASE
+// =========================
+phase: "setup", // setup | idle | live
+
+// =========================
+// 📅 SAISON
+// =========================
+season: {
+year: 1
+}
 };
 
 // =========================
-// 🧪 DEBUG HELPER
+// 🧹 RESET GAME
 // =========================
-window.resetGame = function(){
+function resetGame(){
 
-  localStorage.clear();
+localStorage.clear();
 
-  game.player.name = "";
+game.player.name = "";
 
-  game.league = {
-    key: null,
-    teams: [],
-    schedule: [],
-    currentRound: 0,
-    table: []
-  };
+game.league = {
+key: null,
+teams: [],
+schedule: [],
+currentRound: 0,
+currentMatchIndex: 0,
+table: []
+};
 
-  game.team.selected = null;
+game.team.selected = null;
 
-  game.match.current = null;
+game.match.current = null;
 
-  // 🔥 wichtig: live reset
-  game.match.live = {
-    minute: 0,
-    running: false,
-    score: { home: 0, away: 0 },
-    events: []
-  };
+game.match.live = {
+minute: 0,
+running: false,
+score: { home: 0, away: 0 },
+events: []
+};
 
-  game.events.history = [];
-  game.events.last = null;
+game.events.history = [];
+game.events.last = null;
 
-  game.phase = "setup";
-  game.season.year = 1;
+game.phase = "setup";
+game.season.year = 1;
 
-  console.log("🧹 Game komplett zurückgesetzt");
+console.log("🧹 Game komplett zurückgesetzt");
+}
+
+// =========================
+// 📦 EXPORTS
+// =========================
+export {
+game,
+resetGame
 };
