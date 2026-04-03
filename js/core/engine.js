@@ -347,8 +347,7 @@ function applyMatchResult(match){
   match._processed = true;
 }
 
-// =========================
-// 🌍 GLOBAL
-// =========================
-window.startMatch = startMatch;
-window.handleMainAction = handleMainAction;
+export {
+  startMatch,
+  handleMainAction
+};
