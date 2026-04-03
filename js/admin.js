@@ -55,27 +55,44 @@ const img = new Image();
 
 img.onload = function(){
 
-  // 🔥 FIX: begrenzte Größe
-  const MAX_WIDTH = 320;
-  const MAX_HEIGHT = 90;
-
-  let width = img.width;
-  let height = img.height;
-
-  const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
-
-  width *= ratio;
-  height *= ratio;
+  // =====================
+  // 🔥 AUTO-CROP BANNER (320x90)
+  // =====================
+  const TARGET_W = 320;
+  const TARGET_H = 90;
 
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = TARGET_W;
+  canvas.height = TARGET_H;
 
   const ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0, width, height);
 
-  const resizedBase64 = canvas.toDataURL("image/jpeg", 0.8);
+  const imgRatio = img.width / img.height;
+  const targetRatio = TARGET_W / TARGET_H;
 
+  let sx, sy, sw, sh;
+
+  if(imgRatio > targetRatio){
+    // 👉 zu breit → links/rechts abschneiden
+    sh = img.height;
+    sw = sh * targetRatio;
+    sx = (img.width - sw) / 2;
+    sy = 0;
+  } else {
+    // 👉 zu hoch → oben/unten abschneiden
+    sw = img.width;
+    sh = sw / targetRatio;
+    sx = 0;
+    sy = (img.height - sh) / 2;
+  }
+
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, TARGET_W, TARGET_H);
+
+  const resizedBase64 = canvas.toDataURL("image/jpeg", 0.85);
+
+  // =====================
+  // 💾 SAVE
+  // =====================
   const campaign = {
     id: Date.now(),
     name,
@@ -103,7 +120,7 @@ img.onload = function(){
   render();
 
   console.log("✅ gespeichert:", campaign);
-  alert("Kampagne gespeichert");
+  alert("Kampagne gespeichert (perfekt zugeschnitten)");
 };
 
 img.src = e.target.result;
