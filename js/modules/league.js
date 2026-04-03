@@ -178,25 +178,21 @@ function selectTeam(teamName){
 
 
 // =========================
-// 🧠 HELPER
+// 🧠 GET SELECTED TEAM
 // =========================
 function getSelectedTeam(){
-
-  if(!game.team.selected) return null;
-
-  return game.league.teams.find(
-    t => t.name === game.team.selected
-  );
+return game.league.teams.find(
+t => t.name === game.team.selected
+);
 }
-
 
 // =========================
 // 📦 EXPORTS
 // =========================
 export {
-  initLeagueSelect,
-  populateTeamSelect,
-  selectLeague,
-  selectTeam,
-  getSelectedTeam
+initLeagueSelect,
+populateTeamSelect,
+selectLeague,
+selectTeam,
+getSelectedTeam
 };
