@@ -42,12 +42,11 @@ async function initLeagueSelect(){
   const select = document.getElementById("leagueSelect");
   if(!select) return;
 
-  // 🆕 CSV laden
   try {
     LEAGUES = await loadLeaguesFromCSV("./data/ligen.csv");
     console.log("✅ Ligen geladen:", Object.keys(LEAGUES).length);
   } catch(e){
-    console.error("❌ Fehler beim Laden der Ligen CSV:", e);
+    console.error("❌ Fehler beim Laden der Ligen:", e);
     return;
   }
 
@@ -136,7 +135,7 @@ function selectLeague(key){
     played: 0
   }));
 
-  console.log("✅ Teams erstellt:", game.league.teams.length);
+  console.log(`✅ Liga "${data.name}" geladen mit ${game.league.teams.length} Teams`);
 
   // =========================
   // 📅 SPIELPLAN
