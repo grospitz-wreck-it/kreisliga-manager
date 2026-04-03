@@ -26,7 +26,7 @@ import { bindUI } from "./ui/bindings.js";
 
 // 📦 Funktionen explizit importieren
 import { initLeagueSelect, populateTeamSelect } from "./modules/league.js";
-import { renderSchedule } from "./modules/scheduler.js";
+import { renderSchedule } from "./ui/ui.js";
 
 
 // =========================
