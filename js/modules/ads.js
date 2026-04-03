@@ -56,20 +56,34 @@ if(!el) return;
 
 const ads = getMatchingAds();
 
-console.log("ADS:", ads);
-
 if(!ads.length){
 el.innerHTML = `<div class="leaderboardAd">Keine Werbung</div>`;
 return;
 }
 
-const ad = ads[Math.floor(Math.random() * ads.length)];
+// 👉 DEVICE DETECTION
+const isMobile = window.innerWidth <= 600;
 
-el.innerHTML = `    <div class="leaderboardAd">
-      ${ad.link ?`<a href="${ad.link}" target="_blank">`: ""}         <img src="${ad.image}">
-      ${ad.link ?`</a>`: ""}     </div>
- `;
+// 👉 richtige Größe wählen
+const ad = ads[adIndex % ads.length];
+
+// optional: später getrennte assets möglich
+const image = isMobile && ad.imageMobile
+? ad.imageMobile
+: ad.image;
+
+// 👉 RENDER CLEAN
+el.innerHTML = `
+
+  <div class="leaderboardAd">
+    ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
+      <img src="${image}" alt="Ad">
+    ${ad.link ? `</a>` : ""}
+  </div>
+`;
+
 }
+
 
 // =========================
 // 🔄 ROTATION
