@@ -45,6 +45,10 @@ return false;
 
 });
 }
+// =========================
+// 🔄 STATE
+// =========================
+let adIndex = 0;
 
 // =========================
 // 🎬 RENDER
@@ -61,18 +65,15 @@ el.innerHTML = `<div class="leaderboardAd">Keine Werbung</div>`;
 return;
 }
 
-// 👉 DEVICE DETECTION
 const isMobile = window.innerWidth <= 600;
 
-// 👉 richtige Größe wählen
+// 👉 nutzt jetzt sicheren Index
 const ad = ads[adIndex % ads.length];
 
-// optional: später getrennte assets möglich
 const image = isMobile && ad.imageMobile
 ? ad.imageMobile
 : ad.image;
 
-// 👉 RENDER CLEAN
 el.innerHTML = `
 
   <div class="leaderboardAd">
@@ -81,9 +82,7 @@ el.innerHTML = `
     ${ad.link ? `</a>` : ""}
   </div>
 `;
-
 }
-
 
 // =========================
 // 🔄 ROTATION
@@ -95,7 +94,7 @@ if(!ads.length) return;
 
 adIndex = (adIndex + 1) % ads.length;
 
-renderAds(); // 👉 nutzt jetzt index korrekt
+renderAds();
 }
 
 
