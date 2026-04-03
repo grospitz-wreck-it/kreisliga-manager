@@ -14,13 +14,10 @@ function updateUI(){
 
   const match = game.match?.current;
 
-  // 🛡️ SAFE ACCESS
   const seasonYear = game.season?.year ?? 1;
   const matchday = (game.league?.currentRound ?? 0) + 1;
 
-  // =========================
   // ❌ KEIN MATCH
-  // =========================
   if(!match){
     scoreEl.textContent = "0 : 0";
     matchEl.textContent = `Saison ${seasonYear} | Kein Spiel aktiv`;
@@ -28,25 +25,20 @@ function updateUI(){
     return;
   }
 
-  // =========================
   // ⚽ SCORE
-  // =========================
   scoreEl.textContent =
     matchState.score.home + " : " + matchState.score.away;
 
-  // =========================
-  // 📅 MATCH INFO
-  // =========================
+  // 📅 INFO
   matchEl.textContent =
     `Saison ${seasonYear} | Spieltag ${matchday} | ` +
     `${match.home.name} vs ${match.away.name} | ${matchState.minute}'`;
 
-  // =========================
   // 📊 PROGRESS
-  // =========================
   const percent = Math.min((matchState.minute / 90) * 100, 100);
   progress.style.width = percent + "%";
 }
+
 
 // =========================
 // 🎮 AKTUELLES SPIEL
@@ -54,77 +46,6 @@ function updateUI(){
 function renderCurrentMatch(){
 
   const el = document.getElementById("currentMatch");
-
-  if(!el) return;
-
-  const match = game.match.current;
-
-  if(!match){
-    el.innerHTML = "Kein Spiel aktiv";
-    return;
-  }
-
-  el.innerHTML = `
-    <b>${match.home.name}</b> vs <b>${match.away.name}</b>
-  `;
-}
-function renderLiveFeed(){
-
-  const el = document.getElementById("liveFeed");
-
-  if(!el) return;
-
-  el.innerHTML = matchState.events
-    .map(e => `<p>${e}</p>`)
-    .join("");
-}
-
-window.renderLiveFeed = renderLiveFeed;
-// =========================
-// 📅 SPIELPLAN
-// =========================
-function renderSchedule(){
-
-  const el = document.getElementById("schedule");
-
-  if(!el) return;
-
-  const round = game.league.schedule?.[game.league.currentRound];
-
-  if(!round){
-    el.innerHTML = "Kein Spielplan";
-    return;
-  }
-
-  let html = `<h3>Spieltag ${game.league.currentRound + 1}</h3>`;
-
-  round.forEach(match => {
-
-    const result = match.result
-      ? `${match.result.home}:${match.result.away}`
-      : "-:-";
-
-    html += `
-      <div>
-        ${match.home.name} vs ${match.away.name} (${result})
-      </div>
-    `;
-  });
-
-  el.innerHTML = html;
-}
-
-// =========================
-// 🌍 GLOBAL
-// =========================
-window.updateUI = updateUI;
-window.renderSchedule = renderSchedule;
-window.renderCurrentMatch = renderCurrentMatch;
-
-function renderCurrentMatch(){
-
-  const el = document.getElementById("currentMatch");
-
   if(!el) return;
 
   const match = game.match.current;
@@ -139,10 +60,27 @@ function renderCurrentMatch(){
   `;
 }
 
+
+// =========================
+// 📡 LIVE FEED
+// =========================
+function renderLiveFeed(){
+
+  const el = document.getElementById("liveFeed");
+  if(!el) return;
+
+  el.innerHTML = matchState.events
+    .map(e => `<p>${e}</p>`)
+    .join("");
+}
+
+
+// =========================
+// 📅 SPIELPLAN
+// =========================
 function renderSchedule(){
 
   const el = document.getElementById("schedule");
-
   if(!el) return;
 
   const round = game.league.schedule?.[game.league.currentRound];
@@ -170,7 +108,11 @@ function renderSchedule(){
   el.innerHTML = html;
 }
 
-// 🔥 GLOBAL
+
+// =========================
+// 🌍 GLOBAL (EINMAL!)
+// =========================
 window.updateUI = updateUI;
 window.renderSchedule = renderSchedule;
 window.renderCurrentMatch = renderCurrentMatch;
+window.renderLiveFeed = renderLiveFeed;
