@@ -1,6 +1,8 @@
 // =========================
 // 📦 CORE
 // =========================
+import { renderApp } from "./ui/layout.js";
+import { loadGame } from "./services/storage.js";
 import { game } from "./core/state.js";
 import "./core/events.js";
 import "./core/events.constants.js";
