@@ -10,6 +10,7 @@ import "./modules/table.js";
 import "./modules/scheduler.js";
 import "./services/storage.js";
 import "./core/events.js";
+import "./core/eventStore.js";
 import "./core/events.constants.js";
 import "./core/engine.js";
 import "./ui/bindings.js";
