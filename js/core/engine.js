@@ -261,6 +261,12 @@ function addEvent(text){
     `${matchState.minute}' - ${text}`
   );
 
+  emit(EVENTS.MATCH_EVENT, {
+    type: "generic",
+    text,
+    minute: matchState.minute
+  });
+
   if(matchState.events.length > 25){
     matchState.events.pop();
   }
