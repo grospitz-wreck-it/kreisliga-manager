@@ -176,12 +176,14 @@ opacity: 0.95;
 }
 
 /* =========================
-📢 ADS (CLEAN FINAL)
+📢 ADS – HARD CONTAIN FIX
 ========================= */
+
 #adBanner {
 width: 100%;
-height: 90px;
-margin: 12px 0;
+height: 70px;
+background: #111;
+border-radius: 10px;
 
 display: flex;
 justify-content: center;
@@ -201,27 +203,24 @@ align-items: center;
 overflow: hidden;
 }
 
-.leaderboardAd {
-height: 100%;
-width: 100%;
-max-width: 970px;
-
-display: flex;
-justify-content: center;
-align-items: center;
-
-background: #000;
-border-radius: 10px;
-overflow: hidden;
-}
-
-.leaderboardAd img {
-height: 100%;
-width: auto;
+/* 🔥 DAS IST DER KEY FIX */
+#adTrack img {
+max-height: 100%;
 max-width: 100%;
+
+width: auto;
+height: auto;
+
 object-fit: contain;
 display: block;
 }
+
+/* fallback für alles andere */
+#adTrack * {
+max-height: 100%;
+max-width: 100%;
+}
+
 
 /* =========================
 📱 MOBILE
