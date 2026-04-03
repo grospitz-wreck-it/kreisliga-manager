@@ -13,26 +13,83 @@
       background: #f2f2f2;
     }
 
-    /* 🔥 MINIMAL Desktop Fix */
- .container {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    /* =========================
+       🟡 SPLASH
+    ========================= */
+    #splash {
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 12px;
+      background: #111;
+      color: white;
+      padding: 20px;
+    }
 
-  max-width: 600px;
-  margin: 0 auto;
-}
+    #splash input, #splash button {
+      max-width: 300px;
+    }
 
-/* 🔥 verhindert dass irgendwas gestretched wird */
-.container > * {
-  flex: 0 0 auto;
-}
+    /* =========================
+       🔵 APP
+    ========================= */
+    #app {
+      display: none;
+    }
 
-/* optional nice */
-#adBanner {
-  align-self: center;
-}
+    .container {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .container > * {
+      flex: 0 0 auto;
+    }
+
+    /* =========================
+       🧷 HEADER
+    ========================= */
+    #header {
+      position: sticky;
+      top: 0;
+      background: #111;
+      color: white;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    /* =========================
+       🍔 SIDEBAR
+    ========================= */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background: #222;
+      padding: 20px;
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+      z-index: 20;
+    }
+
+    #sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* =========================
+       🧱 FORM ELEMENTS
+    ========================= */
     input, select, button {
       width: 100%;
       padding: 12px;
@@ -47,6 +104,9 @@
       font-weight: bold;
     }
 
+    /* =========================
+       ⚽ MATCH UI
+    ========================= */
     #score {
       text-align: center;
       font-size: 32px;
@@ -71,6 +131,9 @@
       background: green;
     }
 
+    /* =========================
+       📡 LIVE FEED
+    ========================= */
     #liveFeed {
       background: white;
       border-radius: 10px;
@@ -84,7 +147,9 @@
       margin: 6px 0;
     }
 
-    /* 🔥 ADS FIX (minimal, stabil) */
+    /* =========================
+       📢 ADS
+    ========================= */
     #adBanner {
       width: 100%;
       height: 70px;
@@ -92,8 +157,6 @@
       border-radius: 10px;
       padding: 8px;
       box-sizing: border-box;
-      overflow: hidden;
-
       display: flex;
       align-items: center;
       justify-content: center;
@@ -102,7 +165,6 @@
     #adTrack {
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 20px;
       width: 100%;
     }
@@ -116,71 +178,99 @@
   </style>
 
 </head>
+
 <body>
 
-  <div class="container">
+  <!-- =========================
+       🟡 SPLASH SCREEN
+  ========================= -->
 
-<input id="nameInput" placeholder="Dein Name">
+  <div id="splash">
+    <h1>Kreisliga Manager</h1>
+    <input id="nameInput" placeholder="Dein Name">
+    <button id="startBtn">Spiel starten</button>
+  </div>
 
-<select id="leagueSelect"></select>
-<select id="teamSelect"></select>
-<div id="currentMatch"></div>
+  <!-- =========================
+       🔵 APP
+  ========================= -->
 
-<button id="mainButton">Spiel starten</button>
-<button onclick="saveGame()">Speichern</button>
-<button onclick="loadGame()">Laden</button>
-<button onclick="clearSave()">Reset</button>
+  <div id="app">
 
-<div id="score">0 : 0</div>
-<div id="match"></div>
+<!-- HEADER -->
+<header id="header">
+  <button id="burger">☰</button>
+  <span id="headerTitle">Kreisliga Manager</span>
+</header>
 
-<div id="progressBar">
-  <div id="progressFill"></div>
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <button id="saveBtn">💾 Speichern</button>
+  <button id="loadBtn">📂 Laden</button>
+  <button id="resetBtn">🗑 Reset</button>
 </div>
 
-<div>
-  <label><b>🎯 Taktik anpassen</b></label>
-  <select id="tacticSelect">
-    <option value="balanced">Ausgeglichen</option>
-    <option value="offensive">Offensiv</option>
-    <option value="defensive">Defensiv</option>
-    <option value="pressing">Pressing</option>
-    <option value="counter">Konter</option>
-  </select>
-</div>
+<!-- CONTENT -->
+<div class="container">
 
-<div id="schedule"></div>
+  <select id="leagueSelect"></select>
+  <select id="teamSelect"></select>
 
-<div id="liveFeed"></div>
+  <div id="currentMatch"></div>
 
-<div id="table">
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Team</th>
-        <th>Sp</th>
-        <th>Tore</th>
-        <th>Diff</th>
-        <th>Punkte</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-</div>
+  <button id="mainButton">Spiel starten</button>
 
-<!-- 📢 ADS -->
-<div id="adBanner">
-  <div class="adInner">
+  <div id="score">0 : 0</div>
+  <div id="match"></div>
+
+  <div id="progressBar">
+    <div id="progressFill"></div>
+  </div>
+
+  <div>
+    <label><b>🎯 Taktik anpassen</b></label>
+    <select id="tacticSelect">
+      <option value="balanced">Ausgeglichen</option>
+      <option value="offensive">Offensiv</option>
+      <option value="defensive">Defensiv</option>
+      <option value="pressing">Pressing</option>
+      <option value="counter">Konter</option>
+    </select>
+  </div>
+
+  <div id="schedule"></div>
+  <div id="liveFeed"></div>
+
+  <div id="table">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Team</th>
+          <th>Sp</th>
+          <th>Tore</th>
+          <th>Diff</th>
+          <th>Punkte</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ADS -->
+  <div id="adBanner">
     <div id="adTrack"></div>
   </div>
+
 </div>
 
   </div>
 
-  <!-- 🧠 SCRIPTS (FIXED ORDER + defer) -->
+  <!-- =========================
+       🧠 MAIN SCRIPT
+  ========================= -->
 
- <script type="module" src="js/main.js"></script>
-  
+  <script type="module" src="js/main.js"></script>
+
 </body>
 </html>
