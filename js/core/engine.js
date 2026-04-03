@@ -2,6 +2,7 @@
 // 🌍 MATCH STATE
 // =========================
 import { renderSchedule, updateUI, renderLiveFeed } from "../ui/ui.js";
+import { renderTable, renderLiveTable } from "../modules/table.js";
 import { game } from "../core/state.js";
 import { emit } from "./events.js";
 import { EVENTS } from "./events.constants.js";
