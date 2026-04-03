@@ -15,6 +15,11 @@ import "./modules/scheduler.js";
 import "./modules/table.js";
 import { initLeagueSelect, populateTeamSelect } from "./modules/league.js";
 
+// 🆕 👉 Spieler-Module (minimal ergänzt)
+import { loadCSV } from "./modules/loader.js";
+import { extractTeams } from "./modules/teamGenerator.js";
+import { assignPlayers } from "./modules/assigner.js";
+
 // =========================
 // 🎮 ENGINE
 // =========================
@@ -67,6 +72,26 @@ if(game.league.teams?.length > 0){
 // 👉 Kein Save → Splash
 game.phase = "setup";
 
+// =========================
+// 🆕 👉 SPIELER GENERIERUNG (nur bei neuem Spiel)
+// =========================
+try {
+  console.log("⚽ Generiere Spieler & Teams...");
+
+  const players = loadCSV("./data/spieler.csv");
+  const teamsRaw = loadCSV("./data/teams.csv");
+
+  const teams = extractTeams(teamsRaw);
+  const assignedPlayers = assignPlayers(players, teams);
+
+  // 👉 in Game State speichern (wichtig!)
+  game.players = assignedPlayers;
+
+  console.log(`✅ ${assignedPlayers.length} Spieler zugewiesen`);
+
+} catch (e) {
+  console.warn("❌ Spieler-Setup fehlgeschlagen:", e);
+}
 
 }
 
