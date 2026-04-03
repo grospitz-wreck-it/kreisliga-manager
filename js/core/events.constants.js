@@ -1,13 +1,10 @@
+// =========================
+// 📡 EVENT CONSTANTS
+// =========================
 export const EVENTS = {
-
-  // Game Flow
-  GAME_START: "GAME_START",
-  PLAY_MATCH: "PLAY_MATCH",
-  MATCH_FINISHED: "MATCH_FINISHED",
-  MATCH_EVENT: "MATCH_EVENT"
-  // Player
-  TEAM_UPDATE: "TEAM_UPDATE",
-
-  // UI
-  STATE_CHANGED: "STATE_CHANGED"
+  GAME_START: "game_start",
+  MATCH_EVENT: "match_event",
+  MATCH_FINISHED: "match_finished",
+  STATE_CHANGED: "state_changed",
+  TEAM_UPDATE: "team_update"
 };
