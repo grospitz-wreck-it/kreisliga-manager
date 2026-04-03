@@ -1,57 +1,60 @@
+// =========================
+// 🔗 UI BINDINGS
+// =========================
 function bindUI(){
 
   const leagueSelect = document.getElementById("leagueSelect");
   const teamSelect = document.getElementById("teamSelect");
   const button = document.getElementById("mainButton");
+  const tacticSelect = document.getElementById("tacticSelect");
 
-  // =========================
   // 🏆 Liga wählen
-  // =========================
-  leagueSelect.addEventListener("change", (e) => {
-
-    const key = e.target.value;
-
-    selectLeague(key);
-  });
-
-  // =========================
-  // 👕 Team wählen
-  // =========================
-  teamSelect.addEventListener("change", (e) => {
-
-    const teamName = e.target.value;
-
-    selectTeam(teamName);
-  });
-
-  // =========================
-  // ▶️ Start Button
-  // =========================
-  button.addEventListener("click", () => {
-    handleMainAction();
-  });
-}
-document.getElementById("tacticSelect").addEventListener("change", (e) => {
-  if(game.team.selected){
-    game.team.selected.tactic = e.target.value;
+  if(leagueSelect){
+    leagueSelect.addEventListener("change", (e) => {
+      selectLeague(e.target.value);
+    });
   }
-});
-// =========================
-// 🎮 TAKTIK ÄNDERN
-// =========================
-const tacticSelect = document.getElementById("tacticSelect");
 
-if(tacticSelect){
-  tacticSelect.addEventListener("change", (e) => {
+  // 👕 Team wählen
+  if(teamSelect){
+    teamSelect.addEventListener("change", (e) => {
+      selectTeam(e.target.value);
+    });
+  }
 
-    if(!game.team.selected){
-      console.warn("❌ Kein Team ausgewählt");
-      return;
-    }
+  // ▶️ Start Button
+  if(button){
+    button.addEventListener("click", () => {
+      handleMainAction();
+    });
+  }
 
-    game.team.selected.tactic = e.target.value;
+  // 🧠 Taktik ändern (FIXED)
+  if(tacticSelect){
+    tacticSelect.addEventListener("change", (e) => {
 
-    console.log("🧠 Neue Taktik:", game.team.selected.tactic);
-  });
+      const team = getSelectedTeam?.();
+
+      if(!team){
+        console.warn("❌ Kein Team ausgewählt");
+        return;
+      }
+
+      team.tactic = e.target.value;
+
+      console.log("🧠 Neue Taktik:", team.tactic);
+    });
+  }
 }
+
+
+// =========================
+// 🌍 GLOBAL (für alten Code)
+// =========================
 window.bindUI = bindUI;
+
+
+// =========================
+// 📦 EXPORT (WICHTIG!)
+// =========================
+export { bindUI };
