@@ -3,7 +3,6 @@
 // =========================
 import { game } from "../core/state.js";
 import { generateSchedule } from "../modules/scheduler.js";
-import { matchState } from "../core/engine.js";
 
 const STORAGE_KEY = "kreisliga_save";
 
