@@ -1,7 +1,7 @@
-console.log("🧪 Erste CSV-Zeile:", rows[0]);
+
 import { loadCSV } from "./loader.js";
 export async function loadLeaguesFromCSV(path){
-
+console.log("🧪 Erste CSV-Zeile:", rows[0]);
   const rows = await loadCSV(path);
 
   if(!rows || rows.length === 0){
