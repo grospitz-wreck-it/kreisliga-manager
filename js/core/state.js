@@ -88,3 +88,10 @@ window.resetGame = function(){
 
   console.log("🧹 Game komplett zurückgesetzt");
 };
+// =========================
+// ⚙️ SETTINGS (NEU)
+// =========================
+settings: {
+  sound: true,
+  notifications: true
+},
