@@ -1,77 +1,98 @@
+// =========================
+// 💾 STORAGE MODULE
+// =========================
+import { game } from "../core/state.js";
+import { generateSchedule } from "../modules/scheduler.js";
+import { matchState } from "../core/engine.js";
+
 const STORAGE_KEY = "kreisliga_save";
 
 // =========================
 // 💾 SAVE
 // =========================
-async function saveGame(){
+function saveGame(){
 
-  try {
-    const data = {
-      game,
-      matchState
-    };
+try {
 
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(data)
-    );
+```
+const data = {
+  game,
+  matchState
+};
 
-    console.log("✅ Spiel gespeichert");
-  } catch(e){
-    console.error("❌ Save Fehler", e);
-  }
+localStorage.setItem(
+  STORAGE_KEY,
+  JSON.stringify(data)
+);
+
+console.log("✅ Spiel gespeichert");
+```
+
+} catch(e){
+console.error("❌ Save Fehler", e);
+}
 }
 
 // =========================
 // 📂 LOAD
 // =========================
-async function loadGame(){
+function loadGame(){
 
-  try {
+try {
 
-    const raw = localStorage.getItem(STORAGE_KEY);
+```
+const raw = localStorage.getItem(STORAGE_KEY);
 
-    if(!raw){
-      console.log("ℹ️ Kein Save gefunden");
-      return false;
-    }
+if(!raw){
+  console.log("ℹ️ Kein Save gefunden");
+  return false;
+}
 
-    const data = JSON.parse(raw);
+const data = JSON.parse(raw);
 
-    if(data.game){
-      Object.assign(game, data.game);
-    }
+// 👉 GAME STATE
+if(data.game){
+  Object.assign(game, data.game);
+}
 
-    if(data.matchState){
-      Object.assign(matchState, data.matchState);
-    }
-    if((!game.league.schedule || game.league.schedule.length === 0) 
-   && game.league.teams?.length){
+// 👉 MATCH STATE
+if(data.matchState){
+  Object.assign(matchState, data.matchState);
+}
 
+// 👉 FALLBACK: Spielplan fehlt
+if(
+  (!game.league.schedule || game.league.schedule.length === 0) &&
+  game.league.teams?.length
+){
   console.warn("⚠️ Kein Spielplan im Save → neu generieren");
   generateSchedule();
 }
-    console.log("✅ Spiel geladen");
 
-    return true;
+console.log("✅ Spiel geladen");
 
-  } catch(e){
-    console.error("❌ Load Fehler", e);
-    return false;
-  }
+return true;
+```
+
+} catch(e){
+console.error("❌ Load Fehler", e);
+return false;
+}
 }
 
 // =========================
 // 🗑 DELETE
 // =========================
 function clearSave(){
-  localStorage.removeItem(STORAGE_KEY);
-  console.log("🗑 Save gelöscht");
+localStorage.removeItem(STORAGE_KEY);
+console.log("🗑 Save gelöscht");
 }
 
 // =========================
-// 🌍 EXPORT
+// 📦 EXPORTS
 // =========================
-window.saveGame = saveGame;
-window.loadGame = loadGame;
-window.clearSave = clearSave;
+export {
+saveGame,
+loadGame,
+clearSave
+};
