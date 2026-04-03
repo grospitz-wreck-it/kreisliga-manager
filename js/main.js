@@ -66,7 +66,7 @@ console.log("✅ Init fertig");
 // =========================
 // ▶️ START
 // =========================
-window.addEventListener("load", init);
+document.addEventListener("DOMContentLoaded", init);
 
 // =========================
 // 📦 OPTIONAL EXPORTS
