@@ -4,6 +4,7 @@
 import { generateSchedule } from "./scheduler.js";
 import { renderSchedule, renderCurrentMatch } from "../ui/ui.js";
 import { renderTable } from "./table.js";
+import { game } from "../core/state.js";
 
 
 // =========================
