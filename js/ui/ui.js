@@ -1,7 +1,25 @@
+
 // =========================
-// 📦 STATE
+// 🧭 HEADER UPDATE
 // =========================
 import { game } from "../core/state.js";
+
+function updateHeader(){
+
+const nameEl = document.getElementById("headerName");
+const teamEl = document.getElementById("headerTeam");
+
+if(nameEl){
+nameEl.textContent = game.player?.name || "Manager";
+}
+
+if(teamEl){
+teamEl.textContent = game.team?.selected || "Kein Team";
+}
+}
+
+export { updateHeader };
+
 
 // =========================
 // 🔄 UI UPDATE
