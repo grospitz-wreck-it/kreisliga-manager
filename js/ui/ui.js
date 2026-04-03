@@ -1,6 +1,7 @@
 // =========================
 // 🔄 UI UPDATE
 // =========================
+import { game } from "../core/state.js";
 function updateUI(){
 
   const scoreEl = document.getElementById("score");
