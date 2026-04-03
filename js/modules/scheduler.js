@@ -1,6 +1,7 @@
 // =========================
 // 📅 SPIELPLAN GENERIEREN
 // =========================
+import { game } from "../core/state.js";
 function generateSchedule(){
 
   const originalTeams = game.league.teams;
