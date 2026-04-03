@@ -1,6 +1,20 @@
 // =========================
 // 🌍 GLOBAL GAME STATE
 // =========================
+
+import "./core/state.js";
+import "./modules/ads.js";
+import "./ui/ui.js";
+import "./modules/league.js";
+import "./modules/table.js";
+import "./modules/scheduler.js";
+import "./services/storage.js";
+import "./core/events.js";
+import "./core/events.constants.js";
+import "./core/engine.js";
+import "./ui/bindings.js";
+
+
 const game = {
   phase: "setup",
 
