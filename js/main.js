@@ -51,19 +51,32 @@ const loaded = loadGame();
 
 if(loaded){
 console.log("💾 Save geladen");
-  
+
+
 if(game.league.teams.length > 0){
   populateTeamSelect();
   renderSchedule();
 }
 
+// 👉 Wenn Save existiert → direkt ins Spiel
+game.phase = "idle";
+
+
+} else {
+
+
+// 👉 Kein Save → Splash anzeigen
+game.phase = "setup";
+
+
 }
 
-// 👉 Phase setzen
-game.phase = "setup";
+// 👉 UI anzeigen (WICHTIG!)
+renderApp();
 
 console.log("✅ Init fertig");
 }
+
 
 // =========================
 // ▶️ START
