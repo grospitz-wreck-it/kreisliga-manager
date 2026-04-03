@@ -1,13 +1,15 @@
 // =========================
-// 📦 STORAGE / ADS (MODULE)
+// 📢 ADS ENGINE (CLEAN)
 // =========================
 import { game } from "../core/state.js";
+
+const KEY = "ad_v2";
 
 // =========================
 // 📦 DATA
 // =========================
 function getCampaigns(){
-return JSON.parse(localStorage.getItem("ad_v2") || "[]");
+return JSON.parse(localStorage.getItem(KEY) || "[]");
 }
 
 // =========================
@@ -16,12 +18,12 @@ return JSON.parse(localStorage.getItem("ad_v2") || "[]");
 function getMatchingAds(){
 
 const now = Date.now();
-
 const leagueKey = game.league?.key;
 const teamKey   = game.team?.selected;
 
 return getCampaigns().filter(c => {
 
+```
 // 🕒 Zeitraum
 if(c.start && now < c.start) return false;
 if(c.end && now > c.end) return false;
@@ -29,11 +31,11 @@ if(c.end && now > c.end) return false;
 // 🌍 GLOBAL
 if(c.targeting?.global) return true;
 
-// ⚠️ kein Spielstatus → trotzdem anzeigen
-if(!leagueKey && !teamKey) return true;
+// 👉 Setup Phase → alles zeigen
+if(game.phase === "setup") return true;
 
 // 🏆 Liga
-if(c.targeting?.league === leagueKey) return true;
+if(c.targeting?.league && c.targeting.league === leagueKey) return true;
 
 // 👕 Team
 if(c.targeting?.team){
@@ -42,9 +44,11 @@ if(c.targeting?.team){
 }
 
 return false;
+```
 
 });
 }
+
 // =========================
 // 🔄 STATE
 // =========================
@@ -65,28 +69,16 @@ el.innerHTML = `<div class="leaderboardAd">Keine Werbung</div>`;
 return;
 }
 
-const isMobile = window.innerWidth <= 600;
-// 👉 einmal hinzufügen
-window.addEventListener("resize", () => {
-renderAds();
-});
-// 👉 nutzt jetzt sicheren Index
 adIndex = adIndex % ads.length;
 const ad = ads[adIndex];
 
+const isMobile = window.innerWidth <= 600;
+const image = isMobile && ad.imageMobile ? ad.imageMobile : ad.image;
 
-const image = isMobile && ad.imageMobile
-? ad.imageMobile
-: ad.image;
-
-el.innerHTML = `
-
-  <div class="leaderboardAd">
-    ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
-      <img src="${image}" alt="Ad">
-    ${ad.link ? `</a>` : ""}
-  </div>
-`;
+el.innerHTML = `    <div class="leaderboardAd">
+      ${ad.link ?`<a href="${ad.link}" target="_blank">`: ""}         <img src="${image}" alt="Ad">
+      ${ad.link ?`</a>`: ""}     </div>
+ `;
 }
 
 // =========================
@@ -98,25 +90,25 @@ const ads = getMatchingAds();
 if(!ads.length) return;
 
 adIndex = (adIndex + 1) % ads.length;
-
 renderAds();
 }
-
 
 // =========================
 // 🚀 ENGINE
 // =========================
 function startAdEngine(){
 
-console.log("📢 Ads gestartet");
+console.log("📢 Ads Engine gestartet");
 
+// 👉 initial render
 renderAds();
 
-// 👉 NUR EINE LOGIK
+// 👉 Rotation
 setInterval(rotateAds, 8000);
 
+// 👉 Resize sauber EINMAL
+window.addEventListener("resize", renderAds);
 }
-
 
 // =========================
 // 📦 EXPORTS
