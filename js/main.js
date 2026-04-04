@@ -50,7 +50,7 @@ const startBtn = document.getElementById("startBtn");
 
 // 👉 UI Events binden
 bindUI();
-
+initLeagueSelect();
 // 👉 Ads starten
 startAdEngine();
 
