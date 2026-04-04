@@ -81,7 +81,7 @@ adIndex = adIndex % ads.length;
 const ad = ads[adIndex];
 
 const isMobile = window.innerWidth <= 600;
-const image = isMobile ? (ad.imageMobile || ad.image): ad.image;
+const image = ad.image;
 
 el.innerHTML = `    <div class="leaderboardAd">
       ${ad.link ?`<a href="${ad.link}" target="_blank">`: ""}         <img src="${image}" alt="Ad">
