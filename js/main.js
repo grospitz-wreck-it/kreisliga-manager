@@ -98,47 +98,43 @@ async function init(){
     // =========================
     // 📦 DATEN LADEN
     // =========================
-    try {
+   try {
 
-      console.log("⚽ Lade Spieler & Team-Struktur...");
+  console.log("⚽ Lade Spieler & Team-Struktur...");
 
-      const players = await loadCSV("./data/spieler.csv");
-      const teamsRaw = await loadCSV("./data/ligen.csv");
+  const players = await loadCSV("./data/spieler.csv");
+  const leaguesRaw = await loadCSV("./data/ligen.csv");
 
-      const teams = extractTeams(teamsRaw);
+  // 👉 NEU: echte Ligen extrahieren (passt zu deiner CSV)
+  const leagues = extractLeagues(leaguesRaw);
 
-      // 👉 DEIN BESTEHENDES SYSTEM BEHALTEN
-      game.players = players;
-      game.teams = teams;
+  // 👉 PlayerPool wie gehabt
+  initPlayerPool(players);
 
-      // 👉 MINIMALER FIX: leagues ergänzen (für dein league.js)
-      game.data = {
-        leagues: [
-          {
-            name: "Kreisliga",
-            teams: teams
-          }
-        ]
-      };
+  // 👉 Game State sauber setzen
+  game.players = players;
 
-      // 👉 jetzt ist alles da → UI initialisieren
-      initLeagueSelect();
+  game.data = {
+    leagues: leagues
+  };
 
-      initPlayerPool(players);
-
-      console.log(`✅ PlayerPool: ${players.length} Spieler`);
-      console.log(`✅ Teams: ${teams.length}`);
-
-    } catch (e) {
-      console.warn("❌ Spieler-Setup fehlgeschlagen:", e);
-    }
-
+  // 👉 Default Liga setzen (wichtig für UI!)
+  if (leagues.length > 0) {
+    game.league = game.league || {};
+    game.league.current = leagues[0];
   }
 
-  // 👉 UI immer am Ende
-  renderApp();
+  // 👉 UI jetzt erst initialisieren
+  initLeagueSelect();
 
-  console.log("✅ Init fertig");
+  console.log(`✅ PlayerPool: ${players.length} Spieler`);
+  console.log(`✅ Ligen: ${leagues.length}`);
+  console.log(`✅ Teams gesamt: ${
+    leagues.reduce((sum, l) => sum + l.teams.length, 0)
+  }`);
+
+} catch (e) {
+  console.warn("❌ Spieler-Setup fehlgeschlagen:", e);
 }
 
 // =========================
