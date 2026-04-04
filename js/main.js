@@ -1,3 +1,4 @@
+```js
 // =========================
 // 📦 CORE
 // =========================
@@ -11,7 +12,7 @@ import "./core/eventStore.js";
 // 🔧 MODULES
 // =========================
 import { startAdEngine } from "./modules/ads.js";
-import { generateSchedule } from "./modules/scheduler.js"; // 🔥 WICHTIG
+import { generateSchedule } from "./modules/scheduler.js";
 import "./modules/table.js";
 import { initLeagueSelect } from "./modules/league.js";
 
@@ -66,14 +67,11 @@ async function init(){
     initPlayerPool(players);
 
     game.players = players;
-    game.data = { leagues };
+    game.data.leagues = leagues;
 
-    // 👉 Default Liga + SPIELPLAN
+    // 👉 Default Liga setzen
     if (leagues.length > 0) {
-      game.league = game.league || {};
       game.league.current = leagues[0];
-
-      generateSchedule(); // 🔥 CRITICAL FIX
     }
 
     console.log(`✅ Spieler: ${players.length}`);
@@ -105,11 +103,10 @@ async function init(){
     if(splash) splash.style.display = "none";
     if(app) app.style.display = "block";
 
-    // 👉 UI + Dropdowns
     initLeagueSelect();
 
-    // 👉 FALLBACK: falls Save keinen Plan hat
-    if(!game.league?.schedule || game.league.schedule.length === 0){
+    // 👉 Spielplan absichern
+    if(!game.league.schedule || game.league.schedule.length === 0){
       console.warn("⚠️ Kein Spielplan im Save → neu generieren");
       generateSchedule();
     }
@@ -133,16 +130,25 @@ async function init(){
 
     // 👉 Default Team setzen
     if (
-      game.league?.current &&
+      game.league.current &&
       game.league.current.teams?.length
     ) {
-      game.team = game.team || {};
-
       const first = game.league.current.teams[0];
 
       game.team.selected =
         typeof first === "string" ? first : first.name;
     }
+  }
+
+  // =========================
+  // 📅 SPIELPLAN SICHERSTELLEN (GLOBAL FIX)
+  // =========================
+  if(
+    game.league.current &&
+    (!game.league.schedule || game.league.schedule.length === 0)
+  ){
+    console.log("📅 Generiere Spielplan...");
+    generateSchedule();
   }
 
   // =========================
@@ -165,3 +171,4 @@ export {
   init,
   handleMainAction
 };
+```
