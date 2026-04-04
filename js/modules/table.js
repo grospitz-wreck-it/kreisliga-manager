@@ -1,4 +1,4 @@
-```js
+
 // =========================
 // 📊 TABLE SYSTEM (FINAL FIX)
 // =========================
@@ -180,4 +180,3 @@ export {
   getLiveTable,
   sortTable
 };
-```
