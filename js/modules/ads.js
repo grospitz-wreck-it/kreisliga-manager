@@ -4,9 +4,10 @@
 alert("renderAds läuft");
 const ads = getMatchingAds();
 alert("Ads: " + ads.length);
+const KEY = "ad_v2";
 import { game } from "../core/state.js";
 
-const KEY = "ad_v2";
+
 
 // =========================
 // 📦 DATA
