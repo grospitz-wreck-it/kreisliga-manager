@@ -1,31 +1,27 @@
-export function extractLeagues(data) {
-  const leagues = [];
+// =========================
+// 🏆 LEAGUES AUS CSV
+// =========================
+export function extractLeagues(rows) {
 
-  data.forEach(row => {
+  const leaguesMap = {};
 
-    const league = {
-      name: row["Liga"],
-      kreis: row["Kreis"],
-      bundesland: row["Bundesland"],
-      teams: []
-    };
+  rows.forEach(row => {
 
-    Object.keys(row).forEach(key => {
-      if (key.startsWith("Team") && row[key]) {
-        league.teams.push({
-          name: row[key],
-          liga: row["Liga"],
-          kreis: row["Kreis"]
-        });
-      }
-    });
+    // 👉 flexibel für verschiedene CSV Header
+    const leagueName = row.liga || row.league || row.Liga;
+    const teamName = row.team || row.Team;
 
-    // 👉 nur hinzufügen wenn Teams existieren
-    if (league.teams.length > 0) {
-      leagues.push(league);
+    if (!leagueName || !teamName) return;
+
+    if (!leaguesMap[leagueName]) {
+      leaguesMap[leagueName] = {
+        name: leagueName,
+        teams: []
+      };
     }
 
+    leaguesMap[leagueName].teams.push(teamName);
   });
 
-  return leagues;
+  return Object.values(leaguesMap);
 }
