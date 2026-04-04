@@ -27,13 +27,11 @@
       text-align: center;
     }
 
-    /* 👉 Einheitliche Breite */
     #splash > * {
       width: 100%;
       max-width: 300px;
     }
 
-    /* 👉 Logo bewusst etwas kleiner */
     #logo {
       width: 80%;
       max-width: 220px;
@@ -114,7 +112,42 @@
     }
 
     /* =========================
-       ⚽ MATCH UI
+       🆕 MATCH VIEW
+    ========================= */
+    #topBar {
+      background: #111;
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+    }
+
+    #gameCanvasWrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    #gameCanvas {
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 16 / 9;
+      background: #0b5c2e;
+      border-radius: 10px;
+      image-rendering: pixelated;
+    }
+
+    #eventBar {
+      background: #111;
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      min-height: 40px;
+    }
+
+    /* =========================
+       ⚽ MATCH UI (ALT bleibt)
     ========================= */
     #score {
       text-align: center;
@@ -157,7 +190,7 @@
     }
 
     /* =========================
-       📢 ADS (fix für Skalierung!)
+       📢 ADS
     ========================= */
     #adBanner {
       width: 100%;
@@ -172,11 +205,11 @@
       overflow: hidden;
     }
 
-   #adTrack {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    #adTrack {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     .adItem img {
       width: 100px;
@@ -193,7 +226,6 @@
   <!-- =========================
        🟡 SPLASH SCREEN
   ========================= -->
-
   <div id="splash">
     <img id="logo" src="logos/logo_kickn.png" alt="Kickn Manager Logo">
     <input id="nameInput" placeholder="Dein Name">
@@ -203,7 +235,6 @@
   <!-- =========================
        🔵 APP
   ========================= -->
-
   <div id="app">
 
     <!-- HEADER -->
@@ -222,6 +253,20 @@
     <!-- CONTENT -->
     <div class="container">
 
+      <!-- 🆕 MATCH VIEW -->
+      <div id="topBar">
+        <div id="topTeams">- vs -</div>
+        <div id="topScore">0 : 0</div>
+        <div id="topMinute">0'</div>
+      </div>
+
+      <div id="gameCanvasWrapper">
+        <canvas id="gameCanvas" width="320" height="180"></canvas>
+      </div>
+
+      <div id="eventBar">Willkommen im Spiel</div>
+
+      <!-- 🔽 BESTEHEND -->
       <select id="leagueSelect"></select>
       <select id="teamSelect"></select>
 
@@ -278,7 +323,6 @@
   <!-- =========================
        🧠 MAIN SCRIPT
   ========================= -->
-
   <script type="module" src="js/main.js"></script>
 
 </body>
