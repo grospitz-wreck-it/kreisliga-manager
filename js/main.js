@@ -43,6 +43,11 @@ async function init(){
 
 console.log("🚀 Init läuft...");
 
+// 👉 Splash Elemente holen
+const splash = document.getElementById("splash");
+const app = document.getElementById("app");
+const startBtn = document.getElementById("startBtn");
+
 // 👉 UI Events binden
 bindUI();
 
@@ -57,6 +62,10 @@ if(loaded){
 
   game.phase = "idle";
 
+  // 👉 Splash direkt ausblenden
+  if(splash) splash.style.display = "none";
+  if(app) app.style.display = "block";
+
   // 🔥 UI nach Load wieder aufbauen
   initLeagueSelect();
 
@@ -67,8 +76,25 @@ if(loaded){
 
 } else {
 
-  // 👉 Kein Save → Splash
+  // 👉 Kein Save → Splash anzeigen
   game.phase = "setup";
+
+  if(splash) splash.style.display = "flex";
+  if(app) app.style.display = "none";
+
+  // 👉 Start Button Logik
+  if(startBtn){
+    startBtn.addEventListener("click", () => {
+
+      console.log("🎮 Spiel gestartet");
+
+      splash.style.display = "none";
+      app.style.display = "block";
+
+      // 👉 optional: Phase wechseln
+      game.phase = "idle";
+    });
+  }
 
   // =========================
   // 🆕 👉 SPIELER + TEAM BASIS LADEN (Lazy vorbereitet)
