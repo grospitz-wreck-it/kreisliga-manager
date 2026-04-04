@@ -73,20 +73,23 @@ if(!el) return;
 const ads = getMatchingAds();
 
 if(!ads.length){
-el.innerHTML = `<div class="leaderboardAd">Keine Werbung</div>`;
-return;
+  el.innerHTML = `<div class="leaderboardAd">Keine Werbung</div>`;
+  return;
 }
 
 adIndex = adIndex % ads.length;
 const ad = ads[adIndex];
 
-const isMobile = window.matchMedia("(max-width: 600px)").matches;
-const image = ad.image;
+const isMobile = window.innerWidth <= 600;
+const image = isMobile ? (ad.imageMobile || ad.image): ad.image;
 
-el.innerHTML = `    <div class="leaderboardAd">
-      ${ad.link ?`<a href="${ad.link}" target="_blank">`: ""}         <img src="${image}" alt="Ad">
-      ${ad.link ?`</a>`: ""}     </div>
- `;
+el.innerHTML = `    
+  <div class="leaderboardAd">
+    ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}         
+    <img src="${image}" alt="Ad">
+    ${ad.link ? `</a>` : ""}     
+  </div>
+`;
 }
 
 // =========================
