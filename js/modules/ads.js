@@ -1,19 +1,17 @@
+
 // =========================
 // 📢 ADS ENGINE (CLEAN)
 // =========================
-alert("renderAds läuft");
-const ads = getMatchingAds();
-alert("Ads: " + ads.length);
-const KEY = "ad_v2";
 import { game } from "../core/state.js";
 
-
+// 🔥 WICHTIG: direkt nach import
+const KEY = "ad_v2";
 
 // =========================
 // 📦 DATA
 // =========================
 function getCampaigns(){
-return JSON.parse(localStorage.getItem(KEY) || "[]");
+  return JSON.parse(localStorage.getItem(KEY) || "[]");
 }
 
 // =========================
