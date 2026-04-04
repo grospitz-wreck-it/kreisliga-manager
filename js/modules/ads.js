@@ -67,31 +67,45 @@ let adIndex = 0;
 // =========================
 function renderAds(){
 
-const el = document.getElementById("adTrack");
-if(!el) return;
+  const el = document.getElementById("adTrack");
+  if(!el) return;
 
-const ads = getMatchingAds();
+  const ads = getMatchingAds();
 
-if(!ads.length){
-  el.innerHTML = `<div class="leaderboardAd">Keine Werbung</div>`;
-  return;
+  // ❌ keine Ads
+  if(!ads.length){
+    el.innerHTML = `<div class="leaderboardAd">Keine Werbung</div>`;
+    return;
+  }
+
+  // 👉 aktuelles Ad wählen
+  adIndex = adIndex % ads.length;
+  const ad = ads[adIndex];
+
+  // 👉 Container reset (wichtig!)
+  el.innerHTML = `<div class="leaderboardAd"></div>`;
+  const wrapper = el.querySelector(".leaderboardAd");
+
+  // 👉 Image sauber erstellen (iOS safe)
+  const img = document.createElement("img");
+  img.src = ad.image;
+  img.alt = "Ad";
+  img.loading = "eager"; // 🔥 wichtig für iPhone
+
+  // 👉 optional klickbar
+  if(ad.link){
+    const a = document.createElement("a");
+    a.href = ad.link;
+    a.target = "_blank";
+    a.appendChild(img);
+    wrapper.appendChild(a);
+  } else {
+    wrapper.appendChild(img);
+  }
+
+  // 👉 Debug (optional)
+  console.log("📢 Ad gerendert:", ad.name || ad.id);
 }
-
-adIndex = adIndex % ads.length;
-const ad = ads[adIndex];
-
-const isMobile = window.innerWidth <= 600;
-const image = isMobile ? (ad.imageMobile || ad.image): ad.image;
-
-el.innerHTML = `    
-  <div class="leaderboardAd">
-    ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}         
-    <img src="${image}" alt="Ad">
-    ${ad.link ? `</a>` : ""}     
-  </div>
-`;
-}
-
 // =========================
 // 🔄 ROTATION
 // =========================
