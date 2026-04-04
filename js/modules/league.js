@@ -1,9 +1,7 @@
 // =========================
 // 📦 IMPORTS
 // =========================
-import { generateSchedule } from "./scheduler.js";
-import { renderSchedule, renderCurrentMatch } from "../ui/ui.js";
-import { renderTable } from "./table.js";
+import { renderCurrentMatch } from "../ui/ui.js";
 import { game } from "../core/state.js";
 import { generateTeam } from "./teamLoader.js";
 
@@ -35,8 +33,8 @@ function initLeagueSelect(){
 
   const selects = [splashSelect, menuSelect].filter(Boolean);
 
-  if (!game.data || !game.data.leagues) {
-    console.warn("⚠️ leagues noch nicht geladen");
+  if (!game.data?.leagues?.length) {
+    console.warn("⚠️ Keine Ligen geladen");
     return;
   }
 
@@ -54,10 +52,10 @@ function initLeagueSelect(){
 
     select.onchange = (e) => {
 
-      const index = e.target.value;
+      const index = Number(e.target.value);
       game.league.current = game.data.leagues[index];
 
-      // sync beide selects
+      // sync
       selects.forEach(s => {
         if(s !== select) s.value = index;
       });
@@ -66,15 +64,15 @@ function initLeagueSelect(){
     };
   });
 
-  // 👉 initial setzen
-  if (game.data.leagues.length > 0) {
-    game.league.current = game.data.leagues[0];
-    populateTeamSelect();
-  }
+  // 👉 Default
+  game.league = game.league || {};
+  game.league.current = game.data.leagues[0];
+
+  populateTeamSelect();
 }
 
 // =========================
-// 👕 TEAM DROPDOWN (FIXED)
+// 👕 TEAM SELECT
 // =========================
 function populateTeamSelect() {
 
@@ -85,8 +83,8 @@ function populateTeamSelect() {
 
   const league = game.league?.current;
 
-  if (!league || !league.teams) {
-    console.warn("⚠️ Keine Teams gefunden:", league);
+  if (!league || !Array.isArray(league.teams) || league.teams.length === 0) {
+    console.warn("❌ Keine Teams vorhanden:", league);
     return;
   }
 
@@ -99,11 +97,8 @@ function populateTeamSelect() {
 
       const option = document.createElement("option");
 
-      const name =
-        typeof team === "string" ? team : team.name;
-
-      option.value = name;
-      option.textContent = name;
+      option.value = team.name;
+      option.textContent = team.name;
 
       select.appendChild(option);
     });
@@ -120,16 +115,13 @@ function populateTeamSelect() {
     };
   });
 
-  // 👉 default team setzen
-  if (league.teams.length > 0) {
-    const first =
-      typeof league.teams[0] === "string"
-        ? league.teams[0]
-        : league.teams[0].name;
+  // 👉 Default Team setzen
+  const firstTeam = league.teams[0];
 
-    game.team = game.team || {};
-    game.team.selected = first;
-  }
+  game.team = game.team || {};
+  game.team.selected = firstTeam.name;
+
+  ensureTeamPlayers(firstTeam);
 
   console.log("✅ Teams geladen:", league.teams.length);
 }
@@ -139,28 +131,26 @@ function populateTeamSelect() {
 // =========================
 function selectTeam(teamName){
 
-  const teams = game.league?.current?.teams;
+  const league = game.league?.current;
 
-  if(!teams || teams.length === 0){
-    console.error("❌ Keine Teams geladen");
+  if(!league || !league.teams){
+    console.error("❌ Keine Liga/Teams vorhanden");
     return;
   }
 
-  const teamObj =
-    typeof teams[0] === "string"
-      ? { name: teamName }
-      : teams.find(t => t.name === teamName);
+  const team = league.teams.find(t => t.name === teamName);
 
-  if(!teamObj){
+  if(!team){
     console.warn("⚠️ Team nicht gefunden:", teamName);
     return;
   }
 
-  game.team.selected = teamName;
+  game.team.selected = team.name;
 
-  // 🆕 Spieler generieren falls nötig
-  const players = ensureTeamPlayers(teamObj);
+  const players = ensureTeamPlayers(team);
   game.team.players = players;
+
+  console.log("✅ Team gewählt:", team.name);
 
   renderCurrentMatch();
 }
@@ -170,13 +160,12 @@ function selectTeam(teamName){
 // =========================
 function getSelectedTeam(){
 
-  const teams = game.league?.current?.teams;
+  const league = game.league?.current;
+  if (!league) return null;
 
-  if (!teams) return null;
-
-  return typeof teams[0] === "string"
-    ? teams.find(t => t === game.team.selected)
-    : teams.find(t => t.name === game.team.selected);
+  return league.teams.find(
+    t => t.name === game.team?.selected
+  );
 }
 
 // =========================
