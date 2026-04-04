@@ -8,57 +8,65 @@ import { updateHeader } from "../ui/ui.js";
 console.log("PLAYER MODULE");
 
 // =========================
-// 👤 INIT PLAYER (für UI)
+// 👤 INIT PLAYER
 // =========================
 function initPlayer(){
 
-if(!game.player){
-game.player = { name: "" };
-}
+  game.player = game.player || { name: "" };
 
-const input = document.getElementById("nameInput");
+  const input = document.getElementById("nameInput");
 
-if(input){
-input.value = game.player.name || "";
-}
+  if(input){
+    input.value = game.player.name || "";
+  }
 
-updateHeader();
+  updateHeader();
 }
 
 // =========================
-// 👤 SET NAME (NEU!)
+// 👤 SET NAME (FIXED)
 // =========================
 function setPlayerName(name){
 
-if(!name || !name.trim()){
-console.warn("❌ Ungültiger Name");
-return;
-}
+  // 👉 absichern
+  if(!name || name.trim().length < 2){
+    console.warn("❌ Ungültiger Name");
+    return false;
+  }
 
-game.player.name = name.trim();
+  // 👉 sicherstellen
+  game.player = game.player || {};
 
-saveGame();
-updateHeader();
+  game.player.name = name.trim();
 
-console.log("👤 Player gesetzt:", game.player.name);
+  saveGame();
+  updateHeader();
+
+  console.log("👤 Player gesetzt:", game.player.name);
+
+  return true;
 }
 
 // =========================
-// ✏️ NAME ÄNDERN (UI)
+// ✏️ NAME ÄNDERN
 // =========================
 function changeName(){
 
-const input = document.getElementById("nameInput");
-if(!input) return;
+  const input = document.getElementById("nameInput");
+  if(!input) return;
 
-setPlayerName(input.value);
+  const success = setPlayerName(input.value);
+
+  if(!success){
+    alert("Bitte gültigen Namen eingeben");
+  }
 }
 
 // =========================
 // 📦 EXPORTS
 // =========================
 export {
-initPlayer,
-setPlayerName,
-changeName
+  initPlayer,
+  setPlayerName,
+  changeName
 };
