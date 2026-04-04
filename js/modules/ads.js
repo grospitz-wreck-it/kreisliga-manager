@@ -52,22 +52,17 @@ function getMatchingAds() {
 
   return campaignsCache.filter(c => {
 
-    // ⏱️ Zeitraum
     if (c.start_date && now < new Date(c.start_date).getTime()) return false;
     if (c.end_date && now > new Date(c.end_date).getTime()) return false;
 
     const t = c.targeting || {};
 
-    // 🌍 Global
     if (t.global) return true;
 
-    // fallback
     if (!leagueKey && !teamKey) return true;
 
-    // 🏆 Liga
     if (t.league && t.league === leagueKey) return true;
 
-    // 👕 Team
     if (t.team) {
       if (t.team === "all") return true;
       if (t.team === teamKey) return true;
@@ -78,7 +73,7 @@ function getMatchingAds() {
 }
 
 // =========================
-// 📊 TRACKING (ROBUST)
+// 📊 TRACKING
 // =========================
 async function trackEvent(campaignId, type) {
   try {
@@ -94,37 +89,30 @@ async function trackEvent(campaignId, type) {
 }
 
 // =========================
-// 🎬 RENDER
+// 🎬 RENDER (FIXED)
 // =========================
 function renderAds() {
 
-  const el = document.getElementById("adTrack");
+  // 🔥 FIX: neues Element verwenden
+  const el = document.getElementById("adContainer");
   if (!el) return;
 
   const ads = getMatchingAds();
 
   if (!ads.length) {
-    el.innerHTML = `<div class="leaderboardAd">Keine Werbung</div>`;
+    el.innerHTML = `<div>Keine Werbung</div>`;
     return;
   }
 
   adIndex = adIndex % ads.length;
   const ad = ads[adIndex];
 
-  // =========================
-  // 🎬 DOM RENDER
-  // =========================
-  el.innerHTML = `
-    <div class="leaderboardAd">
-      ${ad.link ? `
-        <a href="${ad.link}" target="_blank" rel="noopener" data-id="${ad.id}" class="adLink">
-          <img src="${ad.image}" alt="Ad" loading="lazy">
-        </a>
-      ` : `
-        <img src="${ad.image}" alt="Ad" loading="lazy">
-      `}
-    </div>
-  `;
+  // 🔥 WICHTIG: KEIN wrapper mehr der Layout sprengt
+  el.innerHTML = ad.link
+    ? `<a href="${ad.link}" target="_blank" rel="noopener" data-id="${ad.id}" class="adLink">
+         <img src="${ad.image}" alt="Ad" loading="lazy">
+       </a>`
+    : `<img src="${ad.image}" alt="Ad" loading="lazy">`;
 
   // =========================
   // 👁️ IMPRESSION
@@ -165,13 +153,11 @@ async function startAdEngine() {
   await loadCampaigns();
   renderAds();
 
-  // 🔁 Rotation + Live Reload
   setInterval(async () => {
-    await loadCampaigns(); // 🔥 live update
+    await loadCampaigns();
     rotateAds();
   }, 8000);
 
-  // 📱 wichtig für mobile redraw bugs
   window.addEventListener("resize", renderAds);
   window.addEventListener("focus", renderAds);
 }
