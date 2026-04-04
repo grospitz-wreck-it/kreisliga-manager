@@ -103,7 +103,7 @@ async function init(){
       console.log("⚽ Lade Spieler & Team-Struktur...");
 
       const players = await loadCSV("./data/spieler.csv");
-      const teamsRaw = await loadCSV("./data/teams.csv");
+      const teamsRaw = await loadCSV("./data/ligen.csv");
 
       const teams = extractTeams(teamsRaw);
 
