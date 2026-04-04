@@ -35,9 +35,6 @@ function ensureTeamPlayers(team){
 
 
 // =========================
-// 🏆 LIGA DROPDOWN
-// =========================
-// =========================
 // 🏆 INIT LEAGUE SELECT
 // =========================
 function initLeagueSelect(){
@@ -70,30 +67,26 @@ function initLeagueSelect(){
 // =========================
 function populateTeamSelect(){
 
-  const select = document.getElementById("teamSelect");
-  if(!select) return;
+  const splashSelect = document.getElementById("teamSelect");
+  const menuSelect   = document.getElementById("teamSelectMenu");
 
-  select.innerHTML = `<option value="">Team wählen</option>`;
+  const selects = [splashSelect, menuSelect].filter(Boolean);
 
-  const teams = game.league.teams;
+  selects.forEach(select => {
+    select.innerHTML = "";
 
-  if(!teams || teams.length === 0) return;
+    game.league.current.teams.forEach((team, i) => {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = team.name;
+      select.appendChild(option);
+    });
 
-  teams.forEach(team => {
-    const opt = document.createElement("option");
-    opt.value = team.name;
-    opt.textContent = `${team.name} (Stärke ${team.strength})`;
-    select.appendChild(opt);
+    select.addEventListener("change", e => {
+      game.team = game.league.current.teams[e.target.value];
+    });
   });
-
-  select.onchange = (e) => {
-    const value = e.target.value;
-    if(!value) return;
-
-    selectTeam(value);
-  };
 }
-
 
 // =========================
 // 🏟️ LIGA LADEN
