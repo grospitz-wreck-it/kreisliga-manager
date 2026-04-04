@@ -80,7 +80,7 @@ return;
 adIndex = adIndex % ads.length;
 const ad = ads[adIndex];
 
-const isMobile = window.innerWidth <= 600;
+const isMobile = window.matchMedia("(max-width: 600px)").matches;
 const image = ad.image;
 
 el.innerHTML = `    <div class="leaderboardAd">
