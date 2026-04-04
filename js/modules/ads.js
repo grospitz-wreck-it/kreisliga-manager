@@ -3,7 +3,6 @@
 // =========================
 import { game } from "../core/state.js";
 
-// 🔥 WICHTIG: ganz oben!
 const KEY = "ad_v2";
 
 // =========================
@@ -66,7 +65,7 @@ function getMatchingAds(){
 let adIndex = 0;
 
 // =========================
-// 🎬 RENDER (iPhone SAFE)
+// 🎬 RENDER (FINAL FIX)
 // =========================
 function renderAds(){
 
@@ -85,15 +84,20 @@ function renderAds(){
   adIndex = adIndex % ads.length;
   const ad = ads[adIndex];
 
-  // 👉 Container reset
+  // 👉 reset container
   el.innerHTML = `<div class="leaderboardAd"></div>`;
   const wrapper = el.querySelector(".leaderboardAd");
 
-  // 👉 Image (URL-basiert!)
+  // 👉 IMAGE erstellen
   const img = document.createElement("img");
-  img.src = ad.image; // 🔥 erwartet jetzt "ads/xyz.jpg"
+
+  // 🔥 FINAL FIX: absoluter Pfad
+  img.src = window.location.origin + "/" + ad.image;
+
   img.alt = "Ad";
   img.loading = "eager";
+
+  console.log("📸 Lade Bild:", img.src);
 
   // 👉 Klickbar
   if(ad.link){
@@ -105,8 +109,6 @@ function renderAds(){
   } else {
     wrapper.appendChild(img);
   }
-
-  console.log("📢 Ad gerendert:", ad.name || ad.id);
 }
 
 // =========================
@@ -128,13 +130,10 @@ function startAdEngine(){
 
   console.log("📢 Ads Engine gestartet");
 
-  // 👉 initial
   renderAds();
 
-  // 👉 Rotation
   setInterval(rotateAds, 8000);
 
-  // 👉 Resize (iPhone fix)
   window.addEventListener("resize", renderAds);
 }
 
