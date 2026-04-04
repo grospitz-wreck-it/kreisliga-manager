@@ -71,6 +71,7 @@ async function init(){
     // 👉 Default Liga setzen
     if (leagues.length > 0) {
       game.league.current = leagues[0];
+      initTable();
     }
 
     console.log(`✅ Spieler: ${players.length}`);
