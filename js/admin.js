@@ -88,8 +88,7 @@ img.onload = function(){
 
   ctx.drawImage(img, sx, sy, sw, sh, 0, 0, TARGET_W, TARGET_H);
 
-  const resizedBase64 = canvas.toDataURL("image/jpeg", 0.85);
-
+  const resizedBase64 = canvas.toDataURL("image/webp", 0.4);
   // =====================
   // 💾 SAVE
   // =====================
