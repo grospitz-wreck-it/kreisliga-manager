@@ -96,13 +96,52 @@ function renderAds(){
   adIndex = adIndex % ads.length;
   const ad = ads[adIndex];
 
+  // =========================
+  // 🎬 RENDER
+  // =========================
   el.innerHTML = `
     <div class="leaderboardAd">
-      ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
+      ${ad.link ? `
+        <a href="${ad.link}" target="_blank" data-id="${ad.id}" class="adLink">
+          <img src="${ad.image}" alt="Ad" loading="lazy">
+        </a>
+      ` : `
         <img src="${ad.image}" alt="Ad" loading="lazy">
-      ${ad.link ? `</a>` : ""}
+      `}
     </div>
   `;
+
+  // =========================
+  // 📊 IMPRESSION TRACKING
+  // =========================
+  try{
+    supabase.from("ad_events").insert({
+      campaign_id: ad.id,
+      type: "impression"
+    });
+  } catch(e){
+    console.warn("Impression Fehler:", e);
+  }
+
+  // =========================
+  // 🖱 CLICK TRACKING (SAFE)
+  // =========================
+  const linkEl = el.querySelector(".adLink");
+
+  if(linkEl){
+    linkEl.addEventListener("click", () => {
+
+      try{
+        supabase.from("ad_events").insert({
+          campaign_id: ad.id,
+          type: "click"
+        });
+      } catch(e){
+        console.warn("Click Fehler:", e);
+      }
+
+    }, { once: true }); // 🔥 verhindert doppelte Events
+  }
 }
 
 // =========================
