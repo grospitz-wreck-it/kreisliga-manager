@@ -44,9 +44,21 @@ function initLeagueSelect(){
 
   const selects = [splashSelect, menuSelect].filter(Boolean);
 
+  // ✅ SAFETY: verhindert deinen Crash
+  if (!game.data || !game.data.leagues) {
+    console.warn("⚠️ leagues noch nicht geladen");
+    return;
+  }
+
   selects.forEach(select => {
+
+    // 🧹 reset
     select.innerHTML = "";
 
+    // 🧠 verhindert doppelte EventListener
+    select.onchange = null;
+
+    // 🏆 Ligen füllen
     game.data.leagues.forEach((league, i) => {
       const option = document.createElement("option");
       option.value = i;
@@ -54,13 +66,28 @@ function initLeagueSelect(){
       select.appendChild(option);
     });
 
-    select.addEventListener("change", e => {
-      game.league.current = game.data.leagues[e.target.value];
-      populateTeamSelect();
-    });
-  });
-}
+    // 🔁 Change Event
+    select.onchange = (e) => {
+      const index = e.target.value;
 
+      game.league.current = game.data.leagues[index];
+
+      // 👉 optional sync zwischen Splash & Menü
+      selects.forEach(s => {
+        if(s !== select) s.value = index;
+      });
+
+      populateTeamSelect();
+    };
+
+  });
+
+  // 👉 optional: initial Teams laden
+  if (game.data.leagues.length > 0) {
+    game.league.current = game.data.leagues[0];
+    populateTeamSelect();
+  }
+}
 
 // =========================
 // 👕 TEAM DROPDOWN
