@@ -1,39 +1,49 @@
 // =========================
-// 📢 ADS ENGINE (SERVER VERSION)
+// 📢 ADS ENGINE (SUPABASE FINAL)
 // =========================
 
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 import { game } from "../core/state.js";
-
-const ADS_URL = "/kreisliga-manager/ads/ads.json";
+import { SUPABASE_URL, SUPABASE_KEY } from "./config.js";
 
 // =========================
-// 📦 FETCH ADS (SERVER)
+// 🔌 INIT
+// =========================
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// =========================
+// 📦 STATE
 // =========================
 let campaignsCache = [];
+let adIndex = 0;
 
+// =========================
+// 📥 LOAD FROM SUPABASE
+// =========================
 async function loadCampaigns(){
-  try{
-    const res = await fetch(ADS_URL + "?t=" + Date.now()); // 🔥 no cache
-    const data = await res.json();
 
-    if(Array.isArray(data)){
-      campaignsCache = data;
-    } else {
+  try{
+    const { data, error } = await supabase
+      .from("campaigns")
+      .select("*")
+      .eq("active", true);
+
+    if(error){
+      console.error("❌ Supabase Fehler:", error);
       campaignsCache = [];
+      return;
     }
 
+    campaignsCache = data || [];
+
   } catch(e){
-    console.error("❌ Ads konnten nicht geladen werden", e);
+    console.error("❌ Load Fehler:", e);
     campaignsCache = [];
   }
 }
 
-function getCampaigns(){
-  return campaignsCache;
-}
-
 // =========================
-// 🎯 MATCHING (DEIN CODE)
+// 🎯 MATCHING ENGINE
 // =========================
 function getMatchingAds(){
 
@@ -41,28 +51,27 @@ function getMatchingAds(){
   const leagueKey = game.league?.key;
   const teamKey   = game.team?.selected;
 
-  const campaigns = getCampaigns();
+  return campaignsCache.filter(c => {
 
-  if(!Array.isArray(campaigns)) return [];
+    // ⏱️ Zeitraum
+    if(c.start_date && now < new Date(c.start_date).getTime()) return false;
+    if(c.end_date && now > new Date(c.end_date).getTime()) return false;
 
-  return campaigns.filter(c => {
+    const t = c.targeting || {};
 
-    if(!c || typeof c !== "object") return false;
+    // 🌍 Global
+    if(t.global) return true;
 
-    const targeting = c.targeting || {};
-
-    if(c.start && now < c.start) return false;
-    if(c.end && now > c.end) return false;
-
-    if(targeting.global) return true;
-
+    // fallback
     if(!leagueKey && !teamKey) return true;
 
-    if(targeting.league && targeting.league === leagueKey) return true;
+    // 🏆 Liga
+    if(t.league && t.league === leagueKey) return true;
 
-    if(targeting.team){
-      if(targeting.team === "all") return true;
-      if(targeting.team === teamKey) return true;
+    // 👕 Team
+    if(t.team){
+      if(t.team === "all") return true;
+      if(t.team === teamKey) return true;
     }
 
     return false;
@@ -70,12 +79,7 @@ function getMatchingAds(){
 }
 
 // =========================
-// 🔄 STATE
-// =========================
-let adIndex = 0;
-
-// =========================
-// 🎬 RENDER (STABIL)
+// 🎬 RENDER
 // =========================
 function renderAds(){
 
@@ -92,12 +96,10 @@ function renderAds(){
   adIndex = adIndex % ads.length;
   const ad = ads[adIndex];
 
-  const image = ad.image;
-
   el.innerHTML = `
     <div class="leaderboardAd">
       ${ad.link ? `<a href="${ad.link}" target="_blank">` : ""}
-        <img src="${image}" alt="Ad" loading="lazy">
+        <img src="${ad.image}" alt="Ad" loading="lazy">
       ${ad.link ? `</a>` : ""}
     </div>
   `;
@@ -107,6 +109,7 @@ function renderAds(){
 // 🔄 ROTATION
 // =========================
 function rotateAds(){
+
   const ads = getMatchingAds();
   if(!ads.length) return;
 
@@ -115,17 +118,17 @@ function rotateAds(){
 }
 
 // =========================
-// 🚀 ENGINE
+// 🚀 ENGINE START
 // =========================
 async function startAdEngine(){
 
-  console.log("📢 Ads Engine gestartet");
+  console.log("📢 Ads Engine gestartet (Supabase)");
 
-  await loadCampaigns();     // 🔥 SERVER LADEN
+  await loadCampaigns();
   renderAds();
 
   setInterval(async () => {
-    await loadCampaigns();   // 🔥 regelmäßig aktualisieren
+    await loadCampaigns();   // 🔥 live update
     rotateAds();
   }, 8000);
 
