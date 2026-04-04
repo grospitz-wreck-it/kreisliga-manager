@@ -107,6 +107,22 @@ button.secondary{
 <option value="SPONSOR">Sponsor</option>
 </select>
 
+<!-- 🔥 NEU: Werbeformat -->
+
+<select id="adFormat">
+  <option value="banner">Banner</option>
+  <option value="preroll">Pre-Roll</option>
+  <option value="midroll">Mid-Roll</option>
+  <option value="postroll">Post-Roll</option>
+  <option value="sponsored">Sponsored</option>
+  <option value="presenter">Presenter</option>
+</select>
+
+<!-- 🔥 NEU: Pricing -->
+
+<input id="cpm" type="number" placeholder="CPM (€)">
+<input id="cpc" type="number" placeholder="CPC (€)">
+
 <input type="date" id="startDate">
 <input type="date" id="endDate">
 
@@ -136,15 +152,24 @@ button.secondary{
 
 <div class="box">
 <h2>Kampagnen</h2>
+
+<!-- 🔥 KPI BAR -->
+
+<div id="kpis" style="display:flex; gap:15px; margin-bottom:15px;">
+  <div class="stat">👁️ Impressions: <span id="kpiImpressions">0</span></div>
+  <div class="stat">🖱 Klicks: <span id="kpiClicks">0</span></div>
+  <div class="stat">💰 Umsatz: <span id="kpiRevenue">0€</span></div>
+</div>
+
 <div id="list"></div>
-</div>
 
 </div>
 
+</div>
 
-<!-- ✅ Nur Admin -->
+<!-- ✅ Admin Script -->
 
-<script src="js/admin.js"></script>
+<script type="module" src="js/admin.js"></script>
 
 </body>
 </html>
