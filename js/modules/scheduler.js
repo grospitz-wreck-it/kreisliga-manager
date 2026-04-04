@@ -2,39 +2,40 @@
 // 📅 SPIELPLAN GENERIEREN
 // =========================
 import { game } from "../core/state.js";
+
 function generateSchedule(){
 
-  const originalTeams = game.league.teams;
+  const league = game.league?.current;
 
-  if(!originalTeams || originalTeams.length === 0){
-    console.warn("❌ Keine Teams vorhanden");
+  if(!league || !Array.isArray(league.teams) || league.teams.length < 2){
+    console.error("❌ Ungültige Liga / zu wenig Teams");
     return;
   }
 
-  // 👉 Referenzen behalten
-  let teams = [...originalTeams];
-
-  const rounds = [];
+  // 👉 IMMER STRING-NAMEN!
+  let teams = league.teams.map(t =>
+    typeof t === "string" ? t : t.name
+  );
 
   const originalCount = teams.length;
-  const isOdd = teams.length % 2 !== 0;
+  const rounds = [];
 
   // 👉 BYE bei ungerader Anzahl
-  if(isOdd){
-    console.warn("⚠️ Ungerade Liga → BYE hinzugefügt");
-    teams.push({ name: "BYE" });
+  if(teams.length % 2 !== 0){
+    console.warn("⚠️ Ungerade Liga → BYE");
+    teams.push("BYE");
   }
 
   const totalRounds = teams.length - 1;
   const half = teams.length / 2;
 
   console.log(`📊 Teams: ${originalCount}`);
-  console.log(`📅 Erwartete Spieltage: ${(originalCount - 1) * 2}`);
+  console.log(`📅 Spieltage: ${(teams.length - 1) * 2}`);
 
   // =========================
   // 🔁 HINRUNDE
   // =========================
-  for(let roundIndex = 0; roundIndex < totalRounds; roundIndex++){
+  for(let r = 0; r < totalRounds; r++){
 
     const round = [];
 
@@ -43,7 +44,7 @@ function generateSchedule(){
       const home = teams[i];
       const away = teams[teams.length - 1 - i];
 
-      if(home.name !== "BYE" && away.name !== "BYE"){
+      if(home !== "BYE" && away !== "BYE"){
         round.push({
           home,
           away,
@@ -55,9 +56,7 @@ function generateSchedule(){
 
     rounds.push(round);
 
-    // =========================
-    // 🔁 ROTATION (Circle Method)
-    // =========================
+    // 👉 Rotation (stabil!)
     const fixed = teams[0];
     const rest = teams.slice(1);
 
@@ -85,62 +84,52 @@ function generateSchedule(){
   game.league.currentRound = 0;
   game.league.currentMatchIndex = 0;
 
-  console.log("✅ Spielplan erstellt:", game.league.schedule.length, "Spieltage");
+  console.log("✅ Spielplan erstellt:", game.league.schedule.length);
 
-  // =========================
-  // 🧪 VALIDIERUNG
-  // =========================
   validateSchedule(originalCount);
 }
 
 // =========================
-// 🧪 VALIDIERUNG (VERBESSERT)
+// 🧪 VALIDIERUNG (FIXED)
 // =========================
 function validateSchedule(expectedTeamCount){
 
   const schedule = game.league.schedule;
 
-  if(!schedule || schedule.length === 0){
+  if(!schedule?.length){
     console.error("❌ Kein Spielplan vorhanden");
     return;
   }
 
   const firstRound = schedule[0];
 
-  if(!firstRound){
-    console.error("❌ Kein erster Spieltag");
+  if(!firstRound?.length){
+    console.error("❌ Erster Spieltag leer");
     return;
   }
 
   const teams = [];
 
   firstRound.forEach(match => {
-    teams.push(match.home.name);
-    teams.push(match.away.name);
+    teams.push(match.home);
+    teams.push(match.away);
   });
 
   const unique = new Set(teams);
 
   console.log("🔍 Teams im Spieltag:", teams.length);
-  console.log("🔍 Unique Teams:", unique.size);
+  console.log("🔍 Unique:", unique.size);
 
-  // ❌ Doppelte Teams
   if(teams.length !== unique.size){
-    console.error("❌ DUPLIKATE IM SPIELTAG!");
+    console.error("❌ DUPLIKATE!");
   }
 
-  // ❌ Fehlende Teams
-  if(unique.size !== expectedTeamCount){
-    console.error("❌ NICHT ALLE TEAMS EINGETEILT!");
-  }
-
-  // ✅ Spiele pro Spieltag
   const expectedMatches = Math.floor(expectedTeamCount / 2);
 
   if(firstRound.length !== expectedMatches){
-    console.error("❌ Falsche Anzahl Spiele pro Spieltag:", firstRound.length);
+    console.error("❌ Falsche Spielanzahl:", firstRound.length);
   } else {
-    console.log("✅ Spiele pro Spieltag korrekt:", expectedMatches);
+    console.log("✅ Spieltag korrekt:", expectedMatches);
   }
 }
 
@@ -149,24 +138,19 @@ function validateSchedule(expectedTeamCount){
 // =========================
 function nextMatch(){
 
-  const schedule = game.league.schedule;
+  const schedule = game.league?.schedule;
 
-  if(!schedule || schedule.length === 0){
-    console.warn("❌ Kein Spielplan vorhanden");
+  if(!schedule?.length){
+    console.warn("❌ Kein Spielplan");
     return null;
   }
 
-  const roundIndex = game.league.currentRound;
+  const roundIndex = game.league.currentRound || 0;
   const matchIndex = game.league.currentMatchIndex || 0;
-
-  if(roundIndex >= schedule.length){
-    console.warn("🏁 Saison beendet");
-    return null;
-  }
 
   const round = schedule[roundIndex];
 
-  if(!round || round.length === 0){
+  if(!round?.length){
     console.warn("❌ Spieltag leer");
     return null;
   }
@@ -175,22 +159,21 @@ function nextMatch(){
 }
 
 // =========================
-// 👉 NACH SPIEL WEITER
+// 👉 WEITER
 // =========================
 function advanceSchedule(){
 
-  let roundIndex = game.league.currentRound;
+  let roundIndex = game.league.currentRound || 0;
   let matchIndex = game.league.currentMatchIndex || 0;
 
   const schedule = game.league.schedule;
 
-  if(!schedule || !schedule[roundIndex]) return;
+  if(!schedule?.length) return;
 
   const round = schedule[roundIndex];
 
   matchIndex++;
 
-  // 👉 nächster Spieltag
   if(matchIndex >= round.length){
     matchIndex = 0;
     roundIndex++;
@@ -200,6 +183,9 @@ function advanceSchedule(){
   game.league.currentMatchIndex = matchIndex;
 }
 
+// =========================
+// 📦 EXPORTS
+// =========================
 export {
   generateSchedule,
   nextMatch,
