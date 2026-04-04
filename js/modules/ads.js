@@ -92,7 +92,7 @@ function renderAds(){
   const img = document.createElement("img");
 
   // 🔥 FINAL FIX: absoluter Pfad
-  img.src = window.location.origin + "/" + ad.image;
+  img.src = "https://via.placeholder.com/320x90?text=AD";
 
   img.alt = "Ad";
   img.loading = "eager";
