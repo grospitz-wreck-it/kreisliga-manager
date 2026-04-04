@@ -4,12 +4,12 @@
 
 * {
   box-sizing: border-box;
-  }
+}
 
 body {
-margin: 0;
-font-family: system-ui;
-background: #f2f2f2;
+  margin: 0;
+  font-family: system-ui;
+  background: #f2f2f2;
 }
 
 /* =========================
@@ -28,22 +28,19 @@ background: #f2f2f2;
   text-align: center;
 }
 
-/* 👉 Einheitliche Breite für ALLE Elemente */
 #splash > * {
   width: 100%;
   max-width: 300px;
 }
 
-/* Logo */
 #logo {
-  width: 70%;          /* bewusst kleiner als Inputs */
-  max-width: 220px;   /* harte Grenze */
+  width: 70%;
+  max-width: 220px;
   height: auto;
   image-rendering: pixelated;
   animation: fadeIn 0.8s ease-out;
 }
 
-/* Inputs + Button */
 #splash input,
 #splash button {
   padding: 12px;
@@ -52,7 +49,6 @@ background: #f2f2f2;
   border: none;
 }
 
-/* Input */
 #splash input {
   background: #222;
   color: white;
@@ -63,7 +59,6 @@ background: #f2f2f2;
   color: #aaa;
 }
 
-/* Button */
 #splash button {
   background: #2e7d32;
   color: white;
@@ -80,7 +75,6 @@ background: #f2f2f2;
   transform: scale(0.97);
 }
 
-/* Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -91,64 +85,64 @@ background: #f2f2f2;
     transform: scale(1);
   }
 }
+
 /* =========================
 🔵 APP
 ========================= */
 #app {
-display: none;
+  display: none;
 }
 
 /* =========================
 📦 CONTAINER
 ========================= */
 .container {
-max-width: 600px;
-margin: 0 auto;
-padding: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 12px;
 
-display: flex;
-flex-direction: column;
-gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* 🔥 verhindert Layout-Stretch */
 .container > * {
-flex: none;
+  flex: none;
 }
 
 /* =========================
 🧷 HEADER
 ========================= */
 #header {
-position: sticky;
-top: 0;
-background: #111;
-color: white;
-padding: 12px;
-display: flex;
-align-items: center;
-gap: 10px;
-z-index: 10;
+  position: sticky;
+  top: 0;
+  background: #111;
+  color: white;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
 }
 
 /* =========================
 🍔 SIDEBAR
 ========================= */
 #sidebar {
-position: fixed;
-top: 0;
-left: 0;
-width: 220px;
-height: 100%;
-background: #222;
-padding: 20px;
-transform: translateX(-100%);
-transition: transform 0.3s;
-z-index: 20;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100%;
+  background: #222;
+  padding: 20px;
+  transform: translateX(-100%);
+  transition: transform 0.3s;
+  z-index: 20;
 }
 
 #sidebar.open {
-transform: translateX(0);
+  transform: translateX(0);
 }
 
 /* =========================
@@ -157,89 +151,89 @@ transform: translateX(0);
 input,
 select,
 button {
-width: 100%;
-padding: 12px;
-font-size: 16px;
-border-radius: 8px;
-border: 1px solid #ccc;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 button {
-background: #2e7d32;
-color: white;
-font-weight: bold;
+  background: #2e7d32;
+  color: white;
+  font-weight: bold;
 }
 
 /* =========================
 ⚽ MATCH UI
 ========================= */
 #score {
-text-align: center;
-font-size: 32px;
-font-weight: bold;
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
 }
 
 #match {
-text-align: center;
-font-size: 16px;
+  text-align: center;
+  font-size: 16px;
 }
 
 #progressBar {
-height: 10px;
-background: #ddd;
-border-radius: 10px;
-overflow: hidden;
+  height: 10px;
+  background: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 #progressFill {
-height: 100%;
-width: 0%;
-background: green;
+  height: 100%;
+  width: 0%;
+  background: green;
 }
 
 /* =========================
 📡 LIVE FEED
 ========================= */
 #liveFeed {
-background: white;
-border-radius: 10px;
-padding: 10px;
-max-height: 250px;
-overflow-y: auto;
-font-size: 14px;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+  font-size: 14px;
 }
 
 #liveFeed p {
-margin: 6px 0;
+  margin: 6px 0;
 }
 
 /* =========================
 📊 TABLE
 ========================= */
 #table {
-background: white;
-border-radius: 10px;
-padding: 10px;
-overflow-x: auto;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  overflow-x: auto;
 }
 
 table {
-width: 100%;
-border-collapse: collapse;
-font-size: 14px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
 }
 
 th, td {
-padding: 6px;
-text-align: center;
-border-bottom: 1px solid #ddd;
+  padding: 6px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
 /* =========================
-📢 ADS – FINAL FIX
+📢 ADS – iOS FIX FINAL
 ========================= */
 
-/* OUTER BANNER */
+/* OUTER */
 #adBanner {
   width: 100%;
   display: flex;
@@ -247,11 +241,12 @@ border-bottom: 1px solid #ddd;
   margin: 12px 0;
 }
 
-/* TRACK (WICHTIG!) */
+/* TRACK */
 #adTrack {
-  width: 320px;       /* 🔥 HARTE BREITE */
-  height: 90px;
-
+  width: 320px;
+  max-width: 100%;
+  height: auto;              /* 🔥 FIX */
+  
   display: flex;
   justify-content: center;
   align-items: center;
@@ -263,22 +258,19 @@ border-bottom: 1px solid #ddd;
 @media (max-width: 600px) {
   #adTrack {
     width: 300px;
-    height: 90px;
+    height: auto;            /* 🔥 FIX */
   }
 }
 
 /* WRAPPER */
 .leaderboardAd {
   width: 100%;
-  height: 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;            /* 🔥 FIX (kein flex mehr!) */
 }
 
+/* IMAGE */
 .leaderboardAd img {
   width: 100%;
-  height: 100%;
-  object-fit: contain;
+  height: auto;              /* 🔥 KEY FIX */
+  display: block;
 }
