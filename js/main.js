@@ -1,3 +1,46 @@
+// =========================
+// 📦 CORE
+// =========================
+import { renderApp } from "./ui/layout.js";
+import { game } from "./core/state.js";
+import "./core/events.js";
+import "./core/events.constants.js";
+import "./core/eventStore.js";
+
+// =========================
+// 🔧 MODULES
+// =========================
+import { startAdEngine } from "./modules/ads.js";
+import "./modules/scheduler.js";
+import "./modules/table.js";
+import { initLeagueSelect } from "./modules/league.js";
+
+// =========================
+// 🆕 DATA
+// =========================
+import { loadCSV } from "./modules/loader.js";
+import { extractLeagues } from "./modules/teamGenerator.js";
+import { initPlayerPool } from "./modules/playerPool.js";
+
+// =========================
+// 🎮 ENGINE
+// =========================
+import { handleMainAction } from "./core/engine.js";
+
+// =========================
+// 💾 STORAGE
+// =========================
+import { loadGame } from "./services/storage.js";
+
+// =========================
+// 🖥 UI
+// =========================
+import { bindUI } from "./ui/bindings.js";
+import { renderSchedule } from "./ui/ui.js";
+
+// =========================
+// 🚀 INIT
+// =========================
 async function init(){
 
   console.log("🚀 Init läuft...");
@@ -10,11 +53,11 @@ async function init(){
   startAdEngine();
 
   // =========================
-  // 📦 DATEN IMMER LADEN
+  // 📦 DATEN LADEN (IMMER!)
   // =========================
   try {
 
-    console.log("⚽ Lade Spieler & Team-Struktur...");
+    console.log("⚽ Lade Daten...");
 
     const players = await loadCSV("./data/spieler.csv");
     const leaguesRaw = await loadCSV("./data/ligen.csv");
@@ -32,9 +75,8 @@ async function init(){
       game.league.current = leagues[0];
     }
 
-    console.log(`✅ PlayerPool: ${players.length}`);
+    console.log(`✅ Spieler: ${players.length}`);
     console.log(`✅ Ligen: ${leagues.length}`);
-    console.log("👉 Current League:", game.league?.current);
 
   } catch (e) {
     console.warn("❌ Daten laden fehlgeschlagen:", e);
@@ -44,8 +86,6 @@ async function init(){
   // 💾 SAVE LADEN
   // =========================
   const loaded = loadGame();
-
-  console.log("💾 LOAD:", loaded);
 
   const hasValidSave =
     loaded &&
@@ -57,42 +97,39 @@ async function init(){
   // =========================
   if (hasValidSave) {
 
-    console.log("✅ Gültiger Save geladen");
+    console.log("✅ Save geladen");
 
     game.phase = "idle";
 
     if(splash) splash.style.display = "none";
     if(app) app.style.display = "block";
 
-    initLeagueSelect();
-    populateTeamSelect(); // 🔥 wichtig
+    initLeagueSelect(); // 👉 kümmert sich auch um Teams
 
     renderSchedule();
   }
 
   // =========================
-  // 🟡 FALL 2: SPLASH
+  // 🟡 FALL 2: KEIN SAVE
   // =========================
   else {
 
-    console.log("🟡 Kein gültiger Save → Splash");
+    console.log("🟡 Kein Save → Splash");
 
     game.phase = "setup";
 
     if(splash) splash.style.display = "flex";
     if(app) app.style.display = "none";
 
-    // 👉 Dropdowns initialisieren
-    initLeagueSelect();
-    populateTeamSelect(); // 🔥 DAS HAT GEFEHLT
+    initLeagueSelect(); // 👉 reicht komplett
 
-    // 👉 Fallback: erstes Team setzen
+    // 👉 Default Team setzen (WICHTIG)
     if (
       game.league?.current &&
       game.league.current.teams?.length
     ) {
       game.team = game.team || {};
-      game.team.selected = game.league.current.teams[0];
+      game.team.selected = game.league.current.teams[0].name;
     }
 
     if(startBtn){
@@ -125,3 +162,16 @@ async function init(){
 
   console.log("✅ Init fertig");
 }
+
+// =========================
+// ▶️ START
+// =========================
+document.addEventListener("DOMContentLoaded", init);
+
+// =========================
+// 📦 EXPORTS
+// =========================
+export {
+  init,
+  handleMainAction
+};
