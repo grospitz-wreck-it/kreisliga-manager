@@ -92,52 +92,49 @@ function initLeagueSelect(){
 // =========================
 // 👕 TEAM DROPDOWN
 // =========================
-function populateTeamSelect(){
+export function populateTeamSelect() {
 
-  const splashSelect = document.getElementById("teamSelect");
-  const menuSelect   = document.getElementById("teamSelectMenu");
+  const select = document.getElementById("teamSelect");
+  if (!select) return;
 
-  const selects = [splashSelect, menuSelect].filter(Boolean);
+  select.innerHTML = "";
 
-  // ✅ SAFETY: verhindert Crash
-  if (!game.league || !game.league.current || !game.league.current.teams) {
-    console.warn("⚠️ keine Teams für aktuelle Liga");
+  const league = game.league?.current;
+
+  if (!league || !league.teams) {
+    console.warn("⚠️ Keine Teams gefunden für Liga:", league);
     return;
   }
 
-  const teams = game.league.current.teams;
+  league.teams.forEach(team => {
 
-  selects.forEach(select => {
+    const option = document.createElement("option");
 
-    // 🧹 reset
-    select.innerHTML = "";
-
-    // 🧠 verhindert doppelte Listener
-    select.onchange = null;
-
-    // 👥 Teams einfügen
-    teams.forEach((team, i) => {
-      const option = document.createElement("option");
-      option.value = i;
+    // 👉 falls String
+    if (typeof team === "string") {
+      option.value = team;
+      option.textContent = team;
+    } 
+    // 👉 falls Objekt
+    else {
+      option.value = team.name;
       option.textContent = team.name;
-      select.appendChild(option);
-    });
+    }
 
-    // 🔁 Change Event
-    select.onchange = (e) => {
-      const index = e.target.value;
-
-      game.team = teams[index];
-
-      // 🔄 Sync Splash ↔ Menü
-      selects.forEach(s => {
-        if(s !== select) s.value = index;
-      });
-
-      console.log("✅ Team gewählt:", game.team.name);
-    };
-
+    select.appendChild(option);
   });
+
+  // 👉 wichtig: erstes Team setzen
+  if (league.teams.length > 0) {
+    game.team = game.team || {};
+    game.team.selected =
+      typeof league.teams[0] === "string"
+        ? league.teams[0]
+        : league.teams[0].name;
+  }
+
+  console.log("✅ Teams geladen:", league.teams.length);
+}
 
   // 👉 Initial setzen (falls noch kein Team)
   if (!game.team && teams.length > 0) {
