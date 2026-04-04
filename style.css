@@ -1,7 +1,6 @@
 /* =========================
 🌍 GLOBAL
 ========================= */
-
 * {
   box-sizing: border-box;
 }
@@ -13,15 +12,19 @@ body {
 }
 
 /* =========================
-🟡 SPLASH
+🟡 SPLASH (FIXED)
 ========================= */
 #splash {
+  position: fixed;       /* 🔥 FIX */
+  inset: 0;              /* full screen */
+  z-index: 9999;         /* 🔥 über alles */
+
   display: flex;
-  min-height: 100vh;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   gap: 20px;
+
   background: #000;
   color: white;
   padding: 20px;
@@ -30,7 +33,7 @@ body {
 
 #splash > * {
   width: 100%;
-  max-width: 300px;
+  max-width: 320px;
 }
 
 #logo {
@@ -38,10 +41,10 @@ body {
   max-width: 220px;
   height: auto;
   image-rendering: pixelated;
-  animation: fadeIn 0.8s ease-out;
 }
 
 #splash input,
+#splash select,
 #splash button {
   padding: 12px;
   font-size: 16px;
@@ -52,7 +55,6 @@ body {
 #splash input {
   background: #222;
   color: white;
-  outline: none;
 }
 
 #splash input::placeholder {
@@ -64,26 +66,6 @@ body {
   color: white;
   font-weight: bold;
   cursor: pointer;
-  transition: transform 0.1s, background 0.2s;
-}
-
-#splash button:hover {
-  background: #388e3c;
-}
-
-#splash button:active {
-  transform: scale(0.97);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 /* =========================
@@ -91,13 +73,15 @@ body {
 ========================= */
 #app {
   display: none;
+  width: 100%;
 }
 
 /* =========================
 📦 CONTAINER
 ========================= */
 .container {
-  max-width: 600px;
+  width: 100%;
+  max-width: 420px; /* 🔥 alles gleich breit */
   margin: 0 auto;
   padding: 12px;
 
@@ -106,23 +90,30 @@ body {
   gap: 12px;
 }
 
-.container > * {
-  flex: none;
-}
-
 /* =========================
-🧷 HEADER
+🧷 HEADER (FIXED CLICK)
 ========================= */
 #header {
   position: sticky;
   top: 0;
-  background: #111;
+  z-index: 1000; /* 🔥 wichtig */
+
+  background: #2e7d32;
   color: white;
   padding: 12px;
+
   display: flex;
   align-items: center;
   gap: 10px;
-  z-index: 10;
+}
+
+/* Burger Button */
+#burger {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
 }
 
 /* =========================
@@ -132,13 +123,21 @@ body {
   position: fixed;
   top: 0;
   left: 0;
+
   width: 220px;
   height: 100%;
+
   background: #222;
   padding: 20px;
+
   transform: translateX(-100%);
   transition: transform 0.3s;
-  z-index: 20;
+
+  z-index: 2000; /* 🔥 über allem */
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 #sidebar.open {
@@ -146,7 +145,7 @@ body {
 }
 
 /* =========================
-🧱 FORM ELEMENTS
+🧱 INPUTS
 ========================= */
 input,
 select,
@@ -165,6 +164,80 @@ button {
 }
 
 /* =========================
+🎤 TOP BAR
+========================= */
+#topBar {
+  background: #111;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+/* =========================
+🎮 GAME CANVAS (FIXED)
+========================= */
+#gameCanvasWrapper {
+  width: 100%;
+}
+
+#gameCanvas {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #0b5c2e;
+  border-radius: 12px;
+  display: block;
+
+  pointer-events: none; /* 🔥 verhindert Klick-Block */
+}
+
+/* =========================
+📢 EVENT + AD (STABLE)
+========================= */
+#eventBar {
+  width: 100%;
+  background: #111;
+  color: white;
+  border-radius: 12px;
+  padding: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#eventText {
+  font-size: 14px;
+}
+
+/* AD CONTAINER */
+#adContainer {
+  width: 100%;
+  height: 80px; /* 🔥 feste Höhe */
+
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #000;
+  border-radius: 8px;
+}
+
+/* AD CONTENT FIX */
+#adContainer img,
+#adContainer iframe {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* =========================
 ⚽ MATCH UI
 ========================= */
 #score {
@@ -175,7 +248,6 @@ button {
 
 #match {
   text-align: center;
-  font-size: 16px;
 }
 
 #progressBar {
@@ -203,10 +275,6 @@ button {
   font-size: 14px;
 }
 
-#liveFeed p {
-  margin: 6px 0;
-}
-
 /* =========================
 📊 TABLE
 ========================= */
@@ -227,50 +295,4 @@ th, td {
   padding: 6px;
   text-align: center;
   border-bottom: 1px solid #ddd;
-}
-
-/* =========================
-📢 ADS – iOS FIX FINAL
-========================= */
-
-/* OUTER */
-#adBanner {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin: 12px 0;
-}
-
-/* TRACK */
-#adTrack {
-  width: 320px;
-  max-width: 100%;
-  height: auto;              /* 🔥 FIX */
-  
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  overflow: hidden;
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-  #adTrack {
-    width: 300px;
-    height: auto;            /* 🔥 FIX */
-  }
-}
-
-/* WRAPPER */
-.leaderboardAd {
-  width: 100%;
-  display: block;            /* 🔥 FIX (kein flex mehr!) */
-}
-
-/* IMAGE */
-.leaderboardAd img {
-  width: 100%;
-  height: auto;              /* 🔥 KEY FIX */
-  display: block;
 }
