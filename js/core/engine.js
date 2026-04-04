@@ -18,7 +18,9 @@ function getTeamName(team){
 }
 
 function getTeamObject(teamName){
-  const teams = game.league?.current?.teams;
+
+  const teams = game.league.current?.teams;
+
   if(!teams) return null;
 
   return teams.find(t =>
