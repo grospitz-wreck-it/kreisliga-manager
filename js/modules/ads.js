@@ -1,5 +1,5 @@
 // =========================
-// 📢 ADS ENGINE (SUPABASE FINAL)
+// 📢 ADS ENGINE (SUPABASE FINAL PRO)
 // =========================
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
@@ -20,15 +20,14 @@ let adIndex = 0;
 // =========================
 // 📥 LOAD FROM SUPABASE
 // =========================
-async function loadCampaigns(){
-
-  try{
+async function loadCampaigns() {
+  try {
     const { data, error } = await supabase
       .from("campaigns")
       .select("*")
       .eq("active", true);
 
-    if(error){
+    if (error) {
       console.error("❌ Supabase Fehler:", error);
       campaignsCache = [];
       return;
@@ -36,7 +35,7 @@ async function loadCampaigns(){
 
     campaignsCache = data || [];
 
-  } catch(e){
+  } catch (e) {
     console.error("❌ Load Fehler:", e);
     campaignsCache = [];
   }
@@ -45,33 +44,33 @@ async function loadCampaigns(){
 // =========================
 // 🎯 MATCHING ENGINE
 // =========================
-function getMatchingAds(){
+function getMatchingAds() {
 
   const now = Date.now();
   const leagueKey = game.league?.key;
-  const teamKey   = game.team?.selected;
+  const teamKey = game.team?.selected;
 
   return campaignsCache.filter(c => {
 
     // ⏱️ Zeitraum
-    if(c.start_date && now < new Date(c.start_date).getTime()) return false;
-    if(c.end_date && now > new Date(c.end_date).getTime()) return false;
+    if (c.start_date && now < new Date(c.start_date).getTime()) return false;
+    if (c.end_date && now > new Date(c.end_date).getTime()) return false;
 
     const t = c.targeting || {};
 
     // 🌍 Global
-    if(t.global) return true;
+    if (t.global) return true;
 
     // fallback
-    if(!leagueKey && !teamKey) return true;
+    if (!leagueKey && !teamKey) return true;
 
     // 🏆 Liga
-    if(t.league && t.league === leagueKey) return true;
+    if (t.league && t.league === leagueKey) return true;
 
     // 👕 Team
-    if(t.team){
-      if(t.team === "all") return true;
-      if(t.team === teamKey) return true;
+    if (t.team) {
+      if (t.team === "all") return true;
+      if (t.team === teamKey) return true;
     }
 
     return false;
@@ -79,16 +78,32 @@ function getMatchingAds(){
 }
 
 // =========================
+// 📊 TRACKING (ROBUST)
+// =========================
+async function trackEvent(campaignId, type) {
+  try {
+    await supabase.from("ad_events").insert([
+      {
+        campaign_id: campaignId,
+        type: type
+      }
+    ]);
+  } catch (e) {
+    console.warn(`Tracking Fehler (${type}):`, e);
+  }
+}
+
+// =========================
 // 🎬 RENDER
 // =========================
-function renderAds(){
+function renderAds() {
 
   const el = document.getElementById("adTrack");
-  if(!el) return;
+  if (!el) return;
 
   const ads = getMatchingAds();
 
-  if(!ads.length){
+  if (!ads.length) {
     el.innerHTML = `<div class="leaderboardAd">Keine Werbung</div>`;
     return;
   }
@@ -97,12 +112,12 @@ function renderAds(){
   const ad = ads[adIndex];
 
   // =========================
-  // 🎬 RENDER
+  // 🎬 DOM RENDER
   // =========================
   el.innerHTML = `
     <div class="leaderboardAd">
       ${ad.link ? `
-        <a href="${ad.link}" target="_blank" data-id="${ad.id}" class="adLink">
+        <a href="${ad.link}" target="_blank" rel="noopener" data-id="${ad.id}" class="adLink">
           <img src="${ad.image}" alt="Ad" loading="lazy">
         </a>
       ` : `
@@ -112,45 +127,29 @@ function renderAds(){
   `;
 
   // =========================
-  // 📊 IMPRESSION TRACKING
+  // 👁️ IMPRESSION
   // =========================
-  try{
-    supabase.from("ad_events").insert({
-      campaign_id: ad.id,
-      type: "impression"
-    });
-  } catch(e){
-    console.warn("Impression Fehler:", e);
-  }
+  trackEvent(ad.id, "impression");
 
   // =========================
-  // 🖱 CLICK TRACKING (SAFE)
+  // 🖱 CLICK TRACKING
   // =========================
   const linkEl = el.querySelector(".adLink");
 
-  if(linkEl){
+  if (linkEl) {
     linkEl.addEventListener("click", () => {
-
-      try{
-        supabase.from("ad_events").insert({
-          campaign_id: ad.id,
-          type: "click"
-        });
-      } catch(e){
-        console.warn("Click Fehler:", e);
-      }
-
-    }, { once: true }); // 🔥 verhindert doppelte Events
+      trackEvent(ad.id, "click");
+    }, { once: true });
   }
 }
 
 // =========================
 // 🔄 ROTATION
 // =========================
-function rotateAds(){
+function rotateAds() {
 
   const ads = getMatchingAds();
-  if(!ads.length) return;
+  if (!ads.length) return;
 
   adIndex = (adIndex + 1) % ads.length;
   renderAds();
@@ -159,19 +158,22 @@ function rotateAds(){
 // =========================
 // 🚀 ENGINE START
 // =========================
-async function startAdEngine(){
+async function startAdEngine() {
 
-  console.log("📢 Ads Engine gestartet (Supabase)");
+  console.log("📢 Ads Engine gestartet (PRO)");
 
   await loadCampaigns();
   renderAds();
 
+  // 🔁 Rotation + Live Reload
   setInterval(async () => {
-    await loadCampaigns();   // 🔥 live update
+    await loadCampaigns(); // 🔥 live update
     rotateAds();
   }, 8000);
 
+  // 📱 wichtig für mobile redraw bugs
   window.addEventListener("resize", renderAds);
+  window.addEventListener("focus", renderAds);
 }
 
 // =========================
