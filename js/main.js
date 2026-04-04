@@ -10,7 +10,7 @@ async function init(){
   startAdEngine();
 
   // =========================
-  // 📦 DATEN IMMER LADEN (WICHTIG)
+  // 📦 DATEN IMMER LADEN
   // =========================
   try {
 
@@ -26,6 +26,7 @@ async function init(){
     game.players = players;
     game.data = { leagues };
 
+    // 👉 Default Liga setzen
     if (leagues.length > 0) {
       game.league = game.league || {};
       game.league.current = leagues[0];
@@ -33,13 +34,14 @@ async function init(){
 
     console.log(`✅ PlayerPool: ${players.length}`);
     console.log(`✅ Ligen: ${leagues.length}`);
+    console.log("👉 Current League:", game.league?.current);
 
   } catch (e) {
     console.warn("❌ Daten laden fehlgeschlagen:", e);
   }
 
   // =========================
-  // 💾 SAVE LADEN (NACH DATEN!)
+  // 💾 SAVE LADEN
   // =========================
   const loaded = loadGame();
 
@@ -51,7 +53,7 @@ async function init(){
     loaded.team;
 
   // =========================
-  // ✅ FALL 1: VALIDER SAVE
+  // ✅ FALL 1: SAVE
   // =========================
   if (hasValidSave) {
 
@@ -63,13 +65,13 @@ async function init(){
     if(app) app.style.display = "block";
 
     initLeagueSelect();
-    populateTeamSelect();
-    renderSchedule();
+    populateTeamSelect(); // 🔥 wichtig
 
+    renderSchedule();
   }
 
   // =========================
-  // 🟡 FALL 2: KEIN SAVE → SPLASH
+  // 🟡 FALL 2: SPLASH
   // =========================
   else {
 
@@ -80,7 +82,18 @@ async function init(){
     if(splash) splash.style.display = "flex";
     if(app) app.style.display = "none";
 
+    // 👉 Dropdowns initialisieren
     initLeagueSelect();
+    populateTeamSelect(); // 🔥 DAS HAT GEFEHLT
+
+    // 👉 Fallback: erstes Team setzen
+    if (
+      game.league?.current &&
+      game.league.current.teams?.length
+    ) {
+      game.team = game.team || {};
+      game.team.selected = game.league.current.teams[0];
+    }
 
     if(startBtn){
       startBtn.onclick = () => {
