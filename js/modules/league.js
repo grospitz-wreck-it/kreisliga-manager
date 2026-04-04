@@ -37,34 +37,31 @@ function ensureTeamPlayers(team){
 // =========================
 // 🏆 LIGA DROPDOWN
 // =========================
-async function initLeagueSelect(){
+// =========================
+// 🏆 INIT LEAGUE SELECT
+// =========================
+function initLeagueSelect(){
 
-  const select = document.getElementById("leagueSelect");
-  if(!select) return;
+  const splashSelect = document.getElementById("leagueSelect");
+  const menuSelect   = document.getElementById("leagueSelectMenu");
 
-  try {
-    LEAGUES = await loadLeaguesFromCSV("./data/ligen.csv");
-    console.log("✅ Ligen geladen:", Object.keys(LEAGUES).length);
-  } catch(e){
-    console.error("❌ Fehler beim Laden der Ligen:", e);
-    return;
-  }
+  const selects = [splashSelect, menuSelect].filter(Boolean);
 
-  select.innerHTML = `<option value="">Liga wählen</option>`;
+  selects.forEach(select => {
+    select.innerHTML = "";
 
-  Object.keys(LEAGUES).forEach(key => {
-    const opt = document.createElement("option");
-    opt.value = key;
-    opt.textContent = LEAGUES[key].name;
-    select.appendChild(opt);
+    game.data.leagues.forEach((league, i) => {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = league.name;
+      select.appendChild(option);
+    });
+
+    select.addEventListener("change", e => {
+      game.league.current = game.data.leagues[e.target.value];
+      populateTeamSelect();
+    });
   });
-
-  select.onchange = (e) => {
-    const value = e.target.value;
-    if(!value) return;
-
-    selectLeague(value);
-  };
 }
 
 
