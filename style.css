@@ -16,23 +16,59 @@ background: #f2f2f2;
 🟡 SPLASH
 ========================= */
 #splash {
-display: flex;
-height: 100vh;
-justify-content: center;
-align-items: center;
-flex-direction: column;
-gap: 12px;
-background: #111;
-color: white;
-padding: 20px;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+  background: #000;
+  color: white;
+  padding: 20px;
+  text-align: center;
 }
 
-#splash input,
+/* Logo */
+#logo {
+  width: 90%;
+  max-width: 420px;
+  image-rendering: pixelated;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Inputs + Button */
+#splash input, #splash button {
+  max-width: 300px;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+}
+
+#splash input {
+  background: #222;
+  color: white;
+}
+
 #splash button {
-max-width: 300px;
-width: 100%;
+  background: #2e7d32;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
 }
 
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 /* =========================
 🔵 APP
 ========================= */
