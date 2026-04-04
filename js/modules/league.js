@@ -6,14 +6,6 @@ import { renderSchedule, renderCurrentMatch } from "../ui/ui.js";
 import { renderTable } from "./table.js";
 import { game } from "../core/state.js";
 import { generateTeam } from "./teamLoader.js";
-import { loadLeaguesFromCSV } from "./leagueLoader.js";
-
-
-// =========================
-// 📦 LIGEN DATEN (DYNAMISCH)
-// =========================
-let LEAGUES = {};
-
 
 // =========================
 // 🧠 HELPERS
@@ -33,7 +25,6 @@ function ensureTeamPlayers(team){
   return team.players;
 }
 
-
 // =========================
 // 🏆 INIT LEAGUE SELECT
 // =========================
@@ -44,7 +35,6 @@ function initLeagueSelect(){
 
   const selects = [splashSelect, menuSelect].filter(Boolean);
 
-  // ✅ SAFETY: verhindert deinen Crash
   if (!game.data || !game.data.leagues) {
     console.warn("⚠️ leagues noch nicht geladen");
     return;
@@ -52,13 +42,9 @@ function initLeagueSelect(){
 
   selects.forEach(select => {
 
-    // 🧹 reset
     select.innerHTML = "";
-
-    // 🧠 verhindert doppelte EventListener
     select.onchange = null;
 
-    // 🏆 Ligen füllen
     game.data.leagues.forEach((league, i) => {
       const option = document.createElement("option");
       option.value = i;
@@ -66,23 +52,21 @@ function initLeagueSelect(){
       select.appendChild(option);
     });
 
-    // 🔁 Change Event
     select.onchange = (e) => {
-      const index = e.target.value;
 
+      const index = e.target.value;
       game.league.current = game.data.leagues[index];
 
-      // 👉 optional sync zwischen Splash & Menü
+      // sync beide selects
       selects.forEach(s => {
         if(s !== select) s.value = index;
       });
 
       populateTeamSelect();
     };
-
   });
 
-  // 👉 optional: initial Teams laden
+  // 👉 initial setzen
   if (game.data.leagues.length > 0) {
     game.league.current = game.data.leagues[0];
     populateTeamSelect();
@@ -90,168 +74,110 @@ function initLeagueSelect(){
 }
 
 // =========================
-// 👕 TEAM DROPDOWN
+// 👕 TEAM DROPDOWN (FIXED)
 // =========================
-export function populateTeamSelect() {
+function populateTeamSelect() {
 
-  const select = document.getElementById("teamSelect");
-  if (!select) return;
+  const splashSelect = document.getElementById("teamSelect");
+  const menuSelect   = document.getElementById("teamSelectMenu");
 
-  select.innerHTML = "";
+  const selects = [splashSelect, menuSelect].filter(Boolean);
 
   const league = game.league?.current;
 
   if (!league || !league.teams) {
-    console.warn("⚠️ Keine Teams gefunden für Liga:", league);
+    console.warn("⚠️ Keine Teams gefunden:", league);
     return;
   }
 
-  league.teams.forEach(team => {
+  selects.forEach(select => {
 
-    const option = document.createElement("option");
+    select.innerHTML = "";
+    select.onchange = null;
 
-    // 👉 falls String
-    if (typeof team === "string") {
-      option.value = team;
-      option.textContent = team;
-    } 
-    // 👉 falls Objekt
-    else {
-      option.value = team.name;
-      option.textContent = team.name;
-    }
+    league.teams.forEach(team => {
 
-    select.appendChild(option);
+      const option = document.createElement("option");
+
+      const name =
+        typeof team === "string" ? team : team.name;
+
+      option.value = name;
+      option.textContent = name;
+
+      select.appendChild(option);
+    });
+
+    select.onchange = (e) => {
+
+      const teamName = e.target.value;
+      selectTeam(teamName);
+
+      // sync beide selects
+      selects.forEach(s => {
+        if(s !== select) s.value = teamName;
+      });
+    };
   });
 
-  // 👉 wichtig: erstes Team setzen
+  // 👉 default team setzen
   if (league.teams.length > 0) {
-    game.team = game.team || {};
-    game.team.selected =
+    const first =
       typeof league.teams[0] === "string"
         ? league.teams[0]
         : league.teams[0].name;
+
+    game.team = game.team || {};
+    game.team.selected = first;
   }
 
   console.log("✅ Teams geladen:", league.teams.length);
 }
-
-  // 👉 Initial setzen (falls noch kein Team)
-  if (!game.team && teams.length > 0) {
-    game.team = teams[0];
-
-    // UI synchronisieren
-    selects.forEach(s => s.value = 0);
-  }
-}
-
-// =========================
-// 🏟️ LIGA LADEN
-// =========================
-function selectLeague(key){
-
-  const data = LEAGUES[key];
-
-  if(!data){
-    console.error("❌ Liga nicht gefunden:", key);
-    return;
-  }
-
-  // Reset
-  game.league.key = key;
-  game.league.currentRound = 0;
-  game.league.currentMatchIndex = 0;
-
-  game.team.selected = null;
-  game.match.current = null;
-
-  // =========================
-  // 🧠 TEAMS ERZEUGEN
-  // =========================
-  game.league.teams = data.teams.map(name => ({
-    name,
-    strength: Math.floor(Math.random() * 30) + 60,
-    tactic: "balanced",
-    form: [],
-    points: 0,
-    goalsFor: 0,
-    goalsAgainst: 0,
-    wins: 0,
-    draws: 0,
-    losses: 0,
-    played: 0
-  }));
-
-  console.log(`✅ Liga "${data.name}" geladen mit ${game.league.teams.length} Teams`);
-
-  // =========================
-  // 📅 SPIELPLAN
-  // =========================
-  generateSchedule();
-
-  if(!game.league.schedule || game.league.schedule.length === 0){
-    console.error("❌ Spielplan fehlgeschlagen!");
-    return;
-  }
-
-  console.log("📅 Spielplan ready:", game.league.schedule.length);
-
-  // =========================
-  // 🖥️ UI UPDATE
-  // =========================
-  renderTable();
-  populateTeamSelect();
-  renderSchedule();
-}
-
 
 // =========================
 // 👤 TEAM WÄHLEN
 // =========================
 function selectTeam(teamName){
 
-  console.log("👉 selectTeam Input:", teamName);
-
-  const teams = game.league.teams;
+  const teams = game.league?.current?.teams;
 
   if(!teams || teams.length === 0){
     console.error("❌ Keine Teams geladen");
     return;
   }
 
-  const team = teams.find(t => t.name === teamName);
+  const teamObj =
+    typeof teams[0] === "string"
+      ? { name: teamName }
+      : teams.find(t => t.name === teamName);
 
-  if(!team){
-    console.warn("⚠️ Ungültiger Team-Wert:", teamName);
+  if(!teamObj){
+    console.warn("⚠️ Team nicht gefunden:", teamName);
     return;
   }
 
-  game.team.selected = team.name;
+  game.team.selected = teamName;
 
-  console.log("✅ Team gewählt:", team.name);
-
-  // 🆕 Lazy Spieler laden
-  const players = ensureTeamPlayers(team);
+  // 🆕 Spieler generieren falls nötig
+  const players = ensureTeamPlayers(teamObj);
   game.team.players = players;
-
-  const tacticSelect = document.getElementById("tacticSelect");
-  if(tacticSelect){
-    tacticSelect.value = team.tactic;
-  }
 
   renderCurrentMatch();
 }
 
-
 // =========================
-// 🧠 GET SELECTED TEAM
+// 🧠 GET TEAM
 // =========================
 function getSelectedTeam(){
-  return game.league.teams.find(
-    t => t.name === game.team.selected
-  );
-}
 
+  const teams = game.league?.current?.teams;
+
+  if (!teams) return null;
+
+  return typeof teams[0] === "string"
+    ? teams.find(t => t === game.team.selected)
+    : teams.find(t => t.name === game.team.selected);
+}
 
 // =========================
 // 📦 EXPORTS
@@ -259,7 +185,6 @@ function getSelectedTeam(){
 export {
   initLeagueSelect,
   populateTeamSelect,
-  selectLeague,
   selectTeam,
   getSelectedTeam
 };
