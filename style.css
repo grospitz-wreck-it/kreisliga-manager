@@ -17,7 +17,7 @@ background: #f2f2f2;
 ========================= */
 #splash {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -28,41 +28,62 @@ background: #f2f2f2;
   text-align: center;
 }
 
+/* 👉 Einheitliche Breite für ALLE Elemente */
+#splash > * {
+  width: 100%;
+  max-width: 300px;
+}
+
 /* Logo */
 #logo {
-  width: 90%;
-  max-width: 420px;
+  width: 100%;
+  height: auto;
   image-rendering: pixelated;
-  animation: fadeIn 1s ease-in-out;
+  animation: fadeIn 0.8s ease-out;
 }
 
 /* Inputs + Button */
-#splash input, #splash button {
-  max-width: 300px;
-  width: 100%;
+#splash input,
+#splash button {
   padding: 12px;
   font-size: 16px;
   border-radius: 8px;
   border: none;
 }
 
+/* Input */
 #splash input {
   background: #222;
   color: white;
+  outline: none;
 }
 
+#splash input::placeholder {
+  color: #aaa;
+}
+
+/* Button */
 #splash button {
   background: #2e7d32;
   color: white;
   font-weight: bold;
   cursor: pointer;
+  transition: transform 0.1s, background 0.2s;
+}
+
+#splash button:hover {
+  background: #388e3c;
+}
+
+#splash button:active {
+  transform: scale(0.97);
 }
 
 /* Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
   to {
     opacity: 1;
