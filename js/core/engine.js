@@ -8,7 +8,7 @@ import { emit } from "./events.js";
 import { EVENTS } from "./events.constants.js";
 
 // 🆕 NEW
-import { triggerEvent, updateEvents, getActiveModifiers } from "./eventSystem.js";
+import { triggerEvent, updateEvents, getActiveModifiers } from "..engine/eventSystem.js";
 import { applyModifiers } from "./modifierEngine.js";
 
 // =========================
