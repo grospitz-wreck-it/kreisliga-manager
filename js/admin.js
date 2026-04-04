@@ -10,6 +10,16 @@ let currentCampaigns = [];
 let editId = null;
 
 // =====================
+// HELPER
+// =====================
+function updateButton(){
+  const btn = document.getElementById("saveBtn");
+  if(!btn) return;
+
+  btn.innerText = editId ? "✏️ Aktualisieren" : "💾 Speichern";
+}
+
+// =====================
 // CREATE / UPDATE
 // =====================
 window.createCampaign = async function(){
@@ -36,32 +46,29 @@ const file = document.getElementById("image").files[0];
 let imageUrl = null;
 
 // =====================
-// IMAGE UPLOAD (nur wenn neu)
+// IMAGE UPLOAD
 // =====================
 if(file){
 
+  const fileName = Date.now() + ".jpg";
 
-const fileName = Date.now() + "_" + file.name;
+  const { error: uploadError } = await supabase
+    .storage
+    .from("ads")
+    .upload(fileName, file);
 
-const { error: uploadError } = await supabase
-  .storage
-  .from("ads")
-  .upload(fileName, file);
+  if(uploadError){
+    alert("❌ Upload Fehler");
+    console.error(uploadError);
+    return;
+  }
 
-if(uploadError){
-  alert("❌ Upload Fehler");
-  console.error(uploadError);
-  return;
-}
+  const { data } = supabase
+    .storage
+    .from("ads")
+    .getPublicUrl(fileName);
 
-const { data } = supabase
-  .storage
-  .from("ads")
-  .getPublicUrl(fileName);
-
-imageUrl = data.publicUrl;
-
-
+  imageUrl = data.publicUrl;
 }
 
 // =====================
@@ -69,60 +76,67 @@ imageUrl = data.publicUrl;
 // =====================
 if(editId){
 
+  const updateData = {
+    name,
+    customer,
+    budget,
+    link,
+    cpm,
+    cpc,
+    ad_format: format,
+    start_date: start,
+    end_date: end,
+    donation_percent: donationPercent
+  };
 
-const updateData = {
-  name,
-  customer,
-  budget,
-  link,
-  cpm,
-  cpc,
-  ad_format: format,
-  start_date: start,
-  end_date: end,
-  donation_percent: donationPercent
-};
+  if(imageUrl){
+    updateData.image = imageUrl;
+  }
 
-if(imageUrl){
-  updateData.image = imageUrl;
-}
+  const { error } = await supabase
+    .from("campaigns")
+    .update(updateData)
+    .eq("id", editId);
 
-await supabase
-  .from("campaigns")
-  .update(updateData)
-  .eq("id", editId);
+  if(error){
+    alert("❌ Update Fehler");
+    console.error(error);
+    return;
+  }
 
-editId = null;
-alert("✏️ Kampagne aktualisiert");
-
+  editId = null;
+  alert("✏️ Kampagne aktualisiert");
 
 } else {
 
+  const { error } = await supabase
+    .from("campaigns")
+    .insert({
+      name,
+      customer,
+      budget,
+      link,
+      image: imageUrl,
+      cpm,
+      cpc,
+      ad_format: format,
+      start_date: start,
+      end_date: end,
+      donation_percent: donationPercent,
+      active: true
+    });
 
-// =====================
-// CREATE
-// =====================
-await supabase.from("campaigns").insert({
-  name,
-  customer,
-  budget,
-  link,
-  image: imageUrl,
-  cpm,
-  cpc,
-  ad_format: format,
-  start_date: start,
-  end_date: end,
-  donation_percent: donationPercent,
-  active: true
-});
+  if(error){
+    alert("❌ Create Fehler");
+    console.error(error);
+    return;
+  }
 
-alert("✅ Kampagne erstellt");
-
-
+  alert("✅ Kampagne erstellt");
 }
 
 clearForm();
+updateButton();
 loadCampaigns();
 };
 
@@ -157,14 +171,12 @@ const stats = {};
 
 (data || []).forEach(e => {
 
-
 if(!stats[e.campaign_id]){
   stats[e.campaign_id] = { impressions:0, clicks:0 };
 }
 
 if(e.type === "impression") stats[e.campaign_id].impressions++;
 if(e.type === "click") stats[e.campaign_id].clicks++;
-
 
 });
 
@@ -182,7 +194,6 @@ let totalRevenue = 0;
 
 campaigns.forEach(c => {
 
-
 const s = stats[c.id] || { impressions:0, clicks:0 };
 
 totalImpr += s.impressions;
@@ -193,7 +204,6 @@ const revenue =
   (s.clicks * (c.cpc || 0));
 
 totalRevenue += revenue;
-
 
 });
 
@@ -226,6 +236,7 @@ if(!c) return;
 
 editId = id;
 
+// FORM FILL
 document.getElementById("name").value = c.name || "";
 document.getElementById("customer").value = c.customer || "";
 document.getElementById("budget").value = c.budget || 0;
@@ -234,6 +245,16 @@ document.getElementById("link").value = c.link || "";
 document.getElementById("cpm").value = c.cpm || 0;
 document.getElementById("cpc").value = c.cpc || 0;
 document.getElementById("adFormat").value = c.ad_format || "banner";
+
+if(c.start_date){
+  document.getElementById("startDate").value = c.start_date.split("T")[0];
+}
+
+if(c.end_date){
+  document.getElementById("endDate").value = c.end_date.split("T")[0];
+}
+
+updateButton();
 
 window.scrollTo({ top: 0, behavior: "smooth" });
 };
@@ -266,7 +287,6 @@ container.innerHTML = "";
 
 campaigns.forEach(c => {
 
-
 const s = stats[c.id] || { impressions:0, clicks:0 };
 const revenue = calcRevenue(c, s);
 
@@ -280,7 +300,7 @@ div.innerHTML = `
       <strong>${c.customer || "-"}</strong><br>
       ${c.name || ""}<br>
       📦 ${c.ad_format || "banner"}<br>
-      📊 ${s.impressions} Impr / ${s.clicks} Klicks<br>
+      📊 ${s.impressions} / ${s.clicks}<br>
       💰 ${revenue} €
     </div>
   </div>
@@ -313,4 +333,7 @@ document.getElementById("image").value = "";
 // =====================
 // INIT
 // =====================
-window.onload = loadCampaigns;
+window.onload = () => {
+  updateButton();
+  loadCampaigns();
+};
