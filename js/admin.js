@@ -15,7 +15,6 @@ let editId = null;
 function updateButton(){
   const btn = document.getElementById("saveBtn");
   if(!btn) return;
-
   btn.innerText = editId ? "✏️ Aktualisieren" : "💾 Speichern";
 }
 
@@ -23,6 +22,8 @@ function updateButton(){
 // CREATE / UPDATE
 // =====================
 window.createCampaign = async function(){
+
+try{
 
 const name = document.getElementById("name").value;
 const customer = document.getElementById("customer").value;
@@ -39,7 +40,7 @@ const format = document.getElementById("adFormat").value;
 const cpm = Number(document.getElementById("cpm").value || 0);
 const cpc = Number(document.getElementById("cpc").value || 0);
 
-const donationPercent = Number(document.getElementById("donation").value || 0);
+const donationPercent = Number(document.getElementById("donation")?.value || 0);
 
 const file = document.getElementById("image").files[0];
 
@@ -50,7 +51,7 @@ let imageUrl = null;
 // =====================
 if(file){
 
-  const fileName = Date.now() + ".jpg";
+  const fileName = Date.now() + "_" + file.name;
 
   const { error: uploadError } = await supabase
     .storage
@@ -58,8 +59,8 @@ if(file){
     .upload(fileName, file);
 
   if(uploadError){
-    alert("❌ Upload Fehler");
     console.error(uploadError);
+    alert("❌ Upload Fehler");
     return;
   }
 
@@ -89,9 +90,7 @@ if(editId){
     donation_percent: donationPercent
   };
 
-  if(imageUrl){
-    updateData.image = imageUrl;
-  }
+  if(imageUrl) updateData.image = imageUrl;
 
   const { error } = await supabase
     .from("campaigns")
@@ -99,8 +98,8 @@ if(editId){
     .eq("id", editId);
 
   if(error){
-    alert("❌ Update Fehler");
     console.error(error);
+    alert("❌ Update Fehler");
     return;
   }
 
@@ -127,8 +126,8 @@ if(editId){
     });
 
   if(error){
-    alert("❌ Create Fehler");
     console.error(error);
+    alert("❌ Create Fehler");
     return;
   }
 
@@ -138,6 +137,11 @@ if(editId){
 clearForm();
 updateButton();
 loadCampaigns();
+
+}catch(e){
+  console.error("❌ Fatal:", e);
+}
+
 };
 
 // =====================
@@ -213,6 +217,62 @@ document.getElementById("kpiRevenue").innerText = totalRevenue.toFixed(2) + "€
 }
 
 // =====================
+// FORECAST + BREAKDOWN
+// =====================
+function updateForecast(campaigns, stats){
+
+let totalRevenue = 0;
+let byFormat = {};
+
+campaigns.forEach(c => {
+
+  const s = stats[c.id] || { impressions:0, clicks:0 };
+
+  const revenue =
+    (s.impressions / 1000) * (c.cpm || 0) +
+    (s.clicks * (c.cpc || 0));
+
+  totalRevenue += revenue;
+
+  const format = c.ad_format || "other";
+
+  if(!byFormat[format]) byFormat[format] = 0;
+  byFormat[format] += revenue;
+
+});
+
+// Forecast
+const daily = totalRevenue / 30;
+
+document.getElementById("forecastMonth").innerText =
+  (daily * 30).toFixed(2) + "€";
+
+document.getElementById("forecastYear").innerText =
+  (daily * 365).toFixed(2) + "€";
+
+// Breakdown
+const container = document.getElementById("revenueBreakdown");
+if(!container) return;
+
+container.innerHTML = "";
+
+Object.entries(byFormat).forEach(([type, value]) => {
+
+  const percent = totalRevenue ? (value / totalRevenue * 100) : 0;
+
+  const div = document.createElement("div");
+  div.className = "bar";
+
+  div.innerHTML = `
+    <div>${type} – ${value.toFixed(2)}€ (${percent.toFixed(1)}%)</div>
+    <div class="barFill" style="width:${percent}%"></div>
+  `;
+
+  container.appendChild(div);
+});
+}
+
+// =====================
 // REVENUE PER CAMPAIGN
 // =====================
 function calcRevenue(c, s){
@@ -220,10 +280,10 @@ function calcRevenue(c, s){
 const impressions = s.impressions || 0;
 const clicks = s.clicks || 0;
 
-const cpmRevenue = (impressions / 1000) * (c.cpm || 0);
-const cpcRevenue = clicks * (c.cpc || 0);
-
-return (cpmRevenue + cpcRevenue).toFixed(2);
+return (
+  (impressions / 1000) * (c.cpm || 0) +
+  (clicks * (c.cpc || 0))
+).toFixed(2);
 }
 
 // =====================
@@ -236,7 +296,6 @@ if(!c) return;
 
 editId = id;
 
-// FORM FILL
 document.getElementById("name").value = c.name || "";
 document.getElementById("customer").value = c.customer || "";
 document.getElementById("budget").value = c.budget || 0;
@@ -255,7 +314,6 @@ if(c.end_date){
 }
 
 updateButton();
-
 window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
@@ -280,7 +338,9 @@ async function render(campaigns){
 currentCampaigns = campaigns;
 
 const stats = await loadStats();
+
 updateKPIs(campaigns, stats);
+updateForecast(campaigns, stats);
 
 const container = document.getElementById("list");
 container.innerHTML = "";
@@ -295,7 +355,7 @@ div.className = "adRow";
 
 div.innerHTML = `
   <div class="adLeft">
-    <img src="${c.image}">
+    <img src="${c.image || ""}">
     <div>
       <strong>${c.customer || "-"}</strong><br>
       ${c.name || ""}<br>
