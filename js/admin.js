@@ -342,6 +342,7 @@ const stats = await loadStats();
 
 updateKPIs(campaigns, stats);
 updateForecast(campaigns, stats);
+buildRevenueChart(events, campaigns);
 
 const container = document.getElementById("list");
 container.innerHTML = "";
