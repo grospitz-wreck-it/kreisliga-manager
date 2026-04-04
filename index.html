@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <style>
     body {
       margin: 0;
@@ -35,7 +35,6 @@
     #logo {
       width: 80%;
       max-width: 220px;
-      height: auto;
       image-rendering: pixelated;
     }
 
@@ -53,10 +52,6 @@
       gap: 12px;
       max-width: 600px;
       margin: 0 auto;
-    }
-
-    .container > * {
-      flex: 0 0 auto;
     }
 
     /* =========================
@@ -88,6 +83,9 @@
       transform: translateX(-100%);
       transition: transform 0.3s;
       z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     #sidebar.open {
@@ -95,7 +93,7 @@
     }
 
     /* =========================
-       🧱 FORM ELEMENTS
+       🧱 INPUTS
     ========================= */
     input, select, button {
       width: 100%;
@@ -112,7 +110,7 @@
     }
 
     /* =========================
-       🆕 MATCH VIEW
+       🎮 MATCH VIEW
     ========================= */
     #topBar {
       background: #111;
@@ -125,17 +123,15 @@
     }
 
     #gameCanvasWrapper {
-      display: flex;
-      justify-content: center;
+      width: 100%;
     }
 
     #gameCanvas {
       width: 100%;
-      max-width: 320px;
       aspect-ratio: 16 / 9;
       background: #0b5c2e;
       border-radius: 10px;
-      image-rendering: pixelated;
+      display: block;
     }
 
     #eventBar {
@@ -147,7 +143,7 @@
     }
 
     /* =========================
-       ⚽ MATCH UI (ALT bleibt)
+       ⚽ MATCH UI
     ========================= */
     #score {
       text-align: center;
@@ -157,7 +153,6 @@
 
     #match {
       text-align: center;
-      font-size: 16px;
     }
 
     #progressBar {
@@ -185,10 +180,6 @@
       font-size: 14px;
     }
 
-    #liveFeed p {
-      margin: 6px 0;
-    }
-
     /* =========================
        📢 ADS
     ========================= */
@@ -197,25 +188,9 @@
       height: 70px;
       background: #111;
       border-radius: 10px;
-      padding: 8px;
-      box-sizing: border-box;
       display: flex;
-      align-items: center;
       justify-content: center;
-      overflow: hidden;
-    }
-
-    #adTrack {
-      display: flex;
       align-items: center;
-      justify-content: center;
-    }
-
-    .adItem img {
-      width: 100px;
-      height: 50px;
-      object-fit: contain;
-      display: block;
     }
 
   </style>
@@ -224,11 +199,16 @@
 <body>
 
   <!-- =========================
-       🟡 SPLASH SCREEN
+       🟡 SPLASH
   ========================= -->
   <div id="splash">
-    <img id="logo" src="logos/logo_kickn.png" alt="Kickn Manager Logo">
+    <img id="logo" src="logos/logo_kickn.png">
     <input id="nameInput" placeholder="Dein Name">
+
+    <!-- 🆕 jetzt im Splash -->
+    <select id="leagueSelect"></select>
+    <select id="teamSelect"></select>
+
     <button id="startBtn">Spiel starten</button>
   </div>
 
@@ -237,41 +217,42 @@
   ========================= -->
   <div id="app">
 
-    <!-- HEADER -->
     <header id="header">
       <button id="burger">☰</button>
-      <span id="headerTitle">Kreisliga Manager</span>
+      <span>Kreisliga Manager</span>
     </header>
 
-    <!-- SIDEBAR -->
     <div id="sidebar">
       <button id="saveBtn">💾 Speichern</button>
       <button id="loadBtn">📂 Laden</button>
       <button id="resetBtn">🗑 Reset</button>
+
+      <hr>
+
+      <!-- 🆕 Menü Auswahl -->
+      <select id="leagueSelectMenu"></select>
+      <select id="teamSelectMenu"></select>
     </div>
 
-    <!-- CONTENT -->
     <div class="container">
 
-      <!-- 🆕 MATCH VIEW -->
+      <!-- 🎤 TOP BAR -->
       <div id="topBar">
         <div id="topTeams">- vs -</div>
         <div id="topScore">0 : 0</div>
         <div id="topMinute">0'</div>
       </div>
 
+      <!-- 🎮 CANVAS -->
       <div id="gameCanvasWrapper">
-        <canvas id="gameCanvas" width="320" height="180"></canvas>
+        <canvas id="gameCanvas"></canvas>
       </div>
 
+      <!-- 📢 EVENT -->
       <div id="eventBar">Willkommen im Spiel</div>
 
-      <!-- 🔽 BESTEHEND -->
-      <select id="leagueSelect"></select>
-      <select id="teamSelect"></select>
-
+      <!-- REST bleibt -->
       <div id="currentMatch"></div>
-
       <button id="mainButton">Spiel starten</button>
 
       <div id="score">0 : 0</div>
@@ -311,7 +292,6 @@
         </table>
       </div>
 
-      <!-- ADS -->
       <div id="adBanner">
         <div id="adTrack"></div>
       </div>
@@ -320,9 +300,6 @@
 
   </div>
 
-  <!-- =========================
-       🧠 MAIN SCRIPT
-  ========================= -->
   <script type="module" src="js/main.js"></script>
 
 </body>
