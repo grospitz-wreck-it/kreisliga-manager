@@ -1,5 +1,6 @@
+```js
 // =========================
-// 📅 SPIELPLAN GENERIEREN
+// 📅 SPIELPLAN GENERIEREN (FINAL FIXED)
 // =========================
 import { game } from "../core/state.js";
 
@@ -12,13 +13,12 @@ function generateSchedule(){
     return;
   }
 
-  // 👉 IMMER STRING-NAMEN!
+  // 👉 IMMER STRING-NAMEN (stabil für Engine!)
   let teams = league.teams.map(t =>
     typeof t === "string" ? t : t.name
   );
 
   const originalCount = teams.length;
-  const rounds = [];
 
   // 👉 BYE bei ungerader Anzahl
   if(teams.length % 2 !== 0){
@@ -29,20 +29,24 @@ function generateSchedule(){
   const totalRounds = teams.length - 1;
   const half = teams.length / 2;
 
+  const rounds = [];
+
   console.log(`📊 Teams: ${originalCount}`);
   console.log(`📅 Spieltage: ${(teams.length - 1) * 2}`);
 
   // =========================
-  // 🔁 HINRUNDE
+  // 🔁 HINRUNDE (Circle Method)
   // =========================
+  let rotation = [...teams]; // 👉 WICHTIG: eigene Kopie!
+
   for(let r = 0; r < totalRounds; r++){
 
     const round = [];
 
     for(let i = 0; i < half; i++){
 
-      const home = teams[i];
-      const away = teams[teams.length - 1 - i];
+      const home = rotation[i];
+      const away = rotation[rotation.length - 1 - i];
 
       if(home !== "BYE" && away !== "BYE"){
         round.push({
@@ -56,17 +60,17 @@ function generateSchedule(){
 
     rounds.push(round);
 
-    // 👉 Rotation (stabil!)
-    const fixed = teams[0];
-    const rest = teams.slice(1);
+    // 👉 Rotation (stabil & bugfrei)
+    const fixed = rotation[0];
+    const rest = rotation.slice(1);
 
     rest.unshift(rest.pop());
 
-    teams = [fixed, ...rest];
+    rotation = [fixed, ...rest];
   }
 
   // =========================
-  // 🔁 RÜCKRUNDE
+  // 🔁 RÜCKRUNDE (reverse)
   // =========================
   const returnRounds = rounds.map(round =>
     round.map(match => ({
@@ -90,7 +94,7 @@ function generateSchedule(){
 }
 
 // =========================
-// 🧪 VALIDIERUNG (FIXED)
+// 🧪 VALIDIERUNG (ROBUST)
 // =========================
 function validateSchedule(expectedTeamCount){
 
@@ -118,12 +122,14 @@ function validateSchedule(expectedTeamCount){
   const unique = new Set(teams);
 
   console.log("🔍 Teams im Spieltag:", teams.length);
-  console.log("🔍 Unique:", unique.size);
+  console.log("🔍 Unique Teams:", unique.size);
 
+  // ❌ doppelte Teams
   if(teams.length !== unique.size){
-    console.error("❌ DUPLIKATE!");
+    console.error("❌ DUPLIKATE IM SPIELTAG!");
   }
 
+  // ❌ falsche Matchanzahl
   const expectedMatches = Math.floor(expectedTeamCount / 2);
 
   if(firstRound.length !== expectedMatches){
@@ -159,7 +165,7 @@ function nextMatch(){
 }
 
 // =========================
-// 👉 WEITER
+// 👉 WEITER (STABIL)
 // =========================
 function advanceSchedule(){
 
@@ -191,3 +197,4 @@ export {
   nextMatch,
   advanceSchedule
 };
+```
