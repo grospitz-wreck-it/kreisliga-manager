@@ -15,7 +15,9 @@ import "./modules/scheduler.js";
 import "./modules/table.js";
 import { initLeagueSelect, populateTeamSelect } from "./modules/league.js";
 
-// 🆕 👉 Spieler-Module (bereinigt)
+// =========================
+// 🆕 SPIELER
+// =========================
 import { loadCSV } from "./modules/loader.js";
 import { extractTeams } from "./modules/teamGenerator.js";
 import { initPlayerPool } from "./modules/playerPool.js";
@@ -41,92 +43,102 @@ import { renderSchedule } from "./ui/ui.js";
 // =========================
 async function init(){
 
-console.log("🚀 Init läuft...");
+  console.log("🚀 Init läuft...");
 
-// 👉 Splash Elemente holen
-const splash = document.getElementById("splash");
-const app = document.getElementById("app");
-const startBtn = document.getElementById("startBtn");
+  const splash = document.getElementById("splash");
+  const app = document.getElementById("app");
+  const startBtn = document.getElementById("startBtn");
 
-// 👉 UI Events binden
-bindUI();
+  bindUI();
+  startAdEngine();
 
-// 👉 Ads starten
-startAdEngine();
+  const loaded = loadGame();
 
-// 👉 Save laden
-const loaded = loadGame();
+  // =========================
+  // 💾 SAVE EXISTIERT
+  // =========================
+  if(loaded){
 
-if(loaded){
-  console.log("💾 Save geladen");
+    console.log("💾 Save geladen");
 
-  game.phase = "idle";
+    game.phase = "idle";
 
-  // 👉 Splash direkt ausblenden
-  if(splash) splash.style.display = "none";
-  if(app) app.style.display = "block";
+    if(splash) splash.style.display = "none";
+    if(app) app.style.display = "block";
 
-  // 🔥 UI nach Load wieder aufbauen
-  initLeagueSelect();
+    // 👉 wichtig: nur wenn Daten existieren
+    if(game.data?.leagues){
+      initLeagueSelect();
+      populateTeamSelect();
+    }
 
-  if(game.league.teams?.length > 0){
-    populateTeamSelect();
     renderSchedule();
+
+  } else {
+
+    // =========================
+    // 🟡 SPLASH MODE
+    // =========================
+    game.phase = "setup";
+
+    if(splash) splash.style.display = "flex";
+    if(app) app.style.display = "none";
+
+    if(startBtn){
+      startBtn.onclick = () => {
+        console.log("🎮 Spiel gestartet");
+
+        splash.style.display = "none";
+        app.style.display = "block";
+
+        game.phase = "idle";
+      };
+    }
+
+    // =========================
+    // 📦 DATEN LADEN
+    // =========================
+    try {
+
+      console.log("⚽ Lade Spieler & Team-Struktur...");
+
+      const players = await loadCSV("./data/spieler.csv");
+      const teamsRaw = await loadCSV("./data/teams.csv");
+
+      const teams = extractTeams(teamsRaw);
+
+      // 👉 DEIN BESTEHENDES SYSTEM BEHALTEN
+      game.players = players;
+      game.teams = teams;
+
+      // 👉 MINIMALER FIX: leagues ergänzen (für dein league.js)
+      game.data = {
+        leagues: [
+          {
+            name: "Kreisliga",
+            teams: teams
+          }
+        ]
+      };
+
+      // 👉 jetzt ist alles da → UI initialisieren
+      initLeagueSelect();
+
+      initPlayerPool(players);
+
+      console.log(`✅ PlayerPool: ${players.length} Spieler`);
+      console.log(`✅ Teams: ${teams.length}`);
+
+    } catch (e) {
+      console.warn("❌ Spieler-Setup fehlgeschlagen:", e);
+    }
+
   }
 
-} else {
+  // 👉 UI immer am Ende
+  renderApp();
 
-  // 👉 Kein Save → Splash anzeigen
-  game.phase = "setup";
-
-  if(splash) splash.style.display = "flex";
-  if(app) app.style.display = "none";
-
-  // 👉 Start Button Logik
-  if(startBtn){
-    startBtn.addEventListener("click", () => {
-
-      console.log("🎮 Spiel gestartet");
-
-      splash.style.display = "none";
-      app.style.display = "block";
-
-      // 👉 optional: Phase wechseln
-      game.phase = "idle";
-    });
-  }
-
-  // =========================
-  // 🆕 👉 SPIELER + TEAM BASIS LADEN (Lazy vorbereitet)
-  // =========================
-  try {
-    console.log("⚽ Lade Spieler & Team-Struktur...");
-
-    const players = await loadCSV("./data/spieler.csv");
-    const teamsRaw = await loadCSV("./data/teams.csv");
-
-    const teams = extractTeams(teamsRaw);
-    initLeagueSelect();
-    // 👉 PlayerPool initialisieren (KEINE Zuweisung!)
-    initPlayerPool(players);
-
-    // 👉 in Game State speichern
-    game.players = players; // kompletter Pool
-    game.teams = teams;     // nur Struktur
-
-    console.log(`✅ PlayerPool: ${players.length} Spieler`);
-    console.log(`✅ Teams: ${teams.length}`);
-
-  } catch (e) {
-    console.warn("❌ Spieler-Setup fehlgeschlagen:", e);
-  }
-
-}
-
-// 👉 UI rendern (IMMER am Ende)
-renderApp();
-
-console.log("✅ Init fertig");
+  console.log("✅ Init fertig");
 }
 
 // =========================
