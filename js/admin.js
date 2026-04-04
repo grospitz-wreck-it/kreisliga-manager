@@ -4,77 +4,126 @@ import { SUPABASE_URL, SUPABASE_KEY } from "./config.js";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // =====================
-// CREATE CAMPAIGN
+// STATE
+// =====================
+let currentCampaigns = [];
+let editId = null;
+
+// =====================
+// CREATE / UPDATE
 // =====================
 window.createCampaign = async function(){
 
-  const name = document.getElementById("name").value;
-  const customer = document.getElementById("customer").value;
-  const budget = Number(document.getElementById("budget").value || 0);
-  const link = document.getElementById("link").value;
+const name = document.getElementById("name").value;
+const customer = document.getElementById("customer").value;
+const budget = Number(document.getElementById("budget").value || 0);
+const link = document.getElementById("link").value;
 
-  const startRaw = document.getElementById("startDate").value;
-  const endRaw = document.getElementById("endDate").value;
+const startRaw = document.getElementById("startDate").value;
+const endRaw = document.getElementById("endDate").value;
 
-  const start = startRaw ? new Date(startRaw).toISOString() : null;
-  const end = endRaw ? new Date(endRaw).toISOString() : null;
+const start = startRaw ? new Date(startRaw).toISOString() : null;
+const end = endRaw ? new Date(endRaw).toISOString() : null;
 
-  const type = document.getElementById("targetType").value;
+const format = document.getElementById("adFormat").value;
+const cpm = Number(document.getElementById("cpm").value || 0);
+const cpc = Number(document.getElementById("cpc").value || 0);
 
-  const donationPercent = Number(document.getElementById("donation").value || 0);
+const donationPercent = Number(document.getElementById("donation").value || 0);
 
-  const file = document.getElementById("image").files[0];
+const file = document.getElementById("image").files[0];
 
-  if(!file){
-    alert("Bitte Bild auswählen");
-    return;
-  }
+let imageUrl = null;
 
-  // =====================
-  // 🔥 UPLOAD IMAGE
-  // =====================
-  const fileName = Date.now() + "_" + file.name;
+// =====================
+// IMAGE UPLOAD (nur wenn neu)
+// =====================
+if(file){
 
-  const { error: uploadError } = await supabase
-    .storage
-    .from("ads")
-    .upload(fileName, file);
 
-  if(uploadError){
-    alert("Upload Fehler");
-    console.error(uploadError);
-    return;
-  }
+const fileName = Date.now() + "_" + file.name;
 
-  const { data } = supabase
-    .storage
-    .from("ads")
-    .getPublicUrl(fileName);
+const { error: uploadError } = await supabase
+  .storage
+  .from("ads")
+  .upload(fileName, file);
 
-  const imageUrl = data.publicUrl;
+if(uploadError){
+  alert("❌ Upload Fehler");
+  console.error(uploadError);
+  return;
+}
 
-  // =====================
-  // 💾 SAVE CAMPAIGN
-  // =====================
-  await supabase.from("campaigns").insert({
-    name,
-    customer,
-    budget,
-    link,
-    image: imageUrl,
-    start_date: start,
-    end_date: end,
-    donation_percent: donationPercent,
-    targeting: {
-      global: type === "global"
-    },
-    active: true
-  });
+const { data } = supabase
+  .storage
+  .from("ads")
+  .getPublicUrl(fileName);
 
-  alert("✅ Kampagne erstellt");
+imageUrl = data.publicUrl;
 
-  loadCampaigns();
-  clearForm();
+
+}
+
+// =====================
+// UPDATE
+// =====================
+if(editId){
+
+
+const updateData = {
+  name,
+  customer,
+  budget,
+  link,
+  cpm,
+  cpc,
+  ad_format: format,
+  start_date: start,
+  end_date: end,
+  donation_percent: donationPercent
+};
+
+if(imageUrl){
+  updateData.image = imageUrl;
+}
+
+await supabase
+  .from("campaigns")
+  .update(updateData)
+  .eq("id", editId);
+
+editId = null;
+alert("✏️ Kampagne aktualisiert");
+
+
+} else {
+
+
+// =====================
+// CREATE
+// =====================
+await supabase.from("campaigns").insert({
+  name,
+  customer,
+  budget,
+  link,
+  image: imageUrl,
+  cpm,
+  cpc,
+  ad_format: format,
+  start_date: start,
+  end_date: end,
+  donation_percent: donationPercent,
+  active: true
+});
+
+alert("✅ Kampagne erstellt");
+
+
+}
+
+clearForm();
+loadCampaigns();
 };
 
 // =====================
@@ -82,78 +131,183 @@ window.createCampaign = async function(){
 // =====================
 async function loadCampaigns(){
 
-  const { data, error } = await supabase
-    .from("campaigns")
-    .select("*")
-    .order("created_at", { ascending: false });
+const { data, error } = await supabase
+.from("campaigns")
+.select("*")
+.order("created_at", { ascending: false });
 
-  if(error){
-    console.error(error);
-    return;
-  }
-
-  render(data);
+if(error){
+console.error(error);
+return;
 }
+
+render(data || []);
+}
+
+// =====================
+// LOAD STATS
+// =====================
+async function loadStats(){
+
+const { data } = await supabase
+.from("ad_events")
+.select("*");
+
+const stats = {};
+
+(data || []).forEach(e => {
+
+
+if(!stats[e.campaign_id]){
+  stats[e.campaign_id] = { impressions:0, clicks:0 };
+}
+
+if(e.type === "impression") stats[e.campaign_id].impressions++;
+if(e.type === "click") stats[e.campaign_id].clicks++;
+
+
+});
+
+return stats;
+}
+
+// =====================
+// KPI UPDATE
+// =====================
+function updateKPIs(campaigns, stats){
+
+let totalImpr = 0;
+let totalClicks = 0;
+let totalRevenue = 0;
+
+campaigns.forEach(c => {
+
+
+const s = stats[c.id] || { impressions:0, clicks:0 };
+
+totalImpr += s.impressions;
+totalClicks += s.clicks;
+
+const revenue =
+  (s.impressions / 1000) * (c.cpm || 0) +
+  (s.clicks * (c.cpc || 0));
+
+totalRevenue += revenue;
+
+
+});
+
+document.getElementById("kpiImpressions").innerText = totalImpr;
+document.getElementById("kpiClicks").innerText = totalClicks;
+document.getElementById("kpiRevenue").innerText = totalRevenue.toFixed(2) + "€";
+}
+
+// =====================
+// REVENUE PER CAMPAIGN
+// =====================
+function calcRevenue(c, s){
+
+const impressions = s.impressions || 0;
+const clicks = s.clicks || 0;
+
+const cpmRevenue = (impressions / 1000) * (c.cpm || 0);
+const cpcRevenue = clicks * (c.cpc || 0);
+
+return (cpmRevenue + cpcRevenue).toFixed(2);
+}
+
+// =====================
+// EDIT
+// =====================
+window.editCampaign = function(id){
+
+const c = currentCampaigns.find(x => x.id === id);
+if(!c) return;
+
+editId = id;
+
+document.getElementById("name").value = c.name || "";
+document.getElementById("customer").value = c.customer || "";
+document.getElementById("budget").value = c.budget || 0;
+document.getElementById("link").value = c.link || "";
+
+document.getElementById("cpm").value = c.cpm || 0;
+document.getElementById("cpc").value = c.cpc || 0;
+document.getElementById("adFormat").value = c.ad_format || "banner";
+
+window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
 // =====================
 // DELETE
 // =====================
 window.deleteCampaign = async function(id){
 
-  await supabase
-    .from("campaigns")
-    .delete()
-    .eq("id", id);
+await supabase
+.from("campaigns")
+.delete()
+.eq("id", id);
 
-  loadCampaigns();
+loadCampaigns();
 };
 
 // =====================
 // RENDER
 // =====================
-function render(campaigns){
+async function render(campaigns){
 
-  const container = document.getElementById("list");
+currentCampaigns = campaigns;
 
-  if(!campaigns.length){
-    container.innerHTML = "<p>Keine Kampagnen</p>";
-    return;
-  }
+const stats = await loadStats();
+updateKPIs(campaigns, stats);
 
-  container.innerHTML = "";
+const container = document.getElementById("list");
+container.innerHTML = "";
 
-  campaigns.forEach(c => {
+campaigns.forEach(c => {
 
-    const div = document.createElement("div");
-    div.className = "adRow";
 
-    div.innerHTML = `
-      <div class="adLeft">
-        <img src="${c.image}">
-        <div>
-          <strong>${c.customer || "-"}</strong><br>
-          ${c.name || ""}<br>
-          Budget: ${c.budget}€
-        </div>
-      </div>
+const s = stats[c.id] || { impressions:0, clicks:0 };
+const revenue = calcRevenue(c, s);
 
-      <button class="danger" onclick="deleteCampaign('${c.id}')">
-        🗑️
-      </button>
-    `;
+const div = document.createElement("div");
+div.className = "adRow";
 
-    container.appendChild(div);
-  });
+div.innerHTML = `
+  <div class="adLeft">
+    <img src="${c.image}">
+    <div>
+      <strong>${c.customer || "-"}</strong><br>
+      ${c.name || ""}<br>
+      📦 ${c.ad_format || "banner"}<br>
+      📊 ${s.impressions} Impr / ${s.clicks} Klicks<br>
+      💰 ${revenue} €
+    </div>
+  </div>
+
+  <div>
+    <button onclick="editCampaign('${c.id}')">✏️</button>
+    <button class="danger" onclick="deleteCampaign('${c.id}')">🗑️</button>
+  </div>
+`;
+
+container.appendChild(div);
+
+});
 }
 
 // =====================
 // RESET FORM
 // =====================
 function clearForm(){
-  ["name","customer","budget","link","startDate","endDate"]
-    .forEach(id => document.getElementById(id).value = "");
 
-  document.getElementById("image").value = "";
+["name","customer","budget","link","startDate","endDate","cpm","cpc"]
+.forEach(id => {
+const el = document.getElementById(id);
+if(el) el.value = "";
+});
+
+document.getElementById("image").value = "";
 }
 
 // =====================
