@@ -2,6 +2,8 @@
 // 📢 ADS ENGINE (CLEAN)
 // =========================
 alert("renderAds läuft");
+const ads = getMatchingAds();
+alert("Ads: " + ads.length);
 import { game } from "../core/state.js";
 
 const KEY = "ad_v2";
