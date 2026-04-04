@@ -8,6 +8,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // =====================
 let currentCampaigns = [];
 let editId = null;
+let chartInstance = null;
 
 // =====================
 // HELPER
@@ -39,8 +40,6 @@ const end = endRaw ? new Date(endRaw).toISOString() : null;
 const format = document.getElementById("adFormat").value;
 const cpm = Number(document.getElementById("cpm").value || 0);
 const cpc = Number(document.getElementById("cpc").value || 0);
-
-const donationPercent = Number(document.getElementById("donation")?.value || 0);
 
 const file = document.getElementById("image").files[0];
 
@@ -86,8 +85,7 @@ if(editId){
     cpc,
     ad_format: format,
     start_date: start,
-    end_date: end,
-    donation_percent: donationPercent
+    end_date: end
   };
 
   if(imageUrl) updateData.image = imageUrl;
@@ -121,7 +119,6 @@ if(editId){
       ad_format: format,
       start_date: start,
       end_date: end,
-      donation_percent: donationPercent,
       active: true
     });
 
@@ -163,7 +160,7 @@ render(data || []);
 }
 
 // =====================
-// LOAD STATS
+// LOAD STATS + EVENTS
 // =====================
 async function loadStats(){
 
@@ -242,7 +239,6 @@ campaigns.forEach(c => {
 
 });
 
-// Forecast
 const daily = totalRevenue / 30;
 
 document.getElementById("forecastMonth").innerText =
@@ -251,7 +247,6 @@ document.getElementById("forecastMonth").innerText =
 document.getElementById("forecastYear").innerText =
   (daily * 365).toFixed(2) + "€";
 
-// Breakdown
 const container = document.getElementById("revenueBreakdown");
 if(!container) return;
 
@@ -274,17 +269,58 @@ Object.entries(byFormat).forEach(([type, value]) => {
 }
 
 // =====================
-// REVENUE PER CAMPAIGN
+// CHART
 // =====================
-function calcRevenue(c, s){
+function buildRevenueChart(events, campaigns){
 
-const impressions = s.impressions || 0;
-const clicks = s.clicks || 0;
+const ctx = document.getElementById("revenueChart");
+if(!ctx) return;
 
-return (
-  (impressions / 1000) * (c.cpm || 0) +
-  (clicks * (c.cpc || 0))
-).toFixed(2);
+const daysMap = {};
+
+events.forEach(e => {
+
+  const date = new Date(e.created_at).toISOString().split("T")[0];
+
+  if(!daysMap[date]) daysMap[date] = 0;
+
+  const campaign = campaigns.find(c => c.id === e.campaign_id);
+  if(!campaign) return;
+
+  if(e.type === "impression"){
+    daysMap[date] += (campaign.cpm || 0) / 1000;
+  }
+
+  if(e.type === "click"){
+    daysMap[date] += (campaign.cpc || 0);
+  }
+
+});
+
+const labels = Object.keys(daysMap).slice(-14);
+const values = labels.map(d => daysMap[d]);
+
+if(chartInstance){
+  chartInstance.destroy();
+}
+
+chartInstance = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels,
+    datasets: [{
+      label: "Revenue €",
+      data: values,
+      tension: 0.3
+    }]
+  },
+  options: {
+    responsive:true,
+    plugins:{
+      legend:{display:false}
+    }
+  }
+});
 }
 
 // =====================
@@ -338,11 +374,14 @@ async function render(campaigns){
 
 currentCampaigns = campaigns;
 
-const stats = await loadStats();
+const { stats, events } = await loadStats();
 
 updateKPIs(campaigns, stats);
 updateForecast(campaigns, stats);
-buildRevenueChart(events, campaigns);
+
+if(events && events.length){
+  buildRevenueChart(events, campaigns);
+}
 
 const container = document.getElementById("list");
 container.innerHTML = "";
@@ -350,7 +389,10 @@ container.innerHTML = "";
 campaigns.forEach(c => {
 
 const s = stats[c.id] || { impressions:0, clicks:0 };
-const revenue = calcRevenue(c, s);
+
+const revenue =
+  (s.impressions / 1000) * (c.cpm || 0) +
+  (s.clicks * (c.cpc || 0));
 
 const div = document.createElement("div");
 div.className = "adRow";
@@ -363,7 +405,7 @@ div.innerHTML = `
       ${c.name || ""}<br>
       📦 ${c.ad_format || "banner"}<br>
       📊 ${s.impressions} / ${s.clicks}<br>
-      💰 ${revenue} €
+      💰 ${revenue.toFixed(2)} €
     </div>
   </div>
 
@@ -399,64 +441,3 @@ window.onload = () => {
   updateButton();
   loadCampaigns();
 };
-let chartInstance = null;
-
-function buildRevenueChart(events, campaigns){
-
-const ctx = document.getElementById("revenueChart");
-if(!ctx) return;
-
-// =====================
-// DATA GROUPING
-// =====================
-const daysMap = {};
-
-events.forEach(e => {
-
-  const date = new Date(e.created_at).toISOString().split("T")[0];
-
-  if(!daysMap[date]) daysMap[date] = 0;
-
-  const campaign = campaigns.find(c => c.id === e.campaign_id);
-  if(!campaign) return;
-
-  if(e.type === "impression"){
-    daysMap[date] += (campaign.cpm || 0) / 1000;
-  }
-
-  if(e.type === "click"){
-    daysMap[date] += (campaign.cpc || 0);
-  }
-
-});
-
-// last 14 days
-const labels = Object.keys(daysMap).slice(-14);
-const values = labels.map(d => daysMap[d]);
-
-// destroy old chart
-if(chartInstance){
-  chartInstance.destroy();
-}
-
-// =====================
-// CHART
-// =====================
-chartInstance = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels,
-    datasets: [{
-      label: "Revenue €",
-      data: values,
-      tension: 0.3
-    }]
-  },
-  options: {
-    responsive:true,
-    plugins:{
-      legend:{display:false}
-    }
-  }
-});
-}
