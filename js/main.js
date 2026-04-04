@@ -12,7 +12,7 @@ import "./core/eventStore.js";
 // =========================
 import { startAdEngine } from "./modules/ads.js";
 import { generateSchedule } from "./modules/scheduler.js";
-import "./modules/table.js";
+import { initTable } from "./modules/table.js";
 import { initLeagueSelect } from "./modules/league.js";
 
 // =========================
