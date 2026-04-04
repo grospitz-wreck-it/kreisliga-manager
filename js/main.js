@@ -103,15 +103,18 @@ async function init(){
     if(splash) splash.style.display = "none";
     if(app) app.style.display = "block";
 
-    initLeagueSelect();
+  initLeagueSelect();
 
-    // 👉 Spielplan absichern
-    if(!game.league.schedule || game.league.schedule.length === 0){
-      console.warn("⚠️ Kein Spielplan im Save → neu generieren");
-      generateSchedule();
-    }
+// 🔥 WICHTIG: erst sicherstellen, dass Teams final sind
+initTable();
 
-    renderSchedule();
+// 👉 dann Schedule
+if(!game.league.schedule || game.league.schedule.length === 0){
+  console.warn("⚠️ Kein Spielplan im Save → neu generieren");
+  generateSchedule();
+}
+
+renderSchedule();
   }
 
   // =========================
