@@ -69,12 +69,16 @@ let adIndex = 0;
 // =========================
 function renderAds(){
 
+  // 🔍 DEBUG (kannst du später wieder rausnehmen)
+  alert("renderAds läuft");
+
+  const ads = getMatchingAds();
+  alert("Ads: " + ads.length);
+
   const el = document.getElementById("adTrack");
   if(!el) return;
 
-  const ads = getMatchingAds();
-
-  // ❌ keine Ads
+  // ❌ keine Ads vorhanden
   if(!ads.length){
     el.innerHTML = `<div class="leaderboardAd">Keine Werbung</div>`;
     return;
@@ -88,13 +92,13 @@ function renderAds(){
   el.innerHTML = `<div class="leaderboardAd"></div>`;
   const wrapper = el.querySelector(".leaderboardAd");
 
-  // 👉 Image sauber erstellen (iOS safe)
+  // 👉 Bild erstellen (iOS stabil!)
   const img = document.createElement("img");
   img.src = ad.image;
   img.alt = "Ad";
-  img.loading = "eager"; // 🔥 wichtig für iPhone
+  img.loading = "eager";
 
-  // 👉 optional klickbar
+  // 👉 falls klickbar
   if(ad.link){
     const a = document.createElement("a");
     a.href = ad.link;
@@ -105,7 +109,6 @@ function renderAds(){
     wrapper.appendChild(img);
   }
 
-  // 👉 Debug (optional)
   console.log("📢 Ad gerendert:", ad.name || ad.id);
 }
 // =========================
