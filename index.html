@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
   <meta charset="UTF-8">
@@ -17,18 +16,29 @@
     ========================= */
     #splash {
       display: flex;
-      height: 100vh;
+      min-height: 100vh;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
       background: #111;
       color: white;
       padding: 20px;
+      text-align: center;
     }
 
-    #splash input, #splash button {
+    /* 👉 Einheitliche Breite */
+    #splash > * {
+      width: 100%;
       max-width: 300px;
+    }
+
+    /* 👉 Logo bewusst etwas kleiner */
+    #logo {
+      width: 80%;
+      max-width: 220px;
+      height: auto;
+      image-rendering: pixelated;
     }
 
     /* =========================
@@ -147,7 +157,7 @@
     }
 
     /* =========================
-       📢 ADS
+       📢 ADS (fix für Skalierung!)
     ========================= */
     #adBanner {
       width: 100%;
@@ -159,6 +169,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
     #adTrack {
@@ -169,13 +180,13 @@
     }
 
     .adItem img {
+      width: 100px;
       height: 50px;
-      max-width: 120px;
       object-fit: contain;
+      display: block;
     }
 
   </style>
-
 </head>
 
 <body>
@@ -184,12 +195,11 @@
        🟡 SPLASH SCREEN
   ========================= -->
 
-<div id="splash">
- <img id="logo" src="logos/logo_kickn.png" alt="Kickn Manager Logo">
-
-  <input id="nameInput" placeholder="Dein Name">
-  <button id="startBtn">Spiel starten</button>
-</div>
+  <div id="splash">
+    <img id="logo" src="logos/logo_kickn.png" alt="Kickn Manager Logo">
+    <input id="nameInput" placeholder="Dein Name">
+    <button id="startBtn">Spiel starten</button>
+  </div>
 
   <!-- =========================
        🔵 APP
@@ -197,72 +207,72 @@
 
   <div id="app">
 
-<!-- HEADER -->
-<header id="header">
-  <button id="burger">☰</button>
-  <span id="headerTitle">Kreisliga Manager</span>
-</header>
+    <!-- HEADER -->
+    <header id="header">
+      <button id="burger">☰</button>
+      <span id="headerTitle">Kreisliga Manager</span>
+    </header>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <button id="saveBtn">💾 Speichern</button>
-  <button id="loadBtn">📂 Laden</button>
-  <button id="resetBtn">🗑 Reset</button>
-</div>
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <button id="saveBtn">💾 Speichern</button>
+      <button id="loadBtn">📂 Laden</button>
+      <button id="resetBtn">🗑 Reset</button>
+    </div>
 
-<!-- CONTENT -->
-<div class="container">
+    <!-- CONTENT -->
+    <div class="container">
 
-  <select id="leagueSelect"></select>
-  <select id="teamSelect"></select>
+      <select id="leagueSelect"></select>
+      <select id="teamSelect"></select>
 
-  <div id="currentMatch"></div>
+      <div id="currentMatch"></div>
 
-  <button id="mainButton">Spiel starten</button>
+      <button id="mainButton">Spiel starten</button>
 
-  <div id="score">0 : 0</div>
-  <div id="match"></div>
+      <div id="score">0 : 0</div>
+      <div id="match"></div>
 
-  <div id="progressBar">
-    <div id="progressFill"></div>
-  </div>
+      <div id="progressBar">
+        <div id="progressFill"></div>
+      </div>
 
-  <div>
-    <label><b>🎯 Taktik anpassen</b></label>
-    <select id="tacticSelect">
-      <option value="balanced">Ausgeglichen</option>
-      <option value="offensive">Offensiv</option>
-      <option value="defensive">Defensiv</option>
-      <option value="pressing">Pressing</option>
-      <option value="counter">Konter</option>
-    </select>
-  </div>
+      <div>
+        <label><b>🎯 Taktik anpassen</b></label>
+        <select id="tacticSelect">
+          <option value="balanced">Ausgeglichen</option>
+          <option value="offensive">Offensiv</option>
+          <option value="defensive">Defensiv</option>
+          <option value="pressing">Pressing</option>
+          <option value="counter">Konter</option>
+        </select>
+      </div>
 
-  <div id="schedule"></div>
-  <div id="liveFeed"></div>
+      <div id="schedule"></div>
+      <div id="liveFeed"></div>
 
-  <div id="table">
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Team</th>
-          <th>Sp</th>
-          <th>Tore</th>
-          <th>Diff</th>
-          <th>Punkte</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
+      <div id="table">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Team</th>
+              <th>Sp</th>
+              <th>Tore</th>
+              <th>Diff</th>
+              <th>Punkte</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
 
-  <!-- ADS -->
-  <div id="adBanner">
-    <div id="adTrack"></div>
-  </div>
+      <!-- ADS -->
+      <div id="adBanner">
+        <div id="adTrack"></div>
+      </div>
 
-</div>
+    </div>
 
   </div>
 
