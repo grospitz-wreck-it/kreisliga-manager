@@ -99,20 +99,53 @@ function populateTeamSelect(){
 
   const selects = [splashSelect, menuSelect].filter(Boolean);
 
+  // ✅ SAFETY: verhindert Crash
+  if (!game.league || !game.league.current || !game.league.current.teams) {
+    console.warn("⚠️ keine Teams für aktuelle Liga");
+    return;
+  }
+
+  const teams = game.league.current.teams;
+
   selects.forEach(select => {
+
+    // 🧹 reset
     select.innerHTML = "";
 
-    game.league.current.teams.forEach((team, i) => {
+    // 🧠 verhindert doppelte Listener
+    select.onchange = null;
+
+    // 👥 Teams einfügen
+    teams.forEach((team, i) => {
       const option = document.createElement("option");
       option.value = i;
       option.textContent = team.name;
       select.appendChild(option);
     });
 
-    select.addEventListener("change", e => {
-      game.team = game.league.current.teams[e.target.value];
-    });
+    // 🔁 Change Event
+    select.onchange = (e) => {
+      const index = e.target.value;
+
+      game.team = teams[index];
+
+      // 🔄 Sync Splash ↔ Menü
+      selects.forEach(s => {
+        if(s !== select) s.value = index;
+      });
+
+      console.log("✅ Team gewählt:", game.team.name);
+    };
+
   });
+
+  // 👉 Initial setzen (falls noch kein Team)
+  if (!game.team && teams.length > 0) {
+    game.team = teams[0];
+
+    // UI synchronisieren
+    selects.forEach(s => s.value = 0);
+  }
 }
 
 // =========================
