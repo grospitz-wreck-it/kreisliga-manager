@@ -1,84 +1,64 @@
 // =========================
-// 🌍 GLOBAL GAME STATE (MODULE)
+// 🌍 GLOBAL GAME STATE
 // =========================
-
 const game = {
 
-// =========================
-// 👤 SPIELER
-// =========================
-player: {
-name: ""
-},
+  player: {
+    name: ""
+  },
 
-// =========================
-// 🏆 LIGA
-// =========================
-league: {
-key: null,
-teams: [],
-schedule: [],
-currentRound: 0,
-currentMatchIndex: 0,
-table: []
-},
+  // =========================
+  // 🏆 LIGA (NEU STRUKTURIERT)
+  // =========================
+  league: {
+    current: null,            // ✅ aktive Liga
+    schedule: [],
+    currentRound: 0,
+    currentMatchIndex: 0
+  },
 
-// =========================
-// 👕 DEIN TEAM
-// =========================
-team: {
-selected: null
-},
+  // =========================
+  // 📚 ALLE DATEN
+  // =========================
+  data: {
+    leagues: []
+  },
 
-// =========================
-// ⚽ MATCH
-// =========================
-match: {
-current: null,
-live: {
-minute: 0,
-running: false,
-score: { home: 0, away: 0 },
-events: []
-}
-},
+  team: {
+    selected: null
+  },
 
-// =========================
-// 📡 EVENTS
-// =========================
-events: {
-history: [],
-last: null
-},
+  match: {
+    current: null,
+    live: {
+      minute: 0,
+      running: false,
+      score: { home: 0, away: 0 },
+      events: []
+    }
+  },
 
-// =========================
-// ⚙️ SETTINGS
-// =========================
-settings: {
-sound: true,
-notifications: true
-},
+  events: {
+    history: [],
+    last: null
+  },
 
-// =========================
-// 🌐 ONLINE (PREP)
-// =========================
-online: {
-leagueId: null,
-playerId: null,
-connected: false
-},
+  settings: {
+    sound: true,
+    notifications: true
+  },
 
-// =========================
-// 🏁 SPIELPHASE
-// =========================
-phase: "setup",
+  online: {
+    leagueId: null,
+    playerId: null,
+    connected: false
+  },
 
-// =========================
-// 📅 SAISON
-// =========================
-season: {
-year: 1
-}
+  phase: "setup",
+
+  season: {
+    year: 1
+  }
 };
 
 // =========================
