@@ -109,3 +109,18 @@ button{
   height:50px;
   border-radius:8px;
 }
+canvas{
+  width:100%;
+  max-height:300px;
+}
+
+.bar{
+  margin-bottom:10px;
+}
+
+.barFill{
+  height:8px;
+  background:#22c55e;
+  border-radius:10px;
+  transition:0.4s;
+}
