@@ -36,25 +36,25 @@ function bindUI(){
   // 👕 TEAM WÄHLEN
   // =========================
   if(teamSelect){
-    teamSelect.addEventListener("change", (e) => {
+    teamSelect.onchange = (e) => {
       selectTeam(e.target.value);
-    });
+    };
   }
 
   // =========================
   // ▶️ MAIN BUTTON
   // =========================
   if(button){
-    button.addEventListener("click", () => {
+    button.onclick = () => {
       handleMainAction();
-    });
+    };
   }
 
   // =========================
   // 🧠 TAKTIK
   // =========================
   if(tacticSelect){
-    tacticSelect.addEventListener("change", (e) => {
+    tacticSelect.onchange = (e) => {
 
       const team = getSelectedTeam();
 
@@ -66,77 +66,103 @@ function bindUI(){
       team.tactic = e.target.value;
 
       console.log("🧠 Neue Taktik:", team.tactic);
-    });
+    };
   }
 
   // =========================
   // 🟡 SPLASH START
   // =========================
   if(startBtn){
-    startBtn.addEventListener("click", () => {
+    startBtn.onclick = () => {
 
       const input = document.getElementById("nameInput");
       if(!input) return;
 
-      setPlayerName(input.value);
+      const success = setPlayerName(input.value);
+
+      if(!success){
+        alert("Bitte gültigen Namen eingeben");
+        return;
+      }
+
+      console.log("🎮 Spiel gestartet");
 
       game.phase = "idle";
 
-      renderApp();
+      const splash = document.getElementById("splash");
+      const app = document.getElementById("app");
 
-      // ❌ KEIN initLeagueSelect hier!
-    });
+      if(splash) splash.style.display = "none";
+      if(app) app.style.display = "block";
+
+      renderApp();
+    };
   }
 
   // =========================
-  // 🍔 BURGER
+  // 🍔 BURGER MENU
   // =========================
   if(burger){
-    burger.addEventListener("click", () => {
+    burger.onclick = () => {
       const sidebar = document.getElementById("sidebar");
       if(sidebar){
         sidebar.classList.toggle("open");
       }
-    });
+    };
   }
 
   // =========================
   // 💾 SAVE
   // =========================
   if(saveBtn){
-    saveBtn.addEventListener("click", () => {
+    saveBtn.onclick = () => {
       saveGame();
-    });
+      console.log("💾 Spiel gespeichert");
+    };
   }
 
   // =========================
   // 📂 LOAD
   // =========================
   if(loadBtn){
-    loadBtn.addEventListener("click", () => {
+    loadBtn.onclick = () => {
 
       const loaded = loadGame();
 
-      if(loaded){
-        game.phase = "idle";
-
-        renderApp();
-
-        // 👉 sauber neu aufbauen
-        initLeagueSelect();
-        renderSchedule();
+      if(!loaded){
+        alert("Kein Save gefunden");
+        return;
       }
-    });
+
+      console.log("📂 Save geladen");
+
+      game.phase = "idle";
+
+      const splash = document.getElementById("splash");
+      const app = document.getElementById("app");
+
+      if(splash) splash.style.display = "none";
+      if(app) app.style.display = "block";
+
+      renderApp();
+
+      // 👉 wichtig: UI neu aufbauen
+      initLeagueSelect();
+      renderSchedule();
+    };
   }
 
   // =========================
   // 🗑 RESET
   // =========================
   if(resetBtn){
-    resetBtn.addEventListener("click", () => {
-      clearSave();
-      location.reload();
-    });
+    resetBtn.onclick = () => {
+
+      if(confirm("Spielstand wirklich löschen?")){
+        clearSave();
+        location.reload();
+      }
+    };
   }
 }
 
