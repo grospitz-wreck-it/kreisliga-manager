@@ -11,11 +11,18 @@ export function extractLeagues(rows) {
     const leagueName = row.Liga;
     if (!leagueName) return;
 
-    // 👉 alle Team-Spalten dynamisch sammeln
-    const teams = Object.keys(row)
-      .filter(key => key.startsWith("Team"))
-      .map(key => row[key])
-      .filter(name => name && name.trim() !== "");
+    const teams = [];
+
+    for (let i = 1; i <= 16; i++) {
+      const key = "Team" + i;
+      const name = row[key];
+
+      if (name && name.trim() !== "") {
+        teams.push({
+          name: name.trim()
+        });
+      }
+    }
 
     leagues.push({
       name: leagueName,
