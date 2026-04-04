@@ -19,7 +19,7 @@ import { initLeagueSelect, populateTeamSelect } from "./modules/league.js";
 // 🆕 SPIELER
 // =========================
 import { loadCSV } from "./modules/loader.js";
-import { extractTeams } from "./modules/teamGenerator.js";
+import { extractLeagues } from "./modules/teamGenerator.js";
 import { initPlayerPool } from "./modules/playerPool.js";
 
 // =========================
