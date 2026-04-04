@@ -1,11 +1,40 @@
-import { getSelectedTeam } from "./league.js";
+```js
+// =========================
+// 📊 TABLE SYSTEM (FINAL FIX)
+// =========================
 import { game } from "../core/state.js";
 
 // =========================
-// 🧠 HELPERS (NEU)
+// 🧠 HELPERS
 // =========================
 function getTeamName(team){
   return typeof team === "string" ? team : team?.name;
+}
+
+// 👉 sorgt für stabile Tabellenwerte
+function normalizeTeam(team){
+  const name = getTeamName(team);
+
+  return {
+    name,
+    played: team.played ?? 0,
+    goalsFor: team.goalsFor ?? 0,
+    goalsAgainst: team.goalsAgainst ?? 0,
+    points: team.points ?? 0
+  };
+}
+
+// =========================
+// 🧱 INIT TABLE (NEU)
+// =========================
+function initTable(){
+
+  const teams = game.league?.current?.teams;
+  if(!teams) return;
+
+  game.league.table = teams.map(t => normalizeTeam(t));
+
+  console.log("📊 Tabelle initialisiert");
 }
 
 // =========================
@@ -30,17 +59,16 @@ function sortTable(table){
 }
 
 // =========================
-// 📈 LIVE TABELLE (FIXED)
+// 📈 LIVE TABLE (ROBUST)
 // =========================
 function getLiveTable(){
 
-  const teams = game.league?.current?.teams;
-  if(!teams) return [];
+  if(!game.league.table || game.league.table.length === 0){
+    initTable();
+  }
 
-  // 👉 saubere Kopie (wichtig!)
-  const table = teams.map(team => ({
-    ...(typeof team === "string" ? { name: team } : team)
-  }));
+  // 👉 WICHTIG: tiefe Kopie!
+  const table = game.league.table.map(t => ({ ...t }));
 
   const match = game.match.current;
   if(!match) return table;
@@ -56,14 +84,14 @@ function getLiveTable(){
   const h = game.match.live.score.home;
   const a = game.match.live.score.away;
 
-  // Tore simulieren
+  // Tore
   home.goalsFor += h;
   home.goalsAgainst += a;
 
   away.goalsFor += a;
   away.goalsAgainst += h;
 
-  // Punkte simulieren
+  // Punkte
   if(h > a){
     home.points += 3;
   }
@@ -79,20 +107,17 @@ function getLiveTable(){
 }
 
 // =========================
-// 🧾 TABELLE RENDERN (FIXED)
+// 🧾 RENDER
 // =========================
 function renderTable(customTable){
 
-  const baseTable =
-    customTable ||
-    game.league?.current?.teams ||
-    [];
+  if(!game.league.table || game.league.table.length === 0){
+    initTable();
+  }
 
-  const normalized = baseTable.map(team => ({
-    ...(typeof team === "string" ? { name: team } : team)
-  }));
+  const tableData = customTable || game.league.table;
 
-  const sorted = sortTable([...normalized]);
+  const sorted = sortTable([...tableData]);
 
   const tbody = document.getElementById("tableBody");
   if(!tbody) return;
@@ -119,7 +144,7 @@ function renderTable(customTable){
       tr.style.background = "#f7c5c5";
     }
 
-    // ⭐ aktuelles Spiel (FIXED)
+    // ⭐ aktuelles Spiel
     if(team.name === homeName || team.name === awayName){
       tr.style.fontWeight = "bold";
     }
@@ -127,10 +152,10 @@ function renderTable(customTable){
     tr.innerHTML = `
       <td>${index + 1}</td>
       <td>${team.name}</td>
-      <td>${team.played ?? 0}</td>
-      <td>${team.goalsFor ?? 0}:${team.goalsAgainst ?? 0}</td>
+      <td>${team.played}</td>
+      <td>${team.goalsFor}:${team.goalsAgainst}</td>
       <td>${diff}</td>
-      <td>${team.points ?? 0}</td>
+      <td>${team.points}</td>
     `;
 
     tbody.appendChild(tr);
@@ -149,8 +174,10 @@ function renderLiveTable(){
 // 📦 EXPORTS
 // =========================
 export {
+  initTable,
   renderTable,
   renderLiveTable,
   getLiveTable,
   sortTable
 };
+```
