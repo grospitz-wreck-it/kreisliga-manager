@@ -172,8 +172,9 @@ const { data } = await supabase
 .select("*");
 
 const stats = {};
+const events = data || [];
 
-(data || []).forEach(e => {
+events.forEach(e => {
 
 if(!stats[e.campaign_id]){
   stats[e.campaign_id] = { impressions:0, clicks:0 };
@@ -184,7 +185,7 @@ if(e.type === "click") stats[e.campaign_id].clicks++;
 
 });
 
-return stats;
+return { stats, events };
 }
 
 // =====================
