@@ -11,7 +11,7 @@ import "./core/eventStore.js";
 // 🔧 MODULES
 // =========================
 import { startAdEngine } from "./modules/ads.js";
-import "./modules/scheduler.js";
+import { generateSchedule } from "./modules/scheduler.js"; // 🔥 WICHTIG
 import "./modules/table.js";
 import { initLeagueSelect } from "./modules/league.js";
 
@@ -47,13 +47,12 @@ async function init(){
 
   const splash = document.getElementById("splash");
   const app = document.getElementById("app");
-  const startBtn = document.getElementById("startBtn");
 
   bindUI();
   startAdEngine();
 
   // =========================
-  // 📦 DATEN LADEN (IMMER!)
+  // 📦 DATEN LADEN
   // =========================
   try {
 
@@ -69,10 +68,12 @@ async function init(){
     game.players = players;
     game.data = { leagues };
 
-    // 👉 Default Liga setzen
+    // 👉 Default Liga + SPIELPLAN
     if (leagues.length > 0) {
       game.league = game.league || {};
       game.league.current = leagues[0];
+
+      generateSchedule(); // 🔥 CRITICAL FIX
     }
 
     console.log(`✅ Spieler: ${players.length}`);
@@ -104,7 +105,14 @@ async function init(){
     if(splash) splash.style.display = "none";
     if(app) app.style.display = "block";
 
-    initLeagueSelect(); // 👉 kümmert sich auch um Teams
+    // 👉 UI + Dropdowns
+    initLeagueSelect();
+
+    // 👉 FALLBACK: falls Save keinen Plan hat
+    if(!game.league?.schedule || game.league.schedule.length === 0){
+      console.warn("⚠️ Kein Spielplan im Save → neu generieren");
+      generateSchedule();
+    }
 
     renderSchedule();
   }
@@ -121,37 +129,19 @@ async function init(){
     if(splash) splash.style.display = "flex";
     if(app) app.style.display = "none";
 
-    initLeagueSelect(); // 👉 reicht komplett
+    initLeagueSelect();
 
-    // 👉 Default Team setzen (WICHTIG)
+    // 👉 Default Team setzen
     if (
       game.league?.current &&
       game.league.current.teams?.length
     ) {
       game.team = game.team || {};
-      game.team.selected = game.league.current.teams[0].name;
-    }
 
-    if(startBtn){
-      startBtn.onclick = () => {
+      const first = game.league.current.teams[0];
 
-        if(!game.league?.current){
-          alert("Bitte Liga wählen");
-          return;
-        }
-
-        if(!game.team?.selected){
-          alert("Bitte Team wählen");
-          return;
-        }
-
-        console.log("🎮 Spiel gestartet");
-
-        splash.style.display = "none";
-        app.style.display = "block";
-
-        game.phase = "idle";
-      };
+      game.team.selected =
+        typeof first === "string" ? first : first.name;
     }
   }
 
