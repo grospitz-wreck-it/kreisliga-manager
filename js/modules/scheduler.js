@@ -1,4 +1,4 @@
-```js
+
 // =========================
 // 📅 SPIELPLAN GENERIEREN (FINAL FIXED)
 // =========================
@@ -197,4 +197,4 @@ export {
   nextMatch,
   advanceSchedule
 };
-```
+
