@@ -41,6 +41,9 @@ import { renderSchedule } from "./ui/ui.js";
 // =========================
 // 🚀 INIT
 // =========================
+// =========================
+// 🚀 INIT
+// =========================
 async function init(){
 
   console.log("🚀 Init läuft...");
@@ -66,7 +69,6 @@ async function init(){
     if(splash) splash.style.display = "none";
     if(app) app.style.display = "block";
 
-    // 👉 wichtig: nur wenn Daten existieren
     if(game.data?.leagues){
       initLeagueSelect();
       populateTeamSelect();
@@ -98,44 +100,48 @@ async function init(){
     // =========================
     // 📦 DATEN LADEN
     // =========================
-   try {
+    try {
 
-  console.log("⚽ Lade Spieler & Team-Struktur...");
+      console.log("⚽ Lade Spieler & Team-Struktur...");
 
-  const players = await loadCSV("./data/spieler.csv");
-  const leaguesRaw = await loadCSV("./data/ligen.csv");
+      const players = await loadCSV("./data/spieler.csv");
+      const leaguesRaw = await loadCSV("./data/ligen.csv");
 
-  // 👉 NEU: echte Ligen extrahieren (passt zu deiner CSV)
-  const leagues = extractLeagues(leaguesRaw);
+      const leagues = extractLeagues(leaguesRaw);
 
-  // 👉 PlayerPool wie gehabt
-  initPlayerPool(players);
+      initPlayerPool(players);
 
-  // 👉 Game State sauber setzen
-  game.players = players;
+      game.players = players;
 
-  game.data = {
-    leagues: leagues
-  };
+      game.data = {
+        leagues: leagues
+      };
 
-  // 👉 Default Liga setzen (wichtig für UI!)
-  if (leagues.length > 0) {
-    game.league = game.league || {};
-    game.league.current = leagues[0];
-  }
+      if (leagues.length > 0) {
+        game.league = game.league || {};
+        game.league.current = leagues[0];
+      }
 
-  // 👉 UI jetzt erst initialisieren
-  initLeagueSelect();
+      initLeagueSelect();
 
-  console.log(`✅ PlayerPool: ${players.length} Spieler`);
-  console.log(`✅ Ligen: ${leagues.length}`);
-  console.log(`✅ Teams gesamt: ${
-    leagues.reduce((sum, l) => sum + l.teams.length, 0)
-  }`);
+      console.log(`✅ PlayerPool: ${players.length} Spieler`);
+      console.log(`✅ Ligen: ${leagues.length}`);
+      console.log(`✅ Teams gesamt: ${
+        leagues.reduce((sum, l) => sum + l.teams.length, 0)
+      }`);
 
-} catch (e) {
-  console.warn("❌ Spieler-Setup fehlgeschlagen:", e);
-}
+    } catch (e) {
+      console.warn("❌ Spieler-Setup fehlgeschlagen:", e);
+    }
+
+  } // ✅ else geschlossen
+
+  // 👉 UI immer am Ende
+  renderApp();
+
+  console.log("✅ Init fertig");
+
+} // ✅ init geschlossen
 
 // =========================
 // ▶️ START
