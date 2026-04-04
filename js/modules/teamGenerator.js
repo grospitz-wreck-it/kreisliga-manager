@@ -1,27 +1,27 @@
+
 // =========================
-// 🏆 LEAGUES AUS CSV
+// 🏆 LEAGUES AUS CSV (FIX FÜR DEIN FORMAT)
 // =========================
 export function extractLeagues(rows) {
 
-  const leaguesMap = {};
+  const leagues = [];
 
   rows.forEach(row => {
 
-    // 👉 flexibel für verschiedene CSV Header
-    const leagueName = row.liga || row.league || row.Liga;
-    const teamName = row.team || row.Team;
+    const leagueName = row.Liga;
+    if (!leagueName) return;
 
-    if (!leagueName || !teamName) return;
+    // 👉 alle Team-Spalten dynamisch sammeln
+    const teams = Object.keys(row)
+      .filter(key => key.startsWith("Team"))
+      .map(key => row[key])
+      .filter(name => name && name.trim() !== "");
 
-    if (!leaguesMap[leagueName]) {
-      leaguesMap[leagueName] = {
-        name: leagueName,
-        teams: []
-      };
-    }
-
-    leaguesMap[leagueName].teams.push(teamName);
+    leagues.push({
+      name: leagueName,
+      teams: teams
+    });
   });
 
-  return Object.values(leaguesMap);
+  return leagues;
 }
