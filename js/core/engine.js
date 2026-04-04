@@ -7,6 +7,10 @@ import { game } from "../core/state.js";
 import { emit } from "./events.js";
 import { EVENTS } from "./events.constants.js";
 
+// 🆕 NEW
+import { triggerEvent, updateEvents, getActiveModifiers } from "./eventSystem.js";
+import { applyModifiers } from "./modifierEngine.js";
+
 // =========================
 // 🧠 HELPERS
 // =========================
@@ -47,7 +51,6 @@ console.warn("❌ Kein Spieltag gefunden");
 return;
 }
 
-// 👉 LIVE STATE RESET
 const live = game.match.live;
 live.minute = 0;
 live.running = true;
@@ -101,6 +104,9 @@ if(!live.running){
 
 live.minute++;
 
+// 🆕 EVENT SYSTEM UPDATE
+updateEvents();
+
 emit(EVENTS.STATE_CHANGED, {
   minute: live.minute
 });
@@ -151,7 +157,12 @@ function createChance(match, isHome){
 const team = isHome ? match.home : match.away;
 const opponent = isHome ? match.away : match.home;
 
-const strengthDiff = team.strength - opponent.strength;
+// 🆕 Modifier System
+const modifiers = getActiveModifiers();
+
+const strengthDiff =
+  applyModifiers(team.strength, modifiers)
+  - opponent.strength;
 
 const base = 0.5 + (strengthDiff * 0.015);
 const tacticBonus = getTacticBonus(team);
@@ -186,6 +197,9 @@ default: return 0;
 // =========================
 function goal(team, isHome){
 
+// 🆕 Event triggern
+triggerEvent("goal", { team });
+
 const live = game.match.live;
 
 if(isHome){
@@ -213,6 +227,9 @@ const team = isHome ? match.home : match.away;
 
 addEvent(`💥 Foul von ${team.name}`);
 
+// 🆕 Event System
+triggerEvent("foul", { team });
+
 if(Math.random() > 0.8){
 createPenalty(match, !isHome);
 }
@@ -226,6 +243,9 @@ function createPenalty(match, isHome){
 const team = isHome ? match.home : match.away;
 
 addEvent(`⚠️ Elfmeter für ${team.name}!`);
+
+// 🆕 Event System
+triggerEvent("penalty", { team });
 
 if(Math.random() < 0.75){
 goal(team, isHome);
@@ -241,7 +261,11 @@ addEvent(`❌ verschossen`);
 function createOffside(match){
 
 const team = Math.random() > 0.5 ? match.home : match.away;
+
 addEvent(`🚫 Abseits von ${team.name}`);
+
+// 🆕
+triggerEvent("offside", { team });
 }
 
 // =========================
