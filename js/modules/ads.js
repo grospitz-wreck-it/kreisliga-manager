@@ -92,7 +92,7 @@ function renderAds(){
   const img = document.createElement("img");
 
   // 🔥 FINAL FIX: absoluter Pfad
-  img.src = "https://via.placeholder.com/320x90?text=AD";
+  img.src = "https://upload.wikimedia.org/wikipedia/commons/3/3f/Placeholder_view_vector.svg";
 
   img.alt = "Ad";
   img.loading = "eager";
