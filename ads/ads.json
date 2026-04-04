@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "image": "https://grospitz-wreck-it.github.io/kreisliga-manager/ads/ad1.jpg",
+    "link": "https://example.com",
+    "start": null,
+    "end": null,
+    "targeting": {
+      "global": true,
+      "league": null,
+      "team": null
+    }
+  }
+]
