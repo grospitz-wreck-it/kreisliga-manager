@@ -50,7 +50,7 @@ const startBtn = document.getElementById("startBtn");
 
 // 👉 UI Events binden
 bindUI();
-initLeagueSelect();
+
 // 👉 Ads starten
 startAdEngine();
 
@@ -106,7 +106,7 @@ if(loaded){
     const teamsRaw = await loadCSV("./data/teams.csv");
 
     const teams = extractTeams(teamsRaw);
-
+    initLeagueSelect();
     // 👉 PlayerPool initialisieren (KEINE Zuweisung!)
     initPlayerPool(players);
 
