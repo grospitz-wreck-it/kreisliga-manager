@@ -397,3 +397,64 @@ window.onload = () => {
   updateButton();
   loadCampaigns();
 };
+let chartInstance = null;
+
+function buildRevenueChart(events, campaigns){
+
+const ctx = document.getElementById("revenueChart");
+if(!ctx) return;
+
+// =====================
+// DATA GROUPING
+// =====================
+const daysMap = {};
+
+events.forEach(e => {
+
+  const date = new Date(e.created_at).toISOString().split("T")[0];
+
+  if(!daysMap[date]) daysMap[date] = 0;
+
+  const campaign = campaigns.find(c => c.id === e.campaign_id);
+  if(!campaign) return;
+
+  if(e.type === "impression"){
+    daysMap[date] += (campaign.cpm || 0) / 1000;
+  }
+
+  if(e.type === "click"){
+    daysMap[date] += (campaign.cpc || 0);
+  }
+
+});
+
+// last 14 days
+const labels = Object.keys(daysMap).slice(-14);
+const values = labels.map(d => daysMap[d]);
+
+// destroy old chart
+if(chartInstance){
+  chartInstance.destroy();
+}
+
+// =====================
+// CHART
+// =====================
+chartInstance = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels,
+    datasets: [{
+      label: "Revenue €",
+      data: values,
+      tension: 0.3
+    }]
+  },
+  options: {
+    responsive:true,
+    plugins:{
+      legend:{display:false}
+    }
+  }
+});
+}
