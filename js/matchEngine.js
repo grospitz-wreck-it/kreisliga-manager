@@ -2,7 +2,7 @@
 // ⚽ MATCH ENGINE (MODULAR)
 // =========================
 
-import { game } from "../core/state.js";
+import { game } from "./core/state.js";
 import { emit } from "./events.js";
 import { EVENTS } from "./events.constants.js";
 
@@ -10,9 +10,9 @@ import {
   triggerEvent,
   updateEvents,
   getActiveModifiers
-} from "../engine/eventSystem.js";
+} from "./engine/eventSystem.js";
 
-import { applyModifiers } from "../engine/modifierEngine.js";
+import { applyModifiers } from "./engine/modifierEngine.js";
 
 // =========================
 // 🧠 HELPERS
@@ -23,21 +23,24 @@ function getTeamName(team){
 
 function getTeamFromTable(name){
   const table = game.league?.current?.table;
-  return table?.find(t => t.name === name) || null;
+  if(!table) return null;
+  return table.find(t => t.name === name) || null;
 }
 
 function isMyTeam(team){
-  return game.team.selected === getTeamName(team);
+  return game.team?.selected === getTeamName(team);
 }
 
 function isMyMatch(match){
-  return isMyTeam(match.home) || isMyTeam(match.away);
+  return isMyTeam(match?.home) || isMyTeam(match?.away);
 }
 
 // =========================
 // 🎮 INIT MATCH
 // =========================
 function initMatch(round){
+
+  if(!round || !game.match?.live) return false;
 
   const live = game.match.live;
 
@@ -49,7 +52,7 @@ function initMatch(round){
   let playerMatch = null;
 
   for(const match of round){
-    if(isMyMatch(match)){
+    if(match && isMyMatch(match)){
       playerMatch = match;
       break;
     }
@@ -76,6 +79,8 @@ function initMatch(round){
 // =========================
 function simulateOtherMatches(round){
 
+  if(!round) return;
+
   for(const match of round){
 
     if(!match || match._processed) continue;
@@ -93,11 +98,11 @@ function simulateOtherMatches(round){
 // =========================
 // 🔁 MATCH LOOP
 // =========================
-function runMatchLoop({ onTick, onEnd }){
+function runMatchLoop({ onTick, onEnd } = {}){
 
   const interval = setInterval(() => {
 
-    const live = game.match.live;
+    const live = game.match?.live;
 
     if(!live?.running){
       clearInterval(interval);
@@ -129,7 +134,7 @@ function runMatchLoop({ onTick, onEnd }){
 // =========================
 function simulateLiveEvent(){
 
-  const match = game.match.current;
+  const match = game.match?.current;
   if(!match) return;
 
   const rand = Math.random();
@@ -152,7 +157,7 @@ function createChance(match, isHome){
 
   if(!team || !opponent) return;
 
-  const modifiers = getActiveModifiers();
+  const modifiers = getActiveModifiers() || [];
 
   const strengthDiff =
     applyModifiers(team.strength || 50, modifiers)
@@ -176,9 +181,12 @@ function createChance(match, isHome){
 // =========================
 function goal(team, isHome){
 
+  if(!team) return;
+
   triggerEvent("goal", { team });
 
-  const live = game.match.live;
+  const live = game.match?.live;
+  if(!live) return;
 
   if(isHome){
     live.score.home++;
@@ -194,7 +202,8 @@ function goal(team, isHome){
 // =========================
 function addEvent(text){
 
-  const live = game.match.live;
+  const live = game.match?.live;
+  if(!live) return;
 
   live.events.unshift(live.minute + "' - " + text);
 
@@ -208,10 +217,10 @@ function addEvent(text){
 // =========================
 function endMatch(onEnd){
 
-  const match = game.match.current;
-  const live = game.match.live;
+  const match = game.match?.current;
+  const live = game.match?.live;
 
-  if(!match || match._processed) return;
+  if(!match || match._processed || !live) return;
 
   match.result = {
     home: live.score.home,
@@ -220,7 +229,9 @@ function endMatch(onEnd){
 
   applyMatchResult(match);
 
-  game.league.current.currentRound++;
+  if(game.league?.current){
+    game.league.current.currentRound++;
+  }
 
   game.match.current = null;
   live.running = false;
