@@ -1,4 +1,4 @@
-/ =========================
+// =========================
 // 📦 IMPORTS
 // =========================
 import { renderSchedule, updateUI, renderLiveFeed } from "../ui/ui.js";
