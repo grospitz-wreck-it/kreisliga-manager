@@ -277,3 +277,5 @@ button.danger{
     width:100%;
   }
 }
+.tabContent { display:none; }
+.tabContent.active { display:block; }
