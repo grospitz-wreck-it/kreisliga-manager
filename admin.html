@@ -15,6 +15,17 @@
 
 <h1>📊 Ad Dashboard</h1>
 
+<!-- ✅ NEU: TABS -->
+<div class="tabs">
+  <button onclick="switchTab('ads')" class="active">📢 Ads</button>
+  <button onclick="switchTab('events')">🎮 Events</button>
+</div>
+
+<!-- ========================= -->
+<!-- ADS TAB (BESTEHEND) -->
+<!-- ========================= -->
+<div id="adsTab" class="tabContent active">
+
 <!-- KPI -->
 <div class="kpiGrid">
   <div class="kpiCard"><span>Impressions</span><h2 id="kpiImpressions">0</h2></div>
@@ -75,10 +86,47 @@
 </div>
 
 </div>
+<!-- END adsTab -->
 
-<!-- Chart.js -->
+<!-- ========================= -->
+<!-- EVENTS TAB (NEU) -->
+<!-- ========================= -->
+<div id="eventsTab" class="tabContent">
+
+<div class="box">
+  <h2>🎮 Neues Event</h2>
+
+  <div class="grid">
+    <input id="eventTitle" placeholder="Titel">
+    <input id="eventKeywords" placeholder="Keywords (comma)">
+
+    <select id="eventType">
+      <option value="game">Game Event</option>
+      <option value="sponsored">Sponsored Event</option>
+    </select>
+
+    <input id="eventProbability" type="number" step="0.1" placeholder="Trigger Chance (0-1)">
+    <input id="eventCooldown" type="number" placeholder="Cooldown (Sekunden)">
+    <input id="eventSponsor" placeholder="Campaign ID (optional)">
+
+    <textarea id="eventDescription" placeholder="Beschreibung"></textarea>
+
+    <input type="file" id="eventMedia">
+
+    <button onclick="createEvent()">🎬 Event speichern</button>
+  </div>
+</div>
+
+<div class="box">
+  <h2>📋 Events</h2>
+  <div id="eventList"></div>
+</div>
+
+</div>
+
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script type="module" src="./js/admin.js"></script>
 
 </body>
