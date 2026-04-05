@@ -8,11 +8,10 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // =====================
 let currentCampaigns = [];
 let editId = null;
-let chartInstance = null;
 let editEventId = null;
 
 // =====================
-// HELPER
+// HELPERS
 // =====================
 function uuid(){
   return crypto.randomUUID();
@@ -24,44 +23,35 @@ function updateButton(){
   btn.innerText = editId ? "✏️ Aktualisieren" : "💾 Speichern";
 }
 
-function copy(text){
-  navigator.clipboard.writeText(text);
-}
-
 // =====================
-// ASSET UI BEHAVIOR
+// ASSET UI
 // =====================
 function createAssetElement(url, id, type="image"){
 
-  const wrapper = document.createElement("div");
-  wrapper.className = "asset";
+  const wrap = document.createElement("div");
+  wrap.className = "asset";
 
-  const el = document.createElement(type === "video" ? "video" : "img");
-  el.src = url;
-  if(type === "video") el.controls = true;
+  const media = document.createElement(type === "video" ? "video" : "img");
+  media.src = url;
+  if(type === "video") media.controls = true;
 
-  const badge = document.createElement("button");
-  badge.className = "assetId";
-  badge.innerText = id;
+  media.onclick = ()=> wrap.classList.toggle("fullscreen");
 
-  // 👉 COPY ONLY ON BUTTON
-  badge.addEventListener("click", (e)=>{
+  const idBtn = document.createElement("button");
+  idBtn.className = "assetIdBtn";
+  idBtn.innerText = "ID";
+
+  idBtn.onclick = (e)=>{
     e.stopPropagation();
     navigator.clipboard.writeText(id);
+    idBtn.innerText = "✓";
+    setTimeout(()=> idBtn.innerText = "ID", 1000);
+  };
 
-    badge.innerText = "✓ kopiert";
-    setTimeout(()=> badge.innerText = id, 1200);
-  });
+  wrap.appendChild(media);
+  wrap.appendChild(idBtn);
 
-  // 👉 FULLSCREEN ONLY ON MEDIA
-  el.addEventListener("click", ()=>{
-    wrapper.classList.toggle("fullscreen");
-  });
-
-  wrapper.appendChild(el);
-  wrapper.appendChild(badge);
-
-  return wrapper;
+  return wrap;
 }
 
 // =====================
@@ -76,12 +66,6 @@ const customer = document.getElementById("customer").value;
 const budget = Number(document.getElementById("budget").value || 0);
 const link = document.getElementById("link").value;
 
-const startRaw = document.getElementById("startDate").value;
-const endRaw = document.getElementById("endDate").value;
-
-const start = startRaw ? new Date(startRaw).toISOString() : null;
-const end = endRaw ? new Date(endRaw).toISOString() : null;
-
 const format = document.getElementById("adFormat").value;
 const cpm = Number(document.getElementById("cpm").value || 0);
 const cpc = Number(document.getElementById("cpc").value || 0);
@@ -91,9 +75,6 @@ const file = document.getElementById("image").files[0];
 let imageUrl = null;
 let assetId = null;
 
-// =====================
-// IMAGE UPLOAD
-// =====================
 if(file){
 
   assetId = uuid();
@@ -118,9 +99,6 @@ if(file){
   imageUrl = data.publicUrl;
 }
 
-// =====================
-// UPDATE
-// =====================
 if(editId){
 
   const updateData = {
@@ -130,9 +108,7 @@ if(editId){
     link,
     cpm,
     cpc,
-    ad_format: format,
-    start_date: start,
-    end_date: end
+    ad_format: format
   };
 
   if(imageUrl){
@@ -162,8 +138,6 @@ if(editId){
       cpm,
       cpc,
       ad_format: format,
-      start_date: start,
-      end_date: end,
       active: true
     });
 
@@ -175,7 +149,7 @@ updateButton();
 loadCampaigns();
 
 }catch(e){
-  console.error("❌ Fatal:", e);
+  console.error("❌ Campaign Error:", e);
 }
 
 }
@@ -190,13 +164,78 @@ const { data } = await supabase
 .select("*")
 .order("created_at", { ascending: false });
 
-render(data || []);
+renderCampaigns(data || []);
 }
 
 // =====================
-// EVENTS (MULTI ASSET)
+// RENDER CAMPAIGNS
+// =====================
+function renderCampaigns(campaigns){
+
+currentCampaigns = campaigns;
+
+const container = document.getElementById("list");
+container.innerHTML = "";
+
+campaigns.forEach(c => {
+
+const row = document.createElement("div");
+row.className = "row";
+
+const left = document.createElement("div");
+left.className = "col left";
+
+left.innerHTML = `
+  <strong>${c.customer || "-"}</strong><br>
+  ${c.name || ""}<br>
+  📦 ${c.ad_format || "banner"}<br>
+  💰 ${c.budget || 0}€
+`;
+
+const center = document.createElement("div");
+center.className = "col center";
+
+if(c.image){
+  const id = c.asset_id || c.image.split("/").pop();
+  center.appendChild(createAssetElement(c.image, id));
+}
+
+const right = document.createElement("div");
+right.className = "col right";
+
+const editBtn = document.createElement("button");
+editBtn.innerText = "✏️";
+editBtn.onclick = ()=>{
+  editId = c.id;
+  document.getElementById("name").value = c.name;
+  document.getElementById("customer").value = c.customer;
+};
+
+const delBtn = document.createElement("button");
+delBtn.innerText = "🗑️";
+delBtn.onclick = async ()=>{
+  await supabase.from("campaigns").delete().eq("id", c.id);
+  loadCampaigns();
+};
+
+right.appendChild(editBtn);
+right.appendChild(delBtn);
+
+row.appendChild(left);
+row.appendChild(center);
+row.appendChild(right);
+
+container.appendChild(row);
+
+});
+}
+
+// =====================
+// CREATE / UPDATE EVENT
 // =====================
 async function createEvent(){
+
+try{
 
 const title = document.getElementById("eventTitle").value;
 const description = document.getElementById("eventDescription").value;
@@ -212,26 +251,50 @@ const keywords = document.getElementById("eventKeywords").value
 
 const files = document.getElementById("eventMedia").files;
 
-let assets = [];
+let newAssets = [];
 
-// MULTI UPLOAD
-for(const file of files){
+if(files && files.length){
 
-  const id = uuid();
-  const fileName = id + "_" + file.name;
+  for(const file of files){
 
-  await supabase.storage.from("events").upload(fileName, file);
+    const id = uuid();
+    const fileName = id + "_" + file.name;
 
-  const { data } = supabase.storage.from("events").getPublicUrl(fileName);
+    const { error } = await supabase
+      .storage
+      .from("events")
+      .upload(fileName, file);
 
-  assets.push({
-    id,
-    url: data.publicUrl,
-    type: file.type.includes("video") ? "video" : "image"
-  });
+    if(error){
+      console.error(error);
+      alert("❌ Upload Fehler");
+      return;
+    }
+
+    const { data } = supabase
+      .storage
+      .from("events")
+      .getPublicUrl(fileName);
+
+    newAssets.push({
+      id,
+      url: data.publicUrl,
+      type: file.type.includes("video") ? "video" : "image"
+    });
+  }
 }
 
 if(editEventId){
+
+  const { data: existing } = await supabase
+    .from("events")
+    .select("assets")
+    .eq("id", editEventId)
+    .single();
+
+  const mergedAssets = newAssets.length
+    ? [...(existing.assets || []), ...newAssets]
+    : existing.assets;
 
   await supabase
     .from("events")
@@ -243,7 +306,7 @@ if(editEventId){
       cooldown,
       sponsor_campaign_id: sponsor,
       keywords,
-      assets
+      assets: mergedAssets
     })
     .eq("id", editEventId);
 
@@ -262,7 +325,7 @@ if(editEventId){
       cooldown,
       sponsor_campaign_id: sponsor,
       keywords,
-      assets,
+      assets: newAssets,
       active: true
     });
 
@@ -271,6 +334,11 @@ if(editEventId){
 
 clearEventForm();
 loadEvents();
+
+}catch(e){
+  console.error("❌ Event Error:", e);
+}
+
 }
 
 // =====================
@@ -288,27 +356,30 @@ container.innerHTML = "";
 
 (data || []).forEach(e => {
 
-const div = document.createElement("div");
-div.className = "eventRow";
+const row = document.createElement("div");
+row.className = "row";
 
-const assetsHTML = document.createElement("div");
+const left = document.createElement("div");
+left.className = "col left";
 
-(e.assets || []).forEach(a=>{
-  assetsHTML.appendChild(createAssetElement(a.url, a.id, a.type));
-});
-
-div.innerHTML = `
-  <div>
-    <strong>${e.title}</strong><br>
-    🎯 ${e.type}<br>
-    ⚡ ${e.probability}
-  </div>
+left.innerHTML = `
+  <strong>${e.title}</strong><br>
+  🎯 ${e.type}<br>
+  ⚡ ${e.probability}<br>
+  ⏱ ${e.cooldown}s
 `;
 
-div.appendChild(assetsHTML);
+const center = document.createElement("div");
+center.className = "col center";
 
-// ACTIONS
-const actions = document.createElement("div");
+const assets = Array.isArray(e.assets) ? e.assets : [];
+
+assets.forEach(a=>{
+  center.appendChild(createAssetElement(a.url, a.id, a.type));
+});
+
+const right = document.createElement("div");
+right.className = "col right";
 
 const editBtn = document.createElement("button");
 editBtn.innerText = "✏️";
@@ -325,64 +396,14 @@ delBtn.onclick = async ()=>{
   loadEvents();
 };
 
-actions.appendChild(editBtn);
-actions.appendChild(delBtn);
-div.appendChild(actions);
+right.appendChild(editBtn);
+right.appendChild(delBtn);
 
-container.appendChild(div);
+row.appendChild(left);
+row.appendChild(center);
+row.appendChild(right);
 
-});
-}
-
-// =====================
-// RENDER CAMPAIGNS
-// =====================
-function render(campaigns){
-
-currentCampaigns = campaigns;
-
-const container = document.getElementById("list");
-container.innerHTML = "";
-
-campaigns.forEach(c => {
-
-const div = document.createElement("div");
-div.className = "adRow";
-
-const asset = c.image
-  ? createAssetElement(c.image, c.asset_id || "no-id")
-  : "";
-
-div.innerHTML = `
-  <div>
-    <strong>${c.customer}</strong><br>
-    ${c.name}
-  </div>
-`;
-
-if(asset) div.appendChild(asset);
-
-const actions = document.createElement("div");
-
-const editBtn = document.createElement("button");
-editBtn.innerText = "✏️";
-editBtn.onclick = ()=>{
-  editId = c.id;
-  document.getElementById("name").value = c.name;
-};
-
-const delBtn = document.createElement("button");
-delBtn.innerText = "🗑️";
-delBtn.onclick = async ()=>{
-  await supabase.from("campaigns").delete().eq("id", c.id);
-  loadCampaigns();
-};
-
-actions.appendChild(editBtn);
-actions.appendChild(delBtn);
-div.appendChild(actions);
-
-container.appendChild(div);
+container.appendChild(row);
 
 });
 }
@@ -391,7 +412,7 @@ container.appendChild(div);
 // RESET
 // =====================
 function clearForm(){
-["name","customer","budget","link","startDate","endDate","cpm","cpc"]
+["name","customer","budget","link","cpm","cpc"]
 .forEach(id=>{
   const el=document.getElementById(id);
   if(el) el.value="";
@@ -411,7 +432,7 @@ document.getElementById("eventMedia").value="";
 }
 
 // =====================
-// INIT (OHNE WINDOW)
+// INIT
 // =====================
 document.addEventListener("DOMContentLoaded", () => {
 
