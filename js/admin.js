@@ -303,7 +303,7 @@ function renderEvents(list){
 
     const assetHTML = assets.map(a=>`
       <div class="asset small">
-        <img src="${a.url}" onclick="toggleFullscreen(this)">
+        <img src="${a.url}" data-action="fullscreen">
         <button class="assetIdBtn" data-action="copy" data-id="${a.id}">
           ${a.id.slice(0,6)}
         </button>
