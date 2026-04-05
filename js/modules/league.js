@@ -53,13 +53,19 @@ function initLeague(league){
   console.log("📊 Tabelle erstellt");
 
   // =========================
-  // 📅 SPIELPLAN
+  // 📅 SPIELPLAN (HIN + RÜCK)
   // =========================
   if(!league.schedule || league.schedule.length === 0){
 
-    const teams = league.teams.map(t => t.name);
-    const schedule = [];
+    const baseTeams = league.teams.map(t => t.name);
+    const teams = [...baseTeams];
 
+    const firstLeg = [];
+    const secondLeg = [];
+
+    // =========================
+    // 🥇 HINRUNDE
+    // =========================
     for(let i = 0; i < teams.length - 1; i++){
 
       const round = [];
@@ -72,15 +78,34 @@ function initLeague(league){
         round.push({ home, away });
       }
 
-      schedule.push(round);
+      firstLeg.push(round);
 
       // Rotation (Round Robin)
       teams.splice(1, 0, teams.pop());
     }
 
-    league.schedule = schedule;
+    // =========================
+    // 🔁 RÜCKRUNDE
+    // =========================
+    firstLeg.forEach(round => {
 
-    console.log("📅 Spielplan generiert:", schedule.length, "Spieltage");
+      const mirrored = round.map(match => ({
+        home: match.away,
+        away: match.home
+      }));
+
+      secondLeg.push(mirrored);
+    });
+
+    // =========================
+    // 📦 KOMBINIEREN
+    // =========================
+    league.schedule = [...firstLeg, ...secondLeg];
+
+    console.log("📅 Spielplan erstellt:");
+    console.log("➡️ Hinrunde:", firstLeg.length);
+    console.log("➡️ Rückrunde:", secondLeg.length);
+    console.log("➡️ Gesamt:", league.schedule.length);
   }
 
   // =========================
@@ -123,7 +148,6 @@ function initLeagueSelect(){
       const index = Number(e.target.value);
       game.league.current = game.data.leagues[index];
 
-      // 👉 NEU: INIT
       initLeague(game.league.current);
 
       // sync
@@ -139,7 +163,6 @@ function initLeagueSelect(){
   game.league = game.league || {};
   game.league.current = game.data.leagues[0];
 
-  // 👉 NEU: INIT
   initLeague(game.league.current);
 
   populateTeamSelect();
