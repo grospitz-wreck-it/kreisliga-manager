@@ -441,3 +441,124 @@ window.onload = () => {
   updateButton();
   loadCampaigns();
 };
+// =====================
+// TAB SWITCH
+// =====================
+window.switchTab = function(tab){
+
+document.querySelectorAll(".tabContent").forEach(t => t.classList.remove("active"));
+document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+
+if(tab === "ads"){
+  document.getElementById("adsTab").classList.add("active");
+  document.querySelectorAll(".tabs button")[0].classList.add("active");
+}
+
+if(tab === "events"){
+  document.getElementById("eventsTab").classList.add("active");
+  document.querySelectorAll(".tabs button")[1].classList.add("active");
+  loadEvents();
+}
+};
+
+// =====================
+// CREATE EVENT
+// =====================
+window.createEvent = async function(){
+
+const title = document.getElementById("eventTitle").value;
+const description = document.getElementById("eventDescription").value;
+const type = document.getElementById("eventType").value;
+const probability = Number(document.getElementById("eventProbability").value || 0.5);
+const cooldown = Number(document.getElementById("eventCooldown").value || 60);
+const sponsor = document.getElementById("eventSponsor").value || null;
+
+const keywords = document.getElementById("eventKeywords").value
+  .split(",")
+  .map(k => k.trim())
+  .filter(Boolean);
+
+const file = document.getElementById("eventMedia").files[0];
+
+let mediaUrl = null;
+let mediaType = "image";
+
+if(file){
+  const fileName = Date.now() + "_" + file.name;
+
+  await supabase.storage.from("events").upload(fileName, file);
+
+  const { data } = supabase.storage.from("events").getPublicUrl(fileName);
+
+  mediaUrl = data.publicUrl;
+
+  if(file.type.includes("video")) mediaType = "video";
+}
+
+await supabase.from("events").insert({
+  title,
+  description,
+  type,
+  probability,
+  cooldown,
+  sponsor_campaign_id: sponsor,
+  keywords,
+  media_url: mediaUrl,
+  media_type: mediaType,
+  active: true
+});
+
+alert("✅ Event erstellt");
+
+clearEventForm();
+loadEvents();
+};
+
+// =====================
+// LOAD EVENTS
+// =====================
+async function loadEvents(){
+
+const { data } = await supabase
+.from("events")
+.select("*")
+.order("created_at", { ascending:false });
+
+const container = document.getElementById("eventList");
+container.innerHTML = "";
+
+(data || []).forEach(e => {
+
+const div = document.createElement("div");
+div.className = "eventRow";
+
+div.innerHTML = `
+  <div>
+    <strong>${e.title}</strong><br>
+    🎯 ${e.type}<br>
+    ⚡ ${e.probability} | ⏱ ${e.cooldown}s
+  </div>
+
+  <div>
+    ${e.media_type === "video"
+      ? `<video class="eventMedia" src="${e.media_url}" muted></video>`
+      : `<img class="eventMedia" src="${e.media_url}">`
+    }
+  </div>
+`;
+
+container.appendChild(div);
+
+});
+}
+
+function clearEventForm(){
+[
+  "eventTitle","eventDescription","eventKeywords",
+  "eventProbability","eventCooldown","eventSponsor"
+].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.value="";
+});
+document.getElementById("eventMedia").value="";
+}
