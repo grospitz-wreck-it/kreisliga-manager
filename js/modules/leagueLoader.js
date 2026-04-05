@@ -1,5 +1,11 @@
+// =========================
+// 📦 IMPORTS
+// =========================
 import { loadCSV } from "./loader.js";
 
+// =========================
+// 🏆 LOAD LEAGUES FROM CSV
+// =========================
 export async function loadLeaguesFromCSV(path){
 
   const rows = await loadCSV(path);
@@ -15,7 +21,9 @@ export async function loadLeaguesFromCSV(path){
 
   rows.forEach(row => {
 
-    // 👉 Keys normalisieren
+    // =========================
+    // 🔤 KEYS NORMALISIEREN
+    // =========================
     const normalized = {};
     Object.keys(row).forEach(k => {
       normalized[k.toLowerCase().trim()] = row[k];
@@ -26,18 +34,50 @@ export async function loadLeaguesFromCSV(path){
 
     const key = liga.toLowerCase().replace(/\s+/g, "_");
 
-    // 👉 Teams aus Team1–Team16 ziehen
+    // =========================
+    // 👕 TEAMS EINLESEN
+    // =========================
     const teams = [];
 
-    for(let i = 1; i <= 20; i++){ // flexibel bis 20
-      const t = normalized[`team${i}`];
-      if(t && t.trim() !== ""){
-        teams.push(t.trim());
-      }
+    for(let i = 1; i <= 20; i++){
+
+      const raw = normalized[`team${i}`];
+      if(!raw) continue;
+
+      const name = raw.trim();
+
+      // 👉 leere CSV-Felder ignorieren
+      if(name === "") continue;
+
+      teams.push({
+        name
+      });
     }
 
-    if(teams.length === 0) return;
+    // =========================
+    // ⚠️ VALIDIERUNG
+    // =========================
+    if(teams.length === 0){
+      console.warn(`⚠️ Liga ohne Teams übersprungen: ${liga}`);
+      return;
+    }
 
+    console.log(`📊 ${liga}: ${teams.length} Teams geladen`);
+
+    // =========================
+    // ⚖️ GERADE TEAMANZAHL ERZWINGEN
+    // =========================
+    if(teams.length % 2 !== 0){
+      console.warn(`⚠️ Liga "${liga}" hat ungerade Anzahl Teams → Freilos hinzugefügt`);
+
+      teams.push({
+        name: "Freilos"
+      });
+    }
+
+    // =========================
+    // 📦 SPEICHERN
+    // =========================
     leagues[key] = {
       name: liga,
       teams
