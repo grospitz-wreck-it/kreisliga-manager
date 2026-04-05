@@ -14,24 +14,31 @@ let currentEvents = [];
 let editEventId = null;
 
 // =====================
+// GLOBAL FIX (für onclick)
+// =====================
+window.copyToClipboard = (text) => navigator.clipboard.writeText(text);
+window.toggleFullscreen = (el) => el.closest(".asset").classList.toggle("fullscreen");
+window.editCampaign = (id) => editCampaign(id);
+window.deleteCampaign = (id) => deleteCampaign(id);
+window.deleteEvent = (id) => deleteEvent(id);
+
+// =====================
 // HELPERS
 // =====================
 function uuid(){
-  return crypto.randomUUID();
-}
-
-function copyToClipboard(text){
-  navigator.clipboard.writeText(text);
-}
-
-function toggleFullscreen(el){
-  el.closest(".asset").classList.toggle("fullscreen");
+return crypto.randomUUID();
 }
 
 function updateButton(){
-  const btn = document.getElementById("saveBtn");
-  if(!btn) return;
-  btn.innerText = editId ? "✏️ Aktualisieren" : "💾 Speichern";
+const btn = document.getElementById("saveBtn");
+if(!btn) return;
+btn.innerText = editId ? "✏️ Aktualisieren" : "💾 Speichern";
+}
+
+function clearForm(){
+document.querySelectorAll("#adsTab input, #adsTab textarea").forEach(i => i.value = "");
+editId = null;
+updateButton();
 }
 
 // =====================
@@ -65,29 +72,29 @@ let assets = [];
 // =====================
 for(const file of files){
 
-  const id = uuid();
-  const fileName = `${id}_${file.name}`;
+const id = uuid();
+const fileName = `${id}_${file.name}`;
 
-  const { error: uploadError } = await supabase
-    .storage
-    .from("ads")
-    .upload(fileName, file);
+const { error: uploadError } = await supabase
+.storage
+.from("ads")
+.upload(fileName, file);
 
-  if(uploadError){
-    console.error(uploadError);
-    continue;
-  }
+if(uploadError){
+console.error(uploadError);
+continue;
+}
 
-  const { data } = supabase
-    .storage
-    .from("ads")
-    .getPublicUrl(fileName);
+const { data } = supabase
+.storage
+.from("ads")
+.getPublicUrl(fileName);
 
-  assets.push({
-    id,
-    url: data.publicUrl,
-    type: file.type.includes("video") ? "video" : "image"
-  });
+assets.push({
+id,
+url: data.publicUrl,
+type: file.type.includes("video") ? "video" : "image"
+});
 }
 
 // =====================
@@ -95,61 +102,61 @@ for(const file of files){
 // =====================
 if(editId){
 
-  const updateData = {
-    name,
-    customer,
-    budget,
-    link,
-    cpm,
-    cpc,
-    ad_format: format,
-    start_date: start,
-    end_date: end
-  };
+const updateData = {
+name,
+customer,
+budget,
+link,
+cpm,
+cpc,
+ad_format: format,
+start_date: start,
+end_date: end
+};
 
-  if(assets.length){
-    updateData.assets = assets;
-  }
+if(assets.length){
+updateData.assets = assets;
+}
 
-  const { error } = await supabase
-    .from("campaigns")
-    .update(updateData)
-    .eq("id", editId);
+const { error } = await supabase
+.from("campaigns")
+.update(updateData)
+.eq("id", editId);
 
-  if(error){
-    console.error(error);
-    alert("❌ Update Fehler");
-    return;
-  }
+if(error){
+console.error(error);
+alert("❌ Update Fehler");
+return;
+}
 
-  editId = null;
-  alert("✏️ Kampagne aktualisiert");
+editId = null;
+alert("✏️ Kampagne aktualisiert");
 
 } else {
 
-  const { error } = await supabase
-    .from("campaigns")
-    .insert({
-      name,
-      customer,
-      budget,
-      link,
-      cpm,
-      cpc,
-      ad_format: format,
-      start_date: start,
-      end_date: end,
-      assets,
-      active: true
-    });
+const { error } = await supabase
+.from("campaigns")
+.insert({
+name,
+customer,
+budget,
+link,
+cpm,
+cpc,
+ad_format: format,
+start_date: start,
+end_date: end,
+assets,
+active: true
+});
 
-  if(error){
-    console.error(error);
-    alert("❌ Create Fehler");
-    return;
-  }
+if(error){
+console.error(error);
+alert("❌ Create Fehler");
+return;
+}
 
-  alert("✅ Kampagne erstellt");
+alert("✅ Kampagne erstellt");
 }
 
 clearForm();
@@ -157,9 +164,30 @@ updateButton();
 loadCampaigns();
 
 }catch(e){
-  console.error("❌ Fatal:", e);
+console.error("❌ Fatal:", e);
 }
 
+}
+
+// =====================
+// DELETE / EDIT CAMPAIGN
+// =====================
+async function deleteCampaign(id){
+await supabase.from("campaigns").delete().eq("id", id);
+loadCampaigns();
+}
+
+function editCampaign(id){
+const c = currentCampaigns.find(x => x.id === id);
+if(!c) return;
+
+document.getElementById("name").value = c.name;
+document.getElementById("customer").value = c.customer;
+document.getElementById("budget").value = c.budget;
+document.getElementById("link").value = c.link;
+
+editId = id;
+updateButton();
 }
 
 // =====================
@@ -181,158 +209,11 @@ render(data || []);
 }
 
 // =====================
-// LOAD STATS
-// =====================
-async function loadStats(){
-
-const { data } = await supabase
-.from("ad_events")
-.select("*");
-
-const stats = {};
-const events = data || [];
-
-events.forEach(e => {
-
-if(!stats[e.campaign_id]){
-  stats[e.campaign_id] = { impressions:0, clicks:0 };
-}
-
-if(e.type === "impression") stats[e.campaign_id].impressions++;
-if(e.type === "click") stats[e.campaign_id].clicks++;
-
-});
-
-return { stats, events };
-}
-
-// =====================
-// KPI
-// =====================
-function updateKPIs(campaigns, stats){
-
-let totalImpr = 0;
-let totalClicks = 0;
-let totalRevenue = 0;
-
-campaigns.forEach(c => {
-
-const s = stats[c.id] || { impressions:0, clicks:0 };
-
-totalImpr += s.impressions;
-totalClicks += s.clicks;
-
-const revenue =
-  (s.impressions / 1000) * (c.cpm || 0) +
-  (s.clicks * (c.cpc || 0));
-
-totalRevenue += revenue;
-
-});
-
-document.getElementById("kpiImpressions").innerText = totalImpr;
-document.getElementById("kpiClicks").innerText = totalClicks;
-document.getElementById("kpiRevenue").innerText = totalRevenue.toFixed(2) + "€";
-}
-
-// =====================
-// FORECAST
-// =====================
-function updateForecast(campaigns, stats){
-
-let totalRevenue = 0;
-let byFormat = {};
-
-campaigns.forEach(c => {
-
-  const s = stats[c.id] || { impressions:0, clicks:0 };
-
-  const revenue =
-    (s.impressions / 1000) * (c.cpm || 0) +
-    (s.clicks * (c.cpc || 0));
-
-  totalRevenue += revenue;
-
-  const format = c.ad_format || "other";
-
-  if(!byFormat[format]) byFormat[format] = 0;
-  byFormat[format] += revenue;
-
-});
-
-const daily = totalRevenue / 30;
-
-document.getElementById("forecastMonth").innerText =
-  (daily * 30).toFixed(2) + "€";
-
-document.getElementById("forecastYear").innerText =
-  (daily * 365).toFixed(2) + "€";
-}
-
-// =====================
-// CHART
-// =====================
-function buildRevenueChart(events, campaigns){
-
-const ctx = document.getElementById("revenueChart");
-if(!ctx) return;
-
-const daysMap = {};
-
-events.forEach(e => {
-
-  const date = new Date(e.created_at).toISOString().split("T")[0];
-
-  if(!daysMap[date]) daysMap[date] = 0;
-
-  const campaign = campaigns.find(c => c.id === e.campaign_id);
-  if(!campaign) return;
-
-  if(e.type === "impression"){
-    daysMap[date] += (campaign.cpm || 0) / 1000;
-  }
-
-  if(e.type === "click"){
-    daysMap[date] += (campaign.cpc || 0);
-  }
-
-});
-
-const labels = Object.keys(daysMap).slice(-14);
-const values = labels.map(d => daysMap[d]);
-
-if(chartInstance){
-  chartInstance.destroy();
-}
-
-chartInstance = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels,
-    datasets: [{
-      label: "Revenue €",
-      data: values,
-      tension: 0.3
-    }]
-  }
-});
-}
-
-// =====================
 // RENDER CAMPAIGNS
 // =====================
 async function render(campaigns){
 
 currentCampaigns = campaigns;
-
-const { stats, events } = await loadStats();
-
-updateKPIs(campaigns, stats);
-updateForecast(campaigns, stats);
-
-if(events && events.length){
-  buildRevenueChart(events, campaigns);
-}
 
 const container = document.getElementById("list");
 container.innerHTML = "";
@@ -342,6 +223,7 @@ campaigns.forEach(c => {
 const assets = c.assets || [];
 
 const assetHTML = assets.map(a=>`
+
 <div class="asset">
   ${a.type==="video"
     ? `<video src="${a.url}" onclick="toggleFullscreen(this)" muted></video>`
@@ -355,6 +237,7 @@ const div = document.createElement("div");
 div.className = "adRow";
 
 div.innerHTML = `
+
 <div class="adLeft">
   <div class="assetRow">${assetHTML}</div>
   <div>
@@ -389,24 +272,24 @@ let assets = [];
 
 for(const file of files){
 
-  const id = uuid();
-  const fileName = `${id}_${file.name}`;
+const id = uuid();
+const fileName = `${id}_${file.name}`;
 
-  await supabase.storage.from("events").upload(fileName, file);
+await supabase.storage.from("events").upload(fileName, file);
 
-  const { data } = supabase.storage.from("events").getPublicUrl(fileName);
+const { data } = supabase.storage.from("events").getPublicUrl(fileName);
 
-  assets.push({
-    id,
-    url: data.publicUrl,
-    type: file.type.includes("video") ? "video" : "image"
-  });
+assets.push({
+id,
+url: data.publicUrl,
+type: file.type.includes("video") ? "video" : "image"
+});
 }
 
 await supabase.from("events").insert({
-  title,
-  description,
-  assets
+title,
+description,
+assets
 });
 
 loadEvents();
@@ -424,6 +307,7 @@ container.innerHTML = "";
 const assets = e.assets || [];
 
 const assetHTML = assets.map(a=>`
+
 <div class="asset">
   <img src="${a.url}" onclick="toggleFullscreen(this)">
   <button class="assetIdBtn" onclick="copyToClipboard('${a.id}')">ID</button>
@@ -434,6 +318,7 @@ const div = document.createElement("div");
 div.className = "eventRow";
 
 div.innerHTML = `
+
 <div>
   <strong>${e.title}</strong>
 </div>
@@ -450,77 +335,43 @@ container.appendChild(div);
 });
 }
 
-window.deleteEvent = async function(id){
-await supabase.from("events").delete().eq("id", id);
-loadEvents();
-};
-
 // =====================
-// INIT (ROBUST FIX)
+// TABS
 // =====================
-document.addEventListener("DOMContentLoaded", () => {
-
-  // BUTTONS
-  document.getElementById("saveBtn")?.addEventListener("click", createCampaign);
-  document.getElementById("createEventBtn")?.addEventListener("click", createEvent);
-
-  // TABS
-  document.getElementById("tabAds")?.addEventListener("click", () => switchTab("ads"));
-  document.getElementById("tabEvents")?.addEventListener("click", () => switchTab("events"));
-  document.getElementById("tabInsights")?.addEventListener("click", () => switchTab("insights"));
-
-  // INITIAL STATE
-  switchTab("ads");
-  loadCampaigns();
-});
-
 function switchTab(tab){
 
-  const tabs = ["ads","events","insights"];
+document.querySelectorAll(".tabContent").forEach(t => t.classList.remove("active"));
+document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
 
-  tabs.forEach(t => {
-    document.getElementById(t + "Tab")?.classList.remove("active");
-  });
+if(tab === "ads"){
+document.getElementById("adsTab").classList.add("active");
+document.getElementById("tabAds").classList.add("active");
+}
 
-  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+if(tab === "events"){
+document.getElementById("eventsTab").classList.add("active");
+document.getElementById("tabEvents").classList.add("active");
+loadEvents();
+}
 
-  if(tab === "ads"){
-    document.getElementById("adsTab").classList.add("active");
-    document.getElementById("tabAds").classList.add("active");
-  }
-
-  if(tab === "events"){
-    document.getElementById("eventsTab").classList.add("active");
-    document.getElementById("tabEvents").classList.add("active");
-    loadEvents();
-  }
-
-  if(tab === "insights"){
-    document.getElementById("insightsTab").classList.add("active");
-    document.getElementById("tabInsights").classList.add("active");
-  }
+if(tab === "insights"){
+document.getElementById("insightsTab").classList.add("active");
+document.getElementById("tabInsights").classList.add("active");
+}
 }
 
 // =====================
-// EVENT BINDINGS FIX
+// INIT (einmal!)
 // =====================
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Campaign
-  const saveBtn = document.getElementById("saveBtn");
-  if(saveBtn) saveBtn.addEventListener("click", createCampaign);
+document.getElementById("saveBtn")?.addEventListener("click", createCampaign);
+document.getElementById("createEventBtn")?.addEventListener("click", createEvent);
 
-  // Event
-  const eventBtn = document.getElementById("createEventBtn");
-  if(eventBtn) eventBtn.addEventListener("click", createEvent);
+document.getElementById("tabAds")?.addEventListener("click", () => switchTab("ads"));
+document.getElementById("tabEvents")?.addEventListener("click", () => switchTab("events"));
+document.getElementById("tabInsights")?.addEventListener("click", () => switchTab("insights"));
 
-  // Tabs
-  const tabAds = document.getElementById("tabAds");
-  const tabEvents = document.getElementById("tabEvents");
-  const tabInsights = document.getElementById("tabInsights");
-
-  if(tabAds) tabAds.onclick = () => switchTab("ads");
-  if(tabEvents) tabEvents.onclick = () => switchTab("events");
-  if(tabInsights) tabInsights.onclick = () => switchTab("insights");
-
+switchTab("ads");
+loadCampaigns();
 });
