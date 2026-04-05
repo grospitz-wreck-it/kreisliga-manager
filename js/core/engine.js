@@ -21,7 +21,7 @@ function getTeamFromTable(name){
 const table = game.league?.table;
 
 if(!table || table.length === 0){
-console.error("❌ Tabelle nicht initialisiert");
+console.error("❌ Tabelle fehlt → game.league.table ist:", game.league?.table);
 return null;
 }
 
