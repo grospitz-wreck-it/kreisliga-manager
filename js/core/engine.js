@@ -1,5 +1,4 @@
-
-// =========================
+/ =========================
 // 📦 IMPORTS
 // =========================
 import { renderSchedule, updateUI, renderLiveFeed } from "../ui/ui.js";
@@ -15,118 +14,127 @@ import { applyModifiers } from "../engine/modifierEngine.js";
 // 🧠 HELPERS
 // =========================
 function getTeamName(team){
-  return typeof team === "string" ? team : team?.name;
+return typeof team === "string" ? team : team?.name;
 }
 
-// 👉 WICHTIG: greift auf TABLE zu!
 function getTeamFromTable(name){
-  return game.league.table?.find(t => t.name === name);
+const table = game.league?.table;
+
+if(!table || table.length === 0){
+console.error("❌ Tabelle nicht initialisiert");
+return null;
+}
+
+return table.find(t => t.name === name) || null;
 }
 
 function isMyTeam(team){
-  return game.team.selected === getTeamName(team);
+return game.team.selected === getTeamName(team);
 }
 
 function isMyMatch(match){
-  return isMyTeam(match.home) || isMyTeam(match.away);
+return isMyTeam(match.home) || isMyTeam(match.away);
 }
 
 // =========================
 // ▶️ BUTTON
 // =========================
 function handleMainAction(){
-  if(game.phase !== "live"){
-    startMatch();
-  }
+if(game.phase !== "live"){
+startMatch();
+}
 }
 
 // =========================
-// 🏁 START MATCH (FINAL FIX)
+// 🏁 START MATCH
 // =========================
 function startMatch(){
 
-  console.log("🚀 Spiel wird gestartet...");
+console.log("🚀 Spiel wird gestartet...");
 
-  // ❌ doppelt starten verhindern
-  if(game.match.live.running){
-    console.warn("⚠️ Match läuft bereits");
-    return;
-  }
+if(game.match?.live?.running){
+console.warn("⚠️ Match läuft bereits");
+return;
+}
 
-  if(!game.team.selected){
-    console.error("❌ Kein Team ausgewählt!");
-    return;
-  }
+if(!game.team?.selected){
+console.error("❌ Kein Team ausgewählt");
+return;
+}
 
-  const schedule = game.league?.schedule;
+const schedule = game.league?.schedule;
+if(!schedule?.length){
+console.error("❌ Kein Spielplan vorhanden");
+return;
+}
 
-  if(!schedule?.length){
-    console.error("❌ Kein Spielplan vorhanden");
-    return;
-  }
+const roundIndex = game.league.currentRound || 0;
+const round = schedule[roundIndex];
 
-  const round = schedule[game.league.currentRound];
+if(!round?.length){
+console.error("❌ Spieltag ungültig:", roundIndex);
+return;
+}
 
-  if(!round){
-    console.warn("❌ Kein Spieltag gefunden");
-    return;
-  }
+if(!game.league?.table?.length){
+console.error("❌ Tabelle fehlt → initTable vergessen?");
+return;
+}
 
-  const live = game.match.live;
+const live = game.match.live;
 
-  live.minute = 0;
-  live.running = true;
-  live.score = { home: 0, away: 0 };
-  live.events = [];
+live.minute = 0;
+live.running = true;
+live.score = { home: 0, away: 0 };
+live.events = [];
 
-  let playerMatch = null;
+let playerMatch = null;
 
-  // 👉 andere Spiele simulieren
-  round.forEach(match => {
+for(const match of round){
 
-    if(isMyMatch(match)){
-      playerMatch = match;
-      return;
-    }
+if(!match || match._processed) continue;
 
-    const home = Math.floor(Math.random() * 3);
-    const away = Math.floor(Math.random() * 3);
+if(isMyMatch(match)){
+  playerMatch = match;
+  continue;
+}
 
-    match.result = { home, away };
+const home = Math.floor(Math.random() * 3);
+const away = Math.floor(Math.random() * 3);
 
-    applyMatchResult(match);
-  });
+match.result = { home, away };
 
-  if(!playerMatch){
-    console.error("❌ Kein Spiel für dein Team gefunden");
-    return;
-  }
+applyMatchResult(match);
 
-  // =========================
-  // 🔥 FIX #8: MATCH MAPPING
-  // =========================
-  const homeTeam = getTeamFromTable(playerMatch.home);
-  const awayTeam = getTeamFromTable(playerMatch.away);
+}
 
-  if(!homeTeam || !awayTeam){
-    console.error("❌ Teams nicht in Tabelle gefunden");
-    return;
-  }
+if(!playerMatch){
+console.error("❌ Kein Spiel für dein Team gefunden");
+return;
+}
 
-  game.match.current = {
-    ...playerMatch,
-    home: homeTeam,
-    away: awayTeam
-  };
+const homeTeam = getTeamFromTable(playerMatch.home);
+const awayTeam = getTeamFromTable(playerMatch.away);
 
-  game.phase = "live";
+if(!homeTeam || !awayTeam){
+console.error("❌ Teams nicht in Tabelle gefunden", playerMatch);
+return;
+}
 
-  emit(EVENTS.GAME_START);
+game.match.current = {
+...playerMatch,
+home: homeTeam,
+away: awayTeam
+};
 
-  renderSchedule();
-  renderTable();
+game.phase = "live";
 
-  runMatchLoop();
+emit(EVENTS.GAME_START);
+
+renderSchedule();
+renderTable();
+
+runMatchLoop();
 }
 
 // =========================
@@ -134,35 +142,35 @@ function startMatch(){
 // =========================
 function runMatchLoop(){
 
-  const interval = setInterval(() => {
+const interval = setInterval(() => {
 
-    const live = game.match.live;
+const live = game.match.live;
 
-    if(!live.running){
-      clearInterval(interval);
-      return;
-    }
+if(!live?.running){
+  clearInterval(interval);
+  return;
+}
 
-    live.minute++;
+live.minute++;
 
-    updateEvents();
+updateEvents();
 
-    emit(EVENTS.STATE_CHANGED, {
-      minute: live.minute
-    });
+emit(EVENTS.STATE_CHANGED, {
+  minute: live.minute
+});
 
-    simulateLiveEvent();
+simulateLiveEvent();
 
-    updateUI();
-    renderLiveFeed();
-    renderLiveTable();
+updateUI();
+renderLiveFeed();
+renderLiveTable();
 
-    if(live.minute > 90){
-      clearInterval(interval);
-      endMatch();
-    }
+if(live.minute >= 90){
+  clearInterval(interval);
+  endMatch();
+}
 
-  }, 400);
+}, 400);
 }
 
 // =========================
@@ -170,17 +178,17 @@ function runMatchLoop(){
 // =========================
 function simulateLiveEvent(){
 
-  const match = game.match.current;
-  if(!match) return;
+const match = game.match.current;
+if(!match) return;
 
-  const rand = Math.random();
+const rand = Math.random();
 
-  if(rand < 0.15){
-    createChance(match, true);
-  }
-  else if(rand < 0.30){
-    createChance(match, false);
-  }
+if(rand < 0.15){
+createChance(match, true);
+}
+else if(rand < 0.30){
+createChance(match, false);
+}
 }
 
 // =========================
@@ -188,23 +196,28 @@ function simulateLiveEvent(){
 // =========================
 function createChance(match, isHome){
 
-  const team = isHome ? match.home : match.away;
-  const opponent = isHome ? match.away : match.home;
+const team = isHome ? match.home : match.away;
+const opponent = isHome ? match.away : match.home;
 
-  const modifiers = getActiveModifiers();
+if(!team || !opponent) return;
 
-  const strengthDiff =
-    applyModifiers(team.strength || 50, modifiers)
-    - (opponent.strength || 50);
+const modifiers = getActiveModifiers();
 
-  const chance = 0.5 + (strengthDiff * 0.015) + (Math.random() * 0.3);
+const strengthDiff =
+applyModifiers(team.strength || 50, modifiers)
+- (opponent.strength || 50);
 
-  if(chance > 0.9){
-    goal(team, isHome);
-  }
-  else{
-    addEvent(`🎯 Chance für ${team.name}`);
-  }
+const chance =
+0.5 +
+(strengthDiff * 0.015) +
+(Math.random() * 0.3);
+
+if(chance > 0.9){
+goal(team, isHome);
+}
+else{
+addEvent("🎯 Chance für " + team.name);
+}
 }
 
 // =========================
@@ -212,17 +225,19 @@ function createChance(match, isHome){
 // =========================
 function goal(team, isHome){
 
-  triggerEvent("goal", { team });
+if(!team) return;
 
-  const live = game.match.live;
+triggerEvent("goal", { team });
 
-  if(isHome){
-    live.score.home++;
-  } else {
-    live.score.away++;
-  }
+const live = game.match.live;
 
-  addEvent(`⚽ TOR für ${team.name}!`);
+if(isHome){
+live.score.home++;
+} else {
+live.score.away++;
+}
+
+addEvent("⚽ TOR für " + team.name + "!");
 }
 
 // =========================
@@ -230,13 +245,14 @@ function goal(team, isHome){
 // =========================
 function addEvent(text){
 
-  const live = game.match.live;
+const live = game.match.live;
+if(!live) return;
 
-  live.events.unshift(`${live.minute}' - ${text}`);
+live.events.unshift(live.minute + "' - " + text);
 
-  if(live.events.length > 25){
-    live.events.pop();
-  }
+if(live.events.length > 25){
+live.events.pop();
+}
 }
 
 // =========================
@@ -244,74 +260,78 @@ function addEvent(text){
 // =========================
 function endMatch(){
 
-  const match = game.match.current;
-  const live = game.match.live;
+const match = game.match.current;
+const live = game.match.live;
 
-  if(!match || match._processed) return;
+if(!match || match._processed) return;
 
-  match.result = {
-    home: live.score.home,
-    away: live.score.away
-  };
+match.result = {
+home: live.score.home,
+away: live.score.away
+};
 
-  applyMatchResult(match);
+applyMatchResult(match);
 
-  game.league.currentRound++;
-  game.match.current = null;
-  live.running = false;
-  game.phase = "idle";
+game.league.currentRound++;
+game.match.current = null;
+live.running = false;
+game.phase = "idle";
 
-  renderTable();
-  renderSchedule();
+renderTable();
+renderSchedule();
 
-  console.log("✅ Spiel beendet");
+console.log("✅ Spiel beendet");
+
+emit(EVENTS.MATCH_FINISHED, {
+score: live.score
+});
 }
 
 // =========================
-// 📊 RESULT (TABLE FIX)
+// 📊 RESULT
 // =========================
 function applyMatchResult(match){
 
-  if(match._processed) return;
+if(!match || match._processed) return;
 
-  const home = getTeamFromTable(getTeamName(match.home));
-  const away = getTeamFromTable(getTeamName(match.away));
+const home = getTeamFromTable(getTeamName(match.home));
+const away = getTeamFromTable(getTeamName(match.away));
 
-  if(!home || !away){
-    console.error("❌ Team nicht gefunden:", match);
-    return;
-  }
+if(!home || !away){
+console.error("❌ Team nicht gefunden:", match);
+return;
+}
 
-  const h = match.result.home;
-  const a = match.result.away;
+const h = match.result?.home ?? 0;
+const a = match.result?.away ?? 0;
 
-  home.played++;
-  away.played++;
+home.played++;
+away.played++;
 
-  home.goalsFor += h;
-  home.goalsAgainst += a;
+home.goalsFor += h;
+home.goalsAgainst += a;
 
-  away.goalsFor += a;
-  away.goalsAgainst += h;
+away.goalsFor += a;
+away.goalsAgainst += h;
 
-  if(h > a){
-    home.points += 3;
-  }
-  else if(a > h){
-    away.points += 3;
-  }
-  else{
-    home.points += 1;
-    away.points += 1;
-  }
+if(h > a){
+home.points += 3;
+}
+else if(a > h){
+away.points += 3;
+}
+else{
+home.points += 1;
+away.points += 1;
+}
 
-  match._processed = true;
+match._processed = true;
 }
 
 // =========================
 // 📦 EXPORTS
 // =========================
 export {
-  startMatch,
-  handleMainAction
+startMatch,
+handleMainAction
 };
