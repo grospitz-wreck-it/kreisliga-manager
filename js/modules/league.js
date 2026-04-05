@@ -24,6 +24,74 @@ function ensureTeamPlayers(team){
 }
 
 // =========================
+// 🏗️ INIT LEAGUE
+// =========================
+function initLeague(league){
+
+  if(!league){
+    console.error("❌ Keine Liga übergeben");
+    return;
+  }
+
+  if(!Array.isArray(league.teams) || league.teams.length === 0){
+    console.error("❌ Liga hat keine Teams", league);
+    return;
+  }
+
+  // =========================
+  // 📊 TABELLE
+  // =========================
+  league.table = league.teams.map(team => ({
+    name: team.name,
+    played: 0,
+    points: 0,
+    goalsFor: 0,
+    goalsAgainst: 0,
+    strength: team.strength || 50
+  }));
+
+  console.log("📊 Tabelle erstellt");
+
+  // =========================
+  // 📅 SPIELPLAN
+  // =========================
+  if(!league.schedule || league.schedule.length === 0){
+
+    const teams = league.teams.map(t => t.name);
+    const schedule = [];
+
+    for(let i = 0; i < teams.length - 1; i++){
+
+      const round = [];
+
+      for(let j = 0; j < teams.length / 2; j++){
+
+        const home = teams[j];
+        const away = teams[teams.length - 1 - j];
+
+        round.push({ home, away });
+      }
+
+      schedule.push(round);
+
+      // Rotation (Round Robin)
+      teams.splice(1, 0, teams.pop());
+    }
+
+    league.schedule = schedule;
+
+    console.log("📅 Spielplan generiert:", schedule.length, "Spieltage");
+  }
+
+  // =========================
+  // 🔄 RESET
+  // =========================
+  league.currentRound = 0;
+
+  console.log("✅ Liga initialisiert:", league.name);
+}
+
+// =========================
 // 🏆 INIT LEAGUE SELECT
 // =========================
 function initLeagueSelect(){
@@ -55,6 +123,9 @@ function initLeagueSelect(){
       const index = Number(e.target.value);
       game.league.current = game.data.leagues[index];
 
+      // 👉 NEU: INIT
+      initLeague(game.league.current);
+
       // sync
       selects.forEach(s => {
         if(s !== select) s.value = index;
@@ -64,9 +135,12 @@ function initLeagueSelect(){
     };
   });
 
-  // 👉 Default
+  // 👉 Default Liga
   game.league = game.league || {};
   game.league.current = game.data.leagues[0];
+
+  // 👉 NEU: INIT
+  initLeague(game.league.current);
 
   populateTeamSelect();
 }
@@ -108,14 +182,14 @@ function populateTeamSelect() {
       const teamName = e.target.value;
       selectTeam(teamName);
 
-      // sync beide selects
+      // sync
       selects.forEach(s => {
         if(s !== select) s.value = teamName;
       });
     };
   });
 
-  // 👉 Default Team setzen
+  // 👉 Default Team
   const firstTeam = league.teams[0];
 
   game.team = game.team || {};
@@ -175,5 +249,6 @@ export {
   initLeagueSelect,
   populateTeamSelect,
   selectTeam,
-  getSelectedTeam
+  getSelectedTeam,
+  initLeague
 };
