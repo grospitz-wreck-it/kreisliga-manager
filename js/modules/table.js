@@ -1,6 +1,5 @@
-
 // =========================
-// 📊 TABLE SYSTEM (FINAL FIX)
+// 📊 TABLE SYSTEM (FINAL STABLE)
 // =========================
 import { game } from "../core/state.js";
 
@@ -11,7 +10,7 @@ function getTeamName(team){
   return typeof team === "string" ? team : team?.name;
 }
 
-// 👉 sorgt für stabile Tabellenwerte
+// 👉 stabile Tabellenwerte
 function normalizeTeam(team){
   const name = getTeamName(team);
 
@@ -25,28 +24,35 @@ function normalizeTeam(team){
 }
 
 // =========================
-// 🧱 INIT TABLE (NEU)
+// 🧱 INIT TABLE
 // =========================
 function initTable(){
 
-  const teams = game.league?.current?.teams;
-  if(!teams) return;
+  const league = game.league?.current;
+  const teams = league?.teams;
 
-  game.league.table = teams.map(t => normalizeTeam(t));
+  if(!league || !teams) return;
+
+  league.table = teams.map(t => normalizeTeam(t));
 
   console.log("📊 Tabelle initialisiert");
 }
 
 // =========================
-// 📊 SORTIERUNG
+// 📊 SORTIERUNG (OHNE MUTATION)
 // =========================
 function sortTable(table){
-  return table.sort((a, b) => {
 
+  if(!Array.isArray(table)) return [];
+
+  return [...table].sort((a, b) => {
+
+    // Punkte
     if(b.points !== a.points){
       return b.points - a.points;
     }
 
+    // Tordifferenz
     const diffA = a.goalsFor - a.goalsAgainst;
     const diffB = b.goalsFor - b.goalsAgainst;
 
@@ -54,21 +60,30 @@ function sortTable(table){
       return diffB - diffA;
     }
 
-    return b.goalsFor - a.goalsFor;
+    // Tore
+    if(b.goalsFor !== a.goalsFor){
+      return b.goalsFor - a.goalsFor;
+    }
+
+    return 0;
   });
 }
 
 // =========================
-// 📈 LIVE TABLE (ROBUST)
+// 📈 LIVE TABLE
 // =========================
 function getLiveTable(){
 
-  if(!game.league.table || game.league.table.length === 0){
+  const league = game.league?.current;
+
+  if(!league?.table || league.table.length === 0){
     initTable();
   }
 
-  // 👉 WICHTIG: tiefe Kopie!
-  const table = game.league.table.map(t => ({ ...t }));
+  if(!league?.table) return [];
+
+  // 👉 tiefe Kopie
+  const table = league.table.map(t => ({ ...t }));
 
   const match = game.match.current;
   if(!match) return table;
@@ -91,7 +106,7 @@ function getLiveTable(){
   away.goalsFor += a;
   away.goalsAgainst += h;
 
-  // Punkte
+  // Punkte (live)
   if(h > a){
     home.points += 3;
   }
@@ -111,13 +126,19 @@ function getLiveTable(){
 // =========================
 function renderTable(customTable){
 
-  if(!game.league.table || game.league.table.length === 0){
+  const league = game.league?.current;
+
+  if(!league){
+    console.warn("⚠️ Keine Liga aktiv");
+    return;
+  }
+
+  if(!league.table || league.table.length === 0){
     initTable();
   }
 
-  const tableData = customTable || game.league.table;
-
-  const sorted = sortTable([...tableData]);
+  const baseTable = customTable || league.table;
+  const sorted = sortTable(baseTable);
 
   const tbody = document.getElementById("tableBody");
   if(!tbody) return;
