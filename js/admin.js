@@ -11,6 +11,55 @@ let editEventId = null;
 let chartInstance = null;
 
 // =====================
+// 🔥 NEW: Clipboard Copy
+// =====================
+function copyToClipboard(text, el){
+  navigator.clipboard.writeText(text);
+
+  const old = el.innerText;
+  el.innerText = "✅ kopiert";
+  setTimeout(()=> el.innerText = old, 1000);
+}
+
+// =====================
+// 🔥 NEW: Fullscreen Media Viewer
+// =====================
+function toggleMedia(src, type){
+
+let overlay = document.getElementById("mediaOverlay");
+
+if(overlay){
+  overlay.remove();
+  return;
+}
+
+overlay = document.createElement("div");
+overlay.id = "mediaOverlay";
+
+overlay.style = `
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.9);
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+cursor:pointer;
+`;
+
+overlay.innerHTML = type==="video"
+? `<video src="${src}" controls autoplay style="max-width:90%;max-height:90%"></video>`
+: `<img src="${src}" style="max-width:90%;max-height:90%">`;
+
+overlay.onclick = ()=> overlay.remove();
+
+document.body.appendChild(overlay);
+}
+
+// =====================
 function updateButton(){
   const btn = document.getElementById("saveBtn");
   if(btn) btn.innerText = editId ? "✏️ Aktualisieren" : "💾 Speichern";
@@ -253,11 +302,11 @@ div.className="adRow";
 
 div.innerHTML=`
 <div class="adLeft">
-<img src="${c.image||""}">
+<img src="${c.image||""}" class="asset" data-src="${c.image}" data-type="image">
 <div>
 <strong>${c.customer||"-"}</strong><br>
 ${c.name||""}<br>
-🆔 ${c.id}<br>
+<span class="copyId" data-id="${c.id}">🆔 ${c.id}</span><br>
 📦 ${c.ad_format||"banner"}<br>
 📊 ${s.impressions} / ${s.clicks}<br>
 💰 ${revenue.toFixed(2)} €
@@ -274,8 +323,6 @@ container.appendChild(div);
 });
 }
 
-// =====================
-// EVENTS
 // =====================
 async function createEvent(){
 
@@ -344,15 +391,15 @@ div.className="eventRow";
 div.innerHTML=`
 <div>
 <strong>${e.title}</strong><br>
-🆔 ${e.id}<br>
+<span class="copyId" data-id="${e.id}">🆔 ${e.id}</span><br>
 🎯 ${e.type}<br>
 ⚡ ${e.probability} | ⏱ ${e.cooldown}s
 </div>
 
 <div>
 ${e.media_type==="video"
-? `<video class="eventMedia" src="${e.media_url}" muted></video>`
-: `<img class="eventMedia" src="${e.media_url}">`}
+? `<video class="eventMedia asset" src="${e.media_url}" data-src="${e.media_url}" data-type="video" muted></video>`
+: `<img class="eventMedia asset" src="${e.media_url}" data-src="${e.media_url}" data-type="image">`}
 </div>
 
 <div>
@@ -368,6 +415,17 @@ container.appendChild(div);
 // =====================
 document.addEventListener("click", async (e)=>{
 
+// COPY ID
+if(e.target.matches(".copyId")){
+copyToClipboard(e.target.dataset.id, e.target);
+}
+
+// MEDIA VIEW
+if(e.target.matches(".asset")){
+toggleMedia(e.target.dataset.src, e.target.dataset.type);
+}
+
+// EXISTING LOGIC (unchanged)
 if(e.target.matches("[data-edit]")){
 const c=currentCampaigns.find(x=>x.id===e.target.dataset.edit);
 if(!c) return;
