@@ -106,3 +106,22 @@ export {
 game,
 resetGame
 };
+game.data.events = [];
+game.data.campaigns = [];
+
+game.events.active = [];
+game.events.cooldowns = {};
+game.events.triggeredCount = 0;
+
+game.ads.active = [];
+game.ads.impressions = {};
+game.ads.clicks = {};
+game.ads.last = null;
+
+game.analytics = {
+  eventsTriggered: 0,
+  adsSeen: 0,
+  clicks: 0,
+  sessionStart: Date.now(),
+  playtime: 0
+};
