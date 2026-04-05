@@ -8,6 +8,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // =====================
 let currentCampaigns = [];
 let editId = null;
+let chartInstance = null;
+
+let currentEvents = [];
 let editEventId = null;
 
 // =====================
@@ -17,41 +20,18 @@ function uuid(){
   return crypto.randomUUID();
 }
 
+function copyToClipboard(text){
+  navigator.clipboard.writeText(text);
+}
+
+function toggleFullscreen(el){
+  el.closest(".asset").classList.toggle("fullscreen");
+}
+
 function updateButton(){
   const btn = document.getElementById("saveBtn");
   if(!btn) return;
   btn.innerText = editId ? "✏️ Aktualisieren" : "💾 Speichern";
-}
-
-// =====================
-// ASSET UI
-// =====================
-function createAssetElement(url, id, type="image"){
-
-  const wrap = document.createElement("div");
-  wrap.className = "asset";
-
-  const media = document.createElement(type === "video" ? "video" : "img");
-  media.src = url;
-  if(type === "video") media.controls = true;
-
-  media.onclick = ()=> wrap.classList.toggle("fullscreen");
-
-  const idBtn = document.createElement("button");
-  idBtn.className = "assetIdBtn";
-  idBtn.innerText = "ID";
-
-  idBtn.onclick = (e)=>{
-    e.stopPropagation();
-    navigator.clipboard.writeText(id);
-    idBtn.innerText = "✓";
-    setTimeout(()=> idBtn.innerText = "ID", 1000);
-  };
-
-  wrap.appendChild(media);
-  wrap.appendChild(idBtn);
-
-  return wrap;
 }
 
 // =====================
@@ -66,29 +46,36 @@ const customer = document.getElementById("customer").value;
 const budget = Number(document.getElementById("budget").value || 0);
 const link = document.getElementById("link").value;
 
+const startRaw = document.getElementById("startDate").value;
+const endRaw = document.getElementById("endDate").value;
+
+const start = startRaw ? new Date(startRaw).toISOString() : null;
+const end = endRaw ? new Date(endRaw).toISOString() : null;
+
 const format = document.getElementById("adFormat").value;
 const cpm = Number(document.getElementById("cpm").value || 0);
 const cpc = Number(document.getElementById("cpc").value || 0);
 
-const file = document.getElementById("image").files[0];
+const files = document.getElementById("image").files;
 
-let imageUrl = null;
-let assetId = null;
+let assets = [];
 
-if(file){
+// =====================
+// MULTI ASSET UPLOAD
+// =====================
+for(const file of files){
 
-  assetId = uuid();
-  const fileName = assetId + "_" + file.name;
+  const id = uuid();
+  const fileName = `${id}_${file.name}`;
 
-  const { error } = await supabase
+  const { error: uploadError } = await supabase
     .storage
     .from("ads")
     .upload(fileName, file);
 
-  if(error){
-    console.error(error);
-    alert("❌ Upload Fehler");
-    return;
+  if(uploadError){
+    console.error(uploadError);
+    continue;
   }
 
   const { data } = supabase
@@ -96,9 +83,16 @@ if(file){
     .from("ads")
     .getPublicUrl(fileName);
 
-  imageUrl = data.publicUrl;
+  assets.push({
+    id,
+    url: data.publicUrl,
+    type: file.type.includes("video") ? "video" : "image"
+  });
 }
 
+// =====================
+// UPDATE
+// =====================
 if(editId){
 
   const updateData = {
@@ -108,38 +102,52 @@ if(editId){
     link,
     cpm,
     cpc,
-    ad_format: format
+    ad_format: format,
+    start_date: start,
+    end_date: end
   };
 
-  if(imageUrl){
-    updateData.image = imageUrl;
-    updateData.asset_id = assetId;
+  if(assets.length){
+    updateData.assets = assets;
   }
 
-  await supabase
+  const { error } = await supabase
     .from("campaigns")
     .update(updateData)
     .eq("id", editId);
+
+  if(error){
+    console.error(error);
+    alert("❌ Update Fehler");
+    return;
+  }
 
   editId = null;
   alert("✏️ Kampagne aktualisiert");
 
 } else {
 
-  await supabase
+  const { error } = await supabase
     .from("campaigns")
     .insert({
       name,
       customer,
       budget,
       link,
-      image: imageUrl,
-      asset_id: assetId,
       cpm,
       cpc,
       ad_format: format,
+      start_date: start,
+      end_date: end,
+      assets,
       active: true
     });
+
+  if(error){
+    console.error(error);
+    alert("❌ Create Fehler");
+    return;
+  }
 
   alert("✅ Kampagne erstellt");
 }
@@ -149,7 +157,7 @@ updateButton();
 loadCampaigns();
 
 }catch(e){
-  console.error("❌ Campaign Error:", e);
+  console.error("❌ Fatal:", e);
 }
 
 }
@@ -159,298 +167,318 @@ loadCampaigns();
 // =====================
 async function loadCampaigns(){
 
-const { data } = await supabase
+const { data, error } = await supabase
 .from("campaigns")
 .select("*")
 .order("created_at", { ascending: false });
 
-renderCampaigns(data || []);
+if(error){
+console.error(error);
+return;
+}
+
+render(data || []);
+}
+
+// =====================
+// LOAD STATS
+// =====================
+async function loadStats(){
+
+const { data } = await supabase
+.from("ad_events")
+.select("*");
+
+const stats = {};
+const events = data || [];
+
+events.forEach(e => {
+
+if(!stats[e.campaign_id]){
+  stats[e.campaign_id] = { impressions:0, clicks:0 };
+}
+
+if(e.type === "impression") stats[e.campaign_id].impressions++;
+if(e.type === "click") stats[e.campaign_id].clicks++;
+
+});
+
+return { stats, events };
+}
+
+// =====================
+// KPI
+// =====================
+function updateKPIs(campaigns, stats){
+
+let totalImpr = 0;
+let totalClicks = 0;
+let totalRevenue = 0;
+
+campaigns.forEach(c => {
+
+const s = stats[c.id] || { impressions:0, clicks:0 };
+
+totalImpr += s.impressions;
+totalClicks += s.clicks;
+
+const revenue =
+  (s.impressions / 1000) * (c.cpm || 0) +
+  (s.clicks * (c.cpc || 0));
+
+totalRevenue += revenue;
+
+});
+
+document.getElementById("kpiImpressions").innerText = totalImpr;
+document.getElementById("kpiClicks").innerText = totalClicks;
+document.getElementById("kpiRevenue").innerText = totalRevenue.toFixed(2) + "€";
+}
+
+// =====================
+// FORECAST
+// =====================
+function updateForecast(campaigns, stats){
+
+let totalRevenue = 0;
+let byFormat = {};
+
+campaigns.forEach(c => {
+
+  const s = stats[c.id] || { impressions:0, clicks:0 };
+
+  const revenue =
+    (s.impressions / 1000) * (c.cpm || 0) +
+    (s.clicks * (c.cpc || 0));
+
+  totalRevenue += revenue;
+
+  const format = c.ad_format || "other";
+
+  if(!byFormat[format]) byFormat[format] = 0;
+  byFormat[format] += revenue;
+
+});
+
+const daily = totalRevenue / 30;
+
+document.getElementById("forecastMonth").innerText =
+  (daily * 30).toFixed(2) + "€";
+
+document.getElementById("forecastYear").innerText =
+  (daily * 365).toFixed(2) + "€";
+}
+
+// =====================
+// CHART
+// =====================
+function buildRevenueChart(events, campaigns){
+
+const ctx = document.getElementById("revenueChart");
+if(!ctx) return;
+
+const daysMap = {};
+
+events.forEach(e => {
+
+  const date = new Date(e.created_at).toISOString().split("T")[0];
+
+  if(!daysMap[date]) daysMap[date] = 0;
+
+  const campaign = campaigns.find(c => c.id === e.campaign_id);
+  if(!campaign) return;
+
+  if(e.type === "impression"){
+    daysMap[date] += (campaign.cpm || 0) / 1000;
+  }
+
+  if(e.type === "click"){
+    daysMap[date] += (campaign.cpc || 0);
+  }
+
+});
+
+const labels = Object.keys(daysMap).slice(-14);
+const values = labels.map(d => daysMap[d]);
+
+if(chartInstance){
+  chartInstance.destroy();
+}
+
+chartInstance = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels,
+    datasets: [{
+      label: "Revenue €",
+      data: values,
+      tension: 0.3
+    }]
+  }
+});
 }
 
 // =====================
 // RENDER CAMPAIGNS
 // =====================
-function renderCampaigns(campaigns){
+async function render(campaigns){
 
 currentCampaigns = campaigns;
+
+const { stats, events } = await loadStats();
+
+updateKPIs(campaigns, stats);
+updateForecast(campaigns, stats);
+
+if(events && events.length){
+  buildRevenueChart(events, campaigns);
+}
 
 const container = document.getElementById("list");
 container.innerHTML = "";
 
 campaigns.forEach(c => {
 
-const row = document.createElement("div");
-row.className = "row";
+const assets = c.assets || [];
 
-const left = document.createElement("div");
-left.className = "col left";
+const assetHTML = assets.map(a=>`
+<div class="asset">
+  ${a.type==="video"
+    ? `<video src="${a.url}" onclick="toggleFullscreen(this)" muted></video>`
+    : `<img src="${a.url}" onclick="toggleFullscreen(this)">`
+  }
+  <button class="assetIdBtn" onclick="copyToClipboard('${a.id}')">ID</button>
+</div>
+`).join("");
 
-left.innerHTML = `
-  <strong>${c.customer || "-"}</strong><br>
-  ${c.name || ""}<br>
-  📦 ${c.ad_format || "banner"}<br>
-  💰 ${c.budget || 0}€
+const div = document.createElement("div");
+div.className = "adRow";
+
+div.innerHTML = `
+<div class="adLeft">
+  <div class="assetRow">${assetHTML}</div>
+  <div>
+    <strong>${c.customer}</strong><br>
+    ${c.name}<br>
+    📦 ${c.ad_format}
+  </div>
+</div>
+
+<div>
+  <button onclick="editCampaign('${c.id}')">✏️</button>
+  <button class="danger" onclick="deleteCampaign('${c.id}')">🗑️</button>
+</div>
 `;
 
-const center = document.createElement("div");
-center.className = "col center";
-
-if(c.image){
-  const id = c.asset_id || c.image.split("/").pop();
-  center.appendChild(createAssetElement(c.image, id));
-}
-
-const right = document.createElement("div");
-right.className = "col right";
-
-const editBtn = document.createElement("button");
-editBtn.innerText = "✏️";
-editBtn.onclick = ()=>{
-  editId = c.id;
-  document.getElementById("name").value = c.name;
-  document.getElementById("customer").value = c.customer;
-};
-
-const delBtn = document.createElement("button");
-delBtn.innerText = "🗑️";
-delBtn.onclick = async ()=>{
-  await supabase.from("campaigns").delete().eq("id", c.id);
-  loadCampaigns();
-};
-
-right.appendChild(editBtn);
-right.appendChild(delBtn);
-
-row.appendChild(left);
-row.appendChild(center);
-row.appendChild(right);
-
-container.appendChild(row);
+container.appendChild(div);
 
 });
 }
 
 // =====================
-// CREATE / UPDATE EVENT
+// EVENTS
 // =====================
 async function createEvent(){
 
-try{
-
 const title = document.getElementById("eventTitle").value;
 const description = document.getElementById("eventDescription").value;
-const type = document.getElementById("eventType").value;
-const probability = Number(document.getElementById("eventProbability").value || 0.5);
-const cooldown = Number(document.getElementById("eventCooldown").value || 60);
-const sponsor = document.getElementById("eventSponsor").value || null;
-
-const keywords = document.getElementById("eventKeywords").value
-  .split(",")
-  .map(k => k.trim())
-  .filter(Boolean);
 
 const files = document.getElementById("eventMedia").files;
 
-let newAssets = [];
+let assets = [];
 
-if(files && files.length){
+for(const file of files){
 
-  for(const file of files){
+  const id = uuid();
+  const fileName = `${id}_${file.name}`;
 
-    const id = uuid();
-    const fileName = id + "_" + file.name;
+  await supabase.storage.from("events").upload(fileName, file);
 
-    const { error } = await supabase
-      .storage
-      .from("events")
-      .upload(fileName, file);
+  const { data } = supabase.storage.from("events").getPublicUrl(fileName);
 
-    if(error){
-      console.error(error);
-      alert("❌ Upload Fehler");
-      return;
-    }
-
-    const { data } = supabase
-      .storage
-      .from("events")
-      .getPublicUrl(fileName);
-
-    newAssets.push({
-      id,
-      url: data.publicUrl,
-      type: file.type.includes("video") ? "video" : "image"
-    });
-  }
+  assets.push({
+    id,
+    url: data.publicUrl,
+    type: file.type.includes("video") ? "video" : "image"
+  });
 }
 
-if(editEventId){
+await supabase.from("events").insert({
+  title,
+  description,
+  assets
+});
 
-  const { data: existing } = await supabase
-    .from("events")
-    .select("assets")
-    .eq("id", editEventId)
-    .single();
-
-  const mergedAssets = newAssets.length
-    ? [...(existing.assets || []), ...newAssets]
-    : existing.assets;
-
-  await supabase
-    .from("events")
-    .update({
-      title,
-      description,
-      type,
-      probability,
-      cooldown,
-      sponsor_campaign_id: sponsor,
-      keywords,
-      assets: mergedAssets
-    })
-    .eq("id", editEventId);
-
-  editEventId = null;
-  alert("✏️ Event aktualisiert");
-
-}else{
-
-  await supabase
-    .from("events")
-    .insert({
-      title,
-      description,
-      type,
-      probability,
-      cooldown,
-      sponsor_campaign_id: sponsor,
-      keywords,
-      assets: newAssets,
-      active: true
-    });
-
-  alert("✅ Event erstellt");
-}
-
-clearEventForm();
 loadEvents();
-
-}catch(e){
-  console.error("❌ Event Error:", e);
 }
 
-}
-
-// =====================
-// LOAD EVENTS
-// =====================
 async function loadEvents(){
 
-const { data } = await supabase
-.from("events")
-.select("*")
-.order("created_at", { ascending:false });
+const { data } = await supabase.from("events").select("*");
 
 const container = document.getElementById("eventList");
 container.innerHTML = "";
 
 (data || []).forEach(e => {
 
-const row = document.createElement("div");
-row.className = "row";
+const assets = e.assets || [];
 
-const left = document.createElement("div");
-left.className = "col left";
+const assetHTML = assets.map(a=>`
+<div class="asset">
+  <img src="${a.url}" onclick="toggleFullscreen(this)">
+  <button class="assetIdBtn" onclick="copyToClipboard('${a.id}')">ID</button>
+</div>
+`).join("");
 
-left.innerHTML = `
-  <strong>${e.title}</strong><br>
-  🎯 ${e.type}<br>
-  ⚡ ${e.probability}<br>
-  ⏱ ${e.cooldown}s
+const div = document.createElement("div");
+div.className = "eventRow";
+
+div.innerHTML = `
+<div>
+  <strong>${e.title}</strong>
+</div>
+
+<div class="assetRow">${assetHTML}</div>
+
+<div>
+  <button onclick="deleteEvent('${e.id}')">🗑️</button>
+</div>
 `;
 
-const center = document.createElement("div");
-center.className = "col center";
+container.appendChild(div);
 
-const assets = Array.isArray(e.assets) ? e.assets : [];
-
-assets.forEach(a=>{
-  center.appendChild(createAssetElement(a.url, a.id, a.type));
 });
+}
 
-const right = document.createElement("div");
-right.className = "col right";
-
-const editBtn = document.createElement("button");
-editBtn.innerText = "✏️";
-editBtn.onclick = ()=>{
-  editEventId = e.id;
-  document.getElementById("eventTitle").value = e.title;
-  document.getElementById("eventDescription").value = e.description;
+window.deleteEvent = async function(id){
+await supabase.from("events").delete().eq("id", id);
+loadEvents();
 };
 
-const delBtn = document.createElement("button");
-delBtn.innerText = "🗑️";
-delBtn.onclick = async ()=>{
-  await supabase.from("events").delete().eq("id", e.id);
-  loadEvents();
-};
-
-right.appendChild(editBtn);
-right.appendChild(delBtn);
-
-row.appendChild(left);
-row.appendChild(center);
-row.appendChild(right);
-
-container.appendChild(row);
-
-});
-}
-
 // =====================
-// RESET
+// INIT (OHNE window)
 // =====================
-function clearForm(){
-["name","customer","budget","link","cpm","cpc"]
-.forEach(id=>{
-  const el=document.getElementById(id);
-  if(el) el.value="";
-});
-document.getElementById("image").value="";
-}
-
-function clearEventForm(){
-[
-  "eventTitle","eventDescription","eventKeywords",
-  "eventProbability","eventCooldown","eventSponsor"
-].forEach(id=>{
-  const el=document.getElementById(id);
-  if(el) el.value="";
-});
-document.getElementById("eventMedia").value="";
-}
-
-// =====================
-// INIT
-// =====================
-document.addEventListener("DOMContentLoaded", () => {
-
 document.getElementById("saveBtn").addEventListener("click", createCampaign);
 document.getElementById("createEventBtn").addEventListener("click", createEvent);
 
-document.getElementById("tabAds").addEventListener("click", ()=>{
+document.getElementById("tabAds").onclick = () => switchTab("ads");
+document.getElementById("tabEvents").onclick = () => switchTab("events");
+
+function switchTab(tab){
+
+document.querySelectorAll(".tabContent").forEach(t => t.classList.remove("active"));
+document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+
+if(tab === "ads"){
   document.getElementById("adsTab").classList.add("active");
-  document.getElementById("eventsTab").classList.remove("active");
-});
+  document.getElementById("tabAds").classList.add("active");
+}
 
-document.getElementById("tabEvents").addEventListener("click", ()=>{
+if(tab === "events"){
   document.getElementById("eventsTab").classList.add("active");
-  document.getElementById("adsTab").classList.remove("active");
+  document.getElementById("tabEvents").classList.add("active");
   loadEvents();
-});
+}
+}
 
-updateButton();
 loadCampaigns();
-
-});
