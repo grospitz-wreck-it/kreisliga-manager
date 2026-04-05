@@ -4,8 +4,9 @@
 import { renderSchedule, updateUI, renderLiveFeed } from "../ui/ui.js";
 import { renderTable, renderLiveTable } from "../modules/table.js";
 import { game } from "../core/state.js";
-import { emit } from "./events.js";
-import { EVENTS } from "./events.constants.js";
+
+import { emit } from "../events.js";
+import { EVENTS } from "../events.constants.js";
 
 import {
   initMatch,
@@ -29,7 +30,13 @@ function startMatch(){
 
   console.log("🚀 Spiel wird gestartet...");
 
-  if(game.match?.live?.running){
+  // 🛑 Guard: match state
+  if(!game.match?.live){
+    console.error("❌ Match State nicht initialisiert");
+    return;
+  }
+
+  if(game.match.live.running){
     console.warn("⚠️ Match läuft bereits");
     return;
   }
@@ -57,33 +64,48 @@ function startMatch(){
   const round = schedule[roundIndex];
 
   if(!round?.length){
-    console.error("❌ Spieltag ungültig:", roundIndex);
+    console.error("❌ Spieltag ungültig:", roundIndex, round);
     return;
   }
 
   if(!league.table || league.table.length === 0){
-    console.error("❌ Tabelle fehlt");
+    console.error("❌ Tabelle fehlt", league);
     return;
   }
 
-  // 👉 andere Matches simulieren
+  console.log("📅 Starte Spieltag:", roundIndex);
+
+  // =========================
+  // 🤖 ANDERE MATCHES
+  // =========================
   simulateOtherMatches(round);
 
-  // 👉 eigenes Match initialisieren
+  // =========================
+  // ⚽ PLAYER MATCH
+  // =========================
   const success = initMatch(round);
 
   if(!success){
-    console.error("❌ Konnte Match nicht initialisieren");
+    console.error("❌ Konnte Match nicht initialisieren", round);
     return;
   }
 
+  // =========================
+  // ▶️ STATE UPDATE
+  // =========================
   game.phase = "live";
 
   emit(EVENTS.GAME_START);
 
+  // =========================
+  // 🖥 UI
+  // =========================
   renderSchedule();
   renderTable();
 
+  // =========================
+  // 🔁 MATCH LOOP
+  // =========================
   runMatchLoop({
     onTick: () => {
       updateUI();
@@ -91,6 +113,8 @@ function startMatch(){
       renderLiveTable();
     },
     onEnd: () => {
+      console.log("🏁 Match beendet → UI Update");
+
       renderTable();
       renderSchedule();
     }
