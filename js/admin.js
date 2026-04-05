@@ -456,22 +456,32 @@ loadEvents();
 };
 
 // =====================
-// INIT (OHNE window)
+// INIT (ROBUST FIX)
 // =====================
-document.getElementById("saveBtn").addEventListener("click", createCampaign);
-document.getElementById("createEventBtn").addEventListener("click", createEvent);
+document.addEventListener("DOMContentLoaded", () => {
 
-document.getElementById("tabAds").onclick = () => switchTab("ads");
-document.getElementById("tabEvents").onclick = () => switchTab("events");
+  // BUTTONS
+  document.getElementById("saveBtn")?.addEventListener("click", createCampaign);
+  document.getElementById("createEventBtn")?.addEventListener("click", createEvent);
+
+  // TABS
+  document.getElementById("tabAds")?.addEventListener("click", () => switchTab("ads"));
+  document.getElementById("tabEvents")?.addEventListener("click", () => switchTab("events"));
+  document.getElementById("tabInsights")?.addEventListener("click", () => switchTab("insights"));
+
+  // INITIAL STATE
+  switchTab("ads");
+  loadCampaigns();
+});
 
 function switchTab(tab){
 
-document.querySelectorAll(".tabContent").forEach(t => t.classList.remove("active"));
-document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+  const tabs = ["ads","events","insights"];
 
-function switchTab(tab){
+  tabs.forEach(t => {
+    document.getElementById(t + "Tab")?.classList.remove("active");
+  });
 
-  document.querySelectorAll(".tabContent").forEach(t => t.classList.remove("active"));
   document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
 
   if(tab === "ads"){
@@ -490,9 +500,7 @@ function switchTab(tab){
     document.getElementById("tabInsights").classList.add("active");
   }
 }
-}
 
-loadCampaigns();
 // =====================
 // EVENT BINDINGS FIX
 // =====================
