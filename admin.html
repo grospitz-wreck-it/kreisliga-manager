@@ -15,14 +15,14 @@
 
 <h1>📊 Ad Dashboard</h1>
 
-<!-- ✅ NEU: TABS -->
+<!-- ✅ TABS (onclick entfernt, IDs hinzugefügt) -->
 <div class="tabs">
-  <button onclick="switchTab('ads')" class="active">📢 Ads</button>
-  <button onclick="switchTab('events')">🎮 Events</button>
+  <button id="tabAds" class="active">📢 Ads</button>
+  <button id="tabEvents">🎮 Events</button>
 </div>
 
 <!-- ========================= -->
-<!-- ADS TAB (BESTEHEND) -->
+<!-- ADS TAB (UNVERÄNDERT) -->
 <!-- ========================= -->
 <div id="adsTab" class="tabContent active">
 
@@ -75,7 +75,8 @@
     <input id="link" placeholder="https://...">
     <input type="file" id="image">
 
-    <button id="saveBtn" onclick="createCampaign()">💾 Speichern</button>
+    <!-- onclick entfernt -->
+    <button id="saveBtn">💾 Speichern</button>
   </div>
 </div>
 
@@ -89,7 +90,7 @@
 <!-- END adsTab -->
 
 <!-- ========================= -->
-<!-- EVENTS TAB (NEU) -->
+<!-- EVENTS TAB -->
 <!-- ========================= -->
 <div id="eventsTab" class="tabContent">
 
@@ -113,7 +114,9 @@
 
     <input type="file" id="eventMedia">
 
-    <button id="createEventBtn">🎬 Event speichern</button></div>
+    <button id="createEventBtn">🎬 Event speichern</button>
+  </div>
+</div>
 
 <div class="box">
   <h2>📋 Events</h2>
