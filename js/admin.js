@@ -482,3 +482,26 @@ if(tab === "events"){
 }
 
 loadCampaigns();
+// =====================
+// EVENT BINDINGS FIX
+// =====================
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Campaign
+  const saveBtn = document.getElementById("saveBtn");
+  if(saveBtn) saveBtn.addEventListener("click", createCampaign);
+
+  // Event
+  const eventBtn = document.getElementById("createEventBtn");
+  if(eventBtn) eventBtn.addEventListener("click", createEvent);
+
+  // Tabs
+  const tabAds = document.getElementById("tabAds");
+  const tabEvents = document.getElementById("tabEvents");
+  const tabInsights = document.getElementById("tabInsights");
+
+  if(tabAds) tabAds.onclick = () => switchTab("ads");
+  if(tabEvents) tabEvents.onclick = () => switchTab("events");
+  if(tabInsights) tabInsights.onclick = () => switchTab("insights");
+
+});
