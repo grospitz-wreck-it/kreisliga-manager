@@ -43,7 +43,6 @@ for(let i = 1; i <= 16; i++){
 
   let t = normalized[`team${i}`];
 
-  // 👉 FIX: undefined behandeln
   if(typeof t !== "string"){
     t = "";
   }
@@ -55,7 +54,10 @@ for(let i = 1; i <= 16; i++){
       name: t
     });
   } else {
-    console.warn(`⚠️ Team${i} fehlt in Liga ${liga}`);
+    teams.push({
+      name: `SPIELFREI ${i}`,
+      isBye: true
+    });
   }
 }
 
