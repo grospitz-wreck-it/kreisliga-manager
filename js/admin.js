@@ -162,9 +162,14 @@ function renderCampaigns(list){
           ? `<video src="${a.url}" data-action="fullscreen" muted></video>`
           : `<img src="${a.url}" data-action="fullscreen">`
         }
-        <button class="assetIdBtn" data-action="copy" data-id="${a.id}">
-          ${a.id.slice(0,6)}
-        </button>
+        <button 
+  class="assetIdBtn" 
+  data-action="copy" 
+  data-id="${a.id}"
+  title="Copy ID"
+>
+  📋 ${a.id.slice(0,6)}
+</button>
       </div>
     `).join("");
 
