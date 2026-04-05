@@ -37,15 +37,25 @@ export async function loadLeaguesFromCSV(path){
     // =========================
     // 👕 TEAMS EINLESEN
     // =========================
-   const teams = [];
+const teams = [];
 
-for(let i = 1; i <= 20; i++){
-  const t = normalized[`team${i}`];
+for(let i = 1; i <= 16; i++){
 
-  if(t && t.trim() !== ""){
+  let t = normalized[`team${i}`];
+
+  // 👉 FIX: undefined behandeln
+  if(typeof t !== "string"){
+    t = "";
+  }
+
+  t = t.trim();
+
+  if(t !== ""){
     teams.push({
-      name: t.trim()
+      name: t
     });
+  } else {
+    console.warn(`⚠️ Team${i} fehlt in Liga ${liga}`);
   }
 }
 
