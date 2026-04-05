@@ -1,3 +1,6 @@
+/* =========================
+   BESTEHEND (UNVERÄNDERT)
+========================= */
 body{
   font-family:'Inter',system-ui;
   background:#0f172a;
@@ -23,7 +26,6 @@ h1{
   margin-bottom:20px;
 }
 
-/* KPI */
 .kpiGrid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -46,36 +48,19 @@ h1{
   font-size:28px;
 }
 
-/* Forecast */
 .forecastGrid{
   display:flex;
   gap:40px;
   margin-bottom:20px;
 }
 
-#revenueBreakdown{
-  margin-top:10px;
-}
-
-/* Bars */
-.bar{
-  margin-bottom:10px;
-}
-
-.barFill{
-  height:8px;
-  background:#22c55e;
-  border-radius:10px;
-}
-
-/* Form */
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
 }
 
-input,select,button{
+input,select,button,textarea{
   padding:12px;
   border-radius:10px;
   border:none;
@@ -88,7 +73,6 @@ button{
   cursor:pointer;
 }
 
-/* Kampagnen */
 .adRow{
   display:flex;
   justify-content:space-between;
@@ -109,18 +93,48 @@ button{
   height:50px;
   border-radius:8px;
 }
-canvas{
-  width:100%;
-  max-height:300px;
+
+/* =========================
+   NEU: TABS + EVENTS
+========================= */
+.tabs{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
 }
 
-.bar{
-  margin-bottom:10px;
+.tabs button{
+  flex:1;
+  padding:12px;
+  border-radius:12px;
+  background:#1e293b;
+  color:#fff;
 }
 
-.barFill{
-  height:8px;
+.tabs button.active{
   background:#22c55e;
-  border-radius:10px;
-  transition:0.4s;
+  color:#000;
+}
+
+.tabContent{
+  display:none;
+}
+
+.tabContent.active{
+  display:block;
+}
+
+.eventRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:10px;
+  padding:10px;
+  background:#0f172a;
+  border-radius:12px;
+}
+
+.eventMedia{
+  height:60px;
+  border-radius:8px;
 }
