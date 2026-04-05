@@ -37,22 +37,17 @@ export async function loadLeaguesFromCSV(path){
     // =========================
     // 👕 TEAMS EINLESEN
     // =========================
-    const teams = [];
+   const teams = [];
 
-    for(let i = 1; i <= 20; i++){
+for(let i = 1; i <= 20; i++){
+  const t = normalized[`team${i}`];
 
-      const raw = normalized[`team${i}`];
-      if(!raw) continue;
-
-      const name = raw.trim();
-
-      // 👉 leere CSV-Felder ignorieren
-      if(name === "") continue;
-
-      teams.push({
-        name
-      });
-    }
+  if(t && t.trim() !== ""){
+    teams.push({
+      name: t.trim()
+    });
+  }
+}
 
     // =========================
     // ⚠️ VALIDIERUNG
