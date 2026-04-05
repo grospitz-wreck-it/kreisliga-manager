@@ -307,8 +307,9 @@ function renderEvents(){
           ? `<video src="${a.url}" data-action="fullscreen" muted></video>`
           : `<img src="${a.url}" data-action="fullscreen">`
         }
-        <button class="assetIdBtn" data-action="copy" data-id="${a.id}" title="${a.id}">ID</button>
-      </div>
+<button class="assetIdBtn" data-action="copy" data-id="${a.id}" title="Click to copy">
+  ${a.id.slice(0,6)}
+</button>      </div>
     `).join("");
 
     el.innerHTML += `
