@@ -40,22 +40,26 @@ function createAssetElement(url, id, type="image"){
   el.src = url;
   if(type === "video") el.controls = true;
 
-  const badge = document.createElement("div");
+  const badge = document.createElement("button");
   badge.className = "assetId";
   badge.innerText = id;
 
-  wrapper.appendChild(el);
-  wrapper.appendChild(badge);
-
-  // CLICK → COPY ID
-  wrapper.addEventListener("click", (e)=>{
+  // 👉 COPY ONLY ON BUTTON
+  badge.addEventListener("click", (e)=>{
     e.stopPropagation();
+    navigator.clipboard.writeText(id);
 
-    copy(id);
+    badge.innerText = "✓ kopiert";
+    setTimeout(()=> badge.innerText = id, 1200);
+  });
 
-    // TOGGLE FULLSCREEN
+  // 👉 FULLSCREEN ONLY ON MEDIA
+  el.addEventListener("click", ()=>{
     wrapper.classList.toggle("fullscreen");
   });
+
+  wrapper.appendChild(el);
+  wrapper.appendChild(badge);
 
   return wrapper;
 }
