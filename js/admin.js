@@ -159,8 +159,8 @@ function renderCampaigns(list){
     const assetHTML = assets.map(a=>`
       <div class="asset">
         ${a.type==="video"
-          ? `<video src="${a.url}" onclick="toggleFullscreen(this)" muted></video>`
-          : `<img src="${a.url}" onclick="toggleFullscreen(this)">`
+          ? `<video src="${a.url}" data-action="fullscreen" muted></video>`
+          : `<img src="${a.url}" data-action="fullscreen">`
         }
         <button class="assetIdBtn" data-action="copy" data-id="${a.id}">
           ${a.id.slice(0,6)}
