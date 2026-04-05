@@ -469,15 +469,26 @@ function switchTab(tab){
 document.querySelectorAll(".tabContent").forEach(t => t.classList.remove("active"));
 document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
 
-if(tab === "ads"){
-  document.getElementById("adsTab").classList.add("active");
-  document.getElementById("tabAds").classList.add("active");
-}
+function switchTab(tab){
 
-if(tab === "events"){
-  document.getElementById("eventsTab").classList.add("active");
-  document.getElementById("tabEvents").classList.add("active");
-  loadEvents();
+  document.querySelectorAll(".tabContent").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+
+  if(tab === "ads"){
+    document.getElementById("adsTab").classList.add("active");
+    document.getElementById("tabAds").classList.add("active");
+  }
+
+  if(tab === "events"){
+    document.getElementById("eventsTab").classList.add("active");
+    document.getElementById("tabEvents").classList.add("active");
+    loadEvents();
+  }
+
+  if(tab === "insights"){
+    document.getElementById("insightsTab").classList.add("active");
+    document.getElementById("tabInsights").classList.add("active");
+  }
 }
 }
 
