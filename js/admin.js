@@ -26,6 +26,14 @@ function uuid(){
 
 function copy(text){
   navigator.clipboard.writeText(text);
+
+  // Mini Feedback
+  const el = document.createElement("div");
+  el.innerText = "Copied";
+  el.className = "copyToast";
+  document.body.appendChild(el);
+
+  setTimeout(()=> el.remove(), 800);
 }
 
 function toggleFullscreen(el){
