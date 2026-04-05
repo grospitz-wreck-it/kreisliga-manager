@@ -11,7 +11,7 @@ import {
   initMatch,
   runMatchLoop,
   simulateOtherMatches
-} from "./matchEngine.js";
+} from "../matchEngine.js";
 
 // =========================
 // ▶️ BUTTON
