@@ -138,3 +138,23 @@ button{
   height:60px;
   border-radius:8px;
 }
+.tabs button {
+  background: #eee;
+  border: none;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-right: 6px;
+  transition: 0.2s;
+}
+
+/* 👉 AKTIVER TAB */
+.tabs button.active {
+  background: #22c55e; /* schönes modernes Grün */
+  color: white;
+}
+
+/* optional: Hover */
+.tabs button:hover {
+  background: #d4d4d4;
+}
