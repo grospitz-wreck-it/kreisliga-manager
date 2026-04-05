@@ -382,7 +382,9 @@ document.addEventListener("click", (e)=>{
   if(a==="editInline") state.inlineEditId = e.target.dataset.id, loadCampaigns();
   if(a==="saveInline") saveInlineCampaign(e.target.dataset.id);
   if(a==="cancelInline") state.inlineEditId = null, loadCampaigns();
-
+  if(a==="fullscreen"){
+  e.target.closest(".asset").classList.toggle("fullscreen");
+}
   if(a==="editInlineEvent") state.inlineEventEditId = e.target.dataset.id, loadEvents();
   if(a==="saveInlineEvent") saveInlineEvent(e.target.dataset.id);
   if(a==="cancelInlineEvent") state.inlineEventEditId = null, loadEvents();
