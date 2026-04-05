@@ -19,7 +19,10 @@ return typeof team === "string" ? team : team?.name;
 
 function getTeamFromTable(name){
 const table = game.league?.table;
-
+if(!game.league?.table){
+  console.warn("⚠️ Tabelle nicht vorhanden – versuche zu rendern...");
+  renderTable();
+}
 if(!table || table.length === 0){
 console.error("❌ Tabelle fehlt → game.league.table ist:", game.league?.table);
 return null;
@@ -51,7 +54,7 @@ startMatch();
 function startMatch(){
 
 console.log("🚀 Spiel wird gestartet...");
-
+console.log("TABLE DEBUG:", game.league);
 if(game.match?.live?.running){
 console.warn("⚠️ Match läuft bereits");
 return;
