@@ -15,31 +15,27 @@
 
 <h1>📊 Ad Dashboard</h1>
 
-<!-- ✅ TABS (onclick entfernt, IDs hinzugefügt) -->
 <div class="tabs">
   <button id="tabAds" class="active">📢 Ads</button>
   <button id="tabEvents">🎮 Events</button>
 </div>
 
 <!-- ========================= -->
-<!-- ADS TAB (UNVERÄNDERT) -->
+<!-- ADS TAB -->
 <!-- ========================= -->
 <div id="adsTab" class="tabContent active">
 
-<!-- KPI -->
 <div class="kpiGrid">
   <div class="kpiCard"><span>Impressions</span><h2 id="kpiImpressions">0</h2></div>
   <div class="kpiCard"><span>Klicks</span><h2 id="kpiClicks">0</h2></div>
   <div class="kpiCard"><span>Revenue</span><h2 id="kpiRevenue">0€</h2></div>
 </div>
 
-<!-- CHART -->
 <div class="box">
   <h2>📈 Umsatzverlauf</h2>
   <canvas id="revenueChart"></canvas>
 </div>
 
-<!-- FORECAST -->
 <div class="box">
   <h2>📊 Forecast</h2>
 
@@ -51,7 +47,6 @@
   <div id="revenueBreakdown"></div>
 </div>
 
-<!-- FORM -->
 <div class="box">
   <h2>Neue Kampagne</h2>
 
@@ -59,6 +54,8 @@
     <input id="name" placeholder="Name">
     <input id="customer" placeholder="Kunde">
     <input id="budget" type="number" placeholder="Budget €">
+
+    <!-- ✅ FIX: falsches eventMedia entfernt -->
 
     <select id="adFormat">
       <option value="banner">Banner</option>
@@ -75,19 +72,16 @@
     <input id="link" placeholder="https://...">
     <input type="file" id="image">
 
-    <!-- onclick entfernt -->
     <button id="saveBtn">💾 Speichern</button>
   </div>
 </div>
 
-<!-- LIST -->
 <div class="box">
   <h2>Kampagnen</h2>
   <div id="list"></div>
 </div>
 
 </div>
-<!-- END adsTab -->
 
 <!-- ========================= -->
 <!-- EVENTS TAB -->
@@ -112,7 +106,8 @@
 
     <textarea id="eventDescription" placeholder="Beschreibung"></textarea>
 
-    <input type="file" id="eventMedia">
+    <!-- ✅ FIX: MULTI-ASSET aktiviert -->
+    <input type="file" id="eventMedia" multiple>
 
     <button id="createEventBtn">🎬 Event speichern</button>
   </div>
